@@ -260,5 +260,3 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 	}
 	return 0;
 }
-
-
