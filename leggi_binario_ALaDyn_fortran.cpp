@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
 	std::cin >> out_swap;
 	std::cout << "Vuoi un output completo? 1 si', 0 no: ";
 	std::cin >> out_file;
-	if (funzione == 1) leggi_campi(argv[2], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
-	else if (funzione == 2) leggi_particelle(argv[2], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
+	if (funzione == 1) leggi_campi(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
+	else if (funzione == 2) leggi_particelle(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
 	return 0;
 }
