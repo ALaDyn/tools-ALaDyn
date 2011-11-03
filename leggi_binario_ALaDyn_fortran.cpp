@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
 		return -1;
 	}
 
-	if (argc > 2 && argc != 7)
+	if (argc >= 2 && argc != 7)
 	{
 		std::cout << "Inserisci il WEIGHT: 0 per output vecchio, 1 per nuovo: ";
 		std::cin >> WEIGHT;
