@@ -1,6 +1,6 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
-
+#include "swap_tools.h"
 
 
 void swap_endian_s(short* in_s,int n)
@@ -56,3 +56,5 @@ void swap_endian_f(float* in_f, int n)
 		in_f[i]=x.fmio;
 	}
 }
+
+

@@ -1,6 +1,6 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
-
+#include "leggi_particelle.h"
 
 
 

@@ -11,9 +11,9 @@
 #define FALSE 0
 
 #include "leggi_binario_ALaDyn_fortran.h"
-//#include "leggi_campi.cpp"
-//#include "leggi_particelle.cpp"
-//#include "swap_tools.cpp"
+#include "leggi_campi.h"
+#include "leggi_particelle.h"
+#include "swap_tools.h"
 
 
 int main (int argc, char *argv[])
@@ -53,9 +53,19 @@ int main (int argc, char *argv[])
 		std::cout << "Request swap (1 si', 0 no): " << out_swap << std::endl;;
 		std::cout << "Complete output (1 si', 0 no): " << out_file << std::endl;
 	}
-
+	
+	
+	if ((WEIGHT != 0 && WEIGHT != 1) || (funzione != 1 && funzione != 2) ||
+		(FLAG_ENDIAN != 1 && FLAG_ENDIAN != 2) || (out_swap != 0 && out_swap != 1) ||
+		(out_file != 0 && out_file != 1))
+	{
+		std::cout << "Input sbagliato!" << std::endl;
+		return -2;
+	}
 
 	if (funzione == 1) leggi_campi(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
 	else if (funzione == 2) leggi_particelle(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
+	else {std::cout << "Input sbagliato" << std::endl; return -3;}
+
 	return 0;
 }
