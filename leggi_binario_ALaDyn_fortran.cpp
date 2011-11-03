@@ -23,9 +23,11 @@ int main (int argc, char *argv[])
 	if (argc == 1)
 	{
 		std::cout << "Usasi:  ./a.out  nomefiledaconvertire.bin  \n ";
-		std::cout << "Per scriptare inserire nell'ordine WEIGHT funzione FLAG_ENDIAN out_swap out_file" << std::endl;
+		std::cout << "Per scriptare inserire nell'ordine: WEIGHT funzione FLAG_ENDIAN out_swap out_file" << std::endl;
+		return -1;
 	}
-	if (argc != 7)
+
+	if (argc > 2 && argc != 7)
 	{
 		std::cout << "Inserisci il WEIGHT: 0 per output vecchio, 1 per nuovo: ";
 		std::cin >> WEIGHT;
@@ -40,12 +42,19 @@ int main (int argc, char *argv[])
 	}
 	else
 	{
-		WEIGHT = atoi(argv[2]);
-		funzione = atoi(argv[3]);
-		FLAG_ENDIAN = atoi(argv[4]);
-		out_swap = atoi(argv[5]);
-		out_file = atoi(argv[6]);
+		WEIGHT = std::atoi(argv[2]);
+		funzione = std::atoi(argv[3]);
+		FLAG_ENDIAN = std::atoi(argv[4]);
+		out_swap = std::atoi(argv[5]);
+		out_file = std::atoi(argv[6]);
+		std::cout << "WEIGHT (0 per output vecchio, 1 per nuovo): " << WEIGHT << std::endl;
+		std::cout << "Tipo file (1 campi, 2 particelle): " << funzione << std::endl;;
+		std::cout << "Local endianness (1 big, 2 little): " << FLAG_ENDIAN << std::endl;;
+		std::cout << "Request swap (1 si', 0 no): " << out_swap << std::endl;;
+		std::cout << "Complete output (1 si', 0 no): " << out_file << std::endl;
 	}
+
+
 	if (funzione == 1) leggi_campi(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
 	else if (funzione == 2) leggi_particelle(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
 	return 0;
