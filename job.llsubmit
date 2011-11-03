@@ -1,0 +1,16 @@
+#!/bin/bash
+# @ shell         = /bin/bash
+# @ executable    = converti_binario
+# @ job_name      = converti_binario_fortran
+# @ output        = job.out
+# @ error         = job.err
+# @ wall_clock_limit = 00:10:00
+# @ resources     = ConsumableMemory(8Gb)
+# @ job_type      = serial
+# @ total_tasks   = 1
+# @ account_no    = IscrA_PICBA
+# @ task_affinity = cpu(1)
+# @ queue
+
+date
+./converti_binario Prpout12.bin 1 2 1 0 1
