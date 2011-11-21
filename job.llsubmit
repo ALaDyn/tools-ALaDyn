@@ -7,8 +7,7 @@
 # @ wall_clock_limit = 00:10:00
 # @ resources     = ConsumableMemory(8Gb)
 # @ job_type      = serial
-# @ total_tasks   = 1
-# @ account_no    = IscrA_PICBA
+# @ account_no    = IscrA_PICPBA
 # @ task_affinity = cpu(1)
 # @ queue
 
