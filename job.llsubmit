@@ -1,6 +1,5 @@
 #!/bin/bash
 # @ shell         = /bin/bash
-# @ executable    = converti_binario
 # @ job_name      = converti_binario_fortran
 # @ output        = job.out
 # @ error         = job.err
