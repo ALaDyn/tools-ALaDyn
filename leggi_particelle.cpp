@@ -1,7 +1,8 @@
-
-#include "leggi_binario_ALaDyn_fortran.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include "leggi_particelle.h"
-
+#include "swap_tools.h"
 
 
 int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, int out_file)
@@ -19,7 +20,8 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 //	float num2phys;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
-	float rx, ry, rz,ux,uy,uz,gamma;
+	float rx, ry, rz,ux,uy,uz;
+	float gamma;
 //	double theta;
 
 	file_in=fopen(fileIN, "r");

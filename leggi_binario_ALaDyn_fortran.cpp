@@ -1,15 +1,4 @@
 
-#include<cstdio>
-#include<iostream>
-#include<cstdlib>
-#include<cmath>
-#include<cstring>
-
-#define MAX(x,y) ((x)>(y)?(x):(y))
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#define TRUE 1
-#define FALSE 0
-
 #include "leggi_binario_ALaDyn_fortran.h"
 #include "leggi_campi.h"
 #include "leggi_particelle.h"
@@ -63,7 +52,8 @@ int main (int argc, char *argv[])
 		return -2;
 	}
 
-	if (funzione == 1) leggi_campi(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
+//	if (funzione == 1) leggi_campi(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
+	if (funzione == 1) leggi_campi(argv[1], FLAG_ENDIAN, out_swap);
 	else if (funzione == 2) leggi_particelle(argv[1], WEIGHT, FLAG_ENDIAN, out_swap, out_file);
 	else {std::cout << "Input sbagliato" << std::endl; return -3;}
 

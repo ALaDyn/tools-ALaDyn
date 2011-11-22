@@ -1,6 +1,10 @@
 #ifndef __LEGGI_CAMPI
 #define __LEGGI_CAMPI
 
-int leggi_campi(char* , int , int , int , int );
+#pragma warning(disable : 593)
+
+//int leggi_campi(char* , int , int , int , int );
+int leggi_campi(char* , int , int );
 
 #endif
+

@@ -1,9 +1,10 @@
-
-#include "leggi_binario_ALaDyn_fortran.h"
+#include <cstdio>
+#include <cstdlib>
 #include "leggi_campi.h"
+#include "swap_tools.h"
 
-
-int leggi_campi(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, int out_file)
+//int leggi_campi(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, int out_file)
+int leggi_campi(char* fileIN, int FLAG_ENDIAN, int out_swap)
 {
 //	int N_particles, pID, ipx;
 	int i, ipy, ipz,  j, k,np_loc, N_param, *int_param,npoint_loc[3], loc_size, kk;
