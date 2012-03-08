@@ -9,6 +9,5 @@
 # @ account_no    = IscrA_PICPBA
 # @ task_affinity = cpu(1)
 # @ queue
-
 date
 ./converti_binario Prpout12.bin 1 2 1 0 1
