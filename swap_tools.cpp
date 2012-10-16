@@ -1,3 +1,5 @@
+#ifndef __SWAP_TOOLS_C
+#define __SWAP_TOOLS_C
 
 #include "swap_tools.h"
 
@@ -57,3 +59,4 @@ void swap_endian_f(float* in_f, int n)
 }
 
 
+#endif

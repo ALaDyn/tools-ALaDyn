@@ -1,8 +1,10 @@
+#ifndef __LEGGI_PARTICELLE_C
+#define __LEGGI_PARTICELLE_C
 
 #include "leggi_particelle.h"
 
 
-int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, int out_binary, int out_ascii)
+int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int out_ascii)
 {
 	int i,ipc,N_param, *int_param,npart_loc;
 	int segnalibro=0, buff, pID;
@@ -13,8 +15,7 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 //	char nomefile_parametri[MAX_LENGTH_FILENAME];
 
 	FILE *file_in;
-	file_in=fopen(fileIN, "rb");
-
+	file_in=fopen(fileIN, "r");
 	FILE *binary_all_out;
 	FILE *ascii_all_out;
 //	FILE *parameters;
@@ -23,11 +24,12 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz,ux,uy,uz;
 
-	fread(&buff,sizeof(int),1,file_in);
-	fread(&N_param,sizeof(int),1,file_in);
-	fread(&buff,sizeof(int),1,file_in);
+	fread((void*) &buff,sizeof(int),1,file_in);
+	fread((void*) &N_param,sizeof(int),1,file_in);
+	fread((void*) &buff,sizeof(int),1,file_in);
 	if (out_swap) swap_endian_i(&N_param,1);
 	printf("numero parametri=%i\n",N_param);
+	fflush(stdout);
 	int_param=(int*)malloc(N_param*sizeof(int));
 	real_param=(float*)malloc(N_param*sizeof(float));
 	fread(&buff,sizeof(int),1,file_in);
@@ -189,3 +191,6 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 
 	return 0;
 }
+
+
+#endif

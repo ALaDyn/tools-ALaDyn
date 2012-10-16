@@ -1,5 +1,5 @@
-#ifndef __LEGGI_PARTICELLE
-#define __LEGGI_PARTICELLE
+#ifndef __LEGGI_PARTICELLE_H
+#define __LEGGI_PARTICELLE_H
 
 #pragma warning(disable : 593)
 
@@ -9,7 +9,7 @@
 #include "swap_tools.h"
 #define MAX_LENGTH_FILENAME 200
 
-int leggi_particelle(char* , int , int , int , int , int );
+int leggi_particelle(char* , int , int , int , int );
 
 #endif
 

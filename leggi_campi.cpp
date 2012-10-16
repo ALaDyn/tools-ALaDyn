@@ -1,9 +1,9 @@
-#include <cstdio>
-#include <cstdlib>
-#include "leggi_campi.h"
-#include "swap_tools.h"
+#ifndef __LEGGI_CAMPI_C
+#define __LEGGI_CAMPI_C
 
-int leggi_campi(char* fileIN, int FLAG_ENDIAN, int out_swap)
+#include "leggi_campi.h"
+
+int leggi_campi(char* fileIN, int out_swap)
 {
 	int i, ipy, ipz,  j, k,np_loc, N_param, *int_param,npoint_loc[3], loc_size, kk;
 	int segnox=0,segnoy=0,segnoz=0, buff;
@@ -197,3 +197,5 @@ int leggi_campi(char* fileIN, int FLAG_ENDIAN, int out_swap)
 
 	return 0;
 }
+
+#endif

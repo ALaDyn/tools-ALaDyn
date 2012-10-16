@@ -1,5 +1,5 @@
-#ifndef __SWAP_TOOLS
-#define __SWAP_TOOLS
+#ifndef __SWAP_TOOLS_H
+#define __SWAP_TOOLS_H
 
 #include <cstdio>
 #include <cstdlib>
