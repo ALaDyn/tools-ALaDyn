@@ -15,7 +15,12 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 //	char nome[100],nome4[100];
 	char nome1[200],nome2[100],nome3[100],nome5[100],nome6[100];
 //	FILE *f, *f3, *f4;
-	FILE *file_in,*f1,*f2,*f5,*f6;
+	FILE *file_in;
+
+	//	Rimosse 16/10/2012
+//	FILE *f1,*f2,*f5;
+
+	FILE *f6;
 //  int nppc,rkord;
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 //	float num2phys;
@@ -116,15 +121,17 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 		}
 		printf("=========FINE LETTURE==========\n");
 		fflush(stdout);
-		sprintf(nome1,"%s_7_out",fileIN);
-		if(out_swap)
-		{
-			swap_endian_f(particelle,nptot*(2*ndim+WEIGHT));
-			sprintf(nome1,"%s_7_out_swap",fileIN);
-		}
-		f1=fopen(nome1, "w");
-		fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),f1);
-		fflush(f1);
+
+		//	Rimosse 16/10/2012
+//		sprintf(nome1,"%s_7_out",fileIN);
+//		if(out_swap)
+//		{
+//			swap_endian_f(particelle,nptot*(2*ndim+WEIGHT));
+//			sprintf(nome1,"%s_7_out_swap",fileIN);
+//		}
+//		f1=fopen(nome1, "w");
+//		fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),f1);
+//		fflush(f1);
     }
 
 
@@ -211,10 +218,13 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 
 		printf("=========FINE LETTURE==========\n");
 		fflush(stdout);
-		sprintf(nome1,"%s_7_out",fileIN);
-		f1=fopen(nome1, "w");
-		fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),f1);
-		fflush(f1);
+
+		//	Rimosse 16/10/2012
+//		sprintf(nome1,"%s_7_out",fileIN);
+//		f1=fopen(nome1, "w");
+//		fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),f1);
+//		fflush(f1);
+
 	}
 	printf("n_proc=%i,   n_dim=%i,  n_ptot=%i\n",npe,ndim,nptot);
 	fflush(stdout);
@@ -224,14 +234,20 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 //		f=fopen(nome, "w");
 //		sprintf(nome1,"%s_XPX",fileIN);
 //		f1=fopen(nome1, "w");
-		sprintf(nome2,"%s_PXPYPZ",fileIN);
-		f2=fopen(nome2, "w");
-		sprintf(nome3,"%s_thetaENERGY",fileIN);
+
+		//	Rimosse 16/10/2012
+//		sprintf(nome2,"%s_PXPYPZ",fileIN);
+//		f2=fopen(nome2, "w");
+
+//		sprintf(nome3,"%s_thetaENERGY",fileIN);
 //		f3=fopen(nome3, "w");
 //		sprintf(nome4,"%s_XYENERGY",fileIN);
 //		f4=fopen(nome4, "w");
-		sprintf(nome5,"%s_ALL_7_bin",fileIN);
-		f5=fopen(nome5, "w");
+
+		//	Rimosse 16/10/2012
+//		sprintf(nome5,"%s_ALL_7_bin",fileIN);
+//		f5=fopen(nome5, "w");
+
 		sprintf(nome6,"%s_ALL_6",fileIN);
 		f6=fopen(nome6, "w");
 
@@ -243,21 +259,32 @@ int leggi_particelle(char* fileIN, int WEIGHT, int FLAG_ENDIAN, int out_swap, in
 			ux=particelle[i*(6+WEIGHT)+3];
 			uy=particelle[i*(6+WEIGHT)+4];
 			uz=particelle[i*(6+WEIGHT)+5];
-			gamma=(float) sqrt(1+ux*ux+uy*uy+uz*uz)-1;
+
+			//	Rimosse 16/10/2012
+//			gamma=(float) sqrt(1.+ux*ux+uy*uy+uz*uz)-1.;
+
 //			fprintf(f,"%e %e\n",rx[i],ry[i]);
 //			fprintf(f1,"%e %e\n",rx[i],ux[i]);
-			fprintf(f2,"%e %e %e\n",ux,uy,uz);
+
+			//	Rimosse 16/10/2012
+//			fprintf(f2,"%e %e %e\n",ux,uy,uz);
+
 //			fprintf(f3,"%e %e\n",theta,(gamma[i]-1)*938);//*mass*0.511);
 //			fprintf(f4,"%e %e %e\n",ry[i],rx[i],(gamma[i]-1)*938);//*mass*0.511);
 //			tagli in energia commentati perche' li faccio poi con altri tools
 //			if(gamma*938>2)
 //			{
 				fprintf(f6,"%e %e %e %e %e %e\n",rx, ry, rz, ux, uy, uz);//mass*0.511);
-				fwrite(particelle+i*(6+WEIGHT),sizeof(float),7,f5);
+
+				//	Rimosse 16/10/2012
+//				fwrite(particelle+i*(6+WEIGHT),sizeof(float),7,f5);
 //			}
 		}
 
-		fclose(f2);
+		//	Rimosse 16/10/2012
+//		fclose(f2);
+//		fclose(f5);
+
 		fclose(f6);
 	}
 	return 0;

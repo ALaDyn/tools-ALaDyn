@@ -13,8 +13,9 @@
 #define FALSE 0
 
 
-int leggi_particelle(char* , int , int , int , int);
-int leggi_campi(char* , int , int , int , int);
+#include "leggi_campi.h"
+#include "leggi_particelle.h"
+#include "swap_tools.h"
 
 
 #endif
