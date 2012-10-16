@@ -12,13 +12,13 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	float *particelle, *real_param;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
-//	char nomefile_parametri[MAX_LENGTH_FILENAME];
+	char nomefile_parametri[MAX_LENGTH_FILENAME];
 
 	FILE *file_in;
 	file_in=fopen(fileIN, "r");
 	FILE *binary_all_out;
 	FILE *ascii_all_out;
-//	FILE *parameters;
+	FILE *parameters;
 
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
@@ -67,7 +67,7 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	zmax=real_param[6];  //estremi della griglia
 	w0x=real_param[7];      //waist del laser in x
 	w0y=real_param[8];      //waist del laser in y
-	nrat=real_param[9];     //n orver n critical
+	nrat=real_param[9];     //n over n critical
 	a0=real_param[10];      // a0 laser
 	lam0=real_param[11];    // lambda
 	E0=real_param[12];      //conversione da campi numerici a TV/m
@@ -108,30 +108,27 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	printf("n_proc=%i,   n_dim=%i,  n_ptot=%i\n",npe,ndim,nptot);
 	fflush(stdout);
 
-	/*
 	sprintf(nomefile_parametri,"%s.parameters",fileIN);
 	parameters=fopen(nomefile_parametri, "w");
 	printf("\nWriting the parameters file\n");
 	fprintf(parameters,"interi\n");
-	fprintf(parameters,"npe_y=%i\n",int_param[0]);     //numero processori
-	fprintf(parameters,"npe_z=%i\n",int_param[1]);     //numero processori
-	fprintf(parameters,"npe=%i\n",npe_y*npe_z);     //numero processori
-	fprintf(parameters,"nx=%i\n",int_param[2]);
-	fprintf(parameters,"nx1=%i\n",int_param[3]);
-	fprintf(parameters,"ny1=%i\n",int_param[4]);
-	fprintf(parameters,"nyloc=%i\n",int_param[5]);
-	fprintf(parameters,"nz1=%i\n",int_param[6]);
-	fprintf(parameters,"nzloc=%i\n",int_param[7]);
-	fprintf(parameters,"ibx=%i\n",int_param[8]);
-	fprintf(parameters,"iby=%i\n",int_param[9]);
-	fprintf(parameters,"ibz=%i\n",int_param[10]);
-	fprintf(parameters,"model=%i\n",int_param[11]);  //modello di laser utilizzato
-	fprintf(parameters,"dmodel=%i\n",int_param[12]); //modello di condizioni iniziali
-	fprintf(parameters,"nsp=%i\n",int_param[13]);    //numero di speci
-	fprintf(parameters,"np_loc=%i\n",int_param[14]);  //numero di componenti dello spazio dei momenti
-	fprintf(parameters,"lpord=%i\n",int_param[15]); //ordine dello schema leapfrog
-	fprintf(parameters,"deord=%i\n",int_param[16]); //ordine derivate
-	fprintf(parameters,"fvar=%i\n",int_param[17]); 
+	fprintf(parameters,"npe=%i\n",int_param[0]);     //numero processori
+	fprintf(parameters,"nx=%i\n",int_param[1]);
+	fprintf(parameters,"ny=%i\n",int_param[2]);
+	fprintf(parameters,"nz=%i\n",int_param[3]);
+	fprintf(parameters,"ibx=%i\n",int_param[4]);
+	fprintf(parameters,"iby=%i\n",int_param[5]);
+	fprintf(parameters,"ibz=%i\n",int_param[6]);
+	fprintf(parameters,"model=%i\n",int_param[7]);  //modello di laser utilizzato
+	fprintf(parameters,"dmodel=%i\n",int_param[8]); //modello di condizioni iniziali
+	fprintf(parameters,"nsp=%i\n",int_param[9]);    //numero di speci
+	fprintf(parameters,"ndim=%i\n",int_param[10]);   
+	fprintf(parameters,"np_loc=%i\n",int_param[11]);  
+	fprintf(parameters,"lpord=%i\n",int_param[12]); //ordine dello schema leapfrog
+	fprintf(parameters,"deord=%i\n",int_param[13]); //ordine derivate
+	fprintf(parameters,"pID=%i\n",int_param[15]); 
+	fprintf(parameters,"nptot=%i\n",int_param[16]); 
+	fprintf(parameters,"ndv=%i\n",int_param[17]); 
 	fprintf(parameters,"========= fine interi\n");
 	fprintf(parameters,"\n floating\n");
 	fprintf(parameters,"tnow=%f\n",real_param[0]);  //tempo dell'output
@@ -143,17 +140,17 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	fprintf(parameters,"zmax=%f\n",real_param[6]);  //estremi della griglia
 	fprintf(parameters,"w0x=%f\n",real_param[7]);      //waist del laser in x
 	fprintf(parameters,"w0y=%f\n",real_param[8]);      //waist del laser in y
-	fprintf(parameters,"nrat=%f\n",real_param[9]);     //n orver n critical
+	fprintf(parameters,"nrat=%f\n",real_param[9]);     //n over n critical
 	fprintf(parameters,"a0=%f\n",real_param[10]);      // a0 laser
 	fprintf(parameters,"lam0=%f\n",real_param[11]);    // lambda
 	fprintf(parameters,"E0=%f\n",real_param[12]);      //conversione da campi numerici a TV/m
 	fprintf(parameters,"ompe=%f\n",real_param[13]);    //costante accoppiamento correnti campi
-	fprintf(parameters,"xt_in=%f\n",real_param[14]);   //inizio plasma
-	fprintf(parameters,"xt_end=%f\n",real_param[15]);
-	fprintf(parameters,"charge=%f\n",real_param[16]);  //carica particella su carica elettrone
-	fprintf(parameters,"mass=%f\n",real_param[17]);    //massa particelle su massa elettrone
+	fprintf(parameters,"np_over_nm=%f\n",real_param[14]);   //numerical2physical particles 14 
+	fprintf(parameters,"xt_in=%f\n",real_param[15]);
+	fprintf(parameters,"xt_end=%f\n",real_param[16]);
+	fprintf(parameters,"charge=%f\n",real_param[17]);  //carica particella su carica elettrone
+	fprintf(parameters,"mass=%f\n",real_param[18]);    //massa particelle su massa elettrone
 	fclose(parameters);
-	*/
 
 	if (out_binary)
 	{

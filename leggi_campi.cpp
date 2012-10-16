@@ -8,10 +8,11 @@ int leggi_campi(char* fileIN, int out_swap)
 	int i, ipy, ipz,  j, k,np_loc, N_param, *int_param,npoint_loc[3], loc_size, kk;
 	int segnox=0,segnoy=0,segnoz=0, buff;
 	float *field,*buffer,  *real_param;
-	char nome[100];
+	char nomefile_parametri[MAX_LENGTH_FILENAME];
+	char nomefile_campi[MAX_LENGTH_FILENAME];
 
 	FILE *file_in;
-//	FILE *parameters;
+	FILE *parameters;
 	FILE *clean_fields;
 
 	int npe,nx,ibx,iby,ibz,model,dmodel,nsp,lpord,deord,npe_y, npe_z;
@@ -79,9 +80,8 @@ int leggi_campi(char* fileIN, int out_swap)
 	charge=real_param[16];  //carica particella su carica elettrone
 	mass=real_param[17];    //massa particelle su massa elettrone
 
-	/*
-	sprintf(nome,"%s.parameters",fileIN);
-	parameters=fopen(nome, "w");
+	sprintf(nomefile_parametri,"%s.parameters",fileIN);
+	parameters=fopen(nomefile_parametri, "w");
 	printf("\nWriting the parameters file\n");
 	fprintf(parameters,"interi\n");
 	fprintf(parameters,"npe_y=%i\n",int_param[0]);     //numero processori
@@ -124,7 +124,6 @@ int leggi_campi(char* fileIN, int out_swap)
 	fprintf(parameters,"charge=%f\n",real_param[16]);  //carica particella su carica elettrone
 	fprintf(parameters,"mass=%f\n",real_param[17]);    //massa particelle su massa elettrone
 	fclose(parameters);
-	*/
 
 	printf("=========INIZIO LETTURE==========\n");
 	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,nx1*ny1*nz1);
@@ -176,8 +175,8 @@ int leggi_campi(char* fileIN, int out_swap)
 	printf("=========FINE LETTURE==========\n");
 	fflush(stdout);
 
-	sprintf(nome,"%s_out",fileIN);
-	clean_fields=fopen(nome, "w");
+	sprintf(nomefile_campi,"%s_out",fileIN);
+	clean_fields=fopen(nomefile_campi, "w");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
 	fprintf(clean_fields,"titolo mio\n");
