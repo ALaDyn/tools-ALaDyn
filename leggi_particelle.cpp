@@ -150,6 +150,7 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	fprintf(parameters,"xt_end=%f\n",real_param[16]);
 	fprintf(parameters,"charge=%f\n",real_param[17]);  //carica particella su carica elettrone
 	fprintf(parameters,"mass=%f\n",real_param[18]);    //massa particelle su massa elettrone
+	if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
 	fclose(parameters);
 
 	if (out_binary)
