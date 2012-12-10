@@ -78,6 +78,7 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	charge=real_param[17];  //carica particella su carica elettrone
 	mass=real_param[18];    //massa particelle su massa elettrone
 	ny=ny_loc*npe;
+	printf("nptot=%i\n",int_param[16]); 
 	printf("\ninizio processori \n");
 	fflush(stdout);
 	particelle=(float*)malloc(nptot*(2*ndim+WEIGHT)*sizeof(float));
