@@ -22,7 +22,11 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
-	float rx, ry, rz,ux,uy,uz;
+	float rx, ry, rz, ux, uy, uz, wgh;
+	int tipo = 0;
+	if (fileIN[0] == 'E') tipo = 3;
+	else if (fileIN[0] == 'P') tipo = 1;
+	else printf("Tipo non riconosciuto!\n");
 
 	fread((void*) &buff,sizeof(int),1,file_in);
 	fread((void*) &N_param,sizeof(int),1,file_in);
@@ -151,7 +155,7 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	fprintf(parameters,"xt_end=%f\n",real_param[16]);
 	fprintf(parameters,"charge=%f\n",real_param[17]);  //carica particella su carica elettrone
 	fprintf(parameters,"mass=%f\n",real_param[18]);    //massa particelle su massa elettrone
-	if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
+//	if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
 	fclose(parameters);
 
 	if (out_binary)
@@ -175,14 +179,15 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 
 		for(i=0;i<nptot;i++)
 		{
-			rx=particelle[i*(6+WEIGHT)+0];
-			ry=particelle[i*(6+WEIGHT)+1];
-			rz=particelle[i*(6+WEIGHT)+2];
-			ux=particelle[i*(6+WEIGHT)+3];
-			uy=particelle[i*(6+WEIGHT)+4];
-			uz=particelle[i*(6+WEIGHT)+5];
+			rx=particelle[i*(6+WEIGHT)+1]*((float)1.e-4);
+			ry=particelle[i*(6+WEIGHT)+2]*((float)1.e-4);
+			rz=particelle[i*(6+WEIGHT)+0]*((float)1.e-4);
+			ux=particelle[i*(6+WEIGHT)+4];
+			uy=particelle[i*(6+WEIGHT)+5];
+			uz=particelle[i*(6+WEIGHT)+3];
+			wgh=particelle[i*(6+WEIGHT)+6];
 
-			fprintf(ascii_all_out,"%e %e %e %e %e %e\n",rx, ry, rz, ux, uy, uz);
+			fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
 		}
 		fflush(ascii_all_out);
 		fclose(ascii_all_out);
