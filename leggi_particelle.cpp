@@ -185,9 +185,15 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 			ux=particelle[i*(6+WEIGHT)+4];
 			uy=particelle[i*(6+WEIGHT)+5];
 			uz=particelle[i*(6+WEIGHT)+3];
-			wgh=particelle[i*(6+WEIGHT)+6];
-
-			fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+			if (WEIGHT)
+			{
+				wgh=particelle[i*(6+WEIGHT)+6];
+				fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+			}
+			else
+			{
+				fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+			}
 		}
 		fflush(ascii_all_out);
 		fclose(ascii_all_out);
