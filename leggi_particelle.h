@@ -10,7 +10,7 @@
 #define MAX_LENGTH_FILENAME 200
 #define P_MASS 938.272
 
-int leggi_particelle(char* , int , int , int , int , parametri_binnaggio);
+int leggi_particelle(char * , parametri);
 
 #endif
 

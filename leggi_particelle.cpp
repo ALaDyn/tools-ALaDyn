@@ -5,8 +5,12 @@
 
 
 
-int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int out_ascii, parametri_binnaggio binning)
+int leggi_particelle(char* fileIN, parametri binning)
 {
+	int out_swap = binning.p[SWAP];
+	int out_binary = binning.p[OUT_BINARY];
+	int out_ascii = binning.p[OUT_ASCII];
+
 	bool out_parameters = true;
 
 	bool fai_slices = true;
@@ -31,12 +35,14 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
+	std::ostringstream nomefile_xpx, nomefile_Etheta, nomefile_Espec;
 
 	FILE *file_in;
 	file_in=fopen(fileIN, "r");
 	FILE *binary_all_out;
 	FILE *ascii_all_out;
 	FILE *parameters;
+	std::ofstream xpx_out, Etheta_out, Espec_out;
 
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
@@ -115,6 +121,7 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 		Etheta[i] = new float [binning.nbin_theta+3];
 		for (int j = 0; j < binning.nbin_theta+3; j++) Etheta[i][j] = 0.0;
 	}
+	float *Espec = new float [binning.nbin_E+3];
 
 	for(ipc=0;ipc<npe;ipc++)
 	{
@@ -223,6 +230,10 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 				if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
 				else		Etheta[whichbinE_int][whichbintheta_int] += 1.0;
 
+				// Espec
+				if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+				else		Espec[whichbinE_int] += 1.0;
+
 			}
 		}
 
@@ -319,6 +330,74 @@ int leggi_particelle(char* fileIN, int WEIGHT, int out_swap, int out_binary, int
 		fclose(parameters);
 	}
 
+	if (fai_slices)
+	{
+		nomefile_xpx << fileIN << "_xpx";
+		nomefile_Etheta << fileIN << "_Etheta";
+		nomefile_Espec << fileIN << "_Espec";
+		xpx_out.open(nomefile_xpx.str().c_str());
+		Etheta_out.open(nomefile_Etheta.str().c_str());
+		Espec_out.open(nomefile_Espec.str().c_str());
+
+		float min1, min2, max1, max2;
+
+		min1=binning.Emin-binning.dimmi_dimE();
+		max1=binning.Emin;
+		for (int i = 0; i < binning.nbin_E+3; i++)
+		{
+			Espec_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << Espec[i] << std::endl;
+
+			min1 += binning.dimmi_dimE();
+			max1 += binning.dimmi_dimE();
+		}
+
+
+		min1=binning.Emin-binning.dimmi_dimE();
+		max1=binning.Emin;
+		min2=binning.thetamin-binning.dimmi_dimtheta();
+		max2=binning.thetamin;
+		
+		for (int i = 0; i < binning.nbin_E+3; i++)
+		{
+			for (int j = 0; j < binning.nbin_theta+3; j++)
+			{
+				Etheta_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << Etheta[i][j] << std::endl;
+				min2 += binning.dimmi_dimtheta();
+				max2 += binning.dimmi_dimtheta();
+			}
+			min1 += binning.dimmi_dimE();
+			max1 += binning.dimmi_dimE();
+			min2 = binning.thetamin-binning.dimmi_dimtheta();
+			max2 = binning.thetamin;
+
+		}
+
+
+		min1=binning.xmin-binning.dimmi_dimx();
+		max1=binning.xmin;
+		min2=binning.pxmin-binning.dimmi_dimpx();
+		max2=binning.pxmin;
+		
+		for (int i = 0; i < binning.nbin_x+3; i++)
+		{
+			for (int j = 0; j < binning.nbin_px+3; j++)
+			{
+				xpx_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << xpx[i][j] << std::endl;
+				min2 += binning.dimmi_dimpx();
+				max2 += binning.dimmi_dimpx();
+			}
+			min1 += binning.dimmi_dimx();
+			max1 += binning.dimmi_dimx();
+			min2 = binning.pxmin-binning.dimmi_dimpx();
+			max2 = binning.pxmin;
+
+		}
+
+		xpx_out.close();
+		Etheta_out.close();
+		Espec_out.close();
+
+	}
 
 	return 0;
 }

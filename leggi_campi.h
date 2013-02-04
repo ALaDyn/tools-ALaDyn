@@ -1,14 +1,13 @@
 #ifndef __LEGGI_CAMPI_H
 #define __LEGGI_CAMPI_H
 
-#include <cstdio>
-#include <cstdlib>
-#include "swap_tools.h"
+#include "leggi_binario_ALaDyn_fortran.h"
+
 #define MAX_LENGTH_FILENAME 200
 
 #pragma warning(disable : 593)
 
-int leggi_campi(char* , int );
+int leggi_campi(char * , parametri );
 
 #endif
 

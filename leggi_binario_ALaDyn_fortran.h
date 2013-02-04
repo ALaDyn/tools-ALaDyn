@@ -7,15 +7,24 @@
 #include<cmath>
 #include<cstring>
 #include<string>
+#include<fstream>
+#include<sstream>
+#include<iomanip>
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
 #define MIN(x,y) ((x)<(y)?(x):(y))
 #define TRUE 1
 #define FALSE 0
 
-class parametri_binnaggio;
+class parametri;
 
-#include "binning.cpp"
+#define NPARAMETRI	5
+#define WEIGHT		0
+#define FUNZIONE	1
+#define SWAP		2
+#define OUT_BINARY	3
+#define OUT_ASCII	4
+
 
 #if defined(_MSC_VER)
 #include "leggi_campi.h"
@@ -27,6 +36,9 @@ class parametri_binnaggio;
 #include "swap_tools.cpp"
 #endif
 
-bool check_parametri(parametri_binnaggio );
+
+#include "classeparametri.cpp"
+
+
 
 #endif

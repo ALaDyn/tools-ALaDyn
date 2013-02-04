@@ -3,8 +3,10 @@
 
 #include "leggi_campi.h"
 
-int leggi_campi(char* fileIN, int out_swap)
+int leggi_campi(char* fileIN, parametri binning)
 {
+	int out_swap = binning.p[SWAP];
+
 	int i, ipy, ipz,  j, k,np_loc, N_param, *int_param,npoint_loc[3], loc_size, kk;
 	int segnox=0,segnoy=0,segnoz=0, buff;
 	float *field,*buffer,  *real_param;
