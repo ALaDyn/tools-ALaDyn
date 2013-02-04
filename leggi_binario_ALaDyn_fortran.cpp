@@ -3,9 +3,13 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
+
 int main (int argc, char *argv[])
 {
-	int WEIGHT, funzione, out_swap, out_binary, out_ascii;
+	int WEIGHT = 0, funzione = -1, out_swap = -1, out_binary = -1, out_ascii = -1;
+	parametri_binnaggio binning;
+	bool test;
+
 	if (argc == 1)
 	{
 		std::cout << "Si usa:\n-manuale: ./reader Nomefile.bin" << std::endl;
@@ -21,7 +25,7 @@ int main (int argc, char *argv[])
 		std::cin >> out_swap;
 		if (funzione == 2)
 		{
-			std::cout << "Inserisci il WEIGHT: 0 per output vecchio, 1 per nuovo: ";
+			std::cout << "C'e' la colonna dei weight? 0 per output vecchio (no), 1 per nuovo (si'): ";
 			std::cin >> WEIGHT;
 			std::cout << "Vuoi l'output binario pulito dal fortran? 1 si', 0 no: ";
 			std::cin >> out_binary;
@@ -29,39 +33,156 @@ int main (int argc, char *argv[])
 			std::cin >> out_ascii;
 		}
 	}
-	else if(argc == 7)
-	{
-		funzione = std::atoi(argv[2]);
-		out_swap = std::atoi(argv[3]);
-		if (funzione == 2)
-		{
-			WEIGHT = std::atoi(argv[4]);
-			out_binary = std::atoi(argv[5]);
-			out_ascii = std::atoi(argv[6]);
-		}
-		std::cout << "Tipo file (1 campi, 2 particelle): " << funzione << std::endl;
-		std::cout << "Swapping ordine byte (1 si', 0 no): " << out_swap << std::endl;
-		if (funzione == 2)
-		{
-			std::cout << "WEIGHT (0 per output vecchio, 1 per nuovo): " << WEIGHT << std::endl;
-			std::cout << "Output binario pulito dal fortran (1 si', 0 no): " << out_binary << std::endl;
-			std::cout << "Output dello spazio delle fasi ascii (1 si', 0 no): " << out_ascii << std::endl;
-		}
-	}
+
 	else
 	{
-		std::cout << "Linea di comando non valida" << std::endl;
-		return -1;
+		for (int i = 1; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
+		{								// * Note that we're starting on 1 because we don't need to know the
+										// * path of the program, which is stored in argv[0]
+			if (std::string(argv[i]) == "-swap")
+			{
+				out_swap = 1;
+			}
+			else if (std::string(argv[i]) == "-field")
+			{
+				funzione = 1;
+			}
+			else if (std::string(argv[i]) == "-particles")
+			{
+				funzione = 2;
+			}
+			else if (std::string(argv[i]) == "-dump_binary")
+			{
+				out_binary = 1;
+			}
+			else if (std::string(argv[i]) == "-dump_ascii")
+			{
+				out_ascii = 1;
+			}
+			else if (std::string(argv[i]) == "-xmin")
+			{
+				binning.xmin = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-xmax")
+			{
+				binning.xmax = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-ymin")
+			{
+				binning.ymin = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-ymax")
+			{
+				binning.ymax = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-zmin")
+			{
+				binning.zmin = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-zmax")
+			{
+				binning.zmax = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-pxmin")
+			{
+				binning.pxmin = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-pxmax")
+			{
+				binning.pxmax = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-pymin")
+			{
+				binning.pymin = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-pymax")
+			{
+				binning.pymax = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-pzmin")
+			{
+				binning.pzmin = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-pzmax")
+			{
+				binning.pzmax = atof(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-nbinx")
+			{
+				binning.nbin_x = atoi(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-nbiny")
+			{
+				binning.nbin_y = atoi(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-nbinz")
+			{
+				binning.nbin_z = atoi(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-nbinpx")
+			{
+				binning.nbin_px = atoi(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-nbinpy")
+			{
+				binning.nbin_py = atoi(argv[i+1]);
+				i++;
+			}
+			else if (std::string(argv[i]) == "-nbinpz")
+			{
+				binning.nbin_pz = atoi(argv[i+1]);
+				i++;
+			}
+		}
 	}
 
+	test = check_parametri(binning);
+
 	if ((funzione != 1 && funzione != 2) || (out_swap != 0 && out_swap != 1) || (funzione == 2 && WEIGHT != 0 && WEIGHT != 1)  
-		|| (funzione==2 && out_ascii != 0 && out_ascii !=1) || (funzione==2 && out_binary != 0 && out_binary != 1))
+		|| (funzione==2 && out_ascii != 0 && out_ascii !=1) || (funzione==2 && out_binary != 0 && out_binary != 1) || (test == false) )
 	{
 		std::cout << "Input sbagliato!" << std::endl;
 		return -2;
 	}
-	
+
 	if (funzione == 1) leggi_campi(argv[1], out_swap);
-	else if (funzione == 2) leggi_particelle(argv[1], WEIGHT, out_swap, out_binary, out_ascii);
+	else if (funzione == 2) leggi_particelle(argv[1], WEIGHT, out_swap, out_binary, out_ascii, binning);
 	return 0;
 }
+
+
+
+bool check_parametri(parametri_binnaggio analizza)
+{
+	bool test = true;
+//	( analizza.xmin < analizza.xmax ) ? test = true : test = false;
+//	( analizza.ymin < analizza.ymax ) ? test = true : test = false;
+//	( analizza.zmin < analizza.zmax ) ? test = true : test = false;
+//	(analizza.pxmin < analizza.pxmax) ? test = true : test = false;
+//	(analizza.pymin < analizza.pymax) ? test = true : test = false;
+//	(analizza.pzmin < analizza.pzmax) ? test = true : test = false;
+//	( analizza.nbin_x > 0) ? test = true : test = false;
+//	( analizza.nbin_y > 0) ? test = true : test = false;
+//	( analizza.nbin_z > 0) ? test = true : test = false;
+//	(analizza.nbin_px > 0) ? test = true : test = false;
+//	(analizza.nbin_py > 0) ? test = true : test = false;
+//	(analizza.nbin_pz > 0) ? test = true : test = false;
+	return test;
+}
+

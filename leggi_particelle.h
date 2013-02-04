@@ -3,13 +3,14 @@
 
 #pragma warning(disable : 593)
 
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include "swap_tools.h"
-#define MAX_LENGTH_FILENAME 200
+#define _USE_MATH_DEFINES
+#include "leggi_binario_ALaDyn_fortran.h"
 
-int leggi_particelle(char* , int , int , int , int );
+
+#define MAX_LENGTH_FILENAME 200
+#define P_MASS 938.272
+
+int leggi_particelle(char* , int , int , int , int , parametri_binnaggio);
 
 #endif
 
