@@ -10,10 +10,10 @@ int leggi_particelle(char* fileIN, parametri binning)
 	int out_swap = binning.p[SWAP];
 	int out_binary = binning.p[OUT_BINARY];
 	int out_ascii = binning.p[OUT_ASCII];
+	int out_parameters = binning.p[OUT_PARAMS];
+	int fai_slices = binning.p[DO_BINNING];
+	int cerca_minmax = binning.p[FIND_MINMAX];
 
-	bool out_parameters = true;
-
-	bool fai_slices = true;
 	float whichbinx = 0., whichbinpx = 0.;
 	int whichbinx_int = (int) whichbinx;
 	int whichbinpx_int = (int) whichbinpx;
@@ -27,22 +27,23 @@ int leggi_particelle(char* fileIN, parametri binning)
 	int nelab=3;	//3 valori per ora: gamma, theta ed energia
 	int conta_nptot = 0;
 	float x,y,z,px,py,pz;
+	float *estremi_min, *estremi_max;
 
 	short buffshort[2];
 	float *particelle, *real_param;
-	//	float *particelle_elaborate;
+//	float *particelle_elaborate;
 	float gamma, theta, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
-	std::ostringstream nomefile_xpx, nomefile_Etheta, nomefile_Espec;
+	std::ostringstream nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 
 	FILE *file_in;
 	file_in=fopen(fileIN, "r");
 	FILE *binary_all_out;
 	FILE *ascii_all_out;
 	FILE *parameters;
-	std::ofstream xpx_out, Etheta_out, Espec_out;
+	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
@@ -79,6 +80,15 @@ int leggi_particelle(char* fileIN, parametri binning)
 	dmodel=int_param[8]; //modello di condizioni iniziali
 	nsp=int_param[9];    //numero di speci
 	ndim=int_param[10];  //numero di componenti dello spazio dei momenti
+
+	estremi_min = new float[2*ndim+nelab];
+	estremi_max = new float[2*ndim+nelab];
+	for (int i = 0; i < (2*ndim+nelab); i++)
+	{
+		estremi_min[i] = (float) NUMERO_MASSIMO;
+		estremi_max[i] = (float) -NUMERO_MASSIMO;
+	}
+
 	np_loc=int_param[11];  //
 	lpord=int_param[12]; //ordine dello schema leapfrog
 	deord=int_param[13]; //ordine derivate
@@ -100,11 +110,11 @@ int leggi_particelle(char* fileIN, parametri binning)
 	lam0=real_param[11];    // lambda
 	E0=real_param[12];      //conversione da campi numerici a TV/m
 	ompe=real_param[13];    //costante accoppiamento correnti campi
-	np_over_nm=real_param[14];   //numerical2physical particles 14 
-	xt_in=real_param[15];   //inizio plasma
+	np_over_nm=real_param[14];		//numerical2physical particles 14 
+	xt_in=real_param[15];			//inizio plasma
 	xt_end=real_param[16];
-	charge=real_param[17];  //carica particella su carica elettrone
-	mass=real_param[18];    //massa particelle su massa elettrone
+	charge=real_param[17];			//carica particella su carica elettrone
+	mass=real_param[18];			//massa particelle su massa elettrone
 	ny=ny_loc*npe;
 	printf("nptot=%i\n",int_param[16]); 
 	printf("\ninizio processori \n");
@@ -144,8 +154,49 @@ int leggi_particelle(char* fileIN, parametri binning)
 			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+WEIGHT));
 		}
 
+		if (cerca_minmax && ndim == 3 && !fai_slices)
+		{
+			for (int i = 0; i < npart_loc; i++)
+			{
+//				x=fabs(*(particelle+i*(2*ndim+WEIGHT)));
+//				y=fabs(*(particelle+i*(2*ndim+WEIGHT)+1));
+//				z=fabs(*(particelle+i*(2*ndim+WEIGHT)+2));
+//				px=fabs(*(particelle+i*(2*ndim+WEIGHT)+3));
+//				py=fabs(*(particelle+i*(2*ndim+WEIGHT)+4));
+//				pz=fabs(*(particelle+i*(2*ndim+WEIGHT)+5));
+				x=*(particelle+i*(2*ndim+WEIGHT));
+				y=*(particelle+i*(2*ndim+WEIGHT)+1);
+				z=*(particelle+i*(2*ndim+WEIGHT)+2);
+				px=*(particelle+i*(2*ndim+WEIGHT)+3);
+				py=*(particelle+i*(2*ndim+WEIGHT)+4);
+				pz=*(particelle+i*(2*ndim+WEIGHT)+5);
+				gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+				theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+				E=(float)(gamma*P_MASS);								//energia
+				if (x < estremi_min[0]) estremi_min[0] = x;
+				if (x > estremi_max[0]) estremi_max[0] = x;
+				if (y < estremi_min[1]) estremi_min[1] = y;
+				if (y > estremi_max[1]) estremi_max[1] = y;
+				if (z < estremi_min[2]) estremi_min[2] = z;
+				if (z > estremi_max[2]) estremi_max[2] = z;
+				if (px < estremi_min[3]) estremi_min[3] = px;
+				if (px > estremi_max[3]) estremi_max[3] = px;
+				if (py < estremi_min[4]) estremi_min[4] = py;
+				if (py > estremi_max[4]) estremi_max[4] = py;
+				if (pz < estremi_min[5]) estremi_min[5] = pz;
+				if (pz > estremi_max[5]) estremi_max[5] = pz;
+				if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+				if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+				if (theta < estremi_min[7]) estremi_min[7] = theta;
+				if (theta > estremi_max[7]) estremi_max[7] = theta;
+				if (E < estremi_min[8]) estremi_min[8] = E;
+				if (E > estremi_max[8]) estremi_max[8] = E;
+			}
 
-		if (fai_slices && ndim == 3)
+		}
+
+
+		if (fai_slices && ndim == 3 && !cerca_minmax)
 		{
 			for (int i = 0; i < npart_loc; i++)
 			{
@@ -155,22 +206,22 @@ int leggi_particelle(char* fileIN, parametri binning)
 				px=*(particelle+i*(2*ndim+WEIGHT)+3);
 				py=*(particelle+i*(2*ndim+WEIGHT)+4);
 				pz=*(particelle+i*(2*ndim+WEIGHT)+5);
-				//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
-				//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-				//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
-				gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
+//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
+//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
+				gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 				theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-				E=(float)(gamma*P_MASS);			//energia
+				E=(float)(gamma*P_MASS);								//energia
 
 				// xpx
 				if (x < binning.xmin)
 				{
-					//					whichbinx = 0.0;
+//					whichbinx = 0.0;
 					whichbinx_int = 0;
 				}
 				else if (x > binning.xmax)
 				{
-					//				  whichbinx = (float) (binning.nbin_x + 2);
+//					whichbinx = (float) (binning.nbin_x + 2);
 					whichbinx_int = binning.nbin_x + 2;
 				}
 				else
@@ -180,12 +231,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 				}
 				if (px < binning.pxmin)
 				{
-					//					whichbinpx = 0.0;
+//					whichbinpx = 0.0;
 					whichbinpx_int = 0;
 				}
 				else if (px > binning.pxmax)
 				{
-					//				  whichbinpx = (float) (binning.nbin_px + 2);
+//					whichbinpx = (float) (binning.nbin_px + 2);
 					whichbinpx_int = binning.nbin_px + 2;
 				}
 				else
@@ -199,12 +250,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 				// Etheta
 				if (E < binning.Emin)
 				{
-					//					whichbinE = 0.0;
+//					whichbinE = 0.0;
 					whichbinE_int = 0;
 				}
 				else if (E > binning.Emax)
 				{
-					//				  whichbinE = (float) (binning.nbin_E + 2);
+//					whichbinE = (float) (binning.nbin_E + 2);
 					whichbinE_int = binning.nbin_E + 2;
 				}
 				else
@@ -214,12 +265,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 				}
 				if (theta < binning.thetamin)
 				{
-					//					whichbintheta = 0.0;
+//					whichbintheta = 0.0;
 					whichbintheta_int = 0;
 				}
 				else if (theta > binning.thetamax)
 				{
-					//				  whichbintheta = (float) (binning.nbin_theta + 2);
+//					whichbintheta = (float) (binning.nbin_theta + 2);
 					whichbintheta_int = binning.nbin_theta + 2;
 				}
 				else
@@ -239,7 +290,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 		if (out_binary)
 		{
-			sprintf(nomefile_binary,"%s_7_out",fileIN);
+			sprintf(nomefile_binary,"%s.clean",fileIN);
 			binary_all_out=fopen(nomefile_binary, "ab");
 			printf("\nWriting the C binary file\n");
 			fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),binary_all_out);
@@ -278,7 +329,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		}
 
 		free(particelle);
-		//		free(particelle_elaborate);
+//		free(particelle_elaborate);
 	}
 
 
@@ -326,11 +377,37 @@ int leggi_particelle(char* fileIN, parametri binning)
 		fprintf(parameters,"xt_end=%f\n",real_param[16]);
 		fprintf(parameters,"charge=%f\n",real_param[17]);  //carica particella su carica elettrone
 		fprintf(parameters,"mass=%f\n",real_param[18]);    //massa particelle su massa elettrone
-		//	if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
+//		if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
 		fclose(parameters);
 	}
 
-	if (fai_slices)
+	if (!fai_slices && cerca_minmax && ndim == 3)
+	{
+		nomefile_Estremi << fileIN << "_extremes";
+		Estremi_out.open(nomefile_Estremi.str().c_str());
+		Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
+		Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
+		Estremi_out << "YMIN = " << estremi_min[1] << std::endl;
+		Estremi_out << "YMAX = " << estremi_max[1] << std::endl;
+		Estremi_out << "ZMIN = " << estremi_min[2] << std::endl;
+		Estremi_out << "ZMAX = " << estremi_max[2] << std::endl;
+		Estremi_out << "PXMIN = " << estremi_min[3] << std::endl;
+		Estremi_out << "PXMAX = " << estremi_max[3] << std::endl;
+		Estremi_out << "PYMIN = " << estremi_min[4] << std::endl;
+		Estremi_out << "PYMAX = " << estremi_max[4] << std::endl;
+		Estremi_out << "PZMIN = " << estremi_min[5] << std::endl;
+		Estremi_out << "PZMAX = " << estremi_max[5] << std::endl;
+		Estremi_out << "GAMMAMIN = " << estremi_min[6] << std::endl;
+		Estremi_out << "GAMMAMAX = " << estremi_max[6] << std::endl;
+		Estremi_out << "THETAMIN = " << estremi_min[7] << std::endl;
+		Estremi_out << "THETAMAX = " << estremi_max[7] << std::endl;
+		Estremi_out << "EMIN = " << estremi_min[8] << std::endl;
+		Estremi_out << "EMAX = " << estremi_max[8] << std::endl;
+		Estremi_out.close();
+	}
+
+
+	if (ndim == 3 && fai_slices && !cerca_minmax)
 	{
 		nomefile_xpx << fileIN << "_xpx";
 		nomefile_Etheta << fileIN << "_Etheta";

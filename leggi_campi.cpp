@@ -177,7 +177,7 @@ int leggi_campi(char* fileIN, parametri binning)
 	printf("=========FINE LETTURE==========\n");
 	fflush(stdout);
 
-	sprintf(nomefile_campi,"%s_out",fileIN);
+	sprintf(nomefile_campi,"%s_out.vtk",fileIN);
 	clean_fields=fopen(nomefile_campi, "w");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
@@ -191,7 +191,7 @@ int leggi_campi(char* fileIN, parametri binning)
 	dz=(zmax-zmin)/(nz1-1);
 	fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
 	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
-	fprintf(clean_fields,"SCALARS Ex float 1\n");
+	fprintf(clean_fields,"SCALARS %s float 1\n",binning.support_label);
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);

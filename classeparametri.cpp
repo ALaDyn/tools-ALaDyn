@@ -9,6 +9,7 @@ class parametri
 public:
 	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta;
 	int p[NPARAMETRI];
+	char support_label[MAX_LENGTH_FILENAME];
 	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, thetamin, thetamax;
 //	float dim_x, dim_y, dim_z, dim_px, dim_py, dim_pz, dim_E, dim_theta;
 

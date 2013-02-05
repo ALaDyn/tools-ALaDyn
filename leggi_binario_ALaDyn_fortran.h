@@ -18,12 +18,17 @@
 
 class parametri;
 
-#define NPARAMETRI	5
+#define NUMERO_MASSIMO	1.0e30
+
+#define NPARAMETRI	8
 #define WEIGHT		0
 #define FUNZIONE	1
 #define SWAP		2
 #define OUT_BINARY	3
 #define OUT_ASCII	4
+#define	FIND_MINMAX	5
+#define DO_BINNING	6
+#define OUT_PARAMS	7
 
 
 #if defined(_MSC_VER)
