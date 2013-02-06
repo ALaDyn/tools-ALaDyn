@@ -105,6 +105,18 @@ public:
 			{
 				p[OUT_ASCII] = 1;
 			}
+			else if (std::string(argv[i]) == "-parameters")
+			{
+				p[OUT_PARAMS] = 1;
+			}
+			else if (std::string(argv[i]) == "-find_minmax")
+			{
+				p[FIND_MINMAX] = 1;
+			}
+			else if (std::string(argv[i]) == "-do_binning")
+			{
+				p[DO_BINNING] = 1;
+			}
 			else if (std::string(argv[i]) == "-xmin")
 			{
 				xmin = (float) atof(argv[i+1]);
