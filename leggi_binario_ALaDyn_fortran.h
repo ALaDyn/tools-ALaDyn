@@ -40,13 +40,13 @@ class parametri;
 #include "classeparametri.cpp"
 
 #if defined(_MSC_VER)
+#include "swap_tools.h"
 #include "leggi_campi.h"
 #include "leggi_particelle.h"
-#include "swap_tools.h"
 #else
+#include "swap_tools.cpp"
 #include "leggi_campi.cpp"
 #include "leggi_particelle.cpp"
-#include "swap_tools.cpp"
 #endif
 
 
