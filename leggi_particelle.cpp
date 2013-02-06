@@ -44,6 +44,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	FILE *ascii_all_out;
 	FILE *parameters;
 	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
+	size_t fread_size;
 
 	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
@@ -53,20 +54,20 @@ int leggi_particelle(char* fileIN, parametri binning)
 	else if (fileIN[0] == 'P') tipo = 1;
 	else printf("Tipo non riconosciuto!\n");
 
-	fread((void*) &buff,sizeof(int),1,file_in);
-	fread((void*) &N_param,sizeof(int),1,file_in);
-	fread((void*) &buff,sizeof(int),1,file_in);
+	fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
+	fread_size = std::fread((void*) &N_param,sizeof(int),1,file_in);
+	fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
 	if (out_swap) swap_endian_i(&N_param,1);
 	printf("numero parametri=%i\n",N_param);
 	fflush(stdout);
 	int_param=(int*)malloc(N_param*sizeof(int));
 	real_param=(float*)malloc(N_param*sizeof(float));
-	fread(&buff,sizeof(int),1,file_in);
-	fread(int_param,sizeof(int),N_param,file_in);
-	fread(&buff,sizeof(int),1,file_in);
-	fread(&buff,sizeof(int),1,file_in);
-	fread(real_param,sizeof(float),N_param,file_in);
-	fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
 	if (out_swap) swap_endian_i(int_param,N_param);
 	if (out_swap) swap_endian_f(real_param,N_param);
 	npe=int_param[0];     //numero processori
@@ -135,9 +136,9 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 	for(ipc=0;ipc<npe;ipc++)
 	{
-		fread(&buff,sizeof(int),1,file_in); 
-		fread(&npart_loc,sizeof(int),1,file_in);
-		fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in); 
+		fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		if (out_swap) swap_endian_i(&npart_loc,1);
 		particelle=(float*)malloc(npart_loc*(2*ndim+WEIGHT)*sizeof(float));
 		//		particelle_elaborate=(float*)malloc(npart_loc*nelab*sizeof(float));
@@ -146,11 +147,11 @@ int leggi_particelle(char* fileIN, parametri binning)
 		{
 			printf("\tentro\t");
 			fflush(stdout);
-			fread(buffshort,sizeof(short),2,file_in);
+			fread_size = std::fread(buffshort,sizeof(short),2,file_in);
 			if (out_swap) swap_endian_s(buffshort,2);
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*2*ndim,buffshort[0],buffshort[1]);
-			fread(particelle,sizeof(float),npart_loc*(2*ndim+WEIGHT),file_in);
-			fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+WEIGHT),file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+WEIGHT));
 		}
 

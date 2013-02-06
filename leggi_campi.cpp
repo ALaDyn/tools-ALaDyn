@@ -23,22 +23,23 @@ int leggi_campi(char* fileIN, parametri binning)
 	float dx, dy, dz;
 	file_in=fopen(fileIN, "r");
 
+	size_t fread_size;
 
-	fread(&buff,sizeof(int),1,file_in);
-	fread(&N_param,sizeof(int),1,file_in);
-	fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(&N_param,sizeof(int),1,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 	if(out_swap) swap_endian_i(&N_param,1);
 
 	printf("numero parametri=%i\n",N_param);
 	int_param=(int*)malloc(N_param*sizeof(int));
 	real_param=(float*)malloc(N_param*sizeof(float));
-	fread(&buff,sizeof(int),1,file_in);
-	fread(int_param,sizeof(int),N_param,file_in);
-	fread(&buff,sizeof(int),1,file_in);
-	fread(&buff,sizeof(int),1,file_in);
-	fread(real_param,sizeof(float),N_param,file_in);
-	fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 	if (out_swap) swap_endian_i(int_param,N_param);
 	if (out_swap) swap_endian_f(real_param,N_param);
@@ -138,9 +139,9 @@ int leggi_campi(char* fileIN, parametri binning)
 		segnoy=0;
 		for(ipy=0;ipy<npe_y;ipy++)
 		{
-			fread(&buff,sizeof(int),1,file_in);
-			fread(npoint_loc,sizeof(int),3,file_in);
-			fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(npoint_loc,sizeof(int),3,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 			if(out_swap) swap_endian_i(npoint_loc,3);
 
@@ -153,9 +154,9 @@ int leggi_campi(char* fileIN, parametri binning)
 			fflush(stdout);
 
 			buffer=(float*)malloc(loc_size*sizeof(float));
-			fread(&buff,sizeof(int),1,file_in);
-			fread(buffer,sizeof(float),loc_size,file_in);
-			fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 			if(out_swap) swap_endian_f(buffer,loc_size);
 

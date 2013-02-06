@@ -1,6 +1,8 @@
 #ifndef __LEGGI_ALADYN_FORTRAN
 #define __LEGGI_ALADYN_FORTRAN
 
+#define _USE_MATH_DEFINES
+
 #include<cstdio>
 #include<iostream>
 #include<cstdlib>
@@ -15,10 +17,14 @@
 #define MIN(x,y) ((x)<(y)?(x):(y))
 #define TRUE 1
 #define FALSE 0
+#define P_MASS 938.272
 
 class parametri;
 
 #define NUMERO_MASSIMO	1.0e30
+#define MAX_LENGTH_FILENAME 200
+
+#pragma warning(disable : 593)
 
 #define NPARAMETRI	8
 #define WEIGHT		0
@@ -31,6 +37,8 @@ class parametri;
 #define OUT_PARAMS	7
 
 
+#include "classeparametri.cpp"
+
 #if defined(_MSC_VER)
 #include "leggi_campi.h"
 #include "leggi_particelle.h"
@@ -40,9 +48,6 @@ class parametri;
 #include "leggi_particelle.cpp"
 #include "swap_tools.cpp"
 #endif
-
-
-#include "classeparametri.cpp"
 
 
 
