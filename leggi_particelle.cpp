@@ -31,7 +31,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 	short buffshort[2];
 	float *particelle, *real_param;
-//	float *particelle_elaborate;
+	//	float *particelle_elaborate;
 	float gamma, theta, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
@@ -134,6 +134,9 @@ int leggi_particelle(char* fileIN, parametri binning)
 	}
 	float *Espec = new float [binning.nbin_E+3];
 
+	sprintf(nomefile_ascii,"%s.ascii",fileIN);
+	sprintf(nomefile_binary,"%s.clean",fileIN);
+
 	for(ipc=0;ipc<npe;ipc++)
 	{
 		fread_size = std::fread(&buff,sizeof(int),1,file_in); 
@@ -153,184 +156,182 @@ int leggi_particelle(char* fileIN, parametri binning)
 			fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+WEIGHT),file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+WEIGHT));
-		}
 
-		if (cerca_minmax && ndim == 3 && !fai_slices)
-		{
-			for (int i = 0; i < npart_loc; i++)
+			if (cerca_minmax && ndim == 3 && !fai_slices)
 			{
-//				x=fabs(*(particelle+i*(2*ndim+WEIGHT)));
-//				y=fabs(*(particelle+i*(2*ndim+WEIGHT)+1));
-//				z=fabs(*(particelle+i*(2*ndim+WEIGHT)+2));
-//				px=fabs(*(particelle+i*(2*ndim+WEIGHT)+3));
-//				py=fabs(*(particelle+i*(2*ndim+WEIGHT)+4));
-//				pz=fabs(*(particelle+i*(2*ndim+WEIGHT)+5));
-				x=*(particelle+i*(2*ndim+WEIGHT));
-				y=*(particelle+i*(2*ndim+WEIGHT)+1);
-				z=*(particelle+i*(2*ndim+WEIGHT)+2);
-				px=*(particelle+i*(2*ndim+WEIGHT)+3);
-				py=*(particelle+i*(2*ndim+WEIGHT)+4);
-				pz=*(particelle+i*(2*ndim+WEIGHT)+5);
-				gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-				theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-				E=(float)(gamma*P_MASS);								//energia
-				if (x < estremi_min[0]) estremi_min[0] = x;
-				if (x > estremi_max[0]) estremi_max[0] = x;
-				if (y < estremi_min[1]) estremi_min[1] = y;
-				if (y > estremi_max[1]) estremi_max[1] = y;
-				if (z < estremi_min[2]) estremi_min[2] = z;
-				if (z > estremi_max[2]) estremi_max[2] = z;
-				if (px < estremi_min[3]) estremi_min[3] = px;
-				if (px > estremi_max[3]) estremi_max[3] = px;
-				if (py < estremi_min[4]) estremi_min[4] = py;
-				if (py > estremi_max[4]) estremi_max[4] = py;
-				if (pz < estremi_min[5]) estremi_min[5] = pz;
-				if (pz > estremi_max[5]) estremi_max[5] = pz;
-				if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-				if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-				if (theta < estremi_min[7]) estremi_min[7] = theta;
-				if (theta > estremi_max[7]) estremi_max[7] = theta;
-				if (E < estremi_min[8]) estremi_min[8] = E;
-				if (E > estremi_max[8]) estremi_max[8] = E;
+				for (int i = 0; i < npart_loc; i++)
+				{
+					//				x=fabs(*(particelle+i*(2*ndim+WEIGHT)));
+					//				y=fabs(*(particelle+i*(2*ndim+WEIGHT)+1));
+					//				z=fabs(*(particelle+i*(2*ndim+WEIGHT)+2));
+					//				px=fabs(*(particelle+i*(2*ndim+WEIGHT)+3));
+					//				py=fabs(*(particelle+i*(2*ndim+WEIGHT)+4));
+					//				pz=fabs(*(particelle+i*(2*ndim+WEIGHT)+5));
+					x=*(particelle+i*(2*ndim+WEIGHT));
+					y=*(particelle+i*(2*ndim+WEIGHT)+1);
+					z=*(particelle+i*(2*ndim+WEIGHT)+2);
+					px=*(particelle+i*(2*ndim+WEIGHT)+3);
+					py=*(particelle+i*(2*ndim+WEIGHT)+4);
+					pz=*(particelle+i*(2*ndim+WEIGHT)+5);
+					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+					E=(float)(gamma*P_MASS);								//energia
+					if (x < estremi_min[0]) estremi_min[0] = x;
+					if (x > estremi_max[0]) estremi_max[0] = x;
+					if (y < estremi_min[1]) estremi_min[1] = y;
+					if (y > estremi_max[1]) estremi_max[1] = y;
+					if (z < estremi_min[2]) estremi_min[2] = z;
+					if (z > estremi_max[2]) estremi_max[2] = z;
+					if (px < estremi_min[3]) estremi_min[3] = px;
+					if (px > estremi_max[3]) estremi_max[3] = px;
+					if (py < estremi_min[4]) estremi_min[4] = py;
+					if (py > estremi_max[4]) estremi_max[4] = py;
+					if (pz < estremi_min[5]) estremi_min[5] = pz;
+					if (pz > estremi_max[5]) estremi_max[5] = pz;
+					if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+					if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+					if (theta < estremi_min[7]) estremi_min[7] = theta;
+					if (theta > estremi_max[7]) estremi_max[7] = theta;
+					if (E < estremi_min[8]) estremi_min[8] = E;
+					if (E > estremi_max[8]) estremi_max[8] = E;
+				}
+
 			}
 
-		}
 
-
-		if (fai_slices && ndim == 3 && !cerca_minmax)
-		{
-			for (int i = 0; i < npart_loc; i++)
+			if (npart_loc>0 && fai_slices && ndim == 3 && !cerca_minmax)
 			{
-				x=*(particelle+i*(2*ndim+WEIGHT));
-				y=*(particelle+i*(2*ndim+WEIGHT)+1);
-				z=*(particelle+i*(2*ndim+WEIGHT)+2);
-				px=*(particelle+i*(2*ndim+WEIGHT)+3);
-				py=*(particelle+i*(2*ndim+WEIGHT)+4);
-				pz=*(particelle+i*(2*ndim+WEIGHT)+5);
-//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
-//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
-				gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-				theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-				E=(float)(gamma*P_MASS);								//energia
+				for (int i = 0; i < npart_loc; i++)
+				{
+					x=*(particelle+i*(2*ndim+WEIGHT));
+					y=*(particelle+i*(2*ndim+WEIGHT)+1);
+					z=*(particelle+i*(2*ndim+WEIGHT)+2);
+					px=*(particelle+i*(2*ndim+WEIGHT)+3);
+					py=*(particelle+i*(2*ndim+WEIGHT)+4);
+					pz=*(particelle+i*(2*ndim+WEIGHT)+5);
+					//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
+					//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+					//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
+					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+					E=(float)(gamma*P_MASS);								//energia
 
-				// xpx
-				if (x < binning.xmin)
-				{
-//					whichbinx = 0.0;
-					whichbinx_int = 0;
-				}
-				else if (x > binning.xmax)
-				{
-//					whichbinx = (float) (binning.nbin_x + 2);
-					whichbinx_int = binning.nbin_x + 2;
-				}
-				else
-				{
-					whichbinx = (x - binning.xmin) / binning.dimmi_dimx();
-					whichbinx_int = (int)(whichbinx+1.0);
-				}
-				if (px < binning.pxmin)
-				{
-//					whichbinpx = 0.0;
-					whichbinpx_int = 0;
-				}
-				else if (px > binning.pxmax)
-				{
-//					whichbinpx = (float) (binning.nbin_px + 2);
-					whichbinpx_int = binning.nbin_px + 2;
-				}
-				else
-				{
-					whichbinpx = (px - binning.pxmin) / binning.dimmi_dimpx();
-					whichbinpx_int = (int)(whichbinpx+1.0);
-				}
-				if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
-				else		xpx[whichbinx_int][whichbinpx_int] += 1.0;
+					// xpx
+					if (x < binning.xmin)
+					{
+						//					whichbinx = 0.0;
+						whichbinx_int = 0;
+					}
+					else if (x > binning.xmax)
+					{
+						//					whichbinx = (float) (binning.nbin_x + 2);
+						whichbinx_int = binning.nbin_x + 2;
+					}
+					else
+					{
+						whichbinx = (x - binning.xmin) / binning.dimmi_dimx();
+						whichbinx_int = (int)(whichbinx+1.0);
+					}
+					if (px < binning.pxmin)
+					{
+						//					whichbinpx = 0.0;
+						whichbinpx_int = 0;
+					}
+					else if (px > binning.pxmax)
+					{
+						//					whichbinpx = (float) (binning.nbin_px + 2);
+						whichbinpx_int = binning.nbin_px + 2;
+					}
+					else
+					{
+						whichbinpx = (px - binning.pxmin) / binning.dimmi_dimpx();
+						whichbinpx_int = (int)(whichbinpx+1.0);
+					}
+					if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+					else		xpx[whichbinx_int][whichbinpx_int] += 1.0;
 
-				// Etheta
-				if (E < binning.Emin)
-				{
-//					whichbinE = 0.0;
-					whichbinE_int = 0;
-				}
-				else if (E > binning.Emax)
-				{
-//					whichbinE = (float) (binning.nbin_E + 2);
-					whichbinE_int = binning.nbin_E + 2;
-				}
-				else
-				{
-					whichbinE = (E - binning.Emin) / binning.dimmi_dimE();
-					whichbinE_int = (int)(whichbinE+1.0);
-				}
-				if (theta < binning.thetamin)
-				{
-//					whichbintheta = 0.0;
-					whichbintheta_int = 0;
-				}
-				else if (theta > binning.thetamax)
-				{
-//					whichbintheta = (float) (binning.nbin_theta + 2);
-					whichbintheta_int = binning.nbin_theta + 2;
-				}
-				else
-				{
-					whichbintheta = (theta - binning.thetamin) / binning.dimmi_dimtheta();
-					whichbintheta_int = (int)(whichbintheta+1.0);
-				}
-				if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
-				else		Etheta[whichbinE_int][whichbintheta_int] += 1.0;
+					// Etheta
+					if (E < binning.Emin)
+					{
+						//					whichbinE = 0.0;
+						whichbinE_int = 0;
+					}
+					else if (E > binning.Emax)
+					{
+						//					whichbinE = (float) (binning.nbin_E + 2);
+						whichbinE_int = binning.nbin_E + 2;
+					}
+					else
+					{
+						whichbinE = (E - binning.Emin) / binning.dimmi_dimE();
+						whichbinE_int = (int)(whichbinE+1.0);
+					}
+					if (theta < binning.thetamin)
+					{
+						//					whichbintheta = 0.0;
+						whichbintheta_int = 0;
+					}
+					else if (theta > binning.thetamax)
+					{
+						//					whichbintheta = (float) (binning.nbin_theta + 2);
+						whichbintheta_int = binning.nbin_theta + 2;
+					}
+					else
+					{
+						whichbintheta = (theta - binning.thetamin) / binning.dimmi_dimtheta();
+						whichbintheta_int = (int)(whichbintheta+1.0);
+					}
+					if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+					else		Etheta[whichbinE_int][whichbintheta_int] += 1.0;
 
-				// Espec
-				if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
-				else		Espec[whichbinE_int] += 1.0;
+					// Espec
+					if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+					else		Espec[whichbinE_int] += 1.0;
 
-			}
-		}
-
-		if (out_binary)
-		{
-			sprintf(nomefile_binary,"%s.clean",fileIN);
-			binary_all_out=fopen(nomefile_binary, "ab");
-			printf("\nWriting the C binary file\n");
-			fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),binary_all_out);
-			fflush(binary_all_out);
-			fclose(binary_all_out);
-		}
-
-
-
-
-		if(out_ascii)
-		{
-			sprintf(nomefile_ascii,"%s.ascii",fileIN);
-			ascii_all_out=fopen(nomefile_ascii, "a");
-
-			for(int i=0;i<nptot;i++)
-			{
-				rx=particelle[i*(6+WEIGHT)+1]*((float)1.e-4);
-				ry=particelle[i*(6+WEIGHT)+2]*((float)1.e-4);
-				rz=particelle[i*(6+WEIGHT)+0]*((float)1.e-4);
-				ux=particelle[i*(6+WEIGHT)+4];
-				uy=particelle[i*(6+WEIGHT)+5];
-				uz=particelle[i*(6+WEIGHT)+3];
-				if (WEIGHT)
-				{
-					wgh=particelle[i*(6+WEIGHT)+6];
-					fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
-				}
-				else
-				{
-					fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
 				}
 			}
-			fflush(ascii_all_out);
-			fclose(ascii_all_out);
-		}
 
-		free(particelle);
-//		free(particelle_elaborate);
+			if (out_binary)
+			{
+				binary_all_out=fopen(nomefile_binary, "ab");
+				printf("\nWriting the C binary file\n");
+				fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),binary_all_out);
+				fflush(binary_all_out);
+				fclose(binary_all_out);
+			}
+
+
+
+
+			if(out_ascii)
+			{
+				ascii_all_out=fopen(nomefile_ascii, "a");
+
+				for(int i=0;i<nptot;i++)
+				{
+					rx=particelle[i*(6+WEIGHT)+1]*((float)1.e-4);
+					ry=particelle[i*(6+WEIGHT)+2]*((float)1.e-4);
+					rz=particelle[i*(6+WEIGHT)+0]*((float)1.e-4);
+					ux=particelle[i*(6+WEIGHT)+4];
+					uy=particelle[i*(6+WEIGHT)+5];
+					uz=particelle[i*(6+WEIGHT)+3];
+					if (WEIGHT)
+					{
+						wgh=particelle[i*(6+WEIGHT)+6];
+						fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+					}
+					else
+					{
+						fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+					}
+				}
+				fflush(ascii_all_out);
+				fclose(ascii_all_out);
+			}
+
+			free(particelle);
+			//		free(particelle_elaborate);
+		}
 	}
 
 
@@ -378,7 +379,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		fprintf(parameters,"xt_end=%f\n",real_param[16]);
 		fprintf(parameters,"charge=%f\n",real_param[17]);  //carica particella su carica elettrone
 		fprintf(parameters,"mass=%f\n",real_param[18]);    //massa particelle su massa elettrone
-//		if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
+		//		if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
 		fclose(parameters);
 	}
 
@@ -434,7 +435,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		max1=binning.Emin;
 		min2=binning.thetamin-binning.dimmi_dimtheta();
 		max2=binning.thetamin;
-		
+
 		for (int i = 0; i < binning.nbin_E+3; i++)
 		{
 			for (int j = 0; j < binning.nbin_theta+3; j++)
@@ -455,7 +456,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		max1=binning.xmin;
 		min2=binning.pxmin-binning.dimmi_dimpx();
 		max2=binning.pxmin;
-		
+
 		for (int i = 0; i < binning.nbin_x+3; i++)
 		{
 			for (int j = 0; j < binning.nbin_px+3; j++)
