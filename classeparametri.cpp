@@ -74,9 +74,153 @@ public:
 		return (Emax - Emin) / nbin_E;
 	}
 
-	void leggi_da_file(char *nomefile)
+	void leggi_da_file(const char *nomefile)
 	{
-		std::cerr << "Non implementato" << std::endl;
+		std::ifstream fileParametri;
+		fileParametri.open(nomefile);
+		std::string evita, leggi;
+
+		std::cout << "Che tipo di file e'? 1 campi, 2 particelle: ";
+		std::cin >> p[FUNZIONE];
+		std::cout << "E' necessario fare lo swap dell'endian? 1 si', 0 no: ";
+		std::cin >> p[SWAP];
+		if (p[FUNZIONE] == 2)
+		{
+			std::cout << "C'e' la colonna dei weight? 0 per output vecchio (no), 1 per nuovo (si'): ";
+			std::cin >> p[WEIGHT];
+			std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
+			std::cin >> p[FIND_MINMAX];
+			if (p[FIND_MINMAX] != 1)
+			{
+				std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
+				std::cin >> p[DO_BINNING];
+				if (p[DO_BINNING] == 1)
+				{
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi; 
+					xmin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					xmax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					ymin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					ymax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					zmin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					zmax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					pxmin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					pxmax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					pymin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					pymax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> pzmin;
+					pzmin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					pzmax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					Emin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					Emax = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					thetamin = (float) atof(leggi.c_str());
+					fileParametri >> evita >> evita;
+					fileParametri >> leggi;
+					thetamax = (float) atof(leggi.c_str());
+				}
+			}
+			std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
+			std::cin >> p[OUT_BINARY];
+			std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
+			std::cin >> p[OUT_ASCII];
+		}
+		else if(p[FUNZIONE] == 1)
+		{
+			std::cout << "Inserisci label per il file: (i.e. Ex) ";
+			std::cin >> support_label;
+		}
+	}
+
+
+	void leggi_interattivo()
+	{
+		std::cout << "Che tipo di file e'? 1 campi, 2 particelle: ";
+		std::cin >> p[FUNZIONE];
+		std::cout << "E' necessario fare lo swap dell'endian? 1 si', 0 no: ";
+		std::cin >> p[SWAP];
+		if (p[FUNZIONE] == 2)
+		{
+			std::cout << "C'e' la colonna dei weight? 0 per output vecchio (no), 1 per nuovo (si'): ";
+			std::cin >> p[WEIGHT];
+			std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
+			std::cin >> p[FIND_MINMAX];
+			if (p[FIND_MINMAX] != 1)
+			{
+				std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
+				std::cin >> p[DO_BINNING];
+				if (p[DO_BINNING] == 1)
+				{
+					std::cout << "xmin = ";
+					std::cin >> xmin;
+					std::cout << "xmax = ";
+					std::cin >> xmax;
+					std::cout << "ymin = ";
+					std::cin >> ymin;
+					std::cout << "ymax = ";
+					std::cin >> ymax;
+					std::cout << "zmin = ";
+					std::cin >> zmin;
+					std::cout << "zmax = ";
+					std::cin >> zmax;
+					std::cout << "pxmin = ";
+					std::cin >> pxmin;
+					std::cout << "pxmax = ";
+					std::cin >> pxmax;
+					std::cout << "pymin = ";
+					std::cin >> pymin;
+					std::cout << "pymax = ";
+					std::cin >> pymax;
+					std::cout << "pzmin = ";
+					std::cin >> pzmin;
+					std::cout << "pzmax = ";
+					std::cin >> pzmax;
+					std::cout << "Emin = ";
+					std::cin >> Emin;
+					std::cout << "Emax = ";
+					std::cin >> Emax;
+					std::cout << "thetamin = ";
+					std::cin >> thetamin;
+					std::cout << "thetamax = ";
+					std::cin >> thetamax;
+				}
+			}
+			std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
+			std::cin >> p[OUT_BINARY];
+			std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
+			std::cin >> p[OUT_ASCII];
+		}
+		else if(p[FUNZIONE] == 1)
+		{
+			std::cout << "Inserisci label per il file: (i.e. Ex) ";
+			std::cin >> support_label;
+		}
 	}
 
 	void leggi_da_shell(int argc, char *argv[])

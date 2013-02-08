@@ -19,31 +19,7 @@ int main (int argc, char *argv[])
 	else if (argc == 2)
 	{
 		std::cout << "Programma di conversione da output binario Fortran ad output \"umano\"" << std::endl;
-		std::cout << "Che tipo di file e'? 1 campi, 2 particelle: ";
-		std::cin >> binning.p[FUNZIONE];
-		std::cout << "E' necessario fare lo swap dell'endian? 1 si', 0 no: ";
-		std::cin >> binning.p[SWAP];
-		if (binning.p[FUNZIONE] == 2)
-		{
-			std::cout << "C'e' la colonna dei weight? 0 per output vecchio (no), 1 per nuovo (si'): ";
-			std::cin >> binning.p[WEIGHT];
-			std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
-			std::cin >> binning.p[FIND_MINMAX];
-			if (binning.p[FIND_MINMAX] != 1)
-			{
-				std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
-				std::cin >> binning.p[DO_BINNING];
-			}
-			std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
-			std::cin >> binning.p[OUT_BINARY];
-			std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
-			std::cin >> binning.p[OUT_ASCII];
-		}
-		else if(binning.p[FUNZIONE] == 1)
-		{
-			std::cout << "Inserisci label per il file: (i.e. Ex) ";
-			std::cin >> binning.support_label;
-		}
+		binning.leggi_interattivo();
 	}
 
 	else if (std::string(argv[2]) == "-readParamfromFile")

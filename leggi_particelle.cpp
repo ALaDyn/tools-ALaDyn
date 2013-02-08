@@ -199,7 +199,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 			}
 
 
-			if (npart_loc>0 && fai_slices && ndim == 3 && !cerca_minmax)
+			if (fai_slices && ndim == 3 && !cerca_minmax)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
