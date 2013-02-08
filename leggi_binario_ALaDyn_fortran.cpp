@@ -7,9 +7,11 @@
 int main (int argc, char *argv[])
 {
 	parametri binning;
-	bool testParametri;
+	bool testParametri = true;;
 	bool fallita_lettura_inputfile = true;
 	std::ifstream inputfile;
+
+	std::cout << "v1.0" << std::endl;
 
 	if (argc == 1)
 	{
@@ -32,19 +34,27 @@ int main (int argc, char *argv[])
 		binning.leggi_da_shell(argc, argv);
 	}
 
+	for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << binning.p[i] << std::endl;
+
 	inputfile.open(argv[1]);
 	fallita_lettura_inputfile = inputfile.fail();
 	inputfile.close();
 	testParametri = binning.check_parametri();
 
-	if ( 
-		    ( testParametri == false																) 
-		 || ( fallita_lettura_inputfile																)
-		 || ( binning.p[FIND_MINMAX] && binning.p[DO_BINNING]										)
-	   )
+	if ( testParametri == false	)
 	{
-		std::cout << "Input sbagliato! (maggiori dettagli in futuro...)" << std::endl;
+		std::cout << "Parametri non coerenti" << std::endl;
 		return -2;
+	}
+	if ( fallita_lettura_inputfile )
+	{
+		std::cout << "Input file non trovato" << std::endl;
+		return -3;
+	}
+	if ( binning.p[FIND_MINMAX] && binning.p[DO_BINNING] )
+	{
+		std::cout << "Non riesco a fare altro che cercare minimi e massimi" << std::endl;
+		return -4;
 	}
 
 	if (binning.p[FUNZIONE] == 1) leggi_campi(argv[1], binning);

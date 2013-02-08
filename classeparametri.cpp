@@ -146,6 +146,7 @@ public:
 					thetamax = (float) atof(leggi.c_str());
 				}
 			}
+			else p[DO_BINNING] = 0;
 			std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
 			std::cin >> p[OUT_BINARY];
 			std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
@@ -211,10 +212,13 @@ public:
 					std::cin >> thetamax;
 				}
 			}
+			else p[DO_BINNING] = 0;
 			std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
 			std::cin >> p[OUT_BINARY];
 			std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
 			std::cin >> p[OUT_ASCII];
+			std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
+			std::cin >> p[OUT_PARAMS];
 		}
 		else if(p[FUNZIONE] == 1)
 		{

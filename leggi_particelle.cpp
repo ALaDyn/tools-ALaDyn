@@ -143,19 +143,20 @@ int leggi_particelle(char* fileIN, parametri binning)
 		fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		if (out_swap) swap_endian_i(&npart_loc,1);
-		particelle=(float*)malloc(npart_loc*(2*ndim+WEIGHT)*sizeof(float));
-		//		particelle_elaborate=(float*)malloc(npart_loc*nelab*sizeof(float));
+		particelle=(float*)malloc(npart_loc*(2*ndim+binning.p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
 		if(npart_loc>0)
 		{
 			printf("\tentro\t");
 			fflush(stdout);
 			fread_size = std::fread(buffshort,sizeof(short),2,file_in);
+			// buffshort[0] = ???
+			// buffshort[1] = ???
 			if (out_swap) swap_endian_s(buffshort,2);
-			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*2*ndim,buffshort[0],buffshort[1]);
-			fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+WEIGHT),file_in);
+			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+binning.p[WEIGHT]),buffshort[0],buffshort[1]);
+			fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+WEIGHT));
+			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+binning.p[WEIGHT]));
 
 			if (cerca_minmax && ndim == 3 && !fai_slices)
 			{
@@ -167,12 +168,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 					//				px=fabs(*(particelle+i*(2*ndim+WEIGHT)+3));
 					//				py=fabs(*(particelle+i*(2*ndim+WEIGHT)+4));
 					//				pz=fabs(*(particelle+i*(2*ndim+WEIGHT)+5));
-					x=*(particelle+i*(2*ndim+WEIGHT));
-					y=*(particelle+i*(2*ndim+WEIGHT)+1);
-					z=*(particelle+i*(2*ndim+WEIGHT)+2);
-					px=*(particelle+i*(2*ndim+WEIGHT)+3);
-					py=*(particelle+i*(2*ndim+WEIGHT)+4);
-					pz=*(particelle+i*(2*ndim+WEIGHT)+5);
+					x=*(particelle+i*(2*ndim+binning.p[WEIGHT]));
+					y=*(particelle+i*(2*ndim+binning.p[WEIGHT])+1);
+					z=*(particelle+i*(2*ndim+binning.p[WEIGHT])+2);
+					px=*(particelle+i*(2*ndim+binning.p[WEIGHT])+3);
+					py=*(particelle+i*(2*ndim+binning.p[WEIGHT])+4);
+					pz=*(particelle+i*(2*ndim+binning.p[WEIGHT])+5);
 					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 					E=(float)(gamma*P_MASS);								//energia
@@ -203,12 +204,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
-					x=*(particelle+i*(2*ndim+WEIGHT));
-					y=*(particelle+i*(2*ndim+WEIGHT)+1);
-					z=*(particelle+i*(2*ndim+WEIGHT)+2);
-					px=*(particelle+i*(2*ndim+WEIGHT)+3);
-					py=*(particelle+i*(2*ndim+WEIGHT)+4);
-					pz=*(particelle+i*(2*ndim+WEIGHT)+5);
+					x=*(particelle+i*(2*ndim+binning.p[WEIGHT]));
+					y=*(particelle+i*(2*ndim+binning.p[WEIGHT])+1);
+					z=*(particelle+i*(2*ndim+binning.p[WEIGHT])+2);
+					px=*(particelle+i*(2*ndim+binning.p[WEIGHT])+3);
+					py=*(particelle+i*(2*ndim+binning.p[WEIGHT])+4);
+					pz=*(particelle+i*(2*ndim+binning.p[WEIGHT])+5);
 					//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
 					//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 					//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
@@ -247,7 +248,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 						whichbinpx = (px - binning.pxmin) / binning.dimmi_dimpx();
 						whichbinpx_int = (int)(whichbinpx+1.0);
 					}
-					if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+					if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+binning.p[WEIGHT])+6);
 					else		xpx[whichbinx_int][whichbinpx_int] += 1.0;
 
 					// Etheta
@@ -281,11 +282,11 @@ int leggi_particelle(char* fileIN, parametri binning)
 						whichbintheta = (theta - binning.thetamin) / binning.dimmi_dimtheta();
 						whichbintheta_int = (int)(whichbintheta+1.0);
 					}
-					if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+					if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+binning.p[WEIGHT])+6);
 					else		Etheta[whichbinE_int][whichbintheta_int] += 1.0;
 
 					// Espec
-					if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+WEIGHT)+6);
+					if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+binning.p[WEIGHT])+6);
 					else		Espec[whichbinE_int] += 1.0;
 
 				}
@@ -295,7 +296,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 			{
 				binary_all_out=fopen(nomefile_binary, "ab");
 				printf("\nWriting the C binary file\n");
-				fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+WEIGHT),binary_all_out);
+				fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+binning.p[WEIGHT]),binary_all_out);
 				fflush(binary_all_out);
 				fclose(binary_all_out);
 			}
@@ -309,15 +310,15 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 				for(int i=0;i<nptot;i++)
 				{
-					rx=particelle[i*(6+WEIGHT)+1]*((float)1.e-4);
-					ry=particelle[i*(6+WEIGHT)+2]*((float)1.e-4);
-					rz=particelle[i*(6+WEIGHT)+0]*((float)1.e-4);
-					ux=particelle[i*(6+WEIGHT)+4];
-					uy=particelle[i*(6+WEIGHT)+5];
-					uz=particelle[i*(6+WEIGHT)+3];
-					if (WEIGHT)
+					rx=particelle[i*(6+binning.p[WEIGHT])+1]*((float)1.e-4);
+					ry=particelle[i*(6+binning.p[WEIGHT])+2]*((float)1.e-4);
+					rz=particelle[i*(6+binning.p[WEIGHT])+0]*((float)1.e-4);
+					ux=particelle[i*(6+binning.p[WEIGHT])+4];
+					uy=particelle[i*(6+binning.p[WEIGHT])+5];
+					uz=particelle[i*(6+binning.p[WEIGHT])+3];
+					if (binning.p[WEIGHT])
 					{
-						wgh=particelle[i*(6+WEIGHT)+6];
+						wgh=particelle[i*(6+binning.p[WEIGHT])+6];
 						fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
 					}
 					else
