@@ -359,6 +359,11 @@ public:
 	bool check_parametri()
 	{
 		bool test = true;
+//		 || ( binning.p[FUNZIONE] != 1 && binning.p[FUNZIONE]   != 2								) 
+//		 || ( binning.p[SWAP]     != 0 && binning.p[SWAP]       != 1								) 
+//		 || ( binning.p[FUNZIONE] == 2 && binning.p[WEIGHT]     != 0 && binning.p[WEIGHT]     != 1	)  
+//		 || ( binning.p[FUNZIONE] == 2 && binning.p[OUT_ASCII]  != 0 && binning.p[OUT_ASCII]  != 1	) 
+//		 || ( binning.p[FUNZIONE] == 2 && binning.p[OUT_BINARY] != 0 && binning.p[OUT_BINARY] != 1  ) 
 	//	( xmin < xmax ) ? test = true : test = false;
 	//	( ymin < ymax ) ? test = true : test = false;
 	//	( zmin < zmax ) ? test = true : test = false;

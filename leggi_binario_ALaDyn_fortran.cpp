@@ -37,13 +37,8 @@ int main (int argc, char *argv[])
 	inputfile.close();
 	testParametri = binning.check_parametri();
 
-	if (
-		    ( binning.p[FUNZIONE] != 1 && binning.p[FUNZIONE]   != 2								) 
-		 || ( binning.p[SWAP]     != 0 && binning.p[SWAP]       != 1								) 
-		 || ( binning.p[FUNZIONE] == 2 && binning.p[WEIGHT]     != 0 && binning.p[WEIGHT]     != 1	)  
-		 || ( binning.p[FUNZIONE] == 2 && binning.p[OUT_ASCII]  != 0 && binning.p[OUT_ASCII]  != 1	) 
-		 || ( binning.p[FUNZIONE] == 2 && binning.p[OUT_BINARY] != 0 && binning.p[OUT_BINARY] != 1  ) 
-		 || ( testParametri == false																) 
+	if ( 
+		    ( testParametri == false																) 
 		 || ( fallita_lettura_inputfile																)
 		 || ( binning.p[FIND_MINMAX] && binning.p[DO_BINNING]										)
 	   )
