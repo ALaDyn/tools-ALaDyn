@@ -11,7 +11,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	int out_binary = binning.p[OUT_BINARY];
 	int out_ascii = binning.p[OUT_ASCII];
 	int out_parameters = binning.p[OUT_PARAMS];
-	int fai_slices = binning.p[DO_BINNING];
+	int fai_binning = binning.p[DO_BINNING];
 	int cerca_minmax = binning.p[FIND_MINMAX];
 
 	float whichbinx = 0., whichbinpx = 0.;
@@ -137,6 +137,32 @@ int leggi_particelle(char* fileIN, parametri binning)
 	sprintf(nomefile_ascii,"%s.ascii",fileIN);
 	sprintf(nomefile_binary,"%s.clean",fileIN);
 
+
+#ifdef ENABLE_DEBUG
+	if (fai_binning)
+	{
+					std::cout << "XMIN = " << binning.xmin << std::endl;
+					std::cout << "XMAX = " << binning.xmax << std::endl;
+					std::cout << "YMIN = " << binning.ymin << std::endl;
+					std::cout << "YMAX = " << binning.ymax << std::endl;
+					std::cout << "ZMIN = " << binning.zmin << std::endl;
+					std::cout << "ZMAX = " << binning.zmax << std::endl;
+					std::cout << "PXMIN = " << binning.pxmin << std::endl;
+					std::cout << "PXMAX = " << binning.pxmax << std::endl;
+					std::cout << "PYMIN = " << binning.pymin << std::endl;
+					std::cout << "PYMAX = " << binning.pymax << std::endl;
+					std::cout << "PZMIN = " << binning.pzmin << std::endl;
+					std::cout << "PZMAX = " << binning.pzmax << std::endl;
+					std::cout << "GAMMAMIN = " << binning.gammamin << std::endl;
+					std::cout << "GAMMAMAX = " << binning.gammamax << std::endl;
+					std::cout << "THETAMIN = " << binning.thetamin << std::endl;
+					std::cout << "THETAMAX = " << binning.thetamax << std::endl;
+					std::cout << "EMIN = " << binning.Emin << std::endl;
+					std::cout << "EMAX = " << binning.Emax << std::endl;
+	}
+#endif
+
+
 	for(ipc=0;ipc<npe;ipc++)
 	{
 		fread_size = std::fread(&buff,sizeof(int),1,file_in); 
@@ -158,7 +184,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+binning.p[WEIGHT]));
 
-			if (cerca_minmax && ndim == 3 && !fai_slices)
+			if (cerca_minmax && ndim == 3 && !fai_binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
@@ -200,7 +226,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 			}
 
 
-			if (fai_slices && ndim == 3 && !cerca_minmax)
+			if (fai_binning && ndim == 3 && !cerca_minmax)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
@@ -384,7 +410,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		fclose(parameters);
 	}
 
-	if (!fai_slices && cerca_minmax && ndim == 3)
+	if (!fai_binning && cerca_minmax && ndim == 3)
 	{
 		nomefile_Estremi << fileIN << "_extremes";
 		Estremi_out.open(nomefile_Estremi.str().c_str());
@@ -410,7 +436,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	}
 
 
-	if (ndim == 3 && fai_slices && !cerca_minmax)
+	if (ndim == 3 && fai_binning && !cerca_minmax)
 	{
 		nomefile_xpx << fileIN << "_xpx";
 		nomefile_Etheta << fileIN << "_Etheta";
