@@ -12,6 +12,23 @@
 #include<fstream>
 #include<sstream>
 #include<iomanip>
+#include<cstdarg>
+#ifndef _WIN32
+#include <strings.h>
+#else
+int    strcasecmp(const char* s1, const char* s2)
+{
+    for (;;) {
+        int c1 = tolower( *((unsigned char*) s1++));
+        int c2 = tolower( *((unsigned char*) s2++));
+
+        if ((c1 != c2) || (c1 == '\0')) {
+            return( c1 - c2);
+        }
+    }
+}
+#endif
+
 
 // #define ENABLE_DEBUG
 
@@ -20,7 +37,18 @@
 #define MIN(x,y) ((x)<(y)?(x):(y))
 #define TRUE 1
 #define FALSE 0
-#define P_MASS 938.272
+
+#define C						2.99792458e+10		// cm / s
+#define ME_G					9.10938291E-28		// electron mass [g]
+#define MP_G					1.6726231e-24		// proton mass [g]
+#define MP_MEV					938.272013			// proton mass [MeV/c^2]
+#define ME_MEV					0.510998928			// electron mass [MeV/c^2]
+// #define CHARGE				4.80320425e-10		// statC	commentata perche' Turchetti la usa un po' diversa
+#define CHARGE					4.803262e-10		// statC    valore usato da Turchetti; nb: e' impreciso negli ultimi due decimali
+#define FROM_TESLA_TO_GAUSS		1.0e+4
+// #define DA_ERG_A_MEV			6.2415097523028e+5	// conversione Servizi
+#define DA_ERG_A_MEV			6.241509744512e+5	// conversione Sinigardi
+#define FROM_VOLT_TO_STATVOLT	3.335640951982e-3	// 1 statvolt = 299.792458 volts.
 
 class parametri;
 
