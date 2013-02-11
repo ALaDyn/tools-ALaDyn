@@ -1,5 +1,5 @@
-# include <leggi_binario_ALaDyn_fortran.h>
-# include <stdarg.h>
+# include "leggi_binario_ALaDyn_fortran.h"
+
 /*
                                    _Filtro
 
@@ -48,7 +48,7 @@ _Filtro :: cost ma usando degli unsigned int.
 
 I metodi static
 
-                         double * _Filtro :: costruisci_filtro
+                         float * _Filtro :: costruisci_filtro
                              void _Filtro :: individua_filtro
 
 lavorando in coppia, risparmiano al programmatore la grana di doversi ricordare
@@ -67,7 +67,7 @@ se viene usato come terzo parametro il valore reso da costruisci_filtro).
 Il primo argomento da fornire al costruttore è, ovviamente, il puntatore ai
 dati da filtrare; il secondo è un puntatore a due interi che siano,
 nell'ordine, il numero di "particelle" e il numero di dati per particella.
-Il terzo argomento è un array ordinato di valori double che contiene le diverse
+Il terzo argomento è un array ordinato di valori float che contiene le diverse
 soglie da utilizzare per la filtratura. Il quarto, se fornito, rappresenta i
 filtri da applicare; se non fornito viene costruito da "costruisci_filtro"
 assieme all'array da usare come terzo argomento.
@@ -138,8 +138,8 @@ struct _Filtro
    {xmin, ymin, zmin, xmax, ymax, zmax,
     pxmin, pymin, pzmin, pxmax, pymax, pzmax,
     emin, emax} nomi;
-static double * costruisci_filtro(const char *, ...);
-static void individua_filtro(char *, double, double *&);
+static float * costruisci_filtro(const char *, ...);
+static void individua_filtro(char *, float, float *&);
 static const unsigned int cost[];
 static unsigned int maschera_interna;
 struct _flag_filtri
@@ -167,8 +167,8 @@ struct _flag_filtri
 // varie ed eventuali
    } flag_filtri;
   static const char * descr[];
-  _Filtro(double *dati, unsigned int n_dati[], double *val, unsigned int maschera = 0)
-    {double * pntt_loc, p[3], E;
+  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int maschera = 0)
+    {float * pntt_loc, p[3], E;
      unsigned int corrente = 0, tests[32];
      bool flag;
      unsigned char tot_test = 0;
@@ -189,7 +189,7 @@ struct _flag_filtri
        for(unsigned char c=0; c < tot_test; ++c)
          {if(!flag) break;
           if(tests[c] == __0X12 || tests[c] == __0X13)
-            E = P_MASS * sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]);
+            E = MP_MEV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f);
           switch(tests[c])
             {case __0X00: // cost::xmin
                nomi = _Nomi::xmin;
@@ -252,10 +252,12 @@ struct _flag_filtri
                flag = flag && flag_filtri . piu_pzmax;
              }
              if(tests[c] == __0X12) // cost::emin
-                flag_filtri . meno_ener = E >= val[n_dati[1]],
+                std :: cerr << "confronto emin " << E << ' ' << val[12] << '\n',
+                flag_filtri . meno_ener = E >= val[12],
                 flag = flag && flag_filtri . meno_ener;
              if(tests[c] == __0X13)  // cost::emax
-                flag_filtri . piu_ener = E <= val[n_dati[1]+1],
+                std :: cerr << "confronto emax " << E << ' ' << val[13] << '\n',
+                flag_filtri . piu_ener = E <= val[13],
                 flag = flag && flag_filtri . piu_ener;
 
           }
@@ -294,15 +296,15 @@ __0X16, __0X17, __0X18, __0X19, __0X20, __0X21, __0X22, __0X23,
 __0X24, __0X25, __0X26, __0X27, __0X28, __0X29, __0X30, __0X31
 };
 
-double * _Filtro :: costruisci_filtro(const char *p, ...)
+float * _Filtro :: costruisci_filtro(const char *p, ...)
  {va_list app;
   char * buff = new char[128], *z = buff;
-  double val, *tutti_val = new double[NUM_FILTRI];
+  float val, *tutti_val = new float[NUM_FILTRI];
   va_start(app, p);
   strcpy(buff, p);
   do
    {
-    val = va_arg(app, double);
+    val = (float)va_arg(app, double);
     individua_filtro(buff, val, tutti_val);
     if(!tutti_val) return nullptr;
     z = va_arg(app, char *);
@@ -313,10 +315,11 @@ double * _Filtro :: costruisci_filtro(const char *p, ...)
   va_end(app);
   return tutti_val;}
 
-void _Filtro :: individua_filtro(char *b, double v, double *& V)
+void _Filtro :: individua_filtro(char *b, float v, float *& V)
   {int i;
    for(i=0; i < NUM_FILTRI; ++i) if(!strcasecmp(b, descr[i])) break;
    if(i >= NUM_FILTRI) {V = nullptr; return;}
+   std :: cerr << "da individua i = " << i << " ci va " << v << '\n',
    V[i] = v;
    maschera_interna |= cost :: tutte[i];
    }
@@ -326,7 +329,7 @@ unsigned int _Filtro :: maschera_interna = 0;
 int main(int narg, char ** args)
  {using namespace std;
 
-  double * dati = new double[56], // array dei dati
+  float * dati = new float[56], // array dei dati
   val[] = {1,1,1,1,1,1,1,1,1,1,1,3,1,1}; // array ordinato delle soglie
   unsigned int N[] {8, 7},  // struttura fine del puntatore "dati"
   m = cost :: xmin | cost :: pzmax; // filtri che si vogliono applicare
@@ -334,7 +337,7 @@ int main(int narg, char ** args)
 
   // i dati da filtrare sono presi da un file: consistono in 8 righe di 7 dati ciascuna
   ifstream issa(args[1]);
-  issa . read (reinterpret_cast<char*>(dati), 56*sizeof(double));
+  issa . read (reinterpret_cast<char*>(dati), 56*sizeof(float));
   issa . close();
 
 
@@ -355,8 +358,8 @@ int main(int narg, char ** args)
 
 
   // oppure applicazione ERRATA del filtro (contumelia, ma "no operation")
-  _Filtro(dati, N, _Filtro :: costruisci_filtro("MERDE", 1.0, "PUPU", 5.0, (char *)NULL));
-
+  //_Filtro(dati, N, _Filtro :: costruisci_filtro("MERDE", 1.0, "PUPU", 5.0, (char *)NULL));
+  _Filtro(dati, N, _Filtro :: costruisci_filtro("EMIN", 300.f, "EMAX", 350.f, (char *)NULL));
 
   // all'uscita in "dati", a partire dall'inizio, sopravvivono N[0] particelle
   cout << "sopravvissute " << N[0] << " particelle\n";
