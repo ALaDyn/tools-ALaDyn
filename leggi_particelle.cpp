@@ -2,7 +2,7 @@
 #define __LEGGI_PARTICELLE_C
 
 #include "leggi_particelle.h"
-
+#include "filtro.cpp"
 
 
 int leggi_particelle(char* fileIN, parametri binning)
@@ -171,6 +171,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		if (out_swap) swap_endian_i(&npart_loc,1);
 		particelle=(float*)malloc(npart_loc*(2*ndim+binning.p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
+		unsigned int val[] = {npart_loc, 2*ndim+binning.p[WEIGHT]};
 		if(npart_loc>0)
 		{
 			printf("\tentro\t");
@@ -183,7 +184,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 			fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+binning.p[WEIGHT]));
-
+			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",binning.Emin,"Emax",binning.Emax,(char *) NULL));
 			if (cerca_minmax && ndim == 3 && !fai_binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
@@ -202,7 +203,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 					pz=*(particelle+i*(2*ndim+binning.p[WEIGHT])+5);
 					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					E=(float)(gamma*P_MASS);								//energia
+					E=(float)(gamma*MP_MEV);								//energia
 					if (x < estremi_min[0]) estremi_min[0] = x;
 					if (x > estremi_max[0]) estremi_max[0] = x;
 					if (y < estremi_min[1]) estremi_min[1] = y;
@@ -241,7 +242,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 					//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
 					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					E=(float)(gamma*P_MASS);								//energia
+					E=(float)(gamma*MP_MEV);								//energia
 
 					// xpx
 					if (x < binning.xmin)
