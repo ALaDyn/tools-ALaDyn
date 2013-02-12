@@ -1,7 +1,7 @@
 #ifndef __SWAP_TOOLS_C
 #define __SWAP_TOOLS_C
 
-#include "swap_tools.h"
+#include "leggi_binario_ALaDyn_fortran.h"
 
 
 void swap_endian_s(short* in_s,int n)

@@ -4,19 +4,11 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-class parametri
-{
-public:
-	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
-	int p[NPARAMETRI];
-	char support_label[MAX_LENGTH_FILENAME];
-	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
-//	float dim_x, dim_y, dim_z, dim_px, dim_py, dim_pz, dim_E, dim_theta;
 
 	/* costruttore default - inizializza a zero per ora. Siccome tutto e' inizializzato a zero 
 	non puo' nemmeno calcolare le le dimensioni dei bin!
 	Verificare che non ci siano cose intelligenti da poter fare! */
-	parametri()
+parametri :: parametri()
 	{
 		nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 0;
 		xmin = xmax = pxmin = pxmax = ymin = ymax = pymin = pymax = zmin = zmax = pzmin = pzmax = thetamin = thetamax = 0.0;
@@ -24,7 +16,7 @@ public:
 	}
 
 	/* costruttore parametrico 1D */
-	parametri(float xm, float xM, float pxm, float pxM, int nx, int npx)
+	parametri :: parametri(float xm, float xM, float pxm, float pxM, int nx, int npx)
 	{
 		nbin_x = nx;
 		nbin_px = npx;
@@ -41,44 +33,44 @@ public:
 //		dim_y = dim_z = dim_py = dim_pz = dim_E = dim_theta = 0.0;
 	}
 
-	float dimmi_dimx()
+	float parametri :: dimmi_dimx()
 	{
 		return (xmax - xmin) / static_cast <float> (nbin_x);
 	}
-	float dimmi_dimy()
+	float parametri :: dimmi_dimy()
 	{
 		return (ymax - ymin) / static_cast <float> (nbin_y);
 	}
-	float dimmi_dimz()
+	float parametri :: dimmi_dimz()
 	{
 		return (zmax - zmin) / static_cast <float> (nbin_z);
 	}
-	float dimmi_dimpx()
+	float parametri :: dimmi_dimpx()
 	{
 		return (pxmax - pxmin) / static_cast <float> (nbin_px);
 	}
-	float dimmi_dimpy()
+	float parametri :: dimmi_dimpy()
 	{
 		return (pymax - pymin) / static_cast <float> (nbin_py);
 	}
-	float dimmi_dimpz()
+	float parametri :: dimmi_dimpz()
 	{
 		return (pzmax - pzmin) / static_cast <float> (nbin_pz);
 	}
-	float dimmi_dimgamma()
+	float parametri :: dimmi_dimgamma()
 	{
 		return (gammamax - gammamin) / static_cast <float> (nbin_gamma);
 	}
-	float dimmi_dimtheta()
+	float parametri :: dimmi_dimtheta()
 	{
 		return (thetamax - thetamin) / static_cast <float> (nbin_theta);
 	}
-	float dimmi_dimE()
+	float parametri :: dimmi_dimE()
 	{
 		return (Emax - Emin) / static_cast <float> (nbin_E);
 	}
 
-	void leggi_da_file(const char *nomefile)
+	void parametri :: leggi_da_file(const char *nomefile)
 	{
 		bool failed_opening_file = true;
 		std::ifstream fileParametri;
@@ -206,7 +198,7 @@ public:
 	}
 
 
-	void leggi_interattivo()
+	void parametri :: leggi_interattivo()
 	{
 		std::cout << "Che tipo di file e'? 1 campi, 2 particelle: ";
 		std::cin >> p[FUNZIONE];
@@ -296,7 +288,7 @@ public:
 		}
 	}
 
-	void leggi_da_shell(int argc, char *argv[])
+	void parametri :: leggi_da_shell(int argc, char *argv[])
 	{
 		for (int i = 2; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
 		{								// * Note that we're starting on 1 because we don't need to know the
@@ -474,7 +466,7 @@ public:
 
 
 	
-	bool check_parametri()
+	bool parametri :: check_parametri()
 	{
 		bool test = true;
 //		 || ( binning.p[FUNZIONE] != 1 && binning.p[FUNZIONE]   != 2								) 
@@ -498,7 +490,7 @@ public:
 	}
 
 
-};
+
 
 
 #endif

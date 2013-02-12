@@ -1,7 +1,7 @@
 #ifndef __LEGGI_CAMPI_C
 #define __LEGGI_CAMPI_C
 
-#include "leggi_campi.h"
+#include "leggi_binario_ALaDyn_fortran.h"
 
 int leggi_campi(char* fileIN, parametri binning)
 {

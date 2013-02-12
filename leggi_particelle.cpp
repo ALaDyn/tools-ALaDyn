@@ -1,8 +1,7 @@
 #ifndef __LEGGI_PARTICELLE_C
 #define __LEGGI_PARTICELLE_C
 
-#include "leggi_particelle.h"
-#include "filtro.cpp"
+#include "leggi_binario_ALaDyn_fortran.h"
 
 
 int leggi_particelle(char* fileIN, parametri binning)
