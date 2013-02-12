@@ -78,6 +78,23 @@ Il main (commentato) che conclude il file esemplifica un paio di esecuzioni
 tipiche.
 
 */
+
+#ifndef _WIN32
+#include <strings.h>
+#else
+int    strcasecmp(const char* s1, const char* s2)
+{
+    for (;;) {
+        int c1 = tolower( *((unsigned char*) s1++));
+        int c2 = tolower( *((unsigned char*) s2++));
+
+        if ((c1 != c2) || (c1 == '\0')) {
+            return( c1 - c2);
+        }
+    }
+}
+#endif
+
 namespace cost
  {unsigned int xmin = __0X00;
   unsigned int ymin = __0X01;
@@ -121,7 +138,7 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
        for(unsigned char c=0; c < tot_test; ++c)
          {if(!flag) break;
           if(tests[c] == __0X12 || tests[c] == __0X13)
-            E = MP_MEV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f);
+            E = (float) (MP_MEV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
           switch(tests[c])
             {case __0X00: // cost::xmin
                nomi = _Nomi::xmin;
@@ -194,7 +211,7 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
 
           }
        if(!flag) continue;
-       for(int k=0; k < n_dati[1]; ++k) dati[n_dati[1]*corrente+k] = pntt_loc[k];
+       for(unsigned int k=0; k < n_dati[1]; ++k) dati[n_dati[1]*corrente+k] = pntt_loc[k];
        corrente++;
        }
      n_dati[0] = corrente,
