@@ -78,6 +78,26 @@ Il main (commentato) che conclude il file esemplifica un paio di esecuzioni
 tipiche.
 
 */
+namespace cost
+ {unsigned int xmin = __0X00;
+  unsigned int ymin = __0X01;
+  unsigned int zmin = __0X02;
+  unsigned int pxmin = __0X03;
+  unsigned int pymin = __0X04;
+  unsigned int pzmin = __0X05;
+  unsigned int xmax = __0X06;
+  unsigned int ymax = __0X07;
+  unsigned int zmax = __0X08;
+  unsigned int pxmax = __0X09;
+  unsigned int pymax = __0X10;
+  unsigned int pzmax = __0X11;
+  unsigned int emin = __0X12;
+  unsigned int emax = __0X13;
+  unsigned int tutte[]=
+   {xmin, ymin, zmin, pxmin, pymin, pzmin, xmax, ymax, zmax, pxmax, pymax, pzmax, emin, emax};
+// varie ed eventuali
+  }
+
 
 _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
     {float * pntt_loc, p[3], E;

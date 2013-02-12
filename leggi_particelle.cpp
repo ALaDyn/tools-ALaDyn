@@ -170,7 +170,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 		if (out_swap) swap_endian_i(&npart_loc,1);
 		particelle=(float*)malloc(npart_loc*(2*ndim+binning.p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
-		unsigned int val[] = {npart_loc, 2*ndim+binning.p[WEIGHT]};
+		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+binning.p[WEIGHT])};
 		if(npart_loc>0)
 		{
 			printf("\tentro\t");
