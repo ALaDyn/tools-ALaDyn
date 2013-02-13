@@ -11,7 +11,7 @@ int main (int argc, char *argv[])
 	bool fallita_lettura_inputfile = true;
 	std::ifstream inputfile;
 
-	std::cout << "v1.0" << std::endl;
+	std::cout << "Binary file reader v2.0" << std::endl;
 
 	if (argc == 1)
 	{
@@ -34,7 +34,9 @@ int main (int argc, char *argv[])
 		binning.leggi_da_shell(argc, argv);
 	}
 
+#ifdef ENABLE_DEBUG
 	for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << binning.p[i] << std::endl;
+#endif
 
 	inputfile.open(argv[1]);
 	fallita_lettura_inputfile = inputfile.fail();
@@ -51,7 +53,7 @@ int main (int argc, char *argv[])
 		std::cout << "Input file non trovato" << std::endl;
 		return -3;
 	}
-	if ( binning.p[FIND_MINMAX] && binning.p[DO_BINNING] )
+	if ( binning.p[FUNZIONE] == 2 && binning.p[FIND_MINMAX] && binning.p[DO_BINNING] )
 	{
 		std::cout << "Non riesco a fare altro che cercare minimi e massimi" << std::endl;
 		return -4;
