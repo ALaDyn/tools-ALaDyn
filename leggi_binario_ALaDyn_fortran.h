@@ -90,7 +90,7 @@
 
 
 struct parametri
- {
+{
 	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
 	int p[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
@@ -114,41 +114,46 @@ struct parametri
 };
 
 struct _Filtro
- {
-  enum class _Nomi : int
-   {xmin, ymin, zmin, xmax, ymax, zmax,
-    pxmin, pymin, pzmin, pxmax, pymax, pzmax,
-    emin, emax} nomi;
-static float * costruisci_filtro(const char *, ...);
-static void individua_filtro(char *, float, float *&);
-static const unsigned int cost[];
-static unsigned int maschera_interna;
-struct _flag_filtri
- {unsigned meno_xmin:1;
-  unsigned meno_ymin:1;
-  unsigned meno_zmin:1;
-  unsigned piu_xmax:1;
-  unsigned piu_ymax:1;
-  unsigned piu_zmax:1;
-  unsigned meno_pxmin:1;
-  unsigned meno_pymin:1;
-  unsigned meno_pzmin:1;
-  unsigned piu_pxmax:1;
-  unsigned piu_pymax:1;
-  unsigned piu_pzmax:1;
-  unsigned meno_ener:1;
-  unsigned piu_ener:1;
-  _flag_filtri operator=(int o)
-   {meno_xmin = meno_ymin = meno_zmin =
-    meno_pxmin = meno_pymin = meno_pzmin =
-    piu_xmax = piu_ymax = piu_zmax =
-    piu_pxmax = piu_pymax = piu_pzmax =
-    meno_ener = piu_ener = 0;
-    return *this;}
-// varie ed eventuali
-   } flag_filtri;
-  static const char * descr[];
-  _Filtro(float *, unsigned int [], float *, unsigned int = 0);
+{
+	enum _Nomi
+	{
+		xmin, ymin, zmin, xmax, ymax, zmax,
+		pxmin, pymin, pzmin, pxmax, pymax, pzmax,
+		emin, emax
+	} nomi;
+	static float * costruisci_filtro(const char *, ...);
+	static void individua_filtro(char *, float, float *&);
+	static const unsigned int cost[];
+	static unsigned int maschera_interna;
+	struct _flag_filtri
+	{
+		unsigned meno_xmin:1;
+		unsigned meno_ymin:1;
+		unsigned meno_zmin:1;
+		unsigned piu_xmax:1;
+		unsigned piu_ymax:1;
+		unsigned piu_zmax:1;
+		unsigned meno_pxmin:1;
+		unsigned meno_pymin:1;
+		unsigned meno_pzmin:1;
+		unsigned piu_pxmax:1;
+		unsigned piu_pymax:1;
+		unsigned piu_pzmax:1;
+		unsigned meno_ener:1;
+		unsigned piu_ener:1;
+		_flag_filtri operator=(int o)
+		{
+			meno_xmin = meno_ymin = meno_zmin =
+				meno_pxmin = meno_pymin = meno_pzmin =
+				piu_xmax = piu_ymax = piu_zmax =
+				piu_pxmax = piu_pymax = piu_pzmax =
+				meno_ener = piu_ener = 0;
+			return *this;
+		}
+		// varie ed eventuali
+	} flag_filtri;
+	static const char * descr[];
+	_Filtro(float *, unsigned int [], float *, unsigned int = 0);
 };
 
 int leggi_campi(char * , parametri );
