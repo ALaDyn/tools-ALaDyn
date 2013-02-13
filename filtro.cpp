@@ -152,62 +152,62 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
 			switch(tests[c])
 			{
 			case __0X00: // cost::xmin
-				nomi = _Nomi::xmin;
+				nomi = xmin;
 				flag_filtri . meno_xmin = pntt_loc[(int)nomi] >= val[(int)nomi];
 				flag = flag && flag_filtri . meno_xmin;
 				break;
 			case __0X01: // cost::ymin
-				nomi = _Nomi::ymin;
+				nomi = ymin;
 				flag_filtri . meno_ymin = pntt_loc[(int)nomi] >= val[(int)nomi];
 				flag = flag && flag_filtri . meno_ymin;
 				break;
 			case __0X02: // cost::zmin
-				nomi = _Nomi::zmin;
+				nomi = zmin;
 				flag_filtri . meno_zmin = pntt_loc[(int)nomi] >= val[(int)nomi];
 				flag = flag && flag_filtri . meno_zmin;
 				break;
 			case __0X03: // cost::pxmin
-				nomi = _Nomi::pxmin;
+				nomi = pxmin;
 				flag_filtri . meno_pxmin = pntt_loc[(int)nomi] >= val[(int)nomi];
 				flag = flag && flag_filtri . meno_pxmin;
 				break;
 			case __0X04: // cost::pymin
-				nomi = _Nomi::pymin;
+				nomi = pymin;
 				flag_filtri . meno_pymin = pntt_loc[(int)nomi] >= val[(int)nomi];
 				flag = flag && flag_filtri . meno_pymin;
 				break;
 			case __0X05: // cost::pzmin
-				nomi = _Nomi::pzmin;
+				nomi = pzmin;
 				flag_filtri . meno_pzmin = pntt_loc[(int)nomi] >= val[(int)nomi];
 				flag = flag && flag_filtri . meno_pzmin;
 				break;
 			case __0X06: // cost::xmax
-				nomi = _Nomi::xmax;
+				nomi = xmax;
 				flag_filtri . piu_xmax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_xmax;
 				break;
 			case __0X07: // cost::ymax
-				nomi = _Nomi::ymax;
+				nomi = ymax;
 				flag_filtri . piu_ymax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_ymax;
 				break;
 			case __0X08: // cost::zmax
-				nomi = _Nomi::zmax;
+				nomi = zmax;
 				flag_filtri . piu_zmax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_zmax;
 				break;
 			case __0X09: // cost::pxmax
-				nomi = _Nomi::pxmax;
+				nomi = pxmax;
 				flag_filtri . piu_pxmax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_pxmax;
 				break;
 			case __0X10: // cost::pymax
-				nomi = _Nomi::pymax;
+				nomi = pymax;
 				flag_filtri . piu_pymax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_pymax;
 				break;
 			case __0X11: // cost::pzmax
-				nomi = _Nomi::pzmax;
+				nomi = pzmax;
 				flag_filtri . piu_pzmax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_pzmax;
 			}
