@@ -6,6 +6,7 @@
 
 int main (int argc, char *argv[])
 {
+	int argmin = 2;
 	parametri binning;
 	bool testParametri = true;;
 	bool fallita_lettura_inputfile = true;
@@ -15,8 +16,8 @@ int main (int argc, char *argv[])
 
 	if (argc == 1)
 	{
-		std::cout << "Si usa:\n-manuale: ./reader Nomefile.bin" << std::endl;
-		std::cout << "-batch: ./reader Nomefile.bin --parameters (see source code for details, for now)" << std::endl;
+		std::cout << "Si usa:\n-manuale: ./reader Nomefile (senza estensione!)" << std::endl;
+		std::cout << "-batch: ./reader Nomefile  --parameters (see source code for details, for now)" << std::endl;
 	}
 	else if (argc == 2)
 	{
@@ -27,20 +28,28 @@ int main (int argc, char *argv[])
 	else if (std::string(argv[2]) == "-readParamfromFile")
 	{
 		binning.leggi_da_file(argv[3]);
+		if (argc > 3) 
+		{
+			argmin = 3;
+			binning.leggi_da_shell(argmin,argv);
+		}
+		if (binning.incompleto()) binning.leggi_interattivo();
 	}
 
 	else
 	{
-		binning.leggi_da_shell(argc, argv);
+		binning.leggi_da_shell(argmin, argv);
+		if (binning.incompleto()) binning.leggi_interattivo();
 	}
 
 #ifdef ENABLE_DEBUG
 	for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << binning.p[i] << std::endl;
 #endif
 
-	inputfile.open(argv[1]);
-	fallita_lettura_inputfile = inputfile.fail();
-	inputfile.close();
+	//inputfile.open(argv[1]);
+	//fallita_lettura_inputfile = inputfile.fail();
+	//inputfile.close();
+	fallita_lettura_inputfile = false;
 	testParametri = binning.check_parametri();
 
 	if ( testParametri == false	)

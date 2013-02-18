@@ -6,12 +6,17 @@
 
 int leggi_particelle(char* fileIN, parametri binning)
 {
+	std::ostringstream nomefile_bin, nomefile_dat;
+	nomefile_bin << std::string(fileIN) << ".bin";
+	nomefile_dat << std::string(fileIN) << ".dat";
 	int out_swap = binning.p[SWAP];
 	int out_binary = binning.p[OUT_BINARY];
 	int out_ascii = binning.p[OUT_ASCII];
 	int out_parameters = binning.p[OUT_PARAMS];
 	int fai_binning = binning.p[DO_BINNING];
 	int cerca_minmax = binning.p[FIND_MINMAX];
+
+	bool old_fortran_bin = false;
 
 	float whichbinx = 0., whichbinpx = 0.;
 	int whichbinx_int = (int) whichbinx;
@@ -35,10 +40,14 @@ int leggi_particelle(char* fileIN, parametri binning)
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
+	char* trascura;
+	trascura = new char[MAX_LENGTH_FILENAME];
 	std::ostringstream nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 
 	FILE *file_in;
-	file_in=fopen(fileIN, "r");
+	std::ifstream file_dat;
+	if (!old_fortran_bin) file_dat.open(nomefile_dat.str().c_str());
+	file_in=fopen(nomefile_bin.str().c_str(), "r");
 	FILE *binary_all_out;
 	FILE *ascii_all_out;
 	FILE *parameters;
@@ -53,33 +62,108 @@ int leggi_particelle(char* fileIN, parametri binning)
 	else if (fileIN[0] == 'P') tipo = 1;
 	else printf("Tipo non riconosciuto!\n");
 
-	fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
-	fread_size = std::fread((void*) &N_param,sizeof(int),1,file_in);
-	fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
-	if (out_swap) swap_endian_i(&N_param,1);
-	printf("numero parametri=%i\n",N_param);
-	fflush(stdout);
-	int_param=(int*)malloc(N_param*sizeof(int));
-	real_param=(float*)malloc(N_param*sizeof(float));
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	if (out_swap) swap_endian_i(int_param,N_param);
-	if (out_swap) swap_endian_f(real_param,N_param);
-	npe=int_param[0];     //numero processori
-	nx=int_param[1];
-	ny_loc=int_param[2];
-	nz=int_param[3];
-	ibx=int_param[4];
-	iby=int_param[5];
-	ibz=int_param[6];
-	model=int_param[7];  //modello di laser utilizzato
-	dmodel=int_param[8]; //modello di condizioni iniziali
-	nsp=int_param[9];    //numero di speci
-	ndim=int_param[10];  //numero di componenti dello spazio dei momenti
+	if (old_fortran_bin) 
+	{
+		fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
+		fread_size = std::fread((void*) &N_param,sizeof(int),1,file_in);
+		fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
+		if (out_swap) swap_endian_i(&N_param,1);
+		printf("numero parametri=%i\n",N_param);
+		fflush(stdout);
+		int_param=(int*)malloc(N_param*sizeof(int));
+		real_param=(float*)malloc(N_param*sizeof(float));
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		if (out_swap) swap_endian_i(int_param,N_param);
+		if (out_swap) swap_endian_f(real_param,N_param);
+		npe=int_param[0];     //numero processori
+		nx=int_param[1];
+		ny_loc=int_param[2];
+		nz=int_param[3];
+		ibx=int_param[4];
+		iby=int_param[5];
+		ibz=int_param[6];
+		model=int_param[7];  //modello di laser utilizzato
+		dmodel=int_param[8]; //modello di condizioni iniziali
+		nsp=int_param[9];    //numero di speci
+		ndim=int_param[10];  //numero di componenti dello spazio dei momenti
+		np_loc=int_param[11];  //
+		lpord=int_param[12]; //ordine dello schema leapfrog
+		deord=int_param[13]; //ordine derivate
+		//current type
+		pID=int_param[15];  //tipo delle particelle
+		nptot=int_param[16]; //numero di particelle da leggere nella specie
+		ndv=int_param[17]; //numero di particelle da leggere nella specie
+		tnow=real_param[0];  /*tempo dell'output*/
+		xmin=real_param[1];  //estremi della griglia
+		xmax=real_param[2];  //estremi della griglia
+		ymin=real_param[3];  //estremi della griglia
+		ymax=real_param[4];  //estremi della griglia
+		zmin=real_param[5];  //estremi della griglia
+		zmax=real_param[6];  //estremi della griglia
+		w0x=real_param[7];      //waist del laser in x
+		w0y=real_param[8];      //waist del laser in y
+		nrat=real_param[9];     //n over n critical
+		a0=real_param[10];      // a0 laser
+		lam0=real_param[11];    // lambda
+		E0=real_param[12];      //conversione da campi numerici a TV/m
+		ompe=real_param[13];    //costante accoppiamento correnti campi
+		np_over_nm=real_param[14];		//numerical2physical particles 14 
+		xt_in=real_param[15];			//inizio plasma
+		xt_end=real_param[16];
+		charge=real_param[17];			//carica particella su carica elettrone
+		mass=real_param[18];			//massa particelle su massa elettrone
+	}
+	else
+	{
+		file_dat.getline(trascura,MAX_LENGTH_FILENAME);
+		file_dat >> npe;
+		file_dat >> nx;
+		file_dat >> ny_loc;
+		file_dat >> nz;
+		file_dat >> ibx;
+		file_dat >> iby;
+		file_dat >> ibz;
+		file_dat >> model;
+		file_dat >> dmodel;
+		file_dat >> nsp;
+		file_dat >> ndim;
+		file_dat >> np_loc;
+		file_dat >> lpord;
+		file_dat >> deord;
+		file_dat >> trascura;
+		file_dat >> pID;
+		file_dat >> nptot;
+		file_dat >> ndv;
+		file_dat >> trascura >> trascura;
+		file_dat.getline(trascura,MAX_LENGTH_FILENAME);
+		file_dat >> tnow;
+		file_dat >> xmin;
+		file_dat >> xmax;
+		file_dat >> ymin;
+		file_dat >> ymax;
+		file_dat >> zmin;
+		file_dat >> zmax;
+		file_dat >> w0x;
+		file_dat >> w0y;
+		file_dat >> nrat;
+		file_dat >> a0;
+		file_dat >> lam0;
+		file_dat >> E0;
+		file_dat >> ompe;
+		file_dat >> np_over_nm;
+		file_dat >> xt_in;
+		file_dat >> xt_end;
+		file_dat >> charge;
+		file_dat >> mass;
+		file_dat >> trascura;
+	}
+
+
 
 	estremi_min = new float[2*ndim+nelab];
 	estremi_max = new float[2*ndim+nelab];
@@ -89,32 +173,6 @@ int leggi_particelle(char* fileIN, parametri binning)
 		estremi_max[i] = (float) -NUMERO_MASSIMO;
 	}
 
-	np_loc=int_param[11];  //
-	lpord=int_param[12]; //ordine dello schema leapfrog
-	deord=int_param[13]; //ordine derivate
-	//current type
-	pID=int_param[15];  //tipo delle particelle
-	nptot=int_param[16]; //numero di particelle da leggere nella specie
-	ndv=int_param[17]; //numero di particelle da leggere nella specie
-	tnow=real_param[0];  /*tempo dell'output*/
-	xmin=real_param[1];  //estremi della griglia
-	xmax=real_param[2];  //estremi della griglia
-	ymin=real_param[3];  //estremi della griglia
-	ymax=real_param[4];  //estremi della griglia
-	zmin=real_param[5];  //estremi della griglia
-	zmax=real_param[6];  //estremi della griglia
-	w0x=real_param[7];      //waist del laser in x
-	w0y=real_param[8];      //waist del laser in y
-	nrat=real_param[9];     //n over n critical
-	a0=real_param[10];      // a0 laser
-	lam0=real_param[11];    // lambda
-	E0=real_param[12];      //conversione da campi numerici a TV/m
-	ompe=real_param[13];    //costante accoppiamento correnti campi
-	np_over_nm=real_param[14];		//numerical2physical particles 14 
-	xt_in=real_param[15];			//inizio plasma
-	xt_end=real_param[16];
-	charge=real_param[17];			//carica particella su carica elettrone
-	mass=real_param[18];			//massa particelle su massa elettrone
 	ny=ny_loc*npe;
 	printf("nptot=%i\n",int_param[16]); 
 	printf("\ninizio processori \n");
@@ -140,34 +198,40 @@ int leggi_particelle(char* fileIN, parametri binning)
 #ifdef ENABLE_DEBUG
 	if (fai_binning)
 	{
-					std::cout << "XMIN = " << binning.xmin << std::endl;
-					std::cout << "XMAX = " << binning.xmax << std::endl;
-					std::cout << "YMIN = " << binning.ymin << std::endl;
-					std::cout << "YMAX = " << binning.ymax << std::endl;
-					std::cout << "ZMIN = " << binning.zmin << std::endl;
-					std::cout << "ZMAX = " << binning.zmax << std::endl;
-					std::cout << "PXMIN = " << binning.pxmin << std::endl;
-					std::cout << "PXMAX = " << binning.pxmax << std::endl;
-					std::cout << "PYMIN = " << binning.pymin << std::endl;
-					std::cout << "PYMAX = " << binning.pymax << std::endl;
-					std::cout << "PZMIN = " << binning.pzmin << std::endl;
-					std::cout << "PZMAX = " << binning.pzmax << std::endl;
-					std::cout << "GAMMAMIN = " << binning.gammamin << std::endl;
-					std::cout << "GAMMAMAX = " << binning.gammamax << std::endl;
-					std::cout << "THETAMIN = " << binning.thetamin << std::endl;
-					std::cout << "THETAMAX = " << binning.thetamax << std::endl;
-					std::cout << "EMIN = " << binning.Emin << std::endl;
-					std::cout << "EMAX = " << binning.Emax << std::endl;
+		std::cout << "XMIN = " << binning.xmin << std::endl;
+		std::cout << "XMAX = " << binning.xmax << std::endl;
+		std::cout << "YMIN = " << binning.ymin << std::endl;
+		std::cout << "YMAX = " << binning.ymax << std::endl;
+		std::cout << "ZMIN = " << binning.zmin << std::endl;
+		std::cout << "ZMAX = " << binning.zmax << std::endl;
+		std::cout << "PXMIN = " << binning.pxmin << std::endl;
+		std::cout << "PXMAX = " << binning.pxmax << std::endl;
+		std::cout << "PYMIN = " << binning.pymin << std::endl;
+		std::cout << "PYMAX = " << binning.pymax << std::endl;
+		std::cout << "PZMIN = " << binning.pzmin << std::endl;
+		std::cout << "PZMAX = " << binning.pzmax << std::endl;
+		std::cout << "GAMMAMIN = " << binning.gammamin << std::endl;
+		std::cout << "GAMMAMAX = " << binning.gammamax << std::endl;
+		std::cout << "THETAMIN = " << binning.thetamin << std::endl;
+		std::cout << "THETAMAX = " << binning.thetamax << std::endl;
+		std::cout << "EMIN = " << binning.Emin << std::endl;
+		std::cout << "EMAX = " << binning.Emax << std::endl;
 	}
 #endif
 
 
 	for(ipc=0;ipc<npe;ipc++)
 	{
-		fread_size = std::fread(&buff,sizeof(int),1,file_in); 
-		fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-		fread_size = std::fread(&buff,sizeof(int),1,file_in);
-		if (out_swap) swap_endian_i(&npart_loc,1);
+
+		if (old_fortran_bin)
+		{
+			fread_size = std::fread(&buff,sizeof(int),1,file_in); 
+			fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			if (out_swap) swap_endian_i(&npart_loc,1);
+		}
+		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+
 		particelle=(float*)malloc(npart_loc*(2*ndim+binning.p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
 		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+binning.p[WEIGHT])};
@@ -175,15 +239,21 @@ int leggi_particelle(char* fileIN, parametri binning)
 		{
 			printf("\tentro\t");
 			fflush(stdout);
-			fread_size = std::fread(buffshort,sizeof(short),2,file_in);
-			// buffshort[0] = ???
-			// buffshort[1] = ???
-			if (out_swap) swap_endian_s(buffshort,2);
+
+			if (old_fortran_bin)
+			{
+				fread_size = std::fread(buffshort,sizeof(short),2,file_in);
+				// buffshort[0] = ???
+				// buffshort[1] = ???
+				if (out_swap) swap_endian_s(buffshort,2);
+				fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
+				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+				if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+binning.p[WEIGHT]));
+			}
+			else fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
+
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+binning.p[WEIGHT]),buffshort[0],buffshort[1]);
-			fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
-			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+binning.p[WEIGHT]));
-			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",binning.Emin,"Emax",binning.Emax,(char *) NULL));
+			//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",binning.Emin,"Emax",binning.Emax,(char *) NULL));
 			if (cerca_minmax && ndim == 3 && !fai_binning)
 			{
 				for (int i = 0; i < npart_loc; i++)

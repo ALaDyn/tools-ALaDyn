@@ -93,8 +93,11 @@ struct parametri
 {
 	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
 	int p[NPARAMETRI];
+	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
 	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
+	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
+		 gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
 	parametri();
 	/* costruttore parametrico 1D */
 	parametri(float, float, float, float, int, int);
@@ -111,6 +114,7 @@ struct parametri
 	void leggi_interattivo();
 	void leggi_da_shell(int, char *[]);
 	bool check_parametri();
+	bool incompleto();
 };
 
 struct _Filtro
