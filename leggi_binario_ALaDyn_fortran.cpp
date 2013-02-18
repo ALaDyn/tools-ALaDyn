@@ -6,7 +6,6 @@
 
 int main (int argc, char *argv[])
 {
-	int argmin = 2;
 	parametri binning;
 	bool testParametri = true;;
 	bool fallita_lettura_inputfile = true;
@@ -30,15 +29,14 @@ int main (int argc, char *argv[])
 		binning.leggi_da_file(argv[3]);
 		if (argc > 3) 
 		{
-			argmin = 3;
-			binning.leggi_da_shell(argmin,argv);
+			binning.leggi_da_shell(argc,argv);
 		}
 		if (binning.incompleto()) binning.leggi_interattivo();
 	}
 
 	else
 	{
-		binning.leggi_da_shell(argmin, argv);
+		binning.leggi_da_shell(argc, argv);
 		if (binning.incompleto()) binning.leggi_interattivo();
 	}
 
