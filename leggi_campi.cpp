@@ -20,7 +20,7 @@ int leggi_campi(char* fileIN, parametri binning)
 	int npe,nx,ibx,iby,ibz,model,dmodel,nsp,lpord,deord,npe_y, npe_z;
 	int nxloc, nx1, ny1, nyloc, nz1, nzloc, fvar;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,B0,ompe,xt_in,xt_end,charge,mass;
-	float dx, dy, dz;
+	float dx, dy, dz, xx, yy, zz;
 	file_in=fopen(fileIN, "r");
 
 	size_t fread_size;
@@ -189,14 +189,38 @@ int leggi_campi(char* fileIN, parametri binning)
 	fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
 	dx=(xmax-xmin)/(nx1-1);
 	dy=(ymax-ymin)/(ny1-1);
-	dz=(zmax-zmin)/(nz1-1);
+	if(nz1<=1)
+	  dz=(zmax-zmin);
+	else
+	  dz=(zmax-zmin)/(nz1-1);
 	fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
 	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
 	fprintf(clean_fields,"SCALARS %s float 1\n",binning.support_label);
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);
-
+	
+	if(nz1<=1)
+	  {
+	    sprintf(nomefile_campi,"%s_out.2D",fileIN);
+	    clean_fields=fopen(nomefile_campi, "w");
+	    printf("\nWriting the fields file 2D (not vtk)\n");
+	    
+	    dx=(xmax-xmin)/(nx1-1);
+	    dy=(ymax-ymin)/(ny1-1);
+	    //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
+	    fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
+	    fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
+	    for(k=0;k<nz1;k++)
+	      for(j=0;j<ny1;j++)
+		for(i=0;i<nx1;i++)
+		  {
+		    xx=xmin+dx*i;
+		    yy=ymin+dy*j;
+		    fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+(j)*nx1+(k)*nx1*ny1]);
+		  }
+	    fclose(clean_fields);
+	  }
 	return 0;
 }
 
