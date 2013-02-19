@@ -6,7 +6,7 @@
 int leggi_campi(char* fileIN, parametri binning)
 {
 	int out_swap = binning.p[SWAP];
-	int out_parameters = binning.p[OUT_PARAMS];
+//	int out_parameters = binning.p[OUT_PARAMS];
 
 //	int kk, segnox=0;
 	int i, ipy, ipz,  j, k, N_param, *int_param, np_loc, npoint_loc[3], loc_size;
@@ -126,6 +126,7 @@ int leggi_campi(char* fileIN, parametri binning)
 	fprintf(parameters,"a0=%f\n",a0);      // a0 laser
 	fprintf(parameters,"lam0=%f\n",lam0);    // lambda
 	fprintf(parameters,"E0=%f\n",E0);      //conversione da campi numerici a TV/m
+	fprintf(parameters,"B0=%f\n",B0);
 	fprintf(parameters,"ompe=%f\n",ompe);    //costante accoppiamento correnti campi
 	fprintf(parameters,"xt_in=%f\n",xt_in);   //inizio plasma
 	fprintf(parameters,"xt_end=%f\n",xt_end);
