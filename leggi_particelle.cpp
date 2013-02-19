@@ -29,13 +29,11 @@ int leggi_particelle(char* fileIN, parametri binning)
 	int buff, pID;
 
 	int nelab=3;	//3 valori per ora: gamma, theta ed energia
-	int conta_nptot = 0;
 	float x,y,z,px,py,pz;
 	float *estremi_min, *estremi_max;
 
 	short buffshort[2];
 	float *particelle, *real_param;
-	//	float *particelle_elaborate;
 	float gamma, theta, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
@@ -54,7 +52,8 @@ int leggi_particelle(char* fileIN, parametri binning)
 	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 	size_t fread_size;
 
-	int npe,nx,ny,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
+	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
+	//	int ny;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	int tipo = 0;
@@ -173,8 +172,8 @@ int leggi_particelle(char* fileIN, parametri binning)
 		estremi_max[i] = (float) -NUMERO_MASSIMO;
 	}
 
-	ny=ny_loc*npe;
-	printf("nptot=%i\n",int_param[16]); 
+	//	ny=ny_loc*npe;
+	printf("nptot=%i\n",nptot); 
 	printf("\ninizio processori \n");
 	fflush(stdout);
 	float **xpx = new float* [binning.nbin_x+3];
@@ -234,7 +233,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 		particelle=(float*)malloc(npart_loc*(2*ndim+binning.p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
-		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+binning.p[WEIGHT])};
+		// unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+binning.p[WEIGHT])};
 		if(npart_loc>0)
 		{
 			printf("\tentro\t");
@@ -438,44 +437,44 @@ int leggi_particelle(char* fileIN, parametri binning)
 		parameters=fopen(nomefile_parametri, "w");
 		printf("\nWriting the parameters file\n");
 		fprintf(parameters,"interi\n");
-		fprintf(parameters,"npe=%i\n",int_param[0]);     //numero processori
-		fprintf(parameters,"nx=%i\n",int_param[1]);
-		fprintf(parameters,"ny=%i\n",int_param[2]);
-		fprintf(parameters,"nz=%i\n",int_param[3]);
-		fprintf(parameters,"ibx=%i\n",int_param[4]);
-		fprintf(parameters,"iby=%i\n",int_param[5]);
-		fprintf(parameters,"ibz=%i\n",int_param[6]);
-		fprintf(parameters,"model=%i\n",int_param[7]);  //modello di laser utilizzato
-		fprintf(parameters,"dmodel=%i\n",int_param[8]); //modello di condizioni iniziali
-		fprintf(parameters,"nsp=%i\n",int_param[9]);    //numero di speci
-		fprintf(parameters,"ndim=%i\n",int_param[10]);   
-		fprintf(parameters,"np_loc=%i\n",int_param[11]);  
-		fprintf(parameters,"lpord=%i\n",int_param[12]); //ordine dello schema leapfrog
-		fprintf(parameters,"deord=%i\n",int_param[13]); //ordine derivate
-		fprintf(parameters,"pID=%i\n",int_param[15]); 
-		fprintf(parameters,"nptot=%i\n",int_param[16]); 
-		fprintf(parameters,"ndv=%i\n",int_param[17]); 
+		fprintf(parameters,"npe=%i\n",npe);     //numero processori
+		fprintf(parameters,"nx=%i\n",nx);
+		fprintf(parameters,"ny=%i\n",ny_loc);
+		fprintf(parameters,"nz=%i\n",nz);
+		fprintf(parameters,"ibx=%i\n",ibx);
+		fprintf(parameters,"iby=%i\n",iby);
+		fprintf(parameters,"ibz=%i\n",ibz);
+		fprintf(parameters,"model=%i\n",model);  //modello di laser utilizzato
+		fprintf(parameters,"dmodel=%i\n",dmodel); //modello di condizioni iniziali
+		fprintf(parameters,"nsp=%i\n",nsp);    //numero di speci
+		fprintf(parameters,"ndim=%i\n",ndim);   
+		fprintf(parameters,"np_loc=%i\n",np_loc);  
+		fprintf(parameters,"lpord=%i\n",lpord); //ordine dello schema leapfrog
+		fprintf(parameters,"deord=%i\n",deord); //ordine derivate
+		fprintf(parameters,"pID=%i\n",pID); 
+		fprintf(parameters,"nptot=%i\n",nptot); 
+		fprintf(parameters,"ndv=%i\n",ndv); 
 		fprintf(parameters,"========= fine interi\n");
 		fprintf(parameters,"\n floating\n");
-		fprintf(parameters,"tnow=%f\n",real_param[0]);  //tempo dell'output
-		fprintf(parameters,"xmin=%f\n",real_param[1]);  //estremi della griglia
-		fprintf(parameters,"xmax=%f\n",real_param[2]);  //estremi della griglia
-		fprintf(parameters,"ymin=%f\n",real_param[3]);  //estremi della griglia
-		fprintf(parameters,"ymax=%f\n",real_param[4]);  //estremi della griglia
-		fprintf(parameters,"zmin=%f\n",real_param[5]);  //estremi della griglia
-		fprintf(parameters,"zmax=%f\n",real_param[6]);  //estremi della griglia
-		fprintf(parameters,"w0x=%f\n",real_param[7]);      //waist del laser in x
-		fprintf(parameters,"w0y=%f\n",real_param[8]);      //waist del laser in y
-		fprintf(parameters,"nrat=%f\n",real_param[9]);     //n over n critical
-		fprintf(parameters,"a0=%f\n",real_param[10]);      // a0 laser
-		fprintf(parameters,"lam0=%f\n",real_param[11]);    // lambda
-		fprintf(parameters,"E0=%f\n",real_param[12]);      //conversione da campi numerici a TV/m
-		fprintf(parameters,"ompe=%f\n",real_param[13]);    //costante accoppiamento correnti campi
-		fprintf(parameters,"np_over_nm=%f\n",real_param[14]);   //numerical2physical particles 14 
-		fprintf(parameters,"xt_in=%f\n",real_param[15]);
-		fprintf(parameters,"xt_end=%f\n",real_param[16]);
-		fprintf(parameters,"charge=%f\n",real_param[17]);  //carica particella su carica elettrone
-		fprintf(parameters,"mass=%f\n",real_param[18]);    //massa particelle su massa elettrone
+		fprintf(parameters,"tnow=%f\n",tnow);  //tempo dell'output
+		fprintf(parameters,"xmin=%f\n",xmin);  //estremi della griglia
+		fprintf(parameters,"xmax=%f\n",xmax);  //estremi della griglia
+		fprintf(parameters,"ymin=%f\n",ymin);  //estremi della griglia
+		fprintf(parameters,"ymax=%f\n",ymax);  //estremi della griglia
+		fprintf(parameters,"zmin=%f\n",zmin);  //estremi della griglia
+		fprintf(parameters,"zmax=%f\n",zmax);  //estremi della griglia
+		fprintf(parameters,"w0x=%f\n",w0x);      //waist del laser in x
+		fprintf(parameters,"w0y=%f\n",w0y);      //waist del laser in y
+		fprintf(parameters,"nrat=%f\n",nrat);     //n over n critical
+		fprintf(parameters,"a0=%f\n",a0);      // a0 laser
+		fprintf(parameters,"lam0=%f\n",lam0);    // lambda
+		fprintf(parameters,"E0=%f\n",E0);      //conversione da campi numerici a TV/m
+		fprintf(parameters,"ompe=%f\n",ompe);    //costante accoppiamento correnti campi
+		fprintf(parameters,"np_over_nm=%f\n",np_over_nm);   //numerical2physical particles 14 
+		fprintf(parameters,"xt_in=%f\n",xt_in);
+		fprintf(parameters,"xt_end=%f\n",xt_end);
+		fprintf(parameters,"charge=%f\n",charge);  //carica particella su carica elettrone
+		fprintf(parameters,"mass=%f\n",mass);    //massa particelle su massa elettrone
 		//		if(WEIGHT) fprintf(parameters,"weight=%f\n",particelle[6]);    //massa particelle su massa elettrone
 		fclose(parameters);
 	}

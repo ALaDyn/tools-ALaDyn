@@ -133,92 +133,92 @@ void parametri :: leggi_da_file(const char *nomefile)
 				while(!fileParametri.eof())
 				{
 					fileParametri >> nomepar >> evita >> leggi;
-					if (nomepar == "xmin" || nomepar == "XMIN" && xmin_b)
+					if ((nomepar == "xmin" || nomepar == "XMIN") && xmin_b)
 					{
 						xmin = (float) std::atof(leggi.c_str());
 						xmin_b = false;
 					}
-					else if (nomepar == "xmax" || nomepar == "XMAX" && xmax_b)
+					else if ((nomepar == "xmax" || nomepar == "XMAX") && xmax_b)
 					{
 						xmax = (float) std::atof(leggi.c_str());
 						xmax_b = false;
 					}
-					else if (nomepar == "ymin" || nomepar == "YMIN" && ymin_b)
+					else if ((nomepar == "ymin" || nomepar == "YMIN") && ymin_b)
 					{
 						ymin = (float) std::atof(leggi.c_str());
 						ymin_b = false;
 					}
-					else if (nomepar == "ymax" || nomepar == "YMAX" && ymax_b)
+					else if ((nomepar == "ymax" || nomepar == "YMAX") && ymax_b)
 					{
 						ymax = (float) std::atof(leggi.c_str());
 						ymax_b = false;
 					}
-					else if (nomepar == "zmin" || nomepar == "ZMIN" && zmin_b)
+					else if ((nomepar == "zmin" || nomepar == "ZMIN") && zmin_b)
 					{
 						zmin = (float) std::atof(leggi.c_str());
 						zmin_b = false;
 					}
-					else if (nomepar == "zmax" || nomepar == "ZMAX" && zmax_b)
+					else if ((nomepar == "zmax" || nomepar == "ZMAX") && zmax_b)
 					{
 						zmax = (float) std::atof(leggi.c_str());
 						zmax_b = false;
 					}
-					else if (nomepar == "pxmin" || nomepar == "PXMIN" && pxmin_b)
+					else if ((nomepar == "pxmin" || nomepar == "PXMIN") && pxmin_b)
 					{
 						pxmin = (float) std::atof(leggi.c_str());
 						pxmin_b = false;
 					}
-					else if (nomepar == "pxmax" || nomepar == "PXMAX" && pxmax_b)
+					else if ((nomepar == "pxmax" || nomepar == "PXMAX") && pxmax_b)
 					{
 						pxmax = (float) std::atof(leggi.c_str());
 						pxmax_b = false;
 					}
-					else if (nomepar == "pymin" || nomepar == "PYMIN" && pymin_b)
+					else if ((nomepar == "pymin" || nomepar == "PYMIN") && pymin_b)
 					{
 						pymin = (float) std::atof(leggi.c_str());
 						pymin_b = false;
 					}
-					else if (nomepar == "pymax" || nomepar == "PYMAX" && pymax_b)
+					else if ((nomepar == "pymax" || nomepar == "PYMAX") && pymax_b)
 					{
 						pymax = (float) std::atof(leggi.c_str());
 						pymax_b = false;
 					}
-					else if (nomepar == "pzmin" || nomepar == "PZMIN" && pzmin_b)
+					else if ((nomepar == "pzmin" || nomepar == "PZMIN") && pzmin_b)
 					{
 						pzmin = (float) std::atof(leggi.c_str());
 						pzmin_b = false;
 					}
-					else if (nomepar == "pzmax" || nomepar == "PZMAX" && pzmax_b)
+					else if ((nomepar == "pzmax" || nomepar == "PZMAX") && pzmax_b)
 					{
 						pzmax = (float) std::atof(leggi.c_str());
 						pzmax_b = false;
 					}
-					else if (nomepar == "gammamin" || nomepar == "GAMMAMIN" && gammamin_b)
+					else if ((nomepar == "gammamin" || nomepar == "GAMMAMIN") && gammamin_b)
 					{
 						gammamin = (float) std::atof(leggi.c_str());
 						gammamin_b = false;
 					}
-					else if (nomepar == "gammamax" || nomepar == "GAMMAMAX" && gammamax_b)
+					else if ((nomepar == "gammamax" || nomepar == "GAMMAMAX") && gammamax_b)
 					{
 						gammamax = (float) std::atof(leggi.c_str());
 						gammamax_b = false;
 					}
-					else if (nomepar == "thetamin" || nomepar == "THETAMIN" && thetamin_b)
+					else if ((nomepar == "thetamin" || nomepar == "THETAMIN") && thetamin_b)
 					{
 						thetamin = (float) std::atof(leggi.c_str());
 						thetamin_b = false;
 					}
-					else if (nomepar == "thetamax" || nomepar == "THETAMAX" && thetamax_b)
+					else if ((nomepar == "thetamax" || nomepar == "THETAMAX") && thetamax_b)
 					{
 						thetamax = (float) std::atof(leggi.c_str());
 						thetamax_b = false;
 					}
-					else if (nomepar == "emin" || nomepar == "EMIN" && Emin_b)
+					else if ((nomepar == "emin" || nomepar == "EMIN") && Emin_b)
 					{
 						Emin = (float) std::atof(leggi.c_str());
 						Emin_b = false;
 					}
-					else if (nomepar == "emax" || nomepar == "EMAX" && Emax_b)
+					else if ((nomepar == "emax" || nomepar == "EMAX") && Emax_b)
 					{
 						Emax = (float) std::atof(leggi.c_str());
 						Emax_b = false;

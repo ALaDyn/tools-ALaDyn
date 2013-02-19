@@ -143,7 +143,7 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
 	{
 		pntt_loc = dati + i*n_dati[1];
 		flag = true;
-		p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5], E;
+		p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
 		for(unsigned char c=0; c < tot_test; ++c)
 		{
 			if(!flag) break;

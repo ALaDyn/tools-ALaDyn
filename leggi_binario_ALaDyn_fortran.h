@@ -38,7 +38,6 @@
 #define NUMERO_MASSIMO	1.0e30
 #define MAX_LENGTH_FILENAME 200
 
-#pragma warning(disable : 593)
 
 #define NPARAMETRI	8
 #define WEIGHT		0
@@ -97,7 +96,7 @@ struct parametri
 	char support_label[MAX_LENGTH_FILENAME];
 	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
-		 gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
+		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
 	parametri();
 	/* costruttore parametrico 1D */
 	parametri(float, float, float, float, int, int);
