@@ -38,6 +38,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
+	std::string riga_persa;
 	char* trascura;
 	trascura = new char[MAX_LENGTH_FILENAME];
 	std::ostringstream nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
@@ -119,7 +120,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	}
 	else
 	{
-		file_dat.getline(trascura,MAX_LENGTH_FILENAME);
+		std::getline(file_dat,riga_persa);
 		file_dat >> npe;
 		file_dat >> nx;
 		file_dat >> ny_loc;
@@ -138,8 +139,10 @@ int leggi_particelle(char* fileIN, parametri binning)
 		file_dat >> pID;
 		file_dat >> nptot;
 		file_dat >> ndv;
-		file_dat >> trascura >> trascura;
-		file_dat.getline(trascura,MAX_LENGTH_FILENAME);
+		file_dat >> trascura;
+		file_dat >> trascura;
+		std::getline(file_dat,riga_persa); // nb: servono due getline per eliminare la riga di testo nel .dat e non capisco il perche'...
+		std::getline(file_dat,riga_persa);
 		file_dat >> tnow;
 		file_dat >> xmin;
 		file_dat >> xmax;
