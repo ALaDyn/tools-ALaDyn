@@ -4,6 +4,18 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
+int is_big_endian(void)
+{
+	union {
+		uint32_t i;
+		char c[4];
+	} bint = {0x01020304};
+
+	return bint.c[0] == 1; 
+}
+
+
+
 void swap_endian_s(short* in_s,int n)
 {
 	int i;

@@ -20,24 +20,15 @@ parametri :: parametri()
 		p_b[i] = true;
 		p[i] = -1;
 	}
+	old_fortran_bin = false;
+	endian_file = 0;
+	endian_machine = is_big_endian();
 }
 
 /* costruttore parametrico 1D */
 parametri :: parametri(float xm, float xM, float pxm, float pxM, int nx, int npx)
 {
-	nbin_x = nx;
-	nbin_px = npx;
-	nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 0;
-	xmin = xm;
-	xmax = xM;
-	pxmin = pxm;
-	pxmax = pxM;
-	ymin = ymax = pymin = pymax = zmin = zmax = pzmin = pzmax = thetamin = thetamax = 0.0;
-	Emin = Emax = 0.0;	// E non calcolata in 1D
-	nbin_E = 0;
-	//		dim_x = (xmax - xmin) / nbin_x;
-	//		dim_px = (pxmax - pxmin) / nbin_px;
-	//		dim_y = dim_z = dim_py = dim_pz = dim_E = dim_theta = 0.0;
+//	non implementato
 }
 
 float parametri :: dimmi_dimx()
@@ -673,11 +664,11 @@ void parametri :: leggi_da_shell(int argc, char *argv[])
 bool parametri :: check_parametri()
 {
 	bool test = true;
-	//		 || ( binning.p[FUNZIONE] != 1 && binning.p[FUNZIONE]   != 2								) 
-	//		 || ( binning.p[SWAP]     != 0 && binning.p[SWAP]       != 1								) 
-	//		 || ( binning.p[FUNZIONE] == 2 && binning.p[WEIGHT]     != 0 && binning.p[WEIGHT]     != 1	)  
-	//		 || ( binning.p[FUNZIONE] == 2 && binning.p[OUT_ASCII]  != 0 && binning.p[OUT_ASCII]  != 1	) 
-	//		 || ( binning.p[FUNZIONE] == 2 && binning.p[OUT_BINARY] != 0 && binning.p[OUT_BINARY] != 1  ) 
+	//	( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2						) 
+	//	( p[SWAP]     != 0 && p[SWAP]       != 1						) 
+	//	( p[FUNZIONE] == 2 && p[WEIGHT]     != 0 && p[WEIGHT]     != 1	)  
+	//	( p[FUNZIONE] == 2 && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1	) 
+	//	( p[FUNZIONE] == 2 && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  ) 
 	//	( xmin < xmax ) ? test = true : test = false;
 	//	( ymin < ymax ) ? test = true : test = false;
 	//	( zmin < zmax ) ? test = true : test = false;

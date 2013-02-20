@@ -3,10 +3,10 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
 
-int leggi_campi(char* fileIN, parametri binning)
+int leggi_campi(char* fileIN, parametri * parametri)
 {
-	int out_swap = binning.p[SWAP];
-//	int out_parameters = binning.p[OUT_PARAMS];
+	int out_swap = parametri->p[SWAP];
+//	int out_parameters = parametri.p[OUT_PARAMS];
 
 //	int kk, segnox=0;
 	int i, ipy, ipz,  j, k, N_param, *int_param, np_loc, npoint_loc[3], loc_size;
@@ -201,7 +201,7 @@ int leggi_campi(char* fileIN, parametri binning)
 		dz=(zmax-zmin)/(nz1-1);
 	fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
 	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
-	fprintf(clean_fields,"SCALARS %s float 1\n",binning.support_label);
+	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);

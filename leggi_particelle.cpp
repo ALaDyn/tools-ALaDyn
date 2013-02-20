@@ -4,19 +4,29 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-int leggi_particelle(char* fileIN, parametri binning)
+int leggi_particelle(char* fileIN, parametri * parametri)
 {
-	std::ostringstream nomefile_bin, nomefile_dat;
+	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 	nomefile_bin << std::string(fileIN) << ".bin";
 	nomefile_dat << std::string(fileIN) << ".dat";
-	int out_swap = binning.p[SWAP];
-	int out_binary = binning.p[OUT_BINARY];
-	int out_ascii = binning.p[OUT_ASCII];
-	int out_parameters = binning.p[OUT_PARAMS];
-	int fai_binning = binning.p[DO_BINNING];
-	int cerca_minmax = binning.p[FIND_MINMAX];
+	std::string riga_persa, endianness, columns;
+	char* trascura;
+	trascura = new char[MAX_LENGTH_FILENAME];
+	FILE *file_in;
+	file_in=fopen(nomefile_bin.str().c_str(), "r");
+	FILE *binary_all_out;
+	FILE *ascii_all_out;
+	FILE *parameters;
+	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
+	std::ifstream file_dat;
 
-	bool old_fortran_bin = false;
+
+	int out_swap = parametri->p[SWAP];
+	int out_binary = parametri->p[OUT_BINARY];
+	int out_ascii = parametri->p[OUT_ASCII];
+	int out_parameters = parametri->p[OUT_PARAMS];
+	int fai_binning = parametri->p[DO_BINNING];
+	int cerca_minmax = parametri->p[FIND_MINMAX];
 
 	float whichbinx = 0., whichbinpx = 0.;
 	int whichbinx_int = (int) whichbinx;
@@ -38,19 +48,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_ascii[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
-	std::string riga_persa;
-	char* trascura;
-	trascura = new char[MAX_LENGTH_FILENAME];
-	std::ostringstream nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 
-	FILE *file_in;
-	std::ifstream file_dat;
-	if (!old_fortran_bin) file_dat.open(nomefile_dat.str().c_str());
-	file_in=fopen(nomefile_bin.str().c_str(), "r");
-	FILE *binary_all_out;
-	FILE *ascii_all_out;
-	FILE *parameters;
-	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 	size_t fread_size;
 
 	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
@@ -62,13 +60,13 @@ int leggi_particelle(char* fileIN, parametri binning)
 	else if (fileIN[0] == 'P') tipo = 1;
 	else printf("Tipo non riconosciuto!\n");
 
-	if (old_fortran_bin) 
+	if (parametri->old_fortran_bin) 
 	{
 		fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
 		fread_size = std::fread((void*) &N_param,sizeof(int),1,file_in);
 		fread_size = std::fread((void*) &buff,sizeof(int),1,file_in);
 		if (out_swap) swap_endian_i(&N_param,1);
-		printf("numero parametri=%i\n",N_param);
+		printf("numero parametri %i\n",N_param);
 		fflush(stdout);
 		int_param=(int*)malloc(N_param*sizeof(int));
 		real_param=(float*)malloc(N_param*sizeof(float));
@@ -179,19 +177,19 @@ int leggi_particelle(char* fileIN, parametri binning)
 	printf("nptot=%i\n",nptot); 
 	printf("\ninizio processori \n");
 	fflush(stdout);
-	float **xpx = new float* [binning.nbin_x+3];
-	for (int i = 0; i < binning.nbin_x+3; i++)
+	float **xpx = new float* [parametri->nbin_x+3];
+	for (int i = 0; i < parametri->nbin_x+3; i++)
 	{
-		xpx[i] = new float [binning.nbin_px+3];
-		for (int j = 0; j < binning.nbin_px+3; j++) xpx[i][j] = 0.0;
+		xpx[i] = new float [parametri->nbin_px+3];
+		for (int j = 0; j < parametri->nbin_px+3; j++) xpx[i][j] = 0.0;
 	}
-	float **Etheta = new float* [binning.nbin_E+3];
-	for (int i = 0; i < binning.nbin_E+3; i++)
+	float **Etheta = new float* [parametri->nbin_E+3];
+	for (int i = 0; i < parametri->nbin_E+3; i++)
 	{
-		Etheta[i] = new float [binning.nbin_theta+3];
-		for (int j = 0; j < binning.nbin_theta+3; j++) Etheta[i][j] = 0.0;
+		Etheta[i] = new float [parametri->nbin_theta+3];
+		for (int j = 0; j < parametri->nbin_theta+3; j++) Etheta[i][j] = 0.0;
 	}
-	float *Espec = new float [binning.nbin_E+3];
+	float *Espec = new float [parametri->nbin_E+3];
 
 	sprintf(nomefile_ascii,"%s.ascii",fileIN);
 	sprintf(nomefile_binary,"%s.clean",fileIN);
@@ -200,24 +198,24 @@ int leggi_particelle(char* fileIN, parametri binning)
 #ifdef ENABLE_DEBUG
 	if (fai_binning)
 	{
-		std::cout << "XMIN = " << binning.xmin << std::endl;
-		std::cout << "XMAX = " << binning.xmax << std::endl;
-		std::cout << "YMIN = " << binning.ymin << std::endl;
-		std::cout << "YMAX = " << binning.ymax << std::endl;
-		std::cout << "ZMIN = " << binning.zmin << std::endl;
-		std::cout << "ZMAX = " << binning.zmax << std::endl;
-		std::cout << "PXMIN = " << binning.pxmin << std::endl;
-		std::cout << "PXMAX = " << binning.pxmax << std::endl;
-		std::cout << "PYMIN = " << binning.pymin << std::endl;
-		std::cout << "PYMAX = " << binning.pymax << std::endl;
-		std::cout << "PZMIN = " << binning.pzmin << std::endl;
-		std::cout << "PZMAX = " << binning.pzmax << std::endl;
-		std::cout << "GAMMAMIN = " << binning.gammamin << std::endl;
-		std::cout << "GAMMAMAX = " << binning.gammamax << std::endl;
-		std::cout << "THETAMIN = " << binning.thetamin << std::endl;
-		std::cout << "THETAMAX = " << binning.thetamax << std::endl;
-		std::cout << "EMIN = " << binning.Emin << std::endl;
-		std::cout << "EMAX = " << binning.Emax << std::endl;
+		std::cout << "XMIN = " << parametri->xmin << std::endl;
+		std::cout << "XMAX = " << parametri->xmax << std::endl;
+		std::cout << "YMIN = " << parametri->ymin << std::endl;
+		std::cout << "YMAX = " << parametri->ymax << std::endl;
+		std::cout << "ZMIN = " << parametri->zmin << std::endl;
+		std::cout << "ZMAX = " << parametri->zmax << std::endl;
+		std::cout << "PXMIN = " << parametri->pxmin << std::endl;
+		std::cout << "PXMAX = " << parametri->pxmax << std::endl;
+		std::cout << "PYMIN = " << parametri->pymin << std::endl;
+		std::cout << "PYMAX = " << parametri->pymax << std::endl;
+		std::cout << "PZMIN = " << parametri->pzmin << std::endl;
+		std::cout << "PZMAX = " << parametri->pzmax << std::endl;
+		std::cout << "GAMMAMIN = " << parametri->gammamin << std::endl;
+		std::cout << "GAMMAMAX = " << parametri->gammamax << std::endl;
+		std::cout << "THETAMIN = " << parametri->thetamin << std::endl;
+		std::cout << "THETAMAX = " << parametri->thetamax << std::endl;
+		std::cout << "EMIN = " << parametri->Emin << std::endl;
+		std::cout << "EMAX = " << parametri->Emax << std::endl;
 	}
 #endif
 
@@ -225,7 +223,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 	for(ipc=0;ipc<npe;ipc++)
 	{
 
-		if (old_fortran_bin)
+		if (parametri->old_fortran_bin)
 		{
 			fread_size = std::fread(&buff,sizeof(int),1,file_in); 
 			fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
@@ -234,28 +232,28 @@ int leggi_particelle(char* fileIN, parametri binning)
 		}
 		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 
-		particelle=(float*)malloc(npart_loc*(2*ndim+binning.p[WEIGHT])*sizeof(float));
+		particelle=(float*)malloc(npart_loc*(2*ndim+parametri->p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
-		// unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+binning.p[WEIGHT])};
+		// unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+parametri->p[WEIGHT])};
 		if(npart_loc>0)
 		{
 			printf("\tentro\t");
 			fflush(stdout);
 
-			if (old_fortran_bin)
+			if (parametri->old_fortran_bin)
 			{
 				fread_size = std::fread(buffshort,sizeof(short),2,file_in);
 				// buffshort[0] = ???
 				// buffshort[1] = ???
 				if (out_swap) swap_endian_s(buffshort,2);
-				fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
+				fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+parametri->p[WEIGHT]),file_in);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
-				if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+binning.p[WEIGHT]));
+				if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+parametri->p[WEIGHT]));
 			}
-			else fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+binning.p[WEIGHT]),file_in);
+			else fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+parametri->p[WEIGHT]),file_in);
 
-			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+binning.p[WEIGHT]),buffshort[0],buffshort[1]);
-			//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",binning.Emin,"Emax",binning.Emax,(char *) NULL));
+			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
+			//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",parametri->Emin,"Emax",parametri->Emax,(char *) NULL));
 			if (cerca_minmax && ndim == 3 && !fai_binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
@@ -266,12 +264,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 					//				px=fabs(*(particelle+i*(2*ndim+WEIGHT)+3));
 					//				py=fabs(*(particelle+i*(2*ndim+WEIGHT)+4));
 					//				pz=fabs(*(particelle+i*(2*ndim+WEIGHT)+5));
-					x=*(particelle+i*(2*ndim+binning.p[WEIGHT]));
-					y=*(particelle+i*(2*ndim+binning.p[WEIGHT])+1);
-					z=*(particelle+i*(2*ndim+binning.p[WEIGHT])+2);
-					px=*(particelle+i*(2*ndim+binning.p[WEIGHT])+3);
-					py=*(particelle+i*(2*ndim+binning.p[WEIGHT])+4);
-					pz=*(particelle+i*(2*ndim+binning.p[WEIGHT])+5);
+					x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
+					y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
+					z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
+					px=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+3);
+					py=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+4);
+					pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
 					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 					E=(float)(gamma*MP_MEV);								//energia
@@ -302,12 +300,12 @@ int leggi_particelle(char* fileIN, parametri binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
-					x=*(particelle+i*(2*ndim+binning.p[WEIGHT]));
-					y=*(particelle+i*(2*ndim+binning.p[WEIGHT])+1);
-					z=*(particelle+i*(2*ndim+binning.p[WEIGHT])+2);
-					px=*(particelle+i*(2*ndim+binning.p[WEIGHT])+3);
-					py=*(particelle+i*(2*ndim+binning.p[WEIGHT])+4);
-					pz=*(particelle+i*(2*ndim+binning.p[WEIGHT])+5);
+					x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
+					y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
+					z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
+					px=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+3);
+					py=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+4);
+					pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
 					//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
 					//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 					//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
@@ -316,75 +314,75 @@ int leggi_particelle(char* fileIN, parametri binning)
 					E=(float)(gamma*MP_MEV);								//energia
 
 					// xpx
-					if (x < binning.xmin)
+					if (x < parametri->xmin)
 					{
 						//					whichbinx = 0.0;
 						whichbinx_int = 0;
 					}
-					else if (x > binning.xmax)
+					else if (x > parametri->xmax)
 					{
-						//					whichbinx = (float) (binning.nbin_x + 2);
-						whichbinx_int = binning.nbin_x + 2;
+						//					whichbinx = (float) (parametri->nbin_x + 2);
+						whichbinx_int = parametri->nbin_x + 2;
 					}
 					else
 					{
-						whichbinx = (x - binning.xmin) / binning.dimmi_dimx();
+						whichbinx = (x - parametri->xmin) / parametri->dimmi_dimx();
 						whichbinx_int = (int)(whichbinx+1.0);
 					}
-					if (px < binning.pxmin)
+					if (px < parametri->pxmin)
 					{
 						//					whichbinpx = 0.0;
 						whichbinpx_int = 0;
 					}
-					else if (px > binning.pxmax)
+					else if (px > parametri->pxmax)
 					{
-						//					whichbinpx = (float) (binning.nbin_px + 2);
-						whichbinpx_int = binning.nbin_px + 2;
+						//					whichbinpx = (float) (parametri->nbin_px + 2);
+						whichbinpx_int = parametri->nbin_px + 2;
 					}
 					else
 					{
-						whichbinpx = (px - binning.pxmin) / binning.dimmi_dimpx();
+						whichbinpx = (px - parametri->pxmin) / parametri->dimmi_dimpx();
 						whichbinpx_int = (int)(whichbinpx+1.0);
 					}
-					if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+binning.p[WEIGHT])+6);
+					if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
 					else		xpx[whichbinx_int][whichbinpx_int] += 1.0;
 
 					// Etheta
-					if (E < binning.Emin)
+					if (E < parametri->Emin)
 					{
 						//					whichbinE = 0.0;
 						whichbinE_int = 0;
 					}
-					else if (E > binning.Emax)
+					else if (E > parametri->Emax)
 					{
-						//					whichbinE = (float) (binning.nbin_E + 2);
-						whichbinE_int = binning.nbin_E + 2;
+						//					whichbinE = (float) (parametri->nbin_E + 2);
+						whichbinE_int = parametri->nbin_E + 2;
 					}
 					else
 					{
-						whichbinE = (E - binning.Emin) / binning.dimmi_dimE();
+						whichbinE = (E - parametri->Emin) / parametri->dimmi_dimE();
 						whichbinE_int = (int)(whichbinE+1.0);
 					}
-					if (theta < binning.thetamin)
+					if (theta < parametri->thetamin)
 					{
 						//					whichbintheta = 0.0;
 						whichbintheta_int = 0;
 					}
-					else if (theta > binning.thetamax)
+					else if (theta > parametri->thetamax)
 					{
-						//					whichbintheta = (float) (binning.nbin_theta + 2);
-						whichbintheta_int = binning.nbin_theta + 2;
+						//					whichbintheta = (float) (parametri->nbin_theta + 2);
+						whichbintheta_int = parametri->nbin_theta + 2;
 					}
 					else
 					{
-						whichbintheta = (theta - binning.thetamin) / binning.dimmi_dimtheta();
+						whichbintheta = (theta - parametri->thetamin) / parametri->dimmi_dimtheta();
 						whichbintheta_int = (int)(whichbintheta+1.0);
 					}
-					if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+binning.p[WEIGHT])+6);
+					if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
 					else		Etheta[whichbinE_int][whichbintheta_int] += 1.0;
 
 					// Espec
-					if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+binning.p[WEIGHT])+6);
+					if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
 					else		Espec[whichbinE_int] += 1.0;
 
 				}
@@ -394,7 +392,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 			{
 				binary_all_out=fopen(nomefile_binary, "ab");
 				printf("\nWriting the C binary file\n");
-				fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+binning.p[WEIGHT]),binary_all_out);
+				fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+parametri->p[WEIGHT]),binary_all_out);
 				fflush(binary_all_out);
 				fclose(binary_all_out);
 			}
@@ -408,15 +406,15 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 				for(int i=0;i<nptot;i++)
 				{
-					rx=particelle[i*(6+binning.p[WEIGHT])+1]*((float)1.e-4);
-					ry=particelle[i*(6+binning.p[WEIGHT])+2]*((float)1.e-4);
-					rz=particelle[i*(6+binning.p[WEIGHT])+0]*((float)1.e-4);
-					ux=particelle[i*(6+binning.p[WEIGHT])+4];
-					uy=particelle[i*(6+binning.p[WEIGHT])+5];
-					uz=particelle[i*(6+binning.p[WEIGHT])+3];
-					if (binning.p[WEIGHT])
+					rx=particelle[i*(6+parametri->p[WEIGHT])+1]*((float)1.e-4);
+					ry=particelle[i*(6+parametri->p[WEIGHT])+2]*((float)1.e-4);
+					rz=particelle[i*(6+parametri->p[WEIGHT])+0]*((float)1.e-4);
+					ux=particelle[i*(6+parametri->p[WEIGHT])+4];
+					uy=particelle[i*(6+parametri->p[WEIGHT])+5];
+					uz=particelle[i*(6+parametri->p[WEIGHT])+3];
+					if (parametri->p[WEIGHT])
 					{
-						wgh=particelle[i*(6+binning.p[WEIGHT])+6];
+						wgh=particelle[i*(6+parametri->p[WEIGHT])+6];
 						fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
 					}
 					else
@@ -484,7 +482,7 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 	if (!fai_binning && cerca_minmax && ndim == 3)
 	{
-		nomefile_Estremi << fileIN << "_extremes";
+		nomefile_Estremi << fileIN << ".extremes";
 		Estremi_out.open(nomefile_Estremi.str().c_str());
 		Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
 		Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
@@ -519,55 +517,55 @@ int leggi_particelle(char* fileIN, parametri binning)
 
 		float min1, min2, max1, max2;
 
-		min1=binning.Emin-binning.dimmi_dimE();
-		max1=binning.Emin;
-		for (int i = 0; i < binning.nbin_E+3; i++)
+		min1=parametri->Emin-parametri->dimmi_dimE();
+		max1=parametri->Emin;
+		for (int i = 0; i < parametri->nbin_E+3; i++)
 		{
 			Espec_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << Espec[i] << std::endl;
 
-			min1 += binning.dimmi_dimE();
-			max1 += binning.dimmi_dimE();
+			min1 += parametri->dimmi_dimE();
+			max1 += parametri->dimmi_dimE();
 		}
 
 
-		min1=binning.Emin-binning.dimmi_dimE();
-		max1=binning.Emin;
-		min2=binning.thetamin-binning.dimmi_dimtheta();
-		max2=binning.thetamin;
+		min1=parametri->Emin-parametri->dimmi_dimE();
+		max1=parametri->Emin;
+		min2=parametri->thetamin-parametri->dimmi_dimtheta();
+		max2=parametri->thetamin;
 
-		for (int i = 0; i < binning.nbin_E+3; i++)
+		for (int i = 0; i < parametri->nbin_E+3; i++)
 		{
-			for (int j = 0; j < binning.nbin_theta+3; j++)
+			for (int j = 0; j < parametri->nbin_theta+3; j++)
 			{
 				Etheta_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << Etheta[i][j] << std::endl;
-				min2 += binning.dimmi_dimtheta();
-				max2 += binning.dimmi_dimtheta();
+				min2 += parametri->dimmi_dimtheta();
+				max2 += parametri->dimmi_dimtheta();
 			}
-			min1 += binning.dimmi_dimE();
-			max1 += binning.dimmi_dimE();
-			min2 = binning.thetamin-binning.dimmi_dimtheta();
-			max2 = binning.thetamin;
+			min1 += parametri->dimmi_dimE();
+			max1 += parametri->dimmi_dimE();
+			min2 = parametri->thetamin-parametri->dimmi_dimtheta();
+			max2 = parametri->thetamin;
 
 		}
 
 
-		min1=binning.xmin-binning.dimmi_dimx();
-		max1=binning.xmin;
-		min2=binning.pxmin-binning.dimmi_dimpx();
-		max2=binning.pxmin;
+		min1=parametri->xmin-parametri->dimmi_dimx();
+		max1=parametri->xmin;
+		min2=parametri->pxmin-parametri->dimmi_dimpx();
+		max2=parametri->pxmin;
 
-		for (int i = 0; i < binning.nbin_x+3; i++)
+		for (int i = 0; i < parametri->nbin_x+3; i++)
 		{
-			for (int j = 0; j < binning.nbin_px+3; j++)
+			for (int j = 0; j < parametri->nbin_px+3; j++)
 			{
 				xpx_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << xpx[i][j] << std::endl;
-				min2 += binning.dimmi_dimpx();
-				max2 += binning.dimmi_dimpx();
+				min2 += parametri->dimmi_dimpx();
+				max2 += parametri->dimmi_dimpx();
 			}
-			min1 += binning.dimmi_dimx();
-			max1 += binning.dimmi_dimx();
-			min2 = binning.pxmin-binning.dimmi_dimpx();
-			max2 = binning.pxmin;
+			min1 += parametri->dimmi_dimx();
+			max1 += parametri->dimmi_dimx();
+			min2 = parametri->pxmin-parametri->dimmi_dimpx();
+			max2 = parametri->pxmin;
 
 		}
 

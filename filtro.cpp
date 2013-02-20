@@ -9,9 +9,7 @@ _Filtro
 
 Al momento sono contemplati filtri di soglia minima e massima per
 
-CIASCUNA COORDINATA DI SPAZIO DI FASE
-e per
-ENERGIA
+CIASCUNA COORDINATA DI SPAZIO DI FASE e per ENERGIA
 
 Quest'ultima è, al presente, valutata da _Filtro stessa, ma si può molto
 facilmente introdurre modifiche per evitarne il calcolo, così come introdurre
@@ -22,8 +20,7 @@ con un solo bit acceso -- INDIPENDENTEMENTE QUINDI DA MSB o LSB ----
 
 STRUTTURA DEL CODICE
 
-Il
-namespace cost
+Il namespace cost
 
 definisce al suo interno nomi mnemonici per i filtri da applicare: ad esempio
 

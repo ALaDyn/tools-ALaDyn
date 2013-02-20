@@ -13,6 +13,7 @@
 #include<sstream>
 #include<iomanip>
 #include<cstdarg>
+#include<cstdint>
 
 
 // #define ENABLE_DEBUG
@@ -39,7 +40,7 @@
 #define MAX_LENGTH_FILENAME 200
 
 
-#define NPARAMETRI	8
+#define NPARAMETRI	9
 #define WEIGHT		0
 #define FUNZIONE	1
 #define SWAP		2
@@ -48,6 +49,7 @@
 #define	FIND_MINMAX	5
 #define DO_BINNING	6
 #define OUT_PARAMS	7
+#define NCOLUMNS	8
 
 
 
@@ -91,12 +93,14 @@
 struct parametri
 {
 	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
+	int endian_file, endian_machine;
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
 	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
 		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
+	bool old_fortran_bin;
 	parametri();
 	/* costruttore parametrico 1D */
 	parametri(float, float, float, float, int, int);
@@ -159,8 +163,10 @@ struct _Filtro
 	_Filtro(float *, unsigned int [], float *, unsigned int = 0);
 };
 
-int leggi_campi(char * , parametri );
-int leggi_particelle(char * , parametri);
+int leggi_campi(char * , parametri * );
+int leggi_particelle(char * , parametri *);
+
+int is_big_endian(void);
 void swap_endian_s(short* ,int );
 void swap_endian_i(int* ,int );
 void swap_endian_f(float* , int );
