@@ -228,20 +228,20 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
 
 const char * _Filtro :: descr[] =
 {
-	"xmin",
-	"ymin",
-	"zmin",
-	"xmax",
-	"ymax",
-	"zmax",
-	"pxmin",
-	"pymin",
-	"pzmin",
-	"pxmax",
-	"pymax",
-	"pzmax",
-	"Emin",
-	"Emax"
+	"+xmin",
+	"+ymin",
+	"+zmin",
+	"+xmax",
+	"+ymax",
+	"+zmax",
+	"+pxmin",
+	"+pymin",
+	"+pzmin",
+	"+pxmax",
+	"+pymax",
+	"+pzmax",
+	"+Emin",
+	"+Emax"
 	// varie ed eventuali
 };
 
@@ -253,6 +253,34 @@ const unsigned int _Filtro :: cost[] =
 	__0X24, __0X25, __0X26, __0X27, __0X28, __0X29, __0X30, __0X31
 };
 
+float * _Filtro :: costruisci_filtro(int narg, const char **args)
+ {char ** miei_args;
+  int indices[NUM_FILTRI], quanti = 0;
+  for(int i=1; i < narg; ++i)
+   {if(args[i][0] == '+')
+    indices[quanti++] = i;}
+  indices[quanti] = -1;
+  if(!quanti) return (float *)NULL;
+  miei_args = new char * [2*NUM_FILTRI+1], miei_args[2*NUM_FILTRI] = 0;
+  for(int i=0; i < quanti; ++i)
+    miei_args[2*i] = const_cast<char*>(args[indices[i]]),
+    miei_args[2*i+1] = const_cast<char*>(args[indices[i]+1]);
+  miei_args[2*quanti] = 0;
+  return costruisci_filtro(
+   miei_args[0], miei_args[1],
+   miei_args[2], miei_args[3],
+   miei_args[4], miei_args[5],
+   miei_args[6], miei_args[7],
+   miei_args[8], miei_args[9],
+   miei_args[10], miei_args[11],
+   miei_args[12], miei_args[13],
+   miei_args[14], miei_args[15],
+   miei_args[16], miei_args[17],
+   miei_args[18], miei_args[19],
+   miei_args[20], miei_args[21],
+   miei_args[22], miei_args[23],
+   miei_args[24], miei_args[25],
+   miei_args[26], miei_args[27], miei_args[2*NUM_FILTRI]);}
 float * _Filtro :: costruisci_filtro(const char *p, ...)
 {
 	va_list app;

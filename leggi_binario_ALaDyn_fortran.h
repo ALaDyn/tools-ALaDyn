@@ -140,6 +140,7 @@ struct _Filtro
 		emin, emax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
+        static float * costruisci_filtro(int, const char **);
 	static void individua_filtro(char *, float, float *&);
 	static const unsigned int cost[];
 	static unsigned int maschera_interna;
