@@ -13,8 +13,19 @@
 #include<sstream>
 #include<iomanip>
 #include<cstdarg>
-#include<cstdint>
 
+#ifdef USE_CPP_11
+#if defined (_MSC_VER)
+#include<cstdint>
+#endif
+#if defined (__GNUC__)
+#if GCC_VERSION >= 4.7
+#include<cstdint>
+#endif
+#endif
+#else
+typedef unsigned long int uint32_t
+#endif
 
 // #define ENABLE_DEBUG
 
