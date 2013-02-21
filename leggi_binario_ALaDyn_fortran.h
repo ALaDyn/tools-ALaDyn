@@ -24,7 +24,7 @@
 #endif
 #endif
 #else
-typedef unsigned long int uint32_t
+typedef unsigned long int uint32_t;
 #endif
 
 // #define ENABLE_DEBUG
