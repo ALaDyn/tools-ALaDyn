@@ -5,6 +5,9 @@
 
 int leggi_campi(char* fileIN, parametri * parametri)
 {
+	std::ostringstream nomefile_bin;
+	nomefile_bin << std::string(fileIN) << ".bin";
+
 	int out_swap = parametri->p[SWAP];
 //	int out_parameters = parametri.p[OUT_PARAMS];
 
@@ -26,7 +29,7 @@ int leggi_campi(char* fileIN, parametri * parametri)
 	float xmin,xmax,ymin,ymax,zmin,zmax,E0;
 	float dx, dy, dz, xx, yy;
 //	float zz;
-	file_in=fopen(fileIN, "r");
+	file_in=fopen(nomefile_bin.str().c_str(), "r");
 
 	size_t fread_size;
 
