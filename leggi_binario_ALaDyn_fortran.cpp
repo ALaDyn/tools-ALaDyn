@@ -97,6 +97,8 @@ int main (const int argc, const char *argv[])
 		return -4;
 	}
 
+	if (parametri.p[DO_BINNING]) parametri.organizza_minimi_massimi();
+
 	if (parametri.p[FUNZIONE] == 1) leggi_campi(argc, argv, &parametri);
 	else if (parametri.p[FUNZIONE] == 2) leggi_particelle(argc, argv, &parametri);
 	return 0;

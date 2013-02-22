@@ -266,17 +266,11 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
 			_Filtro(particelle,val,_Filtro::costruisci_filtro(argc, argv));
-			//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",parametri->Emin,"Emax",parametri->Emax,(char *) NULL));
-			if (cerca_minmax && ndim == 3 && !fai_binning)
+
+			if (cerca_minmax)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
-					//				x=fabs(*(particelle+i*(2*ndim+WEIGHT)));
-					//				y=fabs(*(particelle+i*(2*ndim+WEIGHT)+1));
-					//				z=fabs(*(particelle+i*(2*ndim+WEIGHT)+2));
-					//				px=fabs(*(particelle+i*(2*ndim+WEIGHT)+3));
-					//				py=fabs(*(particelle+i*(2*ndim+WEIGHT)+4));
-					//				pz=fabs(*(particelle+i*(2*ndim+WEIGHT)+5));
 					x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
 					y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
 					z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
@@ -305,101 +299,11 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 					if (E < estremi_min[8]) estremi_min[8] = E;
 					if (E > estremi_max[8]) estremi_max[8] = E;
 				}
-
+			_Binnaggio(particelle,npart_loc,3,parametri,xpx,"x","px");
+			_Binnaggio(particelle,npart_loc,3,parametri,Espec,"E");
+			_Binnaggio(particelle,npart_loc,3,parametri,Etheta,"E","theta");
 			}
 
-
-			if (fai_binning && ndim == 3 && !cerca_minmax)
-			{
-				for (int i = 0; i < npart_loc; i++)
-				{
-					x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
-					y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
-					z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
-					px=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+3);
-					py=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+4);
-					pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
-					//				particelle_elaborate[i]=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);				//gamma
-					//				particelle_elaborate[i+1]=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					//				particelle_elaborate[i+2]=(float)(particelle_elaborate[i]*P_MASS);			//energia
-					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					E=(float)(gamma*MP_MEV);								//energia
-
-					// xpx
-					if (x < parametri->xmin)
-					{
-						//					whichbinx = 0.0;
-						whichbinx_int = 0;
-					}
-					else if (x > parametri->xmax)
-					{
-						//					whichbinx = (float) (parametri->nbin_x + 2);
-						whichbinx_int = parametri->nbin_x + 2;
-					}
-					else
-					{
-						whichbinx = (x - parametri->xmin) / parametri->dimmi_dimx();
-						whichbinx_int = (int)(whichbinx+1.0);
-					}
-					if (px < parametri->pxmin)
-					{
-						//					whichbinpx = 0.0;
-						whichbinpx_int = 0;
-					}
-					else if (px > parametri->pxmax)
-					{
-						//					whichbinpx = (float) (parametri->nbin_px + 2);
-						whichbinpx_int = parametri->nbin_px + 2;
-					}
-					else
-					{
-						whichbinpx = (px - parametri->pxmin) / parametri->dimmi_dimpx();
-						whichbinpx_int = (int)(whichbinpx+1.0);
-					}
-					if (WEIGHT) xpx[whichbinx_int][whichbinpx_int] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
-					else		xpx[whichbinx_int][whichbinpx_int] += 1.0;
-
-					// Etheta
-					if (E < parametri->Emin)
-					{
-						//					whichbinE = 0.0;
-						whichbinE_int = 0;
-					}
-					else if (E > parametri->Emax)
-					{
-						//					whichbinE = (float) (parametri->nbin_E + 2);
-						whichbinE_int = parametri->nbin_E + 2;
-					}
-					else
-					{
-						whichbinE = (E - parametri->Emin) / parametri->dimmi_dimE();
-						whichbinE_int = (int)(whichbinE+1.0);
-					}
-					if (theta < parametri->thetamin)
-					{
-						//					whichbintheta = 0.0;
-						whichbintheta_int = 0;
-					}
-					else if (theta > parametri->thetamax)
-					{
-						//					whichbintheta = (float) (parametri->nbin_theta + 2);
-						whichbintheta_int = parametri->nbin_theta + 2;
-					}
-					else
-					{
-						whichbintheta = (theta - parametri->thetamin) / parametri->dimmi_dimtheta();
-						whichbintheta_int = (int)(whichbintheta+1.0);
-					}
-					if (WEIGHT) Etheta[whichbinE_int][whichbintheta_int] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
-					else		Etheta[whichbinE_int][whichbintheta_int] += 1.0;
-
-					// Espec
-					if (WEIGHT) Espec[whichbinE_int] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
-					else		Espec[whichbinE_int] += 1.0;
-
-				}
-			}
 
 			if (out_binary)
 			{
@@ -440,7 +344,6 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			}
 
 			free(particelle);
-			//		free(particelle_elaborate);
 		}
 	}
 
@@ -493,10 +396,11 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		fclose(parameters);
 	}
 
-	if (!fai_binning && cerca_minmax && ndim == 3)
+	if (cerca_minmax)
 	{
 		nomefile_Estremi << argv[1] << ".extremes";
 		Estremi_out.open(nomefile_Estremi.str().c_str());
+		if (Estremi_out.fail()) printf("unable to create .extremes file");
 		Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
 		Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
 		Estremi_out << "YMIN = " << estremi_min[1] << std::endl;
@@ -519,7 +423,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	}
 
 
-	if (ndim == 3 && fai_binning && !cerca_minmax)
+	if (fai_binning)
 	{
 		nomefile_xpx << argv[1] << "_xpx";
 		nomefile_Etheta << argv[1] << "_Etheta";

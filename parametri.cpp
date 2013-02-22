@@ -67,6 +67,20 @@ float parametri :: dimmi_dimE()
 {
 	return (Emax - Emin) / static_cast <float> (nbin_E);
 }
+float parametri :: dimmi_dim(int colonna)
+{
+	if (colonna == 0)		return dimmi_dimx();
+	else if (colonna == 1)	return dimmi_dimy();
+	else if (colonna == 2)	return dimmi_dimz();
+	else if (colonna == 3)	return dimmi_dimpx();
+	else if (colonna == 4)	return dimmi_dimpy();
+	else if (colonna == 5)	return dimmi_dimpz();
+	else if (colonna == 6)	return dimmi_dimgamma();
+	else if (colonna == 7)	return dimmi_dimtheta();
+	else if (colonna == 8)	return dimmi_dimE();
+	else return 1.0;
+}
+
 
 void parametri :: leggi_da_file(const char *nomefile)
 {
@@ -684,6 +698,29 @@ bool parametri :: check_parametri()
 	return test;
 }
 
+
+void parametri :: organizza_minimi_massimi()
+{
+	minimi[0] = xmin;
+	minimi[1] = ymin;
+	minimi[2] = zmin;
+	minimi[3] = pxmin;
+	minimi[4] = pymin;
+	minimi[5] = pzmin;
+	minimi[6] = gammamin;
+	minimi[7] = thetamin;
+	minimi[8] = Emin;
+
+	massimi[0] = xmin;
+	massimi[1] = ymin;
+	massimi[2] = zmin;
+	massimi[3] = pxmin;
+	massimi[4] = pymin;
+	massimi[5] = pzmin;
+	massimi[6] = gammamin;
+	massimi[7] = thetamin;
+	massimi[8] = Emin;
+}
 
 bool parametri :: incompleto()
 {

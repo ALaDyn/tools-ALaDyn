@@ -108,6 +108,7 @@ struct parametri
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
+	float minimi[9], massimi[9];  // x, y, z, px, py, pz, gamma, theta, E
 	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
 		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
@@ -124,12 +125,22 @@ struct parametri
 	float dimmi_dimgamma();
 	float dimmi_dimtheta();
 	float dimmi_dimE();
+	float dimmi_dim(int);
 	void leggi_da_file(const char *);
 	void leggi_interattivo();
 	void leggi_da_shell(int, const char *[]);
 	bool check_parametri();
 	bool incompleto();
+	void organizza_minimi_massimi();
 };
+
+
+struct _Binnaggio
+{
+	_Binnaggio(float *, int, int, parametri *, float ** , std::string, std::string);
+	_Binnaggio(float *, int, int, parametri *, float * , std::string);
+};
+
 
 struct _Filtro
 {
