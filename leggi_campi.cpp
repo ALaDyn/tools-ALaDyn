@@ -230,6 +230,9 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 				}
 				fclose(clean_fields);
 	}
+
+	fclose(file_in);
+
 	return 0;
 
 }

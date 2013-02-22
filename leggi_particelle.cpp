@@ -13,12 +13,24 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	char* trascura;
 	trascura = new char[MAX_LENGTH_FILENAME];
 	FILE *file_in;
-	file_in=fopen(nomefile_bin.str().c_str(), "r");
+	if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
+	{
+		printf ( "file non-existant!\n" );
+	}
+	else
+	{
+		printf ( "file exists!\n" );
+	}
 	FILE *binary_all_out;
 	FILE *ascii_all_out;
 	FILE *parameters;
 	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 	std::ifstream file_dat;
+	if (!(parametri->old_fortran_bin)) 
+	{
+		file_dat.open(nomefile_dat.str().c_str());
+		if (file_dat.fail()) printf ( "file .dat non-existant!\n" );
+	}
 
 
 	int out_swap = parametri->p[SWAP];
@@ -254,7 +266,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
 			_Filtro(particelle,val,_Filtro::costruisci_filtro(argc, argv));
-//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",parametri->Emin,"Emax",parametri->Emax,(char *) NULL));
+			//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",parametri->Emin,"Emax",parametri->Emax,(char *) NULL));
 			if (cerca_minmax && ndim == 3 && !fai_binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
@@ -576,6 +588,8 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 	}
 
+	if (!(parametri->old_fortran_bin)) file_dat.close();
+	fclose(file_in);
 	return 0;
 }
 
