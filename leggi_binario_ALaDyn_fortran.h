@@ -126,7 +126,7 @@ struct parametri
 	float dimmi_dimE();
 	void leggi_da_file(const char *);
 	void leggi_interattivo();
-	void leggi_da_shell(int, char *[]);
+	void leggi_da_shell(int, const char *[]);
 	bool check_parametri();
 	bool incompleto();
 };
@@ -140,7 +140,7 @@ struct _Filtro
 		emin, emax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
-        static float * costruisci_filtro(int, const char **);
+		static float * costruisci_filtro(int, const char **);
 	static void individua_filtro(char *, float, float *&);
 	static const unsigned int cost[];
 	static unsigned int maschera_interna;
@@ -175,8 +175,8 @@ struct _Filtro
 	_Filtro(float *, unsigned int [], float *, unsigned int = 0);
 };
 
-int leggi_campi(char * , parametri * );
-int leggi_particelle(char * , parametri *);
+int leggi_campi(int , const char ** , parametri * );
+int leggi_particelle(int , const char ** , parametri *);
 
 int is_big_endian(void);
 void swap_endian_s(short* ,int );

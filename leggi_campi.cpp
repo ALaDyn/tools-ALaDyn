@@ -3,10 +3,10 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
 
-int leggi_campi(char* fileIN, parametri * parametri)
+int leggi_campi(int argc, const char** argv, parametri * parametri)
 {
 	std::ostringstream nomefile_bin;
-	nomefile_bin << std::string(fileIN) << ".bin";
+	nomefile_bin << std::string(argv[1]) << ".bin";
 
 	int out_swap = parametri->p[SWAP];
 //	int out_parameters = parametri.p[OUT_PARAMS];
@@ -91,7 +91,7 @@ int leggi_campi(char* fileIN, parametri * parametri)
 	charge=real_param[16];  //carica particella su carica elettrone
 	mass=real_param[17];    //massa particelle su massa elettrone
 
-	sprintf(nomefile_parametri,"%s.parameters",fileIN);
+	sprintf(nomefile_parametri,"%s.parameters",argv[1]);
 	parameters=fopen(nomefile_parametri, "w");
 	printf("\nWriting the parameters file\n");
 	fprintf(parameters,"interi\n");
@@ -187,7 +187,7 @@ int leggi_campi(char* fileIN, parametri * parametri)
 	printf("=========FINE LETTURE==========\n");
 	fflush(stdout);
 
-	sprintf(nomefile_campi,"%s_out.vtk",fileIN);
+	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 	clean_fields=fopen(nomefile_campi, "w");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
@@ -211,7 +211,7 @@ int leggi_campi(char* fileIN, parametri * parametri)
 
 	if(nz1<=1)
 	{
-		sprintf(nomefile_campi,"%s_out.2D",fileIN);
+		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file 2D (not vtk)\n");
 

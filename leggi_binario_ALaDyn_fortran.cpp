@@ -4,7 +4,7 @@
 
 
 
-int main (int argc, char *argv[])
+int main (const int argc, const char *argv[])
 {
 	parametri parametri;
 	bool testParametri = true;;
@@ -97,8 +97,8 @@ int main (int argc, char *argv[])
 		return -4;
 	}
 
-	if (parametri.p[FUNZIONE] == 1) leggi_campi(argv[1], &parametri);
-	else if (parametri.p[FUNZIONE] == 2) leggi_particelle(argv[1], &parametri);
+	if (parametri.p[FUNZIONE] == 1) leggi_campi(argc, argv, &parametri);
+	else if (parametri.p[FUNZIONE] == 2) leggi_particelle(argc, argv, &parametri);
 	return 0;
 }
 

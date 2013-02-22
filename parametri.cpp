@@ -456,7 +456,7 @@ void parametri :: leggi_interattivo()
 	}
 }
 
-void parametri :: leggi_da_shell(int argc, char *argv[])
+void parametri :: leggi_da_shell(int argc, const char *argv[])
 {
 	for (int i = 2; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
 	{								// * Note that we're starting on 1 because we don't need to know the

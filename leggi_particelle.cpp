@@ -4,11 +4,11 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-int leggi_particelle(char* fileIN, parametri * parametri)
+int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 {
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
-	nomefile_bin << std::string(fileIN) << ".bin";
-	nomefile_dat << std::string(fileIN) << ".dat";
+	nomefile_bin << std::string(argv[1]) << ".bin";
+	nomefile_dat << std::string(argv[1]) << ".dat";
 	std::string riga_persa, endianness, columns;
 	char* trascura;
 	trascura = new char[MAX_LENGTH_FILENAME];
@@ -56,8 +56,8 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	int tipo = 0;
-	if (fileIN[0] == 'E') tipo = 3;
-	else if (fileIN[0] == 'P') tipo = 1;
+	if (argv[1][0] == 'E') tipo = 3;
+	else if (argv[1][0] == 'P') tipo = 1;
 	else printf("Tipo non riconosciuto!\n");
 
 	if (parametri->old_fortran_bin) 
@@ -191,8 +191,8 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 	}
 	float *Espec = new float [parametri->nbin_E+3];
 
-	sprintf(nomefile_ascii,"%s.ascii",fileIN);
-	sprintf(nomefile_binary,"%s.clean",fileIN);
+	sprintf(nomefile_ascii,"%s.ascii",argv[1]);
+	sprintf(nomefile_binary,"%s.clean",argv[1]);
 
 
 #ifdef ENABLE_DEBUG
@@ -234,7 +234,7 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 
 		particelle=(float*)malloc(npart_loc*(2*ndim+parametri->p[WEIGHT])*sizeof(float));
 		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
-		// unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+parametri->p[WEIGHT])};
+		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+parametri->p[WEIGHT])};
 		if(npart_loc>0)
 		{
 			printf("\tentro\t");
@@ -253,7 +253,8 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+parametri->p[WEIGHT]),file_in);
 
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
-			//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",parametri->Emin,"Emax",parametri->Emax,(char *) NULL));
+			_Filtro(particelle,val,_Filtro::costruisci_filtro(argc, argv));
+//			_Filtro(particelle,val,_Filtro::costruisci_filtro("Emin",parametri->Emin,"Emax",parametri->Emax,(char *) NULL));
 			if (cerca_minmax && ndim == 3 && !fai_binning)
 			{
 				for (int i = 0; i < npart_loc; i++)
@@ -434,7 +435,7 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 
 	if (out_parameters)
 	{
-		sprintf(nomefile_parametri,"%s.parameters",fileIN);
+		sprintf(nomefile_parametri,"%s.parameters",argv[1]);
 		parameters=fopen(nomefile_parametri, "w");
 		printf("\nWriting the parameters file\n");
 		fprintf(parameters,"interi\n");
@@ -482,7 +483,7 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 
 	if (!fai_binning && cerca_minmax && ndim == 3)
 	{
-		nomefile_Estremi << fileIN << ".extremes";
+		nomefile_Estremi << argv[1] << ".extremes";
 		Estremi_out.open(nomefile_Estremi.str().c_str());
 		Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
 		Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
@@ -508,9 +509,9 @@ int leggi_particelle(char* fileIN, parametri * parametri)
 
 	if (ndim == 3 && fai_binning && !cerca_minmax)
 	{
-		nomefile_xpx << fileIN << "_xpx";
-		nomefile_Etheta << fileIN << "_Etheta";
-		nomefile_Espec << fileIN << "_Espec";
+		nomefile_xpx << argv[1] << "_xpx";
+		nomefile_Etheta << argv[1] << "_Etheta";
+		nomefile_Espec << argv[1] << "_Espec";
 		xpx_out.open(nomefile_xpx.str().c_str());
 		Etheta_out.open(nomefile_Etheta.str().c_str());
 		Espec_out.open(nomefile_Espec.str().c_str());
