@@ -35,11 +35,14 @@ typedef unsigned long int uint32_t;
 #define TRUE 1
 #define FALSE 0
 
-#define C						2.99792458e+10		// cm / s
+#define UMA_G					1.660538921E-24		// fattore di conversione uma -> grammi
+#define C						2.99792458E+10		// cm / s
 #define ME_G					9.10938291E-28		// electron mass [g]
-#define MP_G					1.6726231e-24		// proton mass [g]
+#define MP_G					1.6726231E-24		// proton mass [g]
 #define MP_MEV					938.272013			// proton mass [MeV/c^2]
 #define ME_MEV					0.510998928			// electron mass [MeV/c^2]
+#define MHI_UMA					26.981538			// atomic weight of Aluminum in atomic mass units
+#define MLI_UMA					12.0107				// atomic weight of Carbon in atomic mass units
 // #define CHARGE				4.80320425e-10		// statC	commentata perche' Turchetti la usa un po' diversa
 #define CHARGE					4.803262e-10		// statC    valore usato da Turchetti; nb: e' impreciso negli ultimi due decimali
 #define FROM_TESLA_TO_GAUSS		1.0e+4
@@ -103,6 +106,7 @@ typedef unsigned long int uint32_t;
 
 struct parametri
 {
+	float massa_particella_MeV;
 	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
 	int endian_file, endian_machine;
 	int p[NPARAMETRI];
@@ -113,6 +117,10 @@ struct parametri
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
 		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
 	bool old_fortran_bin;
+	bool fai_plot_xpx, fai_plot_Espec, fai_plot_Etheta;
+	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
+	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
+//	bool file_ALTRI_TIPI_DA_IMPLEMENTARE;
 	parametri();
 	/* costruttore parametrico 1D */
 	parametri(float, float, float, float, int, int);
@@ -129,7 +137,10 @@ struct parametri
 	void leggi_da_file(const char *);
 	void leggi_interattivo();
 	void leggi_da_shell(int, const char *[]);
+	void chiedi_endian_file();
+	void chiedi_numero_colonne();
 	bool check_parametri();
+	void check_filename(const char *);
 	bool incompleto();
 	void organizza_minimi_massimi();
 };
@@ -183,7 +194,7 @@ struct _Filtro
 		// varie ed eventuali
 	} flag_filtri;
 	static const char * descr[];
-	_Filtro(float *, unsigned int [], float *, unsigned int = 0);
+	_Filtro(parametri*, float *, unsigned int [], float *, unsigned int = 0);
 };
 
 int leggi_campi(int , const char ** , parametri * );

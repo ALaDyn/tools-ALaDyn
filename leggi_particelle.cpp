@@ -265,7 +265,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+parametri->p[WEIGHT]),file_in);
 
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
-			_Filtro(particelle,val,_Filtro::costruisci_filtro(argc, argv));
+			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
 
 			if (cerca_minmax)
 			{
@@ -279,7 +279,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 					pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
 					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					E=(float)(gamma*MP_MEV);								//energia
+					E=(float)(gamma*parametri->massa_particella_MeV);		//energia
 					if (x < estremi_min[0]) estremi_min[0] = x;
 					if (x > estremi_max[0]) estremi_max[0] = x;
 					if (y < estremi_min[1]) estremi_min[1] = y;

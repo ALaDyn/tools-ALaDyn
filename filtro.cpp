@@ -117,7 +117,7 @@ namespace cost
 }
 
 
-_Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
+_Filtro ::  _Filtro(parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
 {
 	float * pntt_loc, p[3], E;
 	unsigned int corrente = 0, tests[32];
@@ -127,7 +127,7 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
 	if(!maschera) maschera = maschera_interna;
 	if(!maschera)
 	{
-		std :: cerr << "NON È STATO IMPOSTATO ALCUN FILTRO; NON PERDIAMO TEMPO\n";
+		std :: cerr << "NON E' STATO IMPOSTATO ALCUN FILTRO; NON PERDIAMO TEMPO\n";
 		return;
 	}
 	for(unsigned char c=0; c < 32; ++c)
@@ -145,7 +145,7 @@ _Filtro ::  _Filtro(float *dati, unsigned int n_dati[], float *val, unsigned int
 		{
 			if(!flag) break;
 			if(tests[c] == __0X12 || tests[c] == __0X13)
-				E = (float) (MP_MEV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
+				E = (float) (parametri->massa_particella_MeV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
 			switch(tests[c])
 			{
 			case __0X00: // cost::xmin

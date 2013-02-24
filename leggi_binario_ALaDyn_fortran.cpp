@@ -24,33 +24,61 @@ int main (const int argc, const char *argv[])
 	nomefile_dat << std::string(argv[1]) << ".dat";
 	std::string riga_persa, endianness, columns;
 	std::ifstream file_dat, file_bin;
+	file_bin.open(nomefile_bin.str().c_str());
+	fallita_lettura_inputfile = file_bin.fail();
+	file_bin.close();
+	if ( fallita_lettura_inputfile )
+	{
+		std::cout << "Input file non trovato" << std::endl;
+		return -3;
+	}
+	else
+	{
+		parametri.check_filename(argv[1]);
+	}
 	file_dat.open(nomefile_dat.str().c_str());
-	if (file_dat.fail()) parametri.old_fortran_bin = true;
+	if (file_dat.fail()) 
+	{
+		parametri.old_fortran_bin = true;
+		parametri.chiedi_endian_file();
+		parametri.chiedi_numero_colonne();
+	}
 	else
 	{
 		parametri.old_fortran_bin = false;
 		file_dat >> endianness >> columns;
 		std::getline(file_dat,riga_persa); // nb: serve per pulire dallo stdin gli spazi residui fino al newline
-		if (endianness == "BIG-ENDIAN") parametri.endian_file = 1;
-		else if (endianness == "LITTLE-ENDIAN") parametri.endian_file = 0;
-		if (parametri.endian_file == parametri.endian_machine) 
+		if (endianness == "BIG-ENDIAN")
 		{
-			parametri.p[SWAP] = 0;
-			parametri.p_b[SWAP] = false;
+			parametri.endian_file = 1;
+			parametri.p[NCOLUMNS] = std::atoi(columns.c_str());
+			parametri.p_b[NCOLUMNS] = false;
 		}
-		else 
+		else if (endianness == "LITTLE-ENDIAN")
 		{
-			parametri.p[SWAP] = 1;
-			parametri.p_b[SWAP] = false;
+			parametri.endian_file = 0;
+			parametri.p[NCOLUMNS] = std::atoi(columns.c_str());
+			parametri.p_b[NCOLUMNS] = false;
 		}
-		parametri.p[NCOLUMNS] = std::atoi(columns.c_str());
-		parametri.p_b[NCOLUMNS] = false;
+		else
+		{
+			parametri.chiedi_endian_file();
+			parametri.chiedi_numero_colonne();
+		}
 	}
-	file_bin.open(nomefile_bin.str().c_str());
-	fallita_lettura_inputfile = file_bin.fail();
-	file_bin.close();
+	if (parametri.endian_file == parametri.endian_machine) 
+	{
+		parametri.p[SWAP] = 0;
+		parametri.p_b[SWAP] = false;
+	}
+	else 
+	{
+		parametri.p[SWAP] = 1;
+		parametri.p_b[SWAP] = false;
+	}
 	file_dat.close();
 
+	parametri.check_filename(argv[1]);
 
 	if (argc == 2)
 	{
@@ -58,7 +86,7 @@ int main (const int argc, const char *argv[])
 		parametri.leggi_interattivo();
 	}
 
-	else if (std::string(argv[2]) == "-readParamfromFile")
+	else if (std::string(argv[2]) == "-readParamsfromFile")
 	{
 		parametri.leggi_da_file(argv[3]);
 		if (argc > 3) 
@@ -86,16 +114,14 @@ int main (const int argc, const char *argv[])
 		std::cout << "Parametri non coerenti" << std::endl;
 		return -2;
 	}
-	if ( fallita_lettura_inputfile )
-	{
-		std::cout << "Input file non trovato" << std::endl;
-		return -3;
-	}
+
+	/*
 	if ( parametri.p[FUNZIONE] == 2 && parametri.p[FIND_MINMAX] && parametri.p[DO_BINNING] )
 	{
-		std::cout << "Non riesco a fare altro che cercare minimi e massimi" << std::endl;
-		return -4;
+	std::cout << "Non riesco a fare altro che cercare minimi e massimi" << std::endl;
+	return -4;
 	}
+	*/
 
 	if (parametri.p[DO_BINNING]) parametri.organizza_minimi_massimi();
 
