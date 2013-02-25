@@ -40,13 +40,6 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	int fai_binning = parametri->p[DO_BINNING];
 	int cerca_minmax = parametri->p[FIND_MINMAX];
 
-	float whichbinx = 0., whichbinpx = 0.;
-	int whichbinx_int = (int) whichbinx;
-	int whichbinpx_int = (int) whichbinpx;
-	float whichbinE = 0., whichbintheta = 0.;
-	int whichbinE_int = (int) whichbinE;
-	int whichbintheta_int = (int) whichbintheta;
-
 	int ipc,N_param, *int_param,npart_loc;
 	int buff, pID;
 
@@ -326,9 +319,9 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 						if (E > estremi_max[8]) estremi_max[8] = E;
 					}
 				}
-				_Binnaggio(particelle,npart_loc,3,parametri,xpx,"x","px");
-				_Binnaggio(particelle,npart_loc,3,parametri,Espec,"E");
-				_Binnaggio(particelle,npart_loc,3,parametri,Etheta,"E","theta");
+				_Binnaggio(particelle,npart_loc,ndv,parametri,xpx,"x","px");
+				_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
+				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 			}
 
 
@@ -540,6 +533,8 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		Espec_out.close();
 
 	}
+
+	printf("%i\nFine.",fread_size);
 
 	if (!(parametri->old_fortran_bin)) file_dat.close();
 	fclose(file_in);

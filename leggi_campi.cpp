@@ -3,6 +3,7 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
 
+
 int leggi_campi(int argc, const char** argv, parametri * parametri)
 {
 	std::ostringstream nomefile_bin;
@@ -230,7 +231,7 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 				}
 				fclose(clean_fields);
 	}
-
+	printf("%i\nFine.",fread_size);
 	fclose(file_in);
 
 	return 0;

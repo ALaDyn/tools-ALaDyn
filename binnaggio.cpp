@@ -2,7 +2,7 @@
 # define __BINNING_CPP
 # include "leggi_binario_ALaDyn_fortran.h"
 
-_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndim, parametri * parametri, float ** data_binned, std::string binx, std::string biny)
+_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * parametri, float ** data_binned, std::string binx, std::string biny)
 {
 	int binnare_su_x, binnare_su_y;
 	int whichbin_x, whichbin_y;
@@ -29,28 +29,52 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndim, parametri * pa
 	else if (biny == "E") binnare_su_y = 8;
 	else printf("variabile y non riconosciuta\n");
 
-	float x, y, z, px, py, pz, gamma, theta, E;
+	//	float z;
+	float x, y, px, py, pz, gamma, theta, E;
 	float dato_da_binnare_x, dato_da_binnare_y;
 	for (int i = 0; i < npart; i++)
 	{
-		x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
-		y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
-		z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
-		px=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+3);
-		py=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+4);
-		pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
-		gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-		theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-		E=(float)(gamma*parametri->massa_particella_MeV);								//energia
-		if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*(2*ndim+parametri->p[WEIGHT])+binnare_su_x);
-		else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
-		else if (binnare_su_x == 7) dato_da_binnare_x = theta;
-		else if (binnare_su_x == 8) dato_da_binnare_x = E;
-		if (binnare_su_y < 6) dato_da_binnare_y = *(particelle+i*(2*ndim+parametri->p[WEIGHT])+binnare_su_y);
-		else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
-		else if (binnare_su_y == 7) dato_da_binnare_y = theta;
-		else if (binnare_su_y == 8) dato_da_binnare_y = E;
-
+		if (ndv == 4 || ndv == 5)
+		{
+			x=*(particelle+i*ndv);
+			y=*(particelle+i*ndv+1);
+			px=*(particelle+i*ndv+2);
+			py=*(particelle+i*ndv+3);
+			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
+			theta=(float)(atan2(py,px)*180./M_PI);				//theta
+			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+			if (binnare_su_x == 0) dato_da_binnare_x = x;
+			else if (binnare_su_x == 1) dato_da_binnare_x = y;
+			else if (binnare_su_x == 3) dato_da_binnare_x = px;
+			else if (binnare_su_x == 4) dato_da_binnare_x = py;
+			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
+			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
+			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+			if (binnare_su_y == 0) dato_da_binnare_y = x;
+			else if (binnare_su_y == 1) dato_da_binnare_y = y;
+			else if (binnare_su_y == 3) dato_da_binnare_y = px;
+			else if (binnare_su_y == 4) dato_da_binnare_y = py;
+			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
+			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
+			else if (binnare_su_y == 8) dato_da_binnare_y = E;
+		}
+		else if (ndv == 6 || ndv == 7)
+		{
+			px=*(particelle+i*ndv+3);
+			py=*(particelle+i*ndv+4);
+			pz=*(particelle+i*ndv+5);
+			gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
+			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
+			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
+			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+			if (binnare_su_y < 6) dato_da_binnare_y = *(particelle+i*ndv+binnare_su_y);
+			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
+			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
+			else if (binnare_su_y == 8) dato_da_binnare_y = E;
+		}
 
 
 		if (dato_da_binnare_x < parametri->minimi[binnare_su_x])
@@ -63,26 +87,26 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndim, parametri * pa
 		}
 		else
 		{
-			whichbin_x = (int) (((x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) +1.0);
+			whichbin_x = (int) (((dato_da_binnare_x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) +1.0);
 		}
-		if (px < parametri->pxmin)
+		if (dato_da_binnare_y < parametri->minimi[binnare_su_y])
 		{
 			whichbin_y = 0;
 		}
-		else if (px > parametri->pxmax)
+		else if (dato_da_binnare_y > parametri->massimi[binnare_su_y])
 		{
 			whichbin_y = parametri->nbin_px + 2;
 		}
 		else
 		{
-			whichbin_y = (int) (((px - parametri->pxmin) / parametri->dimmi_dimpx()) +1.0);
+			whichbin_y = (int) (((dato_da_binnare_y - parametri->minimi[binnare_su_y]) / parametri->dimmi_dim(binnare_su_y)) +1.0);
 		}
-		if (WEIGHT) data_binned[whichbin_x][whichbin_y] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
-		else		data_binned[whichbin_x][whichbin_y] += 1.0;
+		if (parametri->p[WEIGHT])	data_binned[whichbin_x][whichbin_y] += *(particelle+i*ndv+6);
+		else						data_binned[whichbin_x][whichbin_y] += 1.0;
 	}
 }
 
-_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndim, parametri * parametri, float * data_binned, std::string binx)
+_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * parametri, float * data_binned, std::string binx)
 {
 	int binnare_su_x;
 	int whichbin_x;
@@ -98,23 +122,41 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndim, parametri * pa
 	else if (binx == "E") binnare_su_x = 8;
 	else printf("variabile x non riconosciuta\n");
 
-	float x, y, z, px, py, pz, gamma, theta, E;
+	//	float z;
+	float x, y, px, py, pz, gamma, theta, E;
 	float dato_da_binnare_x;
 	for (int i = 0; i < npart; i++)
 	{
-		x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
-		y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
-		z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
-		px=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+3);
-		py=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+4);
-		pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
-		gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-		theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-		E=(float)(gamma*parametri->massa_particella_MeV);		//energia
-		if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*(2*ndim+parametri->p[WEIGHT])+binnare_su_x);
-		else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
-		else if (binnare_su_x == 7) dato_da_binnare_x = theta;
-		else if (binnare_su_x == 8) dato_da_binnare_x = E;
+		if (ndv == 4 || ndv == 5)
+		{
+			x=*(particelle+i*ndv);
+			y=*(particelle+i*ndv+1);
+			px=*(particelle+i*ndv+2);
+			py=*(particelle+i*ndv+3);
+			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
+			theta=(float)(atan2(py,px)*180./M_PI);				//theta
+			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+			if (binnare_su_x == 0) dato_da_binnare_x = x;
+			else if (binnare_su_x == 1) dato_da_binnare_x = y;
+			else if (binnare_su_x == 3) dato_da_binnare_x = px;
+			else if (binnare_su_x == 4) dato_da_binnare_x = py;
+			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
+			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
+			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+		}
+		else if (ndv == 6 || ndv == 7)
+		{
+			px=*(particelle+i*ndv+3);
+			py=*(particelle+i*ndv+4);
+			pz=*(particelle+i*ndv+5);
+			gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
+			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
+			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
+			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+		}
 
 		if (dato_da_binnare_x < parametri->minimi[binnare_su_x])
 		{
@@ -126,10 +168,10 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndim, parametri * pa
 		}
 		else
 		{
-			whichbin_x = (int) (((x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) +1.0);
+			whichbin_x = (int) (((dato_da_binnare_x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) +1.0);
 		}
-		if (WEIGHT) data_binned[whichbin_x] += *(particelle+i*(2*ndim+parametri->p[WEIGHT])+6);
-		else		data_binned[whichbin_x] += 1.0;
+		if (parametri->p[WEIGHT])	data_binned[whichbin_x] += *(particelle+i*ndv+6);
+		else						data_binned[whichbin_x] += 1.0;
 	}
 }
 
