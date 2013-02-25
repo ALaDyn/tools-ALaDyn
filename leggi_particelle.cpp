@@ -380,11 +380,11 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 						if (parametri->p[WEIGHT])
 						{
 							wgh=particelle[i*ndv+4];
-							fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+							fprintf(ascii_all_out,"%e %e %e %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
 						}
 						else
 						{
-							fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+							fprintf(ascii_all_out,"%e %e %e %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
 						}
 					}
 				}
