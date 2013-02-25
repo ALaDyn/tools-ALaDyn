@@ -41,31 +41,19 @@ int main (const int argc, const char *argv[])
 	{
 		parametri.old_fortran_bin = true;
 		parametri.chiedi_endian_file();
-		parametri.chiedi_numero_colonne();
+		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI)
+		{
+			parametri.chiedi_numero_colonne();
+			parametri.p_b[NCOLUMNS] = false;
+		}
 	}
 	else
 	{
 		parametri.old_fortran_bin = false;
-		file_dat >> endianness >> columns;
-		std::getline(file_dat,riga_persa); // nb: serve per pulire dallo stdin gli spazi residui fino al newline
-		if (endianness == "BIG-ENDIAN")
-		{
-			parametri.endian_file = 1;
-			parametri.p[NCOLUMNS] = std::atoi(columns.c_str());
-			parametri.p_b[NCOLUMNS] = false;
-		}
-		else if (endianness == "LITTLE-ENDIAN")
-		{
-			parametri.endian_file = 0;
-			parametri.p[NCOLUMNS] = std::atoi(columns.c_str());
-			parametri.p_b[NCOLUMNS] = false;
-		}
-		else
-		{
-			parametri.chiedi_endian_file();
-			parametri.chiedi_numero_colonne();
-		}
+		parametri.leggi_endian_ndv(file_dat);
 	}
+
+
 	if (parametri.endian_file == parametri.endian_machine) 
 	{
 		parametri.p[SWAP] = 0;
@@ -125,11 +113,11 @@ int main (const int argc, const char *argv[])
 	if (parametri.p[DO_BINNING]) parametri.organizza_minimi_massimi();
 
 	if (parametri.p[FUNZIONE] == 1  || parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
-									|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
-									|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
-									|| parametri.file_densita_HI || parametri.file_densita_LI) leggi_campi(argc, argv, &parametri);
+		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
+		|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
+		|| parametri.file_densita_HI || parametri.file_densita_LI) leggi_campi(argc, argv, &parametri);
 	else if (parametri.p[FUNZIONE] == 2 || parametri.file_particelle_P || parametri.file_particelle_E 
-										|| parametri.file_particelle_HI || parametri.file_particelle_LI) leggi_particelle(argc, argv, &parametri);
+		|| parametri.file_particelle_HI || parametri.file_particelle_LI) leggi_particelle(argc, argv, &parametri);
 	return 0;
 }
 

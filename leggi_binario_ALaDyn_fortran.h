@@ -138,6 +138,7 @@ struct parametri
 	void leggi_da_file(const char *);
 	void leggi_interattivo();
 	void leggi_da_shell(int, const char *[]);
+	void leggi_endian_ndv(std::ifstream & );
 	void chiedi_endian_file();
 	void chiedi_numero_colonne();
 	bool check_parametri();

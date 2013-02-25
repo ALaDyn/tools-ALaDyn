@@ -9,7 +9,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 	nomefile_dat << std::string(argv[1]) << ".dat";
-	std::string riga_persa, endianness, columns;
+	std::string riga_persa;
 	char* trascura;
 	trascura = new char[MAX_LENGTH_FILENAME];
 	FILE *file_in;
@@ -63,7 +63,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 	size_t fread_size;
 
-	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv;
+	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
 	//	int ny;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
@@ -149,7 +149,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		file_dat >> pID;
 		file_dat >> nptot;
 		file_dat >> ndv;
-		file_dat >> trascura;
+		file_dat >> i_end;
 		file_dat >> trascura;
 		std::getline(file_dat,riga_persa); // nb: servono due getline per eliminare la riga di testo nel .dat e non capisco il perche'...
 		std::getline(file_dat,riga_persa);
@@ -258,11 +258,11 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				// buffshort[0] = ???
 				// buffshort[1] = ???
 				if (out_swap) swap_endian_s(buffshort,2);
-				fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+parametri->p[WEIGHT]),file_in);
+				fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
-				if (out_swap) swap_endian_f(particelle,npart_loc*(2*ndim+parametri->p[WEIGHT]));
+				if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
 			}
-			else fread_size = std::fread(particelle,sizeof(float),npart_loc*(2*ndim+parametri->p[WEIGHT]),file_in);
+			else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 
 			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
 			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
@@ -271,37 +271,64 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			{
 				for (int i = 0; i < npart_loc; i++)
 				{
-					x=*(particelle+i*(2*ndim+parametri->p[WEIGHT]));
-					y=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+1);
-					z=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+2);
-					px=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+3);
-					py=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+4);
-					pz=*(particelle+i*(2*ndim+parametri->p[WEIGHT])+5);
-					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					E=(float)(gamma*parametri->massa_particella_MeV);		//energia
-					if (x < estremi_min[0]) estremi_min[0] = x;
-					if (x > estremi_max[0]) estremi_max[0] = x;
-					if (y < estremi_min[1]) estremi_min[1] = y;
-					if (y > estremi_max[1]) estremi_max[1] = y;
-					if (z < estremi_min[2]) estremi_min[2] = z;
-					if (z > estremi_max[2]) estremi_max[2] = z;
-					if (px < estremi_min[3]) estremi_min[3] = px;
-					if (px > estremi_max[3]) estremi_max[3] = px;
-					if (py < estremi_min[4]) estremi_min[4] = py;
-					if (py > estremi_max[4]) estremi_max[4] = py;
-					if (pz < estremi_min[5]) estremi_min[5] = pz;
-					if (pz > estremi_max[5]) estremi_max[5] = pz;
-					if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-					if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-					if (theta < estremi_min[7]) estremi_min[7] = theta;
-					if (theta > estremi_max[7]) estremi_max[7] = theta;
-					if (E < estremi_min[8]) estremi_min[8] = E;
-					if (E > estremi_max[8]) estremi_max[8] = E;
+					if (ndv == 6 || ndv == 7)
+					{
+						x=*(particelle+i*ndv);
+						y=*(particelle+i*ndv+1);
+						z=*(particelle+i*ndv+2);
+						px=*(particelle+i*ndv+3);
+						py=*(particelle+i*ndv+4);
+						pz=*(particelle+i*ndv+5);
+						gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+						theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+						E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+						if (x < estremi_min[0]) estremi_min[0] = x;
+						if (x > estremi_max[0]) estremi_max[0] = x;
+						if (y < estremi_min[1]) estremi_min[1] = y;
+						if (y > estremi_max[1]) estremi_max[1] = y;
+						if (z < estremi_min[2]) estremi_min[2] = z;
+						if (z > estremi_max[2]) estremi_max[2] = z;
+						if (px < estremi_min[3]) estremi_min[3] = px;
+						if (px > estremi_max[3]) estremi_max[3] = px;
+						if (py < estremi_min[4]) estremi_min[4] = py;
+						if (py > estremi_max[4]) estremi_max[4] = py;
+						if (pz < estremi_min[5]) estremi_min[5] = pz;
+						if (pz > estremi_max[5]) estremi_max[5] = pz;
+						if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+						if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+						if (theta < estremi_min[7]) estremi_min[7] = theta;
+						if (theta > estremi_max[7]) estremi_max[7] = theta;
+						if (E < estremi_min[8]) estremi_min[8] = E;
+						if (E > estremi_max[8]) estremi_max[8] = E;
+					}
+					else if (ndv == 4 || ndv == 5)
+					{
+						x=*(particelle+i*ndv);
+						y=*(particelle+i*ndv+1);
+						px=*(particelle+i*ndv+2);
+						py=*(particelle+i*ndv+3);
+						gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
+						theta=(float)(atan2(py,px)*180./M_PI);				//theta
+						E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+						if (x < estremi_min[0]) estremi_min[0] = x;
+						if (x > estremi_max[0]) estremi_max[0] = x;
+						if (y < estremi_min[1]) estremi_min[1] = y;
+						if (y > estremi_max[1]) estremi_max[1] = y;
+						if (px < estremi_min[3]) estremi_min[3] = px;
+						if (px > estremi_max[3]) estremi_max[3] = px;
+						if (py < estremi_min[4]) estremi_min[4] = py;
+						if (py > estremi_max[4]) estremi_max[4] = py;
+						if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+						if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+						if (theta < estremi_min[7]) estremi_min[7] = theta;
+						if (theta > estremi_max[7]) estremi_max[7] = theta;
+						if (E < estremi_min[8]) estremi_min[8] = E;
+						if (E > estremi_max[8]) estremi_max[8] = E;
+					}
 				}
-			_Binnaggio(particelle,npart_loc,3,parametri,xpx,"x","px");
-			_Binnaggio(particelle,npart_loc,3,parametri,Espec,"E");
-			_Binnaggio(particelle,npart_loc,3,parametri,Etheta,"E","theta");
+				_Binnaggio(particelle,npart_loc,3,parametri,xpx,"x","px");
+				_Binnaggio(particelle,npart_loc,3,parametri,Espec,"E");
+				_Binnaggio(particelle,npart_loc,3,parametri,Etheta,"E","theta");
 			}
 
 
@@ -309,7 +336,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			{
 				binary_all_out=fopen(nomefile_binary, "ab");
 				printf("\nWriting the C binary file\n");
-				fwrite((void*)particelle,sizeof(float),nptot*(2*ndim+parametri->p[WEIGHT]),binary_all_out);
+				fwrite((void*)particelle,sizeof(float),nptot*(ndv),binary_all_out);
 				fflush(binary_all_out);
 				fclose(binary_all_out);
 			}
@@ -321,22 +348,44 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			{
 				ascii_all_out=fopen(nomefile_ascii, "a");
 
-				for(int i=0;i<nptot;i++)
+				if (ndv == 6 || ndv == 7)
 				{
-					rx=particelle[i*(6+parametri->p[WEIGHT])+1]*((float)1.e-4);
-					ry=particelle[i*(6+parametri->p[WEIGHT])+2]*((float)1.e-4);
-					rz=particelle[i*(6+parametri->p[WEIGHT])+0]*((float)1.e-4);
-					ux=particelle[i*(6+parametri->p[WEIGHT])+4];
-					uy=particelle[i*(6+parametri->p[WEIGHT])+5];
-					uz=particelle[i*(6+parametri->p[WEIGHT])+3];
-					if (parametri->p[WEIGHT])
+					for(int i=0;i<nptot;i++)
 					{
-						wgh=particelle[i*(6+parametri->p[WEIGHT])+6];
-						fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+						rx=particelle[i*ndv+1]*((float)1.e-4);
+						ry=particelle[i*ndv+2]*((float)1.e-4);
+						rz=particelle[i*ndv+0]*((float)1.e-4);
+						ux=particelle[i*ndv+4];
+						uy=particelle[i*ndv+5];
+						uz=particelle[i*ndv+3];
+						if (parametri->p[WEIGHT])
+						{
+							wgh=particelle[i*ndv+6];
+							fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+						}
+						else
+						{
+							fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+						}
 					}
-					else
+				}
+				else if (ndv == 4 || ndv == 5)
+				{
+					for(int i=0;i<nptot;i++)
 					{
-						fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+						rx=particelle[i*ndv+1]*((float)1.e-4);
+						rz=particelle[i*ndv+0]*((float)1.e-4);
+						ux=particelle[i*ndv+3];
+						uz=particelle[i*ndv+2];
+						if (parametri->p[WEIGHT])
+						{
+							wgh=particelle[i*ndv+4];
+							fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+						}
+						else
+						{
+							fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+						}
 					}
 				}
 				fflush(ascii_all_out);

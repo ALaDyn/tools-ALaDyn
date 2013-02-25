@@ -14,8 +14,10 @@ parametri :: parametri()
 	nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 100;
 	xmin = xmax = pxmin = pxmax = ymin = ymax = pymin = pymax = zmin = zmax = pzmin = pzmax = thetamin = thetamax = Emin = Emax = gammamin = gammamax = 0.0;
 	//		dim_x = dim_y = dim_z = dim_px = dim_py = dim_pz = dim_E = dim_theta = 0.0;
-	xmin_b = xmax_b = pxmin_b = pxmax_b = ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = Emin_b = Emax_b = gammamin_b = gammamax_b = thetamin_b = thetamax_b = true;
-	nbin_x_b = nbin_px_b = nbin_y_b = nbin_z_b = nbin_py_b = nbin_pz_b = nbin_E_b = nbin_theta_b = false;
+	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = false;
+	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetamin_b = thetamax_b = true;
+	nbin_y_b = nbin_z_b = nbin_py_b = nbin_pz_b = false;
+	nbin_x_b = nbin_px_b = nbin_E_b = nbin_theta_b = true;
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
 	for (int i = 0; i < NPARAMETRI; i++) 
 	{
@@ -86,6 +88,50 @@ float parametri :: dimmi_dim(int colonna)
 	else return 1.0;
 }
 
+
+void parametri :: leggi_endian_ndv(std::ifstream& file_dat)
+{
+	std::string riga_persa;
+	int trascura, ndv, i_end;
+	std::getline(file_dat,riga_persa);
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> trascura;
+	file_dat >> ndv;
+	file_dat >> i_end;
+	file_dat >> trascura;
+
+	p[NCOLUMNS] = ndv;
+	p_b[NCOLUMNS] = false;
+
+	if (ndv == 4 || ndv == 6)
+	{
+		p[WEIGHT] = 0;
+		p_b[WEIGHT] = false;
+	}
+	else if (ndv == 5 || ndv == 7)
+	{
+		p[WEIGHT] = 1;
+		p_b[WEIGHT] = false;
+	}
+
+	endian_file = (i_end-1);
+
+}
 
 void parametri :: chiedi_numero_colonne()
 {
@@ -329,8 +375,8 @@ void parametri :: leggi_da_file(const char *nomefile)
 	/*
 	else if(file_campi_Ex || file_campi_Ey || file_campi_Ez || file_campi_Bx || file_campi_By || file_campi_Bz)
 	{
-		std::cout << "Inserisci label per il file: (i.e. Ex) ";
-		std::cin >> support_label;
+	std::cout << "Inserisci label per il file: (i.e. Ex) ";
+	std::cin >> support_label;
 	}
 	*/
 	fileParametri.close();
@@ -428,8 +474,8 @@ void parametri :: leggi_interattivo()
 	/*
 	else if(file_campi_Ex || file_campi_Ey || file_campi_Ez || file_campi_Bx || file_campi_By || file_campi_Bz)
 	{
-		std::cout << "Inserisci label per il file: (i.e. Ex) ";
-		std::cin >> support_label;
+	std::cout << "Inserisci label per il file: (i.e. Ex) ";
+	std::cin >> support_label;
 	}
 	*/
 }
