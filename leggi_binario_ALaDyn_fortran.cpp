@@ -125,8 +125,12 @@ int main (const int argc, const char *argv[])
 
 	if (parametri.p[DO_BINNING]) parametri.organizza_minimi_massimi();
 
-	if (parametri.p[FUNZIONE] == 1) leggi_campi(argc, argv, &parametri);
-	else if (parametri.p[FUNZIONE] == 2) leggi_particelle(argc, argv, &parametri);
+	if (parametri.p[FUNZIONE] == 1  || parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
+									|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
+									|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
+									|| parametri.file_densita_HI || parametri.file_densita_LI) leggi_campi(argc, argv, &parametri);
+	else if (parametri.p[FUNZIONE] == 2 || parametri.file_particelle_P || parametri.file_particelle_E 
+										|| parametri.file_particelle_HI || parametri.file_particelle_LI) leggi_particelle(argc, argv, &parametri);
 	return 0;
 }
 
