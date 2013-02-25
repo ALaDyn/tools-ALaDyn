@@ -326,11 +326,13 @@ void parametri :: leggi_da_file(const char *nomefile)
 		std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
 		std::cin >> p[OUT_PARAMS];
 	}
+	/*
 	else if(file_campi_Ex || file_campi_Ey || file_campi_Ez || file_campi_Bx || file_campi_By || file_campi_Bz)
 	{
 		std::cout << "Inserisci label per il file: (i.e. Ex) ";
 		std::cin >> support_label;
 	}
+	*/
 	fileParametri.close();
 }
 

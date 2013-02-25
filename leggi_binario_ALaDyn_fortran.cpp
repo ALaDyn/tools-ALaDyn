@@ -10,7 +10,7 @@ int main (const int argc, const char *argv[])
 	bool testParametri = true;;
 	bool fallita_lettura_inputfile = true;
 
-	std::cout << "Binary file reader v2.0" << std::endl;
+	std::cout << "Binary file reader v3.0" << std::endl;
 
 	if (argc == 1)
 	{
@@ -82,7 +82,6 @@ int main (const int argc, const char *argv[])
 
 	if (argc == 2)
 	{
-		std::cout << "Programma di conversione da output binario Fortran ad output \"umano\"" << std::endl;
 		parametri.leggi_interattivo();
 	}
 
