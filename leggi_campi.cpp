@@ -209,15 +209,13 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);
-
+	
 	if(nz1<=1)
 	{
 		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
-		dx=(xmax-xmin)/(nx1-1);
-		dy=(ymax-ymin)/(ny1-1);
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
@@ -227,9 +225,29 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 				{
 					xx=xmin+dx*i;
 					yy=ymin+dy*j;
-					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+(j)*nx1+(k)*nx1*ny1]);
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
 				fclose(clean_fields);
+	}
+	else
+	{
+		sprintf(nomefile_campi,"%s_out.only2D",argv[1]);
+		clean_fields=fopen(nomefile_campi, "w");
+		printf("\nWriting the fields file 2D (not vtk)\n");
+
+		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
+		k=nz1/2;
+		fprintf(clean_fields,"# 2D cut at z=%g\n",k*dz+zmin); 
+		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
+		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
+		for(j=0;j<ny1;j++)
+		  for(i=0;i<nx1;i++)
+		    {
+		      xx=xmin+dx*i;
+		      yy=ymin+dy*j;
+		      fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+		    }
+		fclose(clean_fields);
 	}
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
 	fclose(file_in);
