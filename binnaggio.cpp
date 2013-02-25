@@ -4,8 +4,8 @@
 
 _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * parametri, float ** data_binned, std::string binx, std::string biny)
 {
-	int binnare_su_x, binnare_su_y;
-	int whichbin_x, whichbin_y;
+	int binnare_su_x = 0, binnare_su_y = 0;
+	int whichbin_x = 0, whichbin_y = 0;
 
 	if (binx == "x") binnare_su_x = 0;
 	else if (binx == "y") binnare_su_x = 1;
@@ -31,7 +31,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 
 	//	float z;
 	float x, y, px, py, pz, gamma, theta, E;
-	float dato_da_binnare_x, dato_da_binnare_y;
+	float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
 	for (int i = 0; i < npart; i++)
 	{
 		if (ndv == 4 || ndv == 5)
@@ -108,8 +108,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 
 _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * parametri, float * data_binned, std::string binx)
 {
-	int binnare_su_x;
-	int whichbin_x;
+	int binnare_su_x = 0;
+	int whichbin_x = 0;
 
 	if (binx == "x") binnare_su_x = 0;
 	else if (binx == "y") binnare_su_x = 1;
@@ -124,7 +124,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 
 	//	float z;
 	float x, y, px, py, pz, gamma, theta, E;
-	float dato_da_binnare_x;
+	float dato_da_binnare_x = 0.;
 	for (int i = 0; i < npart; i++)
 	{
 		if (ndv == 4 || ndv == 5)

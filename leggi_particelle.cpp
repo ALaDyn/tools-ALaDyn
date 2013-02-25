@@ -534,7 +534,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 	}
 
-	printf("%i\nFine.",fread_size);
+	printf("%lu\nFine.",(unsigned long) fread_size);
 
 	if (!(parametri->old_fortran_bin)) file_dat.close();
 	fclose(file_in);
