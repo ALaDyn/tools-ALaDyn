@@ -27,6 +27,7 @@ parametri :: parametri()
 	endian_machine = is_big_endian();
 	file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = false;
 	file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
+	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = false;
 }
 
 /* costruttore parametrico 1D */
@@ -118,8 +119,35 @@ void parametri :: check_filename(const char *nomefile)
 				file_particelle_P = true;
 			}
 		}
+		else if (nomefile[1] == 'd')
+		{
+			file_densita_protoni = true;
+			sprintf (support_label,"pden");
+		}
 	}
-	if (nomefile[0] == 'E')
+	else if (nomefile[0] == 'H')
+	{
+		if (nomefile[1] == 'i')
+		{
+			if (nomefile[2] == 'd')
+			{
+				file_densita_HI = true;
+				sprintf (support_label,"hiden");
+			}
+		}
+	}
+	else if (nomefile[0] == 'L')
+	{
+		if (nomefile[1] == 'i')
+		{
+			if (nomefile[2] == 'd')
+			{
+				file_densita_LI = true;
+				sprintf (support_label,"liden");
+			}
+		}
+	}
+	else if (nomefile[0] == 'E')
 	{
 		if (nomefile[1] == 'l')
 		{
@@ -129,7 +157,69 @@ void parametri :: check_filename(const char *nomefile)
 				file_particelle_E = true;
 			}
 		}
+		else if (nomefile[1] == 'x')
+		{
+			if (nomefile[2] == 'f')
+			{
+				file_campi_Ex = true;
+				sprintf (support_label,"Ex");
+			}
+		}
+		else if (nomefile[1] == 'y')
+		{
+			if (nomefile[2] == 'f')
+			{
+				file_campi_Ey = true;
+				sprintf (support_label,"Ey");
+			}
+		}
+		else if (nomefile[1] == 'z')
+		{
+			if (nomefile[2] == 'f')
+			{
+				file_campi_Ez = true;
+				sprintf (support_label,"Ez");
+			}
+		}
+		else if (nomefile[1] == 'd')
+		{
+			file_campi_Ez = true;
+			sprintf (support_label,"eden");
+		}
 	}
+	else if (nomefile[0] == 'B')
+	{
+		if (nomefile[1] == 'x')
+		{
+			if (nomefile[2] == 'f')
+			{
+				file_campi_Bx = true;
+				sprintf (support_label,"Bx");
+			}
+		}
+		else if (nomefile[1] == 'y')
+		{
+			if (nomefile[2] == 'f')
+			{
+				file_campi_By = true;
+				sprintf (support_label,"By");
+			}
+		}
+		else if (nomefile[1] == 'z')
+		{
+			if (nomefile[2] == 'f')
+			{
+				file_campi_Bz = true;
+				sprintf (support_label,"Bz");
+			}
+		}
+	}
+	else
+	{
+		std::cout << "File non riconosciuto" << std::endl;
+		exit(-15);
+	}
+
 }
 
 void parametri :: leggi_da_file(const char *nomefile)
@@ -200,12 +290,12 @@ void parametri :: leggi_da_file(const char *nomefile)
 					Emax = (float) std::atof(leggi.c_str());
 					Emax_b = false;
 				}
-/*
+				/*
 				else
 				{
-					std::cout << "Parametro " << nomepar << " non riconosciuto." << std::endl;
+				std::cout << "Parametro " << nomepar << " non riconosciuto." << std::endl;
 				}
-*/
+				*/
 			}
 #ifdef ENABLE_DEBUG
 			std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
