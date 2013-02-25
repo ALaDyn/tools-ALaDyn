@@ -231,7 +231,7 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 				}
 				fclose(clean_fields);
 	}
-	printf("%lu\nFine.",(unsigned long) fread_size);
+	printf("%lu\nFine\n\n",(unsigned long) fread_size);
 	fclose(file_in);
 
 	return 0;

@@ -282,8 +282,6 @@ void parametri :: leggi_da_file(const char *nomefile)
 
 	std::string nomepar, evita, leggi;
 
-	chiedi_endian_file();
-
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
 		if (p_b[FIND_MINMAX])
