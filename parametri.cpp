@@ -94,26 +94,26 @@ void parametri :: leggi_endian_ndv(std::ifstream& file_dat)
 	std::string riga_persa;
 	int trascura, ndv, i_end;
 	std::getline(file_dat,riga_persa);
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> trascura;
-	file_dat >> ndv;
-	file_dat >> i_end;
-	file_dat >> trascura;
+	file_dat >> trascura; // 1° parametro
+	file_dat >> trascura; // 2° parametro
+	file_dat >> trascura; // 3° parametro
+	file_dat >> trascura; // 4° parametro
+	file_dat >> trascura; // 5° parametro
+	file_dat >> trascura; // 6° parametro
+	file_dat >> trascura; // 7° parametro
+	file_dat >> trascura; // 8° parametro
+	file_dat >> trascura; // 9° parametro
+	file_dat >> trascura; // 10° parametro
+	file_dat >> trascura; // 11° parametro
+	file_dat >> trascura; // 12° parametro
+	file_dat >> trascura; // 13° parametro
+	file_dat >> trascura; // 14° parametro
+	file_dat >> trascura; // 15° parametro
+	file_dat >> trascura; // 16° parametro
+	file_dat >> trascura; // 17° parametro
+	file_dat >> ndv;	  // 18° parametro
+	file_dat >> trascura; // 19° parametro
+	file_dat >> i_end;	  // 20° parametro
 
 	p[NCOLUMNS] = ndv;
 	p_b[NCOLUMNS] = false;

@@ -10,7 +10,7 @@ int main (const int argc, const char *argv[])
 	bool testParametri = true;;
 	bool fallita_lettura_inputfile = true;
 
-	std::cout << "Binary file reader v3.5" << std::endl;
+	std::cout << "Binary file reader v3.6" << std::endl;
 
 	if (argc == 1)
 	{
