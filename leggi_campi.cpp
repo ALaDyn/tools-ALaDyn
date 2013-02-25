@@ -179,11 +179,11 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 		} 
 		segnoz+=nzloc;
 	}
-
+/*
 	if(out_swap)
 	{
 		swap_endian_f(field,nx1*ny1*nz1);
-	}
+	}*/
 
 	printf("=========FINE LETTURE==========\n");
 	fflush(stdout);
