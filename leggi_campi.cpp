@@ -10,9 +10,9 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 	nomefile_bin << std::string(argv[1]) << ".bin";
 
 	int out_swap = parametri->p[SWAP];
-//	int out_parameters = parametri.p[OUT_PARAMS];
+	//	int out_parameters = parametri.p[OUT_PARAMS];
 
-//	int kk, segnox=0;
+	//	int kk, segnox=0;
 	int i, ipy, ipz,  j, k, N_param, *int_param, np_loc, npoint_loc[3], loc_size;
 	int segnoy=0,segnoz=0, buff;
 	float *field,*buffer,  *real_param;
@@ -29,7 +29,7 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 	float tnow,w0x,w0y,nrat,a0,lam0,B0,ompe,xt_in,xt_end,charge,mass;
 	float xmin,xmax,ymin,ymax,zmin,zmax,E0;
 	float dx, dy, dz, xx, yy;
-//	float zz;
+	//	float zz;
 	file_in=fopen(nomefile_bin.str().c_str(), "r");
 
 	size_t fread_size;
@@ -179,37 +179,18 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 		} 
 		segnoz+=nzloc;
 	}
-/*
-	if(out_swap)
-	{
-		swap_endian_f(field,nx1*ny1*nz1);
-	}*/
 
 	printf("=========FINE LETTURE==========\n");
 	fflush(stdout);
 
-	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
-	clean_fields=fopen(nomefile_campi, "w");
-	printf("\nWriting the fields file\n");
-	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
-	fprintf(clean_fields,"titolo mio\n");
-	fprintf(clean_fields,"BINARY\n");
-	fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
-	fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
-	fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
 	dx=(xmax-xmin)/(nx1-1);
 	dy=(ymax-ymin)/(ny1-1);
 	if(nz1<=1)
 		dz=(zmax-zmin);
 	else
 		dz=(zmax-zmin)/(nz1-1);
-	fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
-	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
-	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
-	fprintf(clean_fields,"LOOKUP_TABLE default\n");
-	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
-	fclose(clean_fields);
-	
+
+
 	if(nz1<=1)
 	{
 		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
@@ -241,15 +222,38 @@ int leggi_campi(int argc, const char** argv, parametri * parametri)
 		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
 		for(j=0;j<ny1;j++)
-		  for(i=0;i<nx1;i++)
-		    {
-		      xx=xmin+dx*i;
-		      yy=ymin+dy*j;
-		      fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
-		    }
-		fclose(clean_fields);
+			for(i=0;i<nx1;i++)
+			{
+				xx=xmin+dx*i;
+				yy=ymin+dy*j;
+				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+			}
+			fclose(clean_fields);
 	}
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
+
+
+	if(parametri->endian_machine == 0)
+	{
+		swap_endian_f(field,nx1*ny1*nz1);
+	}
+
+	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+	clean_fields=fopen(nomefile_campi, "w");
+	printf("\nWriting the fields file\n");
+	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+	fprintf(clean_fields,"titolo mio\n");
+	fprintf(clean_fields,"BINARY\n");
+	fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
+	fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
+	fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+	fprintf(clean_fields,"LOOKUP_TABLE default\n");
+	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+	fclose(clean_fields);
+
 	fclose(file_in);
 
 	return 0;
