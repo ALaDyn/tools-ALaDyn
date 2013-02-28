@@ -324,12 +324,80 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 			}
 
-
+                        int contatori[] = {0,0,0};
 			if (out_binary)
 			{
 				binary_all_out=fopen(nomefile_binary, "ab");
+                                contatori[0] +=
+                                fprintf(binary_all_out, "# vtk DataFile Version 2.0\n");
+                                contatori[0] +=
+                                fprintf(binary_all_out, "titolo nostro\n");
+                                contatori[0] +=
+                                fprintf(binary_all_out, "BINARY\n");
+                                contatori[0] +=
+                                fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
+                                contatori[0] +=
+                                fprintf(binary_all_out, "POINTS %i float\n", nptot);
 				printf("\nWriting the C binary file\n");
-				fwrite((void*)particelle,sizeof(float),nptot*(ndv),binary_all_out);
+                                float zero = 0.0f;
+                                switch(ndv)
+                                  {
+                                   case 4:
+                                   case 5:
+                                    for(int i=0; i < nptot; i += ndv)
+                                     fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
+                                     fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
+                                   break;
+                                   case 6:
+                                   case 7:
+                                    for(int i=0; i < nptot; i += ndv)
+                                     fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+                                   break;
+                                   default:
+                                    printf("Sinigardi è pessimista %i\n", ndv);
+                                   }
+                                
+                                contatori[1] +=
+                                fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
+                                contatori[1] +=
+                                fprintf(binary_all_out, "POINTS %i float\n", nptot);
+                                switch(ndv)
+                                  {
+                                   case 4:
+                                   case 5:
+                                    for(int i=2; i < nptot; i += ndv)
+                                     fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
+                                     fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
+                                   break;
+                                   case 6:
+                                   case 7:
+                                    for(int i=3; i < nptot; i += ndv)
+                                     fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+                                   break;
+                                   default:
+                                    printf("Sinigardi è pessimista %i\n", ndv);
+                                   }
+                                
+				if(ndv == 5 || ndv == 7)
+                                  {
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"ORIGIN 0 0 0\n");
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"SPACING 1 1 1\n");
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"SCALARS w float 1\n");
+                                   contatori[2] +=
+	                           fprintf(binary_all_out,"LOOKUP_TABLE default\n");
+                                   for(int i=ndv-1; i < nptot; i += ndv)
+                                     fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
+                                  }
+
 				fflush(binary_all_out);
 				fclose(binary_all_out);
 			}
