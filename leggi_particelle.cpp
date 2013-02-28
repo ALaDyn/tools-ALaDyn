@@ -370,13 +370,13 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				case 5:
 					// scrittura coordinate x, y, z
 					fseek(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=0; i < nptot; i += ndv)
+					for(int i=0; i < npart_loc; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
 						fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
 
 					// scrittura momenti px, py, pz
 					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=2; i < nptot; i += ndv)
+					for(int i=2; i < npart_loc; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
 						fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
 
@@ -385,12 +385,12 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				case 7:
 					// scrittura coordinate x, y, z
 					fseek(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=0; i < nptot; i += ndv)
+					for(int i=0; i < npart_loc; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
 
 					// scrittura momenti px, py, pz
 					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=3; i < nptot; i += ndv)
+					for(int i=3; i < npart_loc; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
 
 					break;
@@ -403,7 +403,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				{
 					// scrittura pesi
 					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
-					for(int i=ndv-1; i < nptot; i += ndv)
+					for(int i=ndv-1; i < npart_loc; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
 				}
 
@@ -416,7 +416,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			{
 				if (ndv == 6 || ndv == 7)
 				{
-					for(int i=0;i<nptot;i++)
+					for(int i=0;i<npart_loc;i++)
 					{
 						rx=particelle[i*ndv+1]*((float)1.e-4);
 						ry=particelle[i*ndv+2]*((float)1.e-4);
@@ -437,7 +437,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				}
 				else if (ndv == 4 || ndv == 5)
 				{
-					for(int i=0;i<nptot;i++)
+					for(int i=0;i<npart_loc;i++)
 					{
 						rx=particelle[i*ndv+1]*((float)1.e-4);
 						rz=particelle[i*ndv+0]*((float)1.e-4);
