@@ -39,6 +39,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	int out_parameters = parametri->p[OUT_PARAMS];
 	int fai_binning = parametri->p[DO_BINNING];
 	int cerca_minmax = parametri->p[FIND_MINMAX];
+	int weight_esiste = parametri->p[WEIGHT];
 
 	int ipc,N_param, *int_param,npart_loc;
 	int buff, pID;
@@ -197,7 +198,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	float *Espec = new float [parametri->nbin_E+3];
 
 	sprintf(nomefile_ascii,"%s.ascii",argv[1]);
-	sprintf(nomefile_binary,"%s.clean",argv[1]);
+	sprintf(nomefile_binary,"%s.vtk",argv[1]);
 
 
 #ifdef ENABLE_DEBUG
@@ -224,6 +225,41 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	}
 #endif
 
+	int contatori[] = {0,0,0};
+	float zero = 0.0f;
+	int particelle_accumulate = 0;
+
+	if (out_binary)
+	{
+		printf("\nRichiesta scrittura file .vtk\n");
+		binary_all_out=fopen(nomefile_binary, "w");
+		contatori[0] += fprintf(binary_all_out, "# vtk DataFile Version 2.0\n");
+		contatori[0] += fprintf(binary_all_out, "titolo nostro\n");
+		contatori[0] += fprintf(binary_all_out, "BINARY\n");
+		contatori[0] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
+		contatori[0] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+		fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
+		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
+		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+
+		if (weight_esiste)
+		{
+			fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
+			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
+			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
+			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
+			contatori[2] += fprintf(binary_all_out,"SPACING 1 1 1\n");
+			contatori[2] += fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
+			contatori[2] += fprintf(binary_all_out,"SCALARS w float 1\n");
+			contatori[2] += fprintf(binary_all_out,"LOOKUP_TABLE default\n");
+		}
+	}
+
+	if (out_ascii)
+	{
+		printf("\nRichiesta scrittura file ASCII\n");
+		ascii_all_out=fopen(nomefile_ascii, "w");
+	}
 
 	for(ipc=0;ipc<npe;ipc++)
 	{
@@ -324,82 +360,53 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 			}
 
-                        int contatori[] = {0,0,0};
+
+
 			if (out_binary)
 			{
-				binary_all_out=fopen(nomefile_binary, "ab");
-                                contatori[0] +=
-                                fprintf(binary_all_out, "# vtk DataFile Version 2.0\n");
-                                contatori[0] +=
-                                fprintf(binary_all_out, "titolo nostro\n");
-                                contatori[0] +=
-                                fprintf(binary_all_out, "BINARY\n");
-                                contatori[0] +=
-                                fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
-                                contatori[0] +=
-                                fprintf(binary_all_out, "POINTS %i float\n", nptot);
-				printf("\nWriting the C binary file\n");
-                                float zero = 0.0f;
-                                switch(ndv)
-                                  {
-                                   case 4:
-                                   case 5:
-                                    for(int i=0; i < nptot; i += ndv)
-                                     fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
-                                     fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
-                                   break;
-                                   case 6:
-                                   case 7:
-                                    for(int i=0; i < nptot; i += ndv)
-                                     fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
-                                   break;
-                                   default:
-                                    printf("Sinigardi è pessimista %i\n", ndv);
-                                   }
-                                
-                                contatori[1] +=
-                                fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
-                                contatori[1] +=
-                                fprintf(binary_all_out, "POINTS %i float\n", nptot);
-                                switch(ndv)
-                                  {
-                                   case 4:
-                                   case 5:
-                                    for(int i=2; i < nptot; i += ndv)
-                                     fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
-                                     fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
-                                   break;
-                                   case 6:
-                                   case 7:
-                                    for(int i=3; i < nptot; i += ndv)
-                                     fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
-                                   break;
-                                   default:
-                                    printf("Sinigardi è pessimista %i\n", ndv);
-                                   }
-                                
-				if(ndv == 5 || ndv == 7)
-                                  {
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"ORIGIN 0 0 0\n");
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"SPACING 1 1 1\n");
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"SCALARS w float 1\n");
-                                   contatori[2] +=
-	                           fprintf(binary_all_out,"LOOKUP_TABLE default\n");
-                                   for(int i=ndv-1; i < nptot; i += ndv)
-                                     fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
-                                  }
+				switch(ndv)
+				{
+				case 4:
+				case 5:
+					// scrittura coordinate x, y, z
+					fseek(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(int i=0; i < nptot; i += ndv)
+						fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
+						fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
 
-				fflush(binary_all_out);
-				fclose(binary_all_out);
+					// scrittura momenti px, py, pz
+					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(int i=2; i < nptot; i += ndv)
+						fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
+						fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
+
+					break;
+				case 6:
+				case 7:
+					// scrittura coordinate x, y, z
+					fseek(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(int i=0; i < nptot; i += ndv)
+						fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+
+					// scrittura momenti px, py, pz
+					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(int i=3; i < nptot; i += ndv)
+						fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+
+					break;
+				default:
+					printf("ndv imprevisto: %i\n", ndv);
+				}
+
+
+				if(weight_esiste)
+				{
+					// scrittura pesi
+					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+					for(int i=ndv-1; i < nptot; i += ndv)
+						fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
+				}
+
 			}
 
 
@@ -407,8 +414,6 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 			if(out_ascii)
 			{
-				ascii_all_out=fopen(nomefile_ascii, "a");
-
 				if (ndv == 6 || ndv == 7)
 				{
 					for(int i=0;i<nptot;i++)
@@ -449,11 +454,10 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 						}
 					}
 				}
-				fflush(ascii_all_out);
-				fclose(ascii_all_out);
 			}
 
 			free(particelle);
+			particelle_accumulate += npart_loc;
 		}
 	}
 
@@ -603,6 +607,18 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	}
 
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
+
+	if (out_binary)
+	{
+		fflush(binary_all_out);
+		fclose(binary_all_out);
+	}
+
+	if (out_ascii)
+	{
+		fflush(ascii_all_out);
+		fclose(ascii_all_out);
+	}
 
 	if (!(parametri->old_fortran_bin)) file_dat.close();
 	fclose(file_in);
