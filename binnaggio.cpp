@@ -101,7 +101,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 		{
 			whichbin_y = (int) (((dato_da_binnare_y - parametri->minimi[binnare_su_y]) / parametri->dimmi_dim(binnare_su_y)) +1.0);
 		}
-		if (parametri->p[WEIGHT])	data_binned[whichbin_x][whichbin_y] += *(particelle+i*ndv+6);
+		if (parametri->p[WEIGHT])	data_binned[whichbin_x][whichbin_y] += fabs(*(particelle+i*ndv+6));
 		else						data_binned[whichbin_x][whichbin_y] += 1.0;
 	}
 }
@@ -170,7 +170,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 		{
 			whichbin_x = (int) (((dato_da_binnare_x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) +1.0);
 		}
-		if (parametri->p[WEIGHT])	data_binned[whichbin_x] += *(particelle+i*ndv+6);
+		if (parametri->p[WEIGHT])	data_binned[whichbin_x] += fabs(*(particelle+i*ndv+6));
 		else						data_binned[whichbin_x] += 1.0;
 	}
 }
