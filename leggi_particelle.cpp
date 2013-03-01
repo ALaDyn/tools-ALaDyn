@@ -243,7 +243,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		contatori[1] += fprintf(binary_all_out, "POINT_DATA %i\n",nptot);
 //		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
 		contatori[1] += fprintf(binary_all_out, "VECTORS p float\n");
-		contatori[1] += fprintf(binary_all_out, "LOOKUP_TABLE default\n");
+		//		contatori[1] += fprintf(binary_all_out, "LOOKUP_TABLE default\n");
 
 		if (weight_esiste)
 		{
