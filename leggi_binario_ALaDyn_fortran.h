@@ -121,7 +121,7 @@ struct parametri
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;
-//	bool file_ALTRI_TIPI_DA_IMPLEMENTARE;
+	//	bool file_ALTRI_TIPI_DA_IMPLEMENTARE;
 	parametri();
 	/* costruttore parametrico 1D */
 	parametri(float, float, float, float, int, int);
@@ -164,7 +164,7 @@ struct _Filtro
 		emin, emax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
-		static float * costruisci_filtro(int, const char **);
+	static float * costruisci_filtro(int, const char **);
 	static void individua_filtro(char *, float, float *&);
 	static const unsigned int cost[];
 	static unsigned int maschera_interna;

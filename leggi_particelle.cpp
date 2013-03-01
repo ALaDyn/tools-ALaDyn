@@ -239,22 +239,22 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		contatori[0] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[0] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
 		fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
-//		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
+		//		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[1] += fprintf(binary_all_out, "POINT_DATA %i\n",nptot);
-//		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+		//		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
 		contatori[1] += fprintf(binary_all_out, "VECTORS p float\n");
 		//		contatori[1] += fprintf(binary_all_out, "LOOKUP_TABLE default\n");
 
 		if (weight_esiste)
 		{
 			fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
-//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
-//			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
-//			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
-//			contatori[2] += fprintf(binary_all_out,"SPACING 1 1 1\n");
-//			contatori[2] += fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
+			//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
+			//			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
+			//			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
+			//			contatori[2] += fprintf(binary_all_out,"SPACING 1 1 1\n");
+			//			contatori[2] += fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
 			contatori[2] += fprintf(binary_all_out,"SCALARS w float 1\n");
-//			contatori[2] += fprintf(binary_all_out,"LOOKUP_TABLE default\n");
+			contatori[2] += fprintf(binary_all_out,"LOOKUP_TABLE default\n");
 		}
 	}
 
