@@ -239,19 +239,22 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		contatori[0] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[0] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
 		fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
-		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
-		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+//		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
+		contatori[1] += fprintf(binary_all_out, "POINT_DATA %i\n",nptot);
+//		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+		contatori[1] += fprintf(binary_all_out, "VECTORS p float\n");
+		contatori[1] += fprintf(binary_all_out, "LOOKUP_TABLE default\n");
 
 		if (weight_esiste)
 		{
 			fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
-			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
-			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
-			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
-			contatori[2] += fprintf(binary_all_out,"SPACING 1 1 1\n");
-			contatori[2] += fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
+//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
+//			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
+//			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
+//			contatori[2] += fprintf(binary_all_out,"SPACING 1 1 1\n");
+//			contatori[2] += fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
 			contatori[2] += fprintf(binary_all_out,"SCALARS w float 1\n");
-			contatori[2] += fprintf(binary_all_out,"LOOKUP_TABLE default\n");
+//			contatori[2] += fprintf(binary_all_out,"LOOKUP_TABLE default\n");
 		}
 	}
 
@@ -362,8 +365,58 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 
 
+			if(out_ascii)
+			{
+				if (ndv == 6 || ndv == 7)
+				{
+					for(int i=0;i<npart_loc;i++)
+					{
+						rx=particelle[i*ndv+1]*((float)1.e-4);
+						ry=particelle[i*ndv+2]*((float)1.e-4);
+						rz=particelle[i*ndv+0]*((float)1.e-4);
+						ux=particelle[i*ndv+4];
+						uy=particelle[i*ndv+5];
+						uz=particelle[i*ndv+3];
+						if (parametri->p[WEIGHT])
+						{
+							wgh=particelle[i*ndv+6];
+							fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+						}
+						else
+						{
+							fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+						}
+					}
+				}
+				else if (ndv == 4 || ndv == 5)
+				{
+					for(int i=0;i<npart_loc;i++)
+					{
+						rx=particelle[i*ndv+1]*((float)1.e-4);
+						rz=particelle[i*ndv+0]*((float)1.e-4);
+						ux=particelle[i*ndv+3];
+						uz=particelle[i*ndv+2];
+						if (parametri->p[WEIGHT])
+						{
+							wgh=particelle[i*ndv+4];
+							fprintf(ascii_all_out,"%e %e %e %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+						}
+						else
+						{
+							fprintf(ascii_all_out,"%e %e %e %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+						}
+					}
+				}
+			}
+
+
+
 			if (out_binary)
 			{
+				if (parametri->endian_machine == 0)
+				{
+					swap_endian_f(particelle,npart_loc*ndv);
+				}
 				switch(ndv)
 				{
 				case 4:
@@ -411,50 +464,6 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 
 
 
-
-			if(out_ascii)
-			{
-				if (ndv == 6 || ndv == 7)
-				{
-					for(int i=0;i<npart_loc;i++)
-					{
-						rx=particelle[i*ndv+1]*((float)1.e-4);
-						ry=particelle[i*ndv+2]*((float)1.e-4);
-						rz=particelle[i*ndv+0]*((float)1.e-4);
-						ux=particelle[i*ndv+4];
-						uy=particelle[i*ndv+5];
-						uz=particelle[i*ndv+3];
-						if (parametri->p[WEIGHT])
-						{
-							wgh=particelle[i*ndv+6];
-							fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
-						}
-						else
-						{
-							fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
-						}
-					}
-				}
-				else if (ndv == 4 || ndv == 5)
-				{
-					for(int i=0;i<npart_loc;i++)
-					{
-						rx=particelle[i*ndv+1]*((float)1.e-4);
-						rz=particelle[i*ndv+0]*((float)1.e-4);
-						ux=particelle[i*ndv+3];
-						uz=particelle[i*ndv+2];
-						if (parametri->p[WEIGHT])
-						{
-							wgh=particelle[i*ndv+4];
-							fprintf(ascii_all_out,"%e %e %e %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
-						}
-						else
-						{
-							fprintf(ascii_all_out,"%e %e %e %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
-						}
-					}
-				}
-			}
 
 			free(particelle);
 			particelle_accumulate += npart_loc;
