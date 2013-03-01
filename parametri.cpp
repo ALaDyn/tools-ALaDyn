@@ -462,6 +462,7 @@ void parametri :: leggi_interattivo()
 				}
 			}
 		}
+		std::cout << "Hai scritto Emin = "<< Emin << "  Emax = "<< Emax<< std::endl;
 		std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
 		std::cin >> p[OUT_BINARY];
 		std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";

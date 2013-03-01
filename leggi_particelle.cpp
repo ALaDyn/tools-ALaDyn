@@ -15,7 +15,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	FILE *file_in;
 	if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
 	{
-		printf ( "file non-existant!\n" );
+		printf ( "file non-existent!\n" );
 	}
 	else
 	{
@@ -29,7 +29,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 	if (!(parametri->old_fortran_bin)) 
 	{
 		file_dat.open(nomefile_dat.str().c_str());
-		if (file_dat.fail()) printf ( "file .dat non-existant!\n" );
+		if (file_dat.fail()) printf ( "file .dat non-existent!\n" );
 	}
 
 
@@ -277,11 +277,11 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 
 		particelle=(float*)malloc(npart_loc*(2*ndim+parametri->p[WEIGHT])*sizeof(float));
-		printf("proc number %i\tnpart=%i\n",ipc,npart_loc);
+		printf("proc number \t %i \t npart=%i\r",ipc,npart_loc);
 		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+parametri->p[WEIGHT])};
 		if(npart_loc>0)
 		{
-			printf("\tentro\t");
+		  //printf("\tentro\t");
 			fflush(stdout);
 
 			if (parametri->old_fortran_bin)
@@ -296,7 +296,7 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 			}
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 
-			printf("lunghezza=%i    %hu\t%hu\n",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
+			printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
 			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
 
 			if (cerca_minmax)

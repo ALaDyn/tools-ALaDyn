@@ -127,7 +127,7 @@ _Filtro ::  _Filtro(parametri * parametri, float *dati, unsigned int n_dati[], f
 	if(!maschera) maschera = maschera_interna;
 	if(!maschera)
 	{
-		std :: cerr << "NON E' STATO IMPOSTATO ALCUN FILTRO; NON PERDIAMO TEMPO\n";
+	  //std :: cerr << "NON E' STATO IMPOSTATO ALCUN FILTRO; NON PERDIAMO TEMPO\n";
 		return;
 	}
 	for(unsigned char c=0; c < 32; ++c)
