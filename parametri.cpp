@@ -398,6 +398,9 @@ void parametri :: leggi_interattivo()
 			std::cin >> fare_Etheta;
 			std::cout << "Vuoi fare lo spettro in energia? 1 si', 0 no: ";
 			std::cin >> fare_Espec;
+			fai_plot_xpx = fare_xpx;
+			fai_plot_Espec = fare_Espec;
+			fai_plot_Etheta = fare_Etheta;
 			if (fare_xpx)
 			{
 				if (xmin_b)
@@ -602,6 +605,9 @@ bool parametri :: check_parametri()
 
 void parametri :: organizza_minimi_massimi()
 {
+
+	std::cout << "---- organizza_minimi_massimi() -----Hai scritto Emin = "<< Emin << "  Emax = "<< Emax<< std::endl;
+		
 	minimi[0] = xmin;
 	minimi[1] = ymin;
 	minimi[2] = zmin;
@@ -621,6 +627,8 @@ void parametri :: organizza_minimi_massimi()
 	massimi[6] = gammamin;
 	massimi[7] = thetamin;
 	massimi[8] = Emin;
+	std::cout << "---- organizza_minimi_massimi() -----Hai scritto Emin = "<< minimi[8] << "  Emax = "<< massimi[8] << std::endl;
+	
 }
 
 bool parametri :: incompleto()

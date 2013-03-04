@@ -125,6 +125,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 	//	float z;
 	float x, y, px, py, pz, gamma, theta, E;
 	float dato_da_binnare_x = 0.;
+	printf("AIUTO binnare_su_x=%i     min=%g    max=%g   dim=%g\n",binnare_su_x, parametri->minimi[binnare_su_x], parametri->massimi[binnare_su_x], parametri->dimmi_dim(binnare_su_x));
+	fflush(stdout);
 	for (int i = 0; i < npart; i++)
 	{
 		if (ndv == 4 || ndv == 5)

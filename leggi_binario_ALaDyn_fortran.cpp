@@ -110,8 +110,14 @@ int main (const int argc, const char *argv[])
 	}
 	*/
 
-	if (parametri.p[DO_BINNING]) parametri.organizza_minimi_massimi();
-
+	if (parametri.p[DO_BINNING]){
+		printf("parametri.organizza_minimi_massimi()\n");
+		parametri.organizza_minimi_massimi();
+		printf("Emin=%g    Emax=%g   dE=%g\n", parametri.minimi[8], parametri.massimi[8], parametri.dimmi_dim(8));
+	fflush(stdout);
+	
+	}
+return 0;
 	if (parametri.p[FUNZIONE] == 1  || parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
 		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
 		|| parametri.file_densita_elettroni || parametri.file_densita_protoni 

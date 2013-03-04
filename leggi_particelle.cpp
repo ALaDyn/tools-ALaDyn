@@ -362,7 +362,9 @@ int leggi_particelle(int argc, const char ** argv, parametri * parametri)
 				_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
 				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 			}
-
+		_Binnaggio(particelle,npart_loc,ndv,parametri,xpx,"x","px");
+				_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
+				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 
 
 			if(out_ascii)
