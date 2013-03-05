@@ -54,15 +54,14 @@ typedef unsigned long int uint32_t;
 #define MAX_LENGTH_FILENAME 200
 
 
-#define NPARAMETRI	8
+#define NPARAMETRI	7
 #define WEIGHT		0
-#define FUNZIONE	1
-#define SWAP		2
-#define OUT_BINARY	3
-#define OUT_ASCII	4
-#define	FIND_MINMAX	5
-#define DO_BINNING	6
-#define OUT_PARAMS	7
+#define SWAP		1
+#define OUT_BINARY	2
+#define OUT_ASCII	3
+#define	FIND_MINMAX	4
+#define DO_BINNING	5
+#define OUT_PARAMS	6
 
 
 

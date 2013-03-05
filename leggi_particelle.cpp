@@ -346,10 +346,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (x > estremi_max[0]) estremi_max[0] = x;
 						if (y < estremi_min[1]) estremi_min[1] = y;
 						if (y > estremi_max[1]) estremi_max[1] = y;
+                                                estremi_min[2] = 0., estremi_max[2] = 1.;
 						if (px < estremi_min[3]) estremi_min[3] = px;
 						if (px > estremi_max[3]) estremi_max[3] = px;
 						if (py < estremi_min[4]) estremi_min[4] = py;
 						if (py > estremi_max[4]) estremi_max[4] = py;
+                                                estremi_min[5] = 0., estremi_max[5] = 1.;
 						if (gamma < estremi_min[6]) estremi_min[6] = gamma;
 						if (gamma > estremi_max[6]) estremi_max[6] = gamma;
 						if (theta < estremi_min[7]) estremi_min[7] = theta;
@@ -401,11 +403,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (parametri->p[WEIGHT])
 						{
 							wgh=particelle[i*ndv+4];
-							fprintf(ascii_all_out,"%e %e %e %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+							fprintf(ascii_all_out,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
 						}
 						else
 						{
-							fprintf(ascii_all_out,"%e %e %e %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+							fprintf(ascii_all_out,"%e 0 %e %e 0 %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
 						}
 					}
 				}

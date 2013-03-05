@@ -577,27 +577,22 @@ void Parametri :: leggi_interattivo()
 bool Parametri :: check_parametri()
 {
 	bool test = true;
-	if ( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2	)		// check leggi_campi o leggi_particelle
-	{
-		printf("Attenzione: modalita` lavoro non definita\n");
-		test = false;
-	}
 	if ( p[SWAP]     != 0 && p[SWAP]       != 1 )		// check swap o non-swap
 	{
 		printf("Attenzione: modalita` swap non definita\n");
 		test = false;
 	}
-	if ( p[FUNZIONE] == 2 && p[WEIGHT]     != 0 && p[WEIGHT]     != 1 )	// check leggi_particelle: weight o non-weight
+	if ( (file_particelle_P || file_particelle_E) && p[WEIGHT]     != 0 && p[WEIGHT]     != 1 )	// check leggi_particelle: weight o non-weight
 	{
 		printf("Attenzione: modalita` weight non definita\n");
 		test = false;
 	}
-	if ( p[FUNZIONE] == 2 && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+	if ( (file_particelle_P || file_particelle_E) && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
 		printf("Attenzione: output ascii non definito\n");
 		test = false;
 	}
-	if ( p[FUNZIONE] == 2 && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
+	if ( (file_particelle_P || file_particelle_E) && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
 	{
 		printf("Attenzione: output binario non definito\n");
 		test = false;
@@ -678,15 +673,15 @@ void Parametri :: organizza_minimi_massimi()
 	minimi[7] = thetamin;
 	minimi[8] = Emin;
 
-	massimi[0] = xmin;
-	massimi[1] = ymin;
-	massimi[2] = zmin;
-	massimi[3] = pxmin;
-	massimi[4] = pymin;
-	massimi[5] = pzmin;
-	massimi[6] = gammamin;
-	massimi[7] = thetamin;
-	massimi[8] = Emin;
+	massimi[0] = xmax;
+	massimi[1] = ymax;
+	massimi[2] = zmax;
+	massimi[3] = pxmax;
+	massimi[4] = pymax;
+	massimi[5] = pzmax;
+	massimi[6] = gammamax;
+	massimi[7] = thetamax;
+	massimi[8] = Emax;
 
 #ifdef ENABLE_DEBUG
 	std::cout << "---- organizza_minimi_massimi() -----" << std::endl;
