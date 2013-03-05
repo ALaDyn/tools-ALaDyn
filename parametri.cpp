@@ -14,7 +14,7 @@ Parametri :: Parametri()
 	nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 100;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = Emax = gammamax = 1.0;
-	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = false;
+	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetamin_b = thetamax_b = true;
 	nbin_y_b = nbin_z_b = nbin_py_b = nbin_pz_b = false;
 	nbin_x_b = nbin_px_b = nbin_E_b = nbin_theta_b = true;
