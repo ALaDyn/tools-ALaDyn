@@ -270,7 +270,7 @@ void parametri :: leggi_batch(int argc, const char ** argv)
 		if (std::string(argv[i]) == "-readParamsfromFile")
 		{
 			nomefile = std::string(argv[i+1]);
-			fileParametri.open(nomefile);
+			fileParametri.open(nomefile.c_str());
 			failed_opening_file = fileParametri.fail();
 			if (failed_opening_file) 
 			{
