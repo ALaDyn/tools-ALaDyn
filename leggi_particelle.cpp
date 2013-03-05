@@ -281,7 +281,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+parametri->p[WEIGHT])};
 		if(npart_loc>0)
 		{
-		  //printf("\tentro\t");
+			//printf("\tentro\t");
 			fflush(stdout);
 
 			if (parametri->old_fortran_bin)
@@ -346,12 +346,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (x > estremi_max[0]) estremi_max[0] = x;
 						if (y < estremi_min[1]) estremi_min[1] = y;
 						if (y > estremi_max[1]) estremi_max[1] = y;
-                                                estremi_min[2] = 0., estremi_max[2] = 1.;
+						estremi_min[2] = 0., estremi_max[2] = 1.;
 						if (px < estremi_min[3]) estremi_min[3] = px;
 						if (px > estremi_max[3]) estremi_max[3] = px;
 						if (py < estremi_min[4]) estremi_min[4] = py;
 						if (py > estremi_max[4]) estremi_max[4] = py;
-                                                estremi_min[5] = 0., estremi_max[5] = 1.;
+						estremi_min[5] = 0., estremi_max[5] = 1.;
 						if (gamma < estremi_min[6]) estremi_min[6] = gamma;
 						if (gamma > estremi_max[6]) estremi_max[6] = gamma;
 						if (theta < estremi_min[7]) estremi_min[7] = theta;
@@ -364,9 +364,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
 				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 			}
-		_Binnaggio(particelle,npart_loc,ndv,parametri,xpx,"x","px");
-				_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
-				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
+			_Binnaggio(particelle,npart_loc,ndv,parametri,xpx,"x","px");
+			_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
+			_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 
 
 			if(out_ascii)

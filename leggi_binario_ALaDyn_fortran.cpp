@@ -70,14 +70,14 @@ int main (const int argc, const char *argv[])
 	/*
 	if (std::string(argv[2]) == "-readParamsfromFile")
 	{
-		parametri.leggi_da_file(argv[3]);
-		if (argc > 3) parametri.leggi_da_shell(argc,argv);
-		if (parametri.incompleto()) parametri.leggi_interattivo();
+	parametri.leggi_da_file(argv[3]);
+	if (argc > 3) parametri.leggi_da_shell(argc,argv);
+	if (parametri.incompleto()) parametri.leggi_interattivo();
 	}
 	else
 	{
-		parametri.leggi_da_shell(argc, argv);
-		if (parametri.incompleto()) parametri.leggi_interattivo();
+	parametri.leggi_da_shell(argc, argv);
+	if (parametri.incompleto()) parametri.leggi_interattivo();
 	}
 	*/
 
