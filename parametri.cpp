@@ -259,6 +259,7 @@ void parametri :: check_filename(const char *nomefile)
 void parametri :: leggi_batch(int argc, const char ** argv)
 {
 	std::ifstream fileParametri;
+	std::string nomefile;
 	bool failed_opening_file;
 	for (int i = 2; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
 	{								// * Note that we're starting on 1 because we don't need to know the
@@ -268,7 +269,8 @@ void parametri :: leggi_batch(int argc, const char ** argv)
 
 		if (std::string(argv[i]) == "-readParamsfromFile")
 		{
-			fileParametri.open(std::string(argv[i+1]));
+			nomefile = std::string(argv[i+1]);
+			fileParametri.open(nomefile);
 			failed_opening_file = fileParametri.fail();
 			if (failed_opening_file) 
 			{
@@ -362,28 +364,6 @@ void parametri :: leggi_batch(int argc, const char ** argv)
 			nbin_E_b = false;
 			i++;
 		}
-#ifdef ENABLE_DEBUG
-		std::cout << "Ora ho i seguenti estremi:" << std::endl;
-		std::cout << "XMIN = " << xmin << std::endl;
-		std::cout << "XMAX = " << xmax << std::endl;
-		std::cout << "YMIN = " << ymin << std::endl;
-		std::cout << "YMAX = " << ymax << std::endl;
-		std::cout << "ZMIN = " << zmin << std::endl;
-		std::cout << "ZMAX = " << zmax << std::endl;
-		std::cout << "PXMIN = " << pxmin << std::endl;
-		std::cout << "PXMAX = " << pxmax << std::endl;
-		std::cout << "PYMIN = " << pymin << std::endl;
-		std::cout << "PYMAX = " << pymax << std::endl;
-		std::cout << "PZMIN = " << pzmin << std::endl;
-		std::cout << "PZMAX = " << pzmax << std::endl;
-		std::cout << "GAMMAMIN = " << gammamin << std::endl;
-		std::cout << "GAMMAMAX = " << gammamax << std::endl;
-		std::cout << "THETAMIN = " << thetamin << std::endl;
-		std::cout << "THETAMAX = " << thetamax << std::endl;
-		std::cout << "EMIN = " << Emin << std::endl;
-		std::cout << "EMAX = " << Emax << std::endl;
-#endif		
-
 	}
 
 
@@ -483,7 +463,6 @@ void parametri :: leggi_batch(int argc, const char ** argv)
 
 void parametri :: leggi_interattivo()
 {
-	int fare_xpx, fare_Espec, fare_Etheta;
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
 		std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
@@ -492,16 +471,13 @@ void parametri :: leggi_interattivo()
 		std::cin >> p[DO_BINNING];
 		if (p[DO_BINNING] == 1)
 		{
-			std::cout << "Vuoi fare il plot x-px? 1 si', 0 no: ";
-			std::cin >> fare_xpx;
-			std::cout << "Vuoi fare il plot E-theta? 1 si', 0 no: ";
-			std::cin >> fare_Etheta;
-			std::cout << "Vuoi fare lo spettro in energia? 1 si', 0 no: ";
-			std::cin >> fare_Espec;
-			fai_plot_xpx = fare_xpx;
-			fai_plot_Espec = fare_Espec;
-			fai_plot_Etheta = fare_Etheta;
-			if (fare_xpx)
+			std::cout << "Vuoi fare il plot x-px? 0 per no, 1 per si': ";
+			std::cin >> fai_plot_xpx;
+			std::cout << "Vuoi fare il plot E-theta? 0 per no, 1 per si': ";
+			std::cin >> fai_plot_Etheta;
+			std::cout << "Vuoi fare lo spettro in energia? 0 per no, 1 per si': ";
+			std::cin >> fai_plot_Espec;
+			if (fai_plot_xpx)
 			{
 				if (xmin_b)
 				{
@@ -522,7 +498,7 @@ void parametri :: leggi_interattivo()
 					nbin_x_b = false;
 				}
 			}
-			if (fare_Etheta)
+			if (fai_plot_Etheta)
 			{
 				if (thetamin_b)
 				{
@@ -543,7 +519,7 @@ void parametri :: leggi_interattivo()
 					nbin_theta_b = false;
 				}
 			}
-			if (fare_Etheta || fare_Espec)
+			if (fai_plot_Etheta || fai_plot_Espec)
 			{
 				if (Emin_b)
 				{
@@ -596,35 +572,32 @@ void parametri :: leggi_interattivo()
 
 }
 
-void parametri :: leggi_da_shell(int argc, const char *argv[])
-{
-}
 
 
 bool parametri :: check_parametri()
 {
 	bool test = true;
-	if ( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2	);		// check leggi_campi o leggi_particelle
+	if ( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2	)		// check leggi_campi o leggi_particelle
 	{
 		printf("Attenzione: modalita` lavoro non definita\n");
 		test = false;
 	}
-	if ( p[SWAP]     != 0 && p[SWAP]       != 1 );		// check swap o non-swap
+	if ( p[SWAP]     != 0 && p[SWAP]       != 1 )		// check swap o non-swap
 	{
 		printf("Attenzione: modalita` swap non definita\n");
 		test = false;
 	}
-	if ( p[FUNZIONE] == 2 && p[WEIGHT]     != 0 && p[WEIGHT]     != 1 );	// check leggi_particelle: weight o non-weight
+	if ( p[FUNZIONE] == 2 && p[WEIGHT]     != 0 && p[WEIGHT]     != 1 )	// check leggi_particelle: weight o non-weight
 	{
 		printf("Attenzione: modalita` weight non definita\n");
 		test = false;
 	}
-	if ( p[FUNZIONE] == 2 && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1 );	// check leggi_particelle: out-ascii o non-out-ascii
+	if ( p[FUNZIONE] == 2 && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
 		printf("Attenzione: output ascii non definito\n");
 		test = false;
 	}
-	if ( p[FUNZIONE] == 2 && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  );
+	if ( p[FUNZIONE] == 2 && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
 	{
 		printf("Attenzione: output binario non definito\n");
 		test = false;
