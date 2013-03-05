@@ -8,7 +8,6 @@ int main (const int argc, const char *argv[])
 {
 	parametri parametri;
 	bool testParametri = true;;
-	bool fallita_lettura_inputfile = true;
 
 	std::cout << "Binary file reader v3.6" << std::endl;
 
@@ -24,10 +23,10 @@ int main (const int argc, const char *argv[])
 	nomefile_dat << std::string(argv[1]) << ".dat";
 	std::string riga_persa, endianness, columns;
 	std::ifstream file_dat, file_bin;
+
+	/* Controllo file binario */
 	file_bin.open(nomefile_bin.str().c_str());
-	fallita_lettura_inputfile = file_bin.fail();
-	file_bin.close();
-	if ( fallita_lettura_inputfile )
+	if ( file_bin.fail() )
 	{
 		std::cout << "Input file non trovato" << std::endl;
 		return -3;
@@ -36,22 +35,22 @@ int main (const int argc, const char *argv[])
 	{
 		parametri.check_filename(argv[1]);
 	}
+	file_bin.close();
+
+	/* Controllo file ascii */
 	file_dat.open(nomefile_dat.str().c_str());
 	if (file_dat.fail()) 
 	{
 		parametri.old_fortran_bin = true;
 		parametri.chiedi_endian_file();
-		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI)
-		{
-			parametri.chiedi_numero_colonne();
-			parametri.p_b[NCOLUMNS] = false;
-		}
+		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) parametri.chiedi_numero_colonne();
 	}
 	else
 	{
 		parametri.old_fortran_bin = false;
-		parametri.leggi_endian_ndv(file_dat);
+		parametri.leggi_endian_e_ncol(file_dat);
 	}
+	file_dat.close();
 
 
 	if (parametri.endian_file == parametri.endian_machine) 
@@ -64,30 +63,23 @@ int main (const int argc, const char *argv[])
 		parametri.p[SWAP] = 1;
 		parametri.p_b[SWAP] = false;
 	}
-	file_dat.close();
 
-	parametri.check_filename(argv[1]);
+	if (argc == 2) parametri.leggi_interattivo();
+	else parametri.leggi_batch(argc, argv);
 
-	if (argc == 2)
-	{
-		parametri.leggi_interattivo();
-	}
-
-	else if (std::string(argv[2]) == "-readParamsfromFile")
+	/*
+	if (std::string(argv[2]) == "-readParamsfromFile")
 	{
 		parametri.leggi_da_file(argv[3]);
-		if (argc > 3) 
-		{
-			parametri.leggi_da_shell(argc,argv);
-		}
+		if (argc > 3) parametri.leggi_da_shell(argc,argv);
 		if (parametri.incompleto()) parametri.leggi_interattivo();
 	}
-
 	else
 	{
 		parametri.leggi_da_shell(argc, argv);
 		if (parametri.incompleto()) parametri.leggi_interattivo();
 	}
+	*/
 
 #ifdef ENABLE_DEBUG
 	for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << parametri.p[i] << std::endl;
@@ -102,28 +94,35 @@ int main (const int argc, const char *argv[])
 		return -2;
 	}
 
-	/*
-	if ( parametri.p[FUNZIONE] == 2 && parametri.p[FIND_MINMAX] && parametri.p[DO_BINNING] )
-	{
-	std::cout << "Non riesco a fare altro che cercare minimi e massimi" << std::endl;
-	return -4;
-	}
-	*/
 
-	if (parametri.p[DO_BINNING]){
-		printf("parametri.organizza_minimi_massimi()\n");
+	if (parametri.p[DO_BINNING])
+	{
 		parametri.organizza_minimi_massimi();
+#ifdef ENABLE_DEBUG
+		printf("Chiamata main parametri.organizza_minimi_massimi()\n");
 		printf("Emin=%g    Emax=%g   dE=%g\n", parametri.minimi[8], parametri.massimi[8], parametri.dimmi_dim(8));
-	fflush(stdout);
-	
+		fflush(stdout);
+#endif
 	}
-return 0;
+
+
+
 	if (parametri.p[FUNZIONE] == 1  || parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
 		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
 		|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
-		|| parametri.file_densita_HI || parametri.file_densita_LI) leggi_campi(argc, argv, &parametri);
+		|| parametri.file_densita_HI || parametri.file_densita_LI)
+
+		leggi_campi(argc, argv, &parametri);
+
+
 	else if (parametri.p[FUNZIONE] == 2 || parametri.file_particelle_P || parametri.file_particelle_E 
-		|| parametri.file_particelle_HI || parametri.file_particelle_LI) leggi_particelle(argc, argv, &parametri);
+		|| parametri.file_particelle_HI || parametri.file_particelle_LI) 
+
+		leggi_particelle(argc, argv, &parametri);
+
+
+
+
 	return 0;
 }
 

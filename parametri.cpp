@@ -12,18 +12,20 @@ parametri :: parametri()
 {
 	massa_particella_MeV = 0.;
 	nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 100;
-	xmin = xmax = pxmin = pxmax = ymin = ymax = pymin = pymax = zmin = zmax = pzmin = pzmax = thetamin = thetamax = Emin = Emax = gammamin = gammamax = 0.0;
-	//		dim_x = dim_y = dim_z = dim_px = dim_py = dim_pz = dim_E = dim_theta = 0.0;
+	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = Emin = gammamin = 0.0;
+	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = Emax = gammamax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = false;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetamin_b = thetamax_b = true;
 	nbin_y_b = nbin_z_b = nbin_py_b = nbin_pz_b = false;
 	nbin_x_b = nbin_px_b = nbin_E_b = nbin_theta_b = true;
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
+
 	for (int i = 0; i < NPARAMETRI; i++) 
 	{
 		p_b[i] = true;
 		p[i] = -1;
 	}
+
 	old_fortran_bin = false;
 	endian_file = 0;
 	endian_machine = is_big_endian();
@@ -32,11 +34,7 @@ parametri :: parametri()
 	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = false;
 }
 
-/* costruttore parametrico 1D */
-parametri :: parametri(float xm, float xM, float pxm, float pxM, int nx, int npx)
-{
-	//	non implementato
-}
+
 
 float parametri :: dimmi_dimx()
 {
@@ -89,7 +87,7 @@ float parametri :: dimmi_dim(int colonna)
 }
 
 
-void parametri :: leggi_endian_ndv(std::ifstream& file_dat)
+void parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 {
 	std::string riga_persa;
 	int trascura, ndv, i_end;
@@ -115,20 +113,10 @@ void parametri :: leggi_endian_ndv(std::ifstream& file_dat)
 	file_dat >> trascura; // 19° parametro
 	file_dat >> i_end;	  // 20° parametro
 
-	p[NCOLUMNS] = ndv;
-	p_b[NCOLUMNS] = false;
+	if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
+	else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
 
-	if (ndv == 4 || ndv == 6)
-	{
-		p[WEIGHT] = 0;
-		p_b[WEIGHT] = false;
-	}
-	else if (ndv == 5 || ndv == 7)
-	{
-		p[WEIGHT] = 1;
-		p_b[WEIGHT] = false;
-	}
-
+	p_b[WEIGHT] = false;
 	endian_file = (i_end-1);
 
 }
@@ -268,17 +256,136 @@ void parametri :: check_filename(const char *nomefile)
 
 }
 
-void parametri :: leggi_da_file(const char *nomefile)
+void parametri :: leggi_batch(int argc, const char ** argv)
 {
-	bool failed_opening_file = true;
 	std::ifstream fileParametri;
-	fileParametri.open(nomefile);
-	failed_opening_file = fileParametri.fail();
-	if (failed_opening_file) 
-	{
-		std::cout << "Impossibile aprire il file dei parametri per il binnaggio" << std::endl;
-		return;
+	bool failed_opening_file;
+	for (int i = 2; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
+	{								// * Note that we're starting on 1 because we don't need to know the
+		// * path of the program, which is stored in argv[0], and the input file,
+		// * which is supposed to be given as the first argument and so is in argv[1]
+
+
+		if (std::string(argv[i]) == "-readParamsfromFile")
+		{
+			fileParametri.open(std::string(argv[i+1]));
+			failed_opening_file = fileParametri.fail();
+			if (failed_opening_file) 
+			{
+				std::cout << "Impossibile aprire il file " << argv[i+1] << " contenente i parametri di binnaggio" << std::endl;
+				exit(50);
+			}
+			i++;
+		}
+		else if (std::string(argv[i]) == "-swap")
+		{
+			p[SWAP] = 1;
+		}
+		else if (std::string(argv[i]) == "-ncol")
+		{
+			int ncolumns = atoi(argv[i+1]);
+			if (ncolumns == 6) p[WEIGHT] = 0;
+			else if (ncolumns == 7) p[WEIGHT] = 1;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-dump_binary")
+		{
+			p[OUT_BINARY] = 1;
+		}
+		else if (std::string(argv[i]) == "-dump_ascii")
+		{
+			p[OUT_ASCII] = 1;
+		}
+		else if (std::string(argv[i]) == "-parameters")
+		{
+			p[OUT_PARAMS] = 1;
+		}
+		else if (std::string(argv[i]) == "-find_minmax")
+		{
+			p[FIND_MINMAX] = 1;
+		}
+		else if (std::string(argv[i]) == "-do_binning")
+		{
+			p[DO_BINNING] = 1;
+		}
+		else if (std::string(argv[i]) == "-xmin")
+		{
+			xmin = (float) atof(argv[i+1]);
+			xmin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-xmax")
+		{
+			xmax = (float) atof(argv[i+1]);
+			xmax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-thetamin")
+		{
+			thetamin = (float) atof(argv[i+1]);
+			thetamin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-thetamax")
+		{
+			thetamax = (float) atof(argv[i+1]);
+			thetamax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-Emin")
+		{
+			Emin = (float) atof(argv[i+1]);
+			Emin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-Emax")
+		{
+			Emax = (float) atof(argv[i+1]);
+			Emax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinx")
+		{
+			nbin_x = atoi(argv[i+1]);
+			nbin_x_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbintheta")
+		{
+			nbin_gamma = atoi(argv[i+1]);
+			nbin_gamma_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinE")
+		{
+			nbin_E = atoi(argv[i+1]);
+			nbin_E_b = false;
+			i++;
+		}
+#ifdef ENABLE_DEBUG
+		std::cout << "Ora ho i seguenti estremi:" << std::endl;
+		std::cout << "XMIN = " << xmin << std::endl;
+		std::cout << "XMAX = " << xmax << std::endl;
+		std::cout << "YMIN = " << ymin << std::endl;
+		std::cout << "YMAX = " << ymax << std::endl;
+		std::cout << "ZMIN = " << zmin << std::endl;
+		std::cout << "ZMAX = " << zmax << std::endl;
+		std::cout << "PXMIN = " << pxmin << std::endl;
+		std::cout << "PXMAX = " << pxmax << std::endl;
+		std::cout << "PYMIN = " << pymin << std::endl;
+		std::cout << "PYMAX = " << pymax << std::endl;
+		std::cout << "PZMIN = " << pzmin << std::endl;
+		std::cout << "PZMAX = " << pzmax << std::endl;
+		std::cout << "GAMMAMIN = " << gammamin << std::endl;
+		std::cout << "GAMMAMAX = " << gammamax << std::endl;
+		std::cout << "THETAMIN = " << thetamin << std::endl;
+		std::cout << "THETAMAX = " << thetamax << std::endl;
+		std::cout << "EMIN = " << Emin << std::endl;
+		std::cout << "EMAX = " << Emax << std::endl;
+#endif		
+
 	}
+
 
 	std::string nomepar, evita, leggi;
 
@@ -341,28 +448,28 @@ void parametri :: leggi_da_file(const char *nomefile)
 				}
 				*/
 			}
-#ifdef ENABLE_DEBUG
-			std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
-			std::cout << "XMIN = " << xmin << std::endl;
-			std::cout << "XMAX = " << xmax << std::endl;
-			std::cout << "YMIN = " << ymin << std::endl;
-			std::cout << "YMAX = " << ymax << std::endl;
-			std::cout << "ZMIN = " << zmin << std::endl;
-			std::cout << "ZMAX = " << zmax << std::endl;
-			std::cout << "PXMIN = " << pxmin << std::endl;
-			std::cout << "PXMAX = " << pxmax << std::endl;
-			std::cout << "PYMIN = " << pymin << std::endl;
-			std::cout << "PYMAX = " << pymax << std::endl;
-			std::cout << "PZMIN = " << pzmin << std::endl;
-			std::cout << "PZMAX = " << pzmax << std::endl;
-			std::cout << "GAMMAMIN = " << gammamin << std::endl;
-			std::cout << "GAMMAMAX = " << gammamax << std::endl;
-			std::cout << "THETAMIN = " << thetamin << std::endl;
-			std::cout << "THETAMAX = " << thetamax << std::endl;
-			std::cout << "EMIN = " << Emin << std::endl;
-			std::cout << "EMAX = " << Emax << std::endl;
-#endif
 		}
+#ifdef ENABLE_DEBUG
+		std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
+		std::cout << "XMIN = " << xmin << std::endl;
+		std::cout << "XMAX = " << xmax << std::endl;
+		std::cout << "YMIN = " << ymin << std::endl;
+		std::cout << "YMAX = " << ymax << std::endl;
+		std::cout << "ZMIN = " << zmin << std::endl;
+		std::cout << "ZMAX = " << zmax << std::endl;
+		std::cout << "PXMIN = " << pxmin << std::endl;
+		std::cout << "PXMAX = " << pxmax << std::endl;
+		std::cout << "PYMIN = " << pymin << std::endl;
+		std::cout << "PYMAX = " << pymax << std::endl;
+		std::cout << "PZMIN = " << pzmin << std::endl;
+		std::cout << "PZMAX = " << pzmax << std::endl;
+		std::cout << "GAMMAMIN = " << gammamin << std::endl;
+		std::cout << "GAMMAMAX = " << gammamax << std::endl;
+		std::cout << "THETAMIN = " << thetamin << std::endl;
+		std::cout << "THETAMAX = " << thetamax << std::endl;
+		std::cout << "EMIN = " << Emin << std::endl;
+		std::cout << "EMAX = " << Emax << std::endl;
+#endif
 		std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
 		std::cin >> p[OUT_BINARY];
 		std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
@@ -370,13 +477,6 @@ void parametri :: leggi_da_file(const char *nomefile)
 		std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
 		std::cin >> p[OUT_PARAMS];
 	}
-	/*
-	else if(file_campi_Ex || file_campi_Ey || file_campi_Ez || file_campi_Bx || file_campi_By || file_campi_Bz)
-	{
-	std::cout << "Inserisci label per il file: (i.e. Ex) ";
-	std::cin >> support_label;
-	}
-	*/
 	fileParametri.close();
 }
 
@@ -465,7 +565,27 @@ void parametri :: leggi_interattivo()
 				}
 			}
 		}
-		std::cout << "Hai scritto Emin = "<< Emin << "  Emax = "<< Emax<< std::endl;
+#ifdef ENABLE_DEBUG
+		std::cout << "Ora ho i seguenti estremi:" << std::endl;
+		std::cout << "XMIN = " << xmin << std::endl;
+		std::cout << "XMAX = " << xmax << std::endl;
+		std::cout << "YMIN = " << ymin << std::endl;
+		std::cout << "YMAX = " << ymax << std::endl;
+		std::cout << "ZMIN = " << zmin << std::endl;
+		std::cout << "ZMAX = " << zmax << std::endl;
+		std::cout << "PXMIN = " << pxmin << std::endl;
+		std::cout << "PXMAX = " << pxmax << std::endl;
+		std::cout << "PYMIN = " << pymin << std::endl;
+		std::cout << "PYMAX = " << pymax << std::endl;
+		std::cout << "PZMIN = " << pzmin << std::endl;
+		std::cout << "PZMAX = " << pzmax << std::endl;
+		std::cout << "GAMMAMIN = " << gammamin << std::endl;
+		std::cout << "GAMMAMAX = " << gammamax << std::endl;
+		std::cout << "THETAMIN = " << thetamin << std::endl;
+		std::cout << "THETAMAX = " << thetamax << std::endl;
+		std::cout << "EMIN = " << Emin << std::endl;
+		std::cout << "EMAX = " << Emax << std::endl;
+#endif		
 		std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
 		std::cin >> p[OUT_BINARY];
 		std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
@@ -473,141 +593,108 @@ void parametri :: leggi_interattivo()
 		std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
 		std::cin >> p[OUT_PARAMS];
 	}
-	/*
-	else if(file_campi_Ex || file_campi_Ey || file_campi_Ez || file_campi_Bx || file_campi_By || file_campi_Bz)
-	{
-	std::cout << "Inserisci label per il file: (i.e. Ex) ";
-	std::cin >> support_label;
-	}
-	*/
+
 }
 
 void parametri :: leggi_da_shell(int argc, const char *argv[])
 {
-	int ncolumns;
-	for (int i = 2; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
-	{								// * Note that we're starting on 1 because we don't need to know the
-		// * path of the program, which is stored in argv[0], and the input file,
-		// * which is supposed to be given as the first argument and so is in argv[1]
-		if (std::string(argv[i]) == "-swap")
-		{
-			p[SWAP] = 1;
-		}
-		else if (std::string(argv[i]) == "-ncol")
-		{
-			ncolumns = atoi(argv[i+1]);
-			i++;
-			if (ncolumns == 6) p[WEIGHT] = 0;
-			else if (ncolumns == 7) p[WEIGHT] = 1;
-		}
-		else if (std::string(argv[i]) == "-dump_binary")
-		{
-			p[OUT_BINARY] = 1;
-		}
-		else if (std::string(argv[i]) == "-dump_ascii")
-		{
-			p[OUT_ASCII] = 1;
-		}
-		else if (std::string(argv[i]) == "-parameters")
-		{
-			p[OUT_PARAMS] = 1;
-		}
-		else if (std::string(argv[i]) == "-find_minmax")
-		{
-			p[FIND_MINMAX] = 1;
-		}
-		else if (std::string(argv[i]) == "-do_binning")
-		{
-			p[DO_BINNING] = 1;
-		}
-		else if (std::string(argv[i]) == "-xmin")
-		{
-			xmin = (float) atof(argv[i+1]);
-			xmin_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-xmax")
-		{
-			xmax = (float) atof(argv[i+1]);
-			xmax_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-thetamin")
-		{
-			thetamin = (float) atof(argv[i+1]);
-			thetamin_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-thetamax")
-		{
-			thetamax = (float) atof(argv[i+1]);
-			thetamax_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-Emin")
-		{
-			Emin = (float) atof(argv[i+1]);
-			Emin_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-Emax")
-		{
-			Emax = (float) atof(argv[i+1]);
-			Emax_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-nbinx")
-		{
-			nbin_x = atoi(argv[i+1]);
-			nbin_x_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-nbintheta")
-		{
-			nbin_gamma = atoi(argv[i+1]);
-			nbin_gamma_b = false;
-			i++;
-		}
-		else if (std::string(argv[i]) == "-nbinE")
-		{
-			nbin_E = atoi(argv[i+1]);
-			nbin_E_b = false;
-			i++;
-		}
-	}
 }
-
 
 
 bool parametri :: check_parametri()
 {
 	bool test = true;
-	//	( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2						) 
-	//	( p[SWAP]     != 0 && p[SWAP]       != 1						) 
-	//	( p[FUNZIONE] == 2 && p[WEIGHT]     != 0 && p[WEIGHT]     != 1	)  
-	//	( p[FUNZIONE] == 2 && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1	) 
-	//	( p[FUNZIONE] == 2 && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  ) 
-	//	( xmin < xmax ) ? test = true : test = false;
-	//	( ymin < ymax ) ? test = true : test = false;
-	//	( zmin < zmax ) ? test = true : test = false;
-	//	(pxmin < pxmax) ? test = true : test = false;
-	//	(pymin < pymax) ? test = true : test = false;
-	//	(pzmin < pzmax) ? test = true : test = false;
-	//	( nbin_x > 0) ? test = true : test = false;
-	//	( nbin_y > 0) ? test = true : test = false;
-	//	( nbin_z > 0) ? test = true : test = false;
-	//	(nbin_px > 0) ? test = true : test = false;
-	//	(nbin_py > 0) ? test = true : test = false;
-	//	(nbin_pz > 0) ? test = true : test = false;
+	if ( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2	);		// check leggi_campi o leggi_particelle
+	{
+		printf("Attenzione: modalita` lavoro non definita\n");
+		test = false;
+	}
+	if ( p[SWAP]     != 0 && p[SWAP]       != 1 );		// check swap o non-swap
+	{
+		printf("Attenzione: modalita` swap non definita\n");
+		test = false;
+	}
+	if ( p[FUNZIONE] == 2 && p[WEIGHT]     != 0 && p[WEIGHT]     != 1 );	// check leggi_particelle: weight o non-weight
+	{
+		printf("Attenzione: modalita` weight non definita\n");
+		test = false;
+	}
+	if ( p[FUNZIONE] == 2 && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1 );	// check leggi_particelle: out-ascii o non-out-ascii
+	{
+		printf("Attenzione: output ascii non definito\n");
+		test = false;
+	}
+	if ( p[FUNZIONE] == 2 && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  );
+	{
+		printf("Attenzione: output binario non definito\n");
+		test = false;
+	}
+	if ( xmin >= xmax )
+	{
+		printf("Attenzione: xmin > xmax\n");
+		test = false;
+	}
+	if ( ymin >= ymax ) 
+	{
+		printf("Attenzione: ymin > ymax\n");
+		test = false;
+	}
+	if ( zmin >= zmax )
+	{
+		printf("Attenzione: zmin > zmax\n");
+		test = false;
+	}
+	if (pxmin >= pxmax)
+	{
+		printf("Attenzione: pxmin > pxmax\n");
+		test = false;
+	}
+	if (pymin >= pymax)
+	{
+		printf("Attenzione: pymin > pymax\n");
+		test = false;
+	}
+	if (pzmin >= pzmax)
+	{
+		printf("Attenzione: pzmin > pzmax\n");
+		test = false;
+	}
+	if ( nbin_x <= 0 )
+	{
+		printf("Attenzione: nbin_x < 0\n");
+		test = false;
+	}
+	if ( nbin_y <= 0 )
+	{
+		printf("Attenzione: nbin_y < 0\n");
+		test = false;
+	}
+	if ( nbin_z <= 0 )
+	{
+		printf("Attenzione: nbin_z < 0\n");
+		test = false;
+	}
+	if ( nbin_px <= 0 )
+	{
+		printf("Attenzione: nbin_px < 0\n");
+		test = false;
+	}
+	if ( nbin_py <= 0 )
+	{
+		printf("Attenzione: nbin_py < 0\n");
+		test = false;
+	}
+	if (nbin_pz <= 0)
+	{
+		printf("Attenzione: nbin_pz < 0\n");
+		test = false;
+	}
 	return test;
 }
 
 
 void parametri :: organizza_minimi_massimi()
 {
-
-	std::cout << "---- organizza_minimi_massimi() -----Hai scritto Emin = "<< Emin << "  Emax = "<< Emax<< std::endl;
-		
 	minimi[0] = xmin;
 	minimi[1] = ymin;
 	minimi[2] = zmin;
@@ -627,9 +714,15 @@ void parametri :: organizza_minimi_massimi()
 	massimi[6] = gammamin;
 	massimi[7] = thetamin;
 	massimi[8] = Emin;
-	std::cout << "---- organizza_minimi_massimi() -----Hai scritto Emin = "<< minimi[8] << "  Emax = "<< massimi[8] << std::endl;
-	
+
+#ifdef ENABLE_DEBUG
+	std::cout << "---- organizza_minimi_massimi() -----" << std::endl;
+	std::cout << "Hai scritto Emin = "<< Emin << "  Emax = "<< Emax << std::endl;
+	std::cout << "Hai scritto minimi[8] = "<< minimi[8] << "  massimi[8] = "<< massimi[8] << std::endl;
+#endif
 }
+
+
 
 bool parametri :: incompleto()
 {

@@ -27,7 +27,7 @@
 typedef unsigned long int uint32_t;
 #endif
 
-// #define ENABLE_DEBUG
+#define ENABLE_DEBUG
 
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
@@ -54,7 +54,7 @@ typedef unsigned long int uint32_t;
 #define MAX_LENGTH_FILENAME 200
 
 
-#define NPARAMETRI	9
+#define NPARAMETRI	8
 #define WEIGHT		0
 #define FUNZIONE	1
 #define SWAP		2
@@ -63,7 +63,6 @@ typedef unsigned long int uint32_t;
 #define	FIND_MINMAX	5
 #define DO_BINNING	6
 #define OUT_PARAMS	7
-#define NCOLUMNS	8
 
 
 
@@ -121,10 +120,7 @@ struct parametri
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;
-	//	bool file_ALTRI_TIPI_DA_IMPLEMENTARE;
 	parametri();
-	/* costruttore parametrico 1D */
-	parametri(float, float, float, float, int, int);
 	float dimmi_dimx();
 	float dimmi_dimy();
 	float dimmi_dimz();
@@ -135,10 +131,10 @@ struct parametri
 	float dimmi_dimtheta();
 	float dimmi_dimE();
 	float dimmi_dim(int);
-	void leggi_da_file(const char *);
+	void leggi_batch(int , const char ** );
 	void leggi_interattivo();
-	void leggi_da_shell(int, const char *[]);
-	void leggi_endian_ndv(std::ifstream & );
+//	void leggi_da_shell(int, const char *[]);
+	void leggi_endian_e_ncol(std::ifstream & );
 	void chiedi_endian_file();
 	void chiedi_numero_colonne();
 	bool check_parametri();
