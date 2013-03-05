@@ -6,7 +6,7 @@
 
 int main (const int argc, const char *argv[])
 {
-	parametri parametri;
+	Parametri parametri;
 	bool testParametri = true;;
 
 	std::cout << "Binary file reader v3.6" << std::endl;

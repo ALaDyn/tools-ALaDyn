@@ -4,7 +4,7 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-int leggi_campi(int argc, const char** argv, parametri * parametri)
+int leggi_campi(int argc, const char** argv, Parametri * parametri)
 {
 	std::ostringstream nomefile_bin;
 	nomefile_bin << std::string(argv[1]) << ".bin";

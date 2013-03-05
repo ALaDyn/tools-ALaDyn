@@ -2,7 +2,7 @@
 # define __BINNING_CPP
 # include "leggi_binario_ALaDyn_fortran.h"
 
-_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * parametri, float ** data_binned, std::string binx, std::string biny)
+_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * parametri, float ** data_binned, std::string binx, std::string biny)
 {
 	int binnare_su_x = 0, binnare_su_y = 0;
 	int whichbin_x = 0, whichbin_y = 0;
@@ -106,7 +106,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * par
 	}
 }
 
-_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, parametri * parametri, float * data_binned, std::string binx)
+_Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * parametri, float * data_binned, std::string binx)
 {
 	int binnare_su_x = 0;
 	int whichbin_x = 0;

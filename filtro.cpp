@@ -117,7 +117,7 @@ namespace cost
 }
 
 
-_Filtro ::  _Filtro(parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
+_Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
 {
 	float * pntt_loc, p[3], E;
 	unsigned int corrente = 0, tests[32];

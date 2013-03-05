@@ -103,7 +103,7 @@ typedef unsigned long int uint32_t;
 # endif
 
 
-struct parametri
+struct Parametri
 {
 	float massa_particella_MeV;
 	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
@@ -120,7 +120,7 @@ struct parametri
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;
-	parametri();
+	Parametri();
 	float dimmi_dimx();
 	float dimmi_dimy();
 	float dimmi_dimz();
@@ -146,8 +146,8 @@ struct parametri
 
 struct _Binnaggio
 {
-	_Binnaggio(float *, int, int, parametri *, float ** , std::string, std::string);
-	_Binnaggio(float *, int, int, parametri *, float * , std::string);
+	_Binnaggio(float *, int, int, Parametri *, float ** , std::string, std::string);
+	_Binnaggio(float *, int, int, Parametri *, float * , std::string);
 };
 
 
@@ -192,11 +192,11 @@ struct _Filtro
 		// varie ed eventuali
 	} flag_filtri;
 	static const char * descr[];
-	_Filtro(parametri*, float *, unsigned int [], float *, unsigned int = 0);
+	_Filtro(Parametri*, float *, unsigned int [], float *, unsigned int = 0);
 };
 
-int leggi_campi(int , const char ** , parametri * );
-int leggi_particelle(int , const char ** , parametri *);
+int leggi_campi(int , const char ** , Parametri * );
+int leggi_particelle(int , const char ** , Parametri *);
 
 int is_big_endian(void);
 void swap_endian_s(short* ,int );

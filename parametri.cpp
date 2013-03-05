@@ -8,7 +8,7 @@
 /* costruttore default - inizializza a zero per ora. Siccome tutto e' inizializzato a zero 
 non puo' nemmeno calcolare le le dimensioni dei bin!
 Verificare che non ci siano cose intelligenti da poter fare! */
-parametri :: parametri()
+Parametri :: Parametri()
 {
 	massa_particella_MeV = 0.;
 	nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 100;
@@ -36,43 +36,43 @@ parametri :: parametri()
 
 
 
-float parametri :: dimmi_dimx()
+float Parametri :: dimmi_dimx()
 {
 	return (xmax - xmin) / static_cast <float> (nbin_x);
 }
-float parametri :: dimmi_dimy()
+float Parametri :: dimmi_dimy()
 {
 	return (ymax - ymin) / static_cast <float> (nbin_y);
 }
-float parametri :: dimmi_dimz()
+float Parametri :: dimmi_dimz()
 {
 	return (zmax - zmin) / static_cast <float> (nbin_z);
 }
-float parametri :: dimmi_dimpx()
+float Parametri :: dimmi_dimpx()
 {
 	return (pxmax - pxmin) / static_cast <float> (nbin_px);
 }
-float parametri :: dimmi_dimpy()
+float Parametri :: dimmi_dimpy()
 {
 	return (pymax - pymin) / static_cast <float> (nbin_py);
 }
-float parametri :: dimmi_dimpz()
+float Parametri :: dimmi_dimpz()
 {
 	return (pzmax - pzmin) / static_cast <float> (nbin_pz);
 }
-float parametri :: dimmi_dimgamma()
+float Parametri :: dimmi_dimgamma()
 {
 	return (gammamax - gammamin) / static_cast <float> (nbin_gamma);
 }
-float parametri :: dimmi_dimtheta()
+float Parametri :: dimmi_dimtheta()
 {
 	return (thetamax - thetamin) / static_cast <float> (nbin_theta);
 }
-float parametri :: dimmi_dimE()
+float Parametri :: dimmi_dimE()
 {
 	return (Emax - Emin) / static_cast <float> (nbin_E);
 }
-float parametri :: dimmi_dim(int colonna)
+float Parametri :: dimmi_dim(int colonna)
 {
 	if (colonna == 0)		return dimmi_dimx();
 	else if (colonna == 1)	return dimmi_dimy();
@@ -87,7 +87,7 @@ float parametri :: dimmi_dim(int colonna)
 }
 
 
-void parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
+void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 {
 	std::string riga_persa;
 	int trascura, ndv, i_end;
@@ -121,7 +121,7 @@ void parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 
 }
 
-void parametri :: chiedi_numero_colonne()
+void Parametri :: chiedi_numero_colonne()
 {
 	int ncolonne;
 	std::cout << "Il file contiene 6 o 7 colonne? ";
@@ -133,7 +133,7 @@ void parametri :: chiedi_numero_colonne()
 }
 
 
-void parametri :: chiedi_endian_file()
+void Parametri :: chiedi_endian_file()
 {
 	std::cout << "Il file e' little [x86] (0) o big [ppc] (1) endian? ";
 	std::cin >> endian_file;
@@ -141,7 +141,7 @@ void parametri :: chiedi_endian_file()
 }
 
 
-void parametri :: check_filename(const char *nomefile)
+void Parametri :: check_filename(const char *nomefile)
 {
 	if (nomefile[0] == 'P')
 	{
@@ -256,7 +256,7 @@ void parametri :: check_filename(const char *nomefile)
 
 }
 
-void parametri :: leggi_batch(int argc, const char ** argv)
+void Parametri :: leggi_batch(int argc, const char ** argv)
 {
 	std::ifstream fileParametri;
 	std::string nomefile;
@@ -461,7 +461,7 @@ void parametri :: leggi_batch(int argc, const char ** argv)
 }
 
 
-void parametri :: leggi_interattivo()
+void Parametri :: leggi_interattivo()
 {
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
@@ -574,7 +574,7 @@ void parametri :: leggi_interattivo()
 
 
 
-bool parametri :: check_parametri()
+bool Parametri :: check_parametri()
 {
 	bool test = true;
 	if ( p[FUNZIONE] != 1 && p[FUNZIONE]   != 2	)		// check leggi_campi o leggi_particelle
@@ -666,7 +666,7 @@ bool parametri :: check_parametri()
 }
 
 
-void parametri :: organizza_minimi_massimi()
+void Parametri :: organizza_minimi_massimi()
 {
 	minimi[0] = xmin;
 	minimi[1] = ymin;
@@ -697,7 +697,7 @@ void parametri :: organizza_minimi_massimi()
 
 
 
-bool parametri :: incompleto()
+bool Parametri :: incompleto()
 {
 	bool test=true;
 	//	if (!xmin_b && !xmax_b && !pxmin_b && !pxmax_b && !ymin_b && !ymax_b && !pymin_b && !pymax_b && !zmin_b && !zmax_b && !pzmin_b && !pzmax_b && 
