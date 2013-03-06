@@ -276,9 +276,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		}
 		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 
-		particelle=(float*)malloc(npart_loc*(2*ndim+parametri->p[WEIGHT])*sizeof(float));
+		particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
 		printf("proc number \t %i \t npart=%i\r",ipc,npart_loc);
-		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(2*ndim+parametri->p[WEIGHT])};
+		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(ndv)};
 		if(npart_loc>0)
 		{
 			//printf("\tentro\t");
