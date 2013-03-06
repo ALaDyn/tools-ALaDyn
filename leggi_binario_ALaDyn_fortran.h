@@ -98,7 +98,7 @@ typedef unsigned long int uint32_t;
 # define __0X30 0x40000000
 # define __0X31 0x80000000
 # ifndef NUM_FILTRI
-# define NUM_FILTRI 14
+# define NUM_FILTRI 16
 # endif
 
 
@@ -156,7 +156,7 @@ struct _Filtro
 	{
 		xmin, ymin, zmin, xmax, ymax, zmax,
 		pxmin, pymin, pzmin, pxmax, pymax, pzmax,
-		emin, emax
+		emin, emax, thetamin, thetamax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
 	static float * costruisci_filtro(int, const char **);
@@ -179,13 +179,15 @@ struct _Filtro
 		unsigned piu_pzmax:1;
 		unsigned meno_ener:1;
 		unsigned piu_ener:1;
+                unsigned meno_theta:1;
+                unsigned piu_theta:1;
 		_flag_filtri operator=(int o)
 		{
 			meno_xmin = meno_ymin = meno_zmin =
 				meno_pxmin = meno_pymin = meno_pzmin =
 				piu_xmax = piu_ymax = piu_zmax =
 				piu_pxmax = piu_pymax = piu_pzmax =
-				meno_ener = piu_ener = 0;
+				meno_ener = piu_ener = meno_theta = piu_theta = 0;
 			return *this;
 		}
 		// varie ed eventuali
