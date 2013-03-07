@@ -264,6 +264,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		ascii_all_out=fopen(nomefile_ascii, "w");
 	}
 
+	printf("\ninizio processori per davvero\n");
+	fflush(stdout);
+	
 	for(ipc=0;ipc<npe;ipc++)
 	{
 
@@ -296,7 +299,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			}
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 
-			printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
+			//printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
 			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
 
 			if (cerca_minmax)

@@ -153,7 +153,7 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 			if(tests[c] == __0X12 || tests[c] == __0X13)
 				E = (float) (parametri->massa_particella_MeV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
                         else if(tests[c] == __0X14 || tests[c] == __0X15)
-                                theta = 0.0; // definire espressione di theta
+			  theta=(float)(atan2(sqrt(p[1]*p[1]+p[2]*p[2]),p[0])*180./M_PI);//theta = 0.0; // definire espressione di theta
 			switch(tests[c])
 			{
 			case __0X00: // cost::xmin
