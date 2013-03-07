@@ -11,13 +11,13 @@ Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri :: Parametri()
 {
 	massa_particella_MeV = 0.;
-	nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 100;
+	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 100;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = Emax = gammamax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetamin_b = thetamax_b = true;
-	nbin_y_b = nbin_z_b = nbin_py_b = nbin_pz_b = false;
-	nbin_x_b = nbin_px_b = nbin_E_b = nbin_theta_b = true;
+	nbin_E_b = nbin_theta_b = nbin_gamma_b = true;
+	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
 
 	for (int i = 0; i < NPARAMETRI; i++) 
@@ -260,55 +260,66 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 {
 	std::ifstream fileParametri;
 	std::string nomefile;
+	bool usa_file_parametri = false;
 	bool failed_opening_file;
-	for (int i = 2; i < argc; i++)	// * We will iterate over argv[] to get the parameters stored inside.
-	{								// * Note that we're starting on 1 because we don't need to know the
-		// * path of the program, which is stored in argv[0], and the input file,
-		// * which is supposed to be given as the first argument and so is in argv[1]
-
+	bool do_not_ask_missing = false;
+	for (int i = 2; i < argc; i++)	
+		/************************************************************************
+		We will iterate over argv[] to get the parameters stored inside.
+		Note that we're starting on 1 because we don't need to know the
+		path of the program, which is stored in argv[0], and the input file,
+		which is supposed to be given as the first argument and so is in argv[1]
+		************************************************************************/
+	{
 
 		if (std::string(argv[i]) == "-readParamsfromFile")
 		{
 			nomefile = std::string(argv[i+1]);
-			fileParametri.open(nomefile.c_str());
-			failed_opening_file = fileParametri.fail();
-			if (failed_opening_file) 
-			{
-				std::cout << "Impossibile aprire il file " << argv[i+1] << " contenente i parametri di binnaggio" << std::endl;
-				exit(50);
-			}
+			usa_file_parametri = true;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-swap")
 		{
 			p[SWAP] = 1;
+			p_b[SWAP] = false;
 		}
 		else if (std::string(argv[i]) == "-ncol")
 		{
 			int ncolumns = atoi(argv[i+1]);
 			if (ncolumns == 6) p[WEIGHT] = 0;
 			else if (ncolumns == 7) p[WEIGHT] = 1;
+			p_b[WEIGHT] = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-dump_binary")
 		{
 			p[OUT_BINARY] = 1;
+			p_b[OUT_BINARY] = false;
 		}
-		else if (std::string(argv[i]) == "-dump_ascii")
+		else if (std::string(argv[i]) == "-dump_propaga")
 		{
-			p[OUT_ASCII] = 1;
+			p[OUT_PROPAGA] = 1;
+			p_b[OUT_PROPAGA] = false;
+		}
+		else if (std::string(argv[i]) == "-dump_csv")
+		{
+			p[OUT_CSV] = 1;
+			p_b[OUT_CSV] = false;
 		}
 		else if (std::string(argv[i]) == "-parameters")
 		{
 			p[OUT_PARAMS] = 1;
+			p_b[OUT_PARAMS] = false;
 		}
 		else if (std::string(argv[i]) == "-find_minmax")
 		{
 			p[FIND_MINMAX] = 1;
+			p_b[FIND_MINMAX] = false;
 		}
 		else if (std::string(argv[i]) == "-do_binning")
 		{
 			p[DO_BINNING] = 1;
+			p_b[DO_BINNING] = false;
 		}
 		else if (std::string(argv[i]) == "-xmin")
 		{
@@ -320,6 +331,66 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 		{
 			xmax = (float) atof(argv[i+1]);
 			xmax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-ymin")
+		{
+			ymin = (float) atof(argv[i+1]);
+			ymin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-ymax")
+		{
+			ymax = (float) atof(argv[i+1]);
+			ymax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-zmin")
+		{
+			zmin = (float) atof(argv[i+1]);
+			zmin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-zmax")
+		{
+			zmax = (float) atof(argv[i+1]);
+			zmax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-pxmin")
+		{
+			pxmin = (float) atof(argv[i+1]);
+			pxmin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-pxmax")
+		{
+			pxmax = (float) atof(argv[i+1]);
+			pxmax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-pymin")
+		{
+			pymin = (float) atof(argv[i+1]);
+			pymin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-pymax")
+		{
+			pymax = (float) atof(argv[i+1]);
+			pymax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-pzmin")
+		{
+			pzmin = (float) atof(argv[i+1]);
+			pzmin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-pzmax")
+		{
+			pzmax = (float) atof(argv[i+1]);
+			pzmax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-thetamin")
@@ -334,6 +405,18 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 			thetamax_b = false;
 			i++;
 		}
+		else if (std::string(argv[i]) == "-gammamin")
+		{
+			gammamin = (float) atof(argv[i+1]);
+			gammamin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-gammamax")
+		{
+			gammamax = (float) atof(argv[i+1]);
+			gammamax_b = false;
+			i++;
+		}
 		else if (std::string(argv[i]) == "-Emin")
 		{
 			Emin = (float) atof(argv[i+1]);
@@ -346,23 +429,99 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 			Emax_b = false;
 			i++;
 		}
+		else if (std::string(argv[i]) == "-plot_xpx")
+		{
+			fai_plot_xpx = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_espec")
+		{
+			fai_plot_Espec = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_etheta")
+		{
+			fai_plot_Etheta = 1;
+		}
+		else if (std::string(argv[i]) == "-nbin")
+		{
+			nbin = atoi(argv[i+1]);
+			if (nbin_x_b) nbin_x = nbin;
+			if (nbin_y_b) nbin_y = nbin;
+			if (nbin_z_b) nbin_z = nbin;
+			if (nbin_px_b) nbin_px = nbin;
+			if (nbin_py_b) nbin_py = nbin;
+			if (nbin_pz_b) nbin_pz = nbin;
+			if (nbin_gamma_b) nbin_gamma = nbin;
+			if (nbin_theta_b) nbin_theta = nbin;
+			if (nbin_E_b) nbin_E = nbin;
+			nbin_b = false;
+			i++;
+		}
 		else if (std::string(argv[i]) == "-nbinx")
 		{
 			nbin_x = atoi(argv[i+1]);
 			nbin_x_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbiny")
+		{
+			nbin_y = atoi(argv[i+1]);
+			nbin_y_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinz")
+		{
+			nbin_z = atoi(argv[i+1]);
+			nbin_z_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinpx")
+		{
+			nbin_px = atoi(argv[i+1]);
+			nbin_px_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinpy")
+		{
+			nbin_py = atoi(argv[i+1]);
+			nbin_py_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinpz")
+		{
+			nbin_pz = atoi(argv[i+1]);
+			nbin_pz_b = false;
+			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbintheta")
 		{
+			nbin_theta = atoi(argv[i+1]);
+			nbin_theta_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbingamma")
+		{
 			nbin_gamma = atoi(argv[i+1]);
 			nbin_gamma_b = false;
+			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinE")
 		{
 			nbin_E = atoi(argv[i+1]);
 			nbin_E_b = false;
+			nbin_b = false;
 			i++;
+		}
+		else if (std::string(argv[i]) == "-dontask")
+		{
+			do_not_ask_missing = true;
 		}
 	}
 
@@ -371,23 +530,15 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
-		if (p_b[FIND_MINMAX])
+		if (usa_file_parametri)
 		{
-			std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
-			std::cin >> p[FIND_MINMAX];
-			p_b[FIND_MINMAX] = false;
-		}
-		if (p_b[DO_BINNING])
-		{
-			std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
-			std::cin >> p[DO_BINNING];
-			p_b[DO_BINNING] = false;
-		}
-		if (p[DO_BINNING] == 1)
-		{
-			std::cout << "Quanti bin per asse vuoi usare? (consiglio: 100): ";
-			std::cin >> nbin_x;
-			nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_x;
+			fileParametri.open(nomefile.c_str());
+			failed_opening_file = fileParametri.fail();
+			if (failed_opening_file) 
+			{
+				std::cout << "Impossibile aprire il file " << nomefile << " contenente i parametri di binnaggio" << std::endl;
+				exit(50);
+			}
 			while(!fileParametri.eof())
 			{
 				fileParametri >> nomepar >> evita >> leggi;
@@ -488,6 +639,25 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 				}
 				*/
 			}
+			fileParametri.close();
+		}
+		if (p_b[FIND_MINMAX] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
+			std::cin >> p[FIND_MINMAX];
+			p_b[FIND_MINMAX] = false;
+		}
+		if (p_b[DO_BINNING] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
+			std::cin >> p[DO_BINNING];
+			p_b[DO_BINNING] = false;
+		}
+		if (p[DO_BINNING] == 1 && nbin_b)
+		{
+			std::cout << "Quanti bin per asse vuoi usare? (consiglio: 100): ";
+			std::cin >> nbin;
+			nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin;
 		}
 #ifdef ENABLE_DEBUG
 		std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
@@ -510,12 +680,26 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
 #endif
-		std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
-		std::cin >> p[OUT_BINARY];
-		std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
-		std::cin >> p[OUT_ASCII];
-		std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
-		std::cin >> p[OUT_PARAMS];
+		if (p_b[OUT_BINARY] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
+			std::cin >> p[OUT_BINARY];
+		}
+		if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
+			std::cin >> p[OUT_PROPAGA];
+		}
+		if (p_b[OUT_CSV] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
+			std::cin >> p[OUT_CSV];
+		}
+		if (p_b[OUT_PARAMS] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
+			std::cin >> p[OUT_PARAMS];
+		}
 	}
 	fileParametri.close();
 }
@@ -622,10 +806,12 @@ void Parametri :: leggi_interattivo()
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
 #endif		
-		std::cout << "Vuoi l'output completo binario? 1 si', 0 no: ";
+		std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
 		std::cin >> p[OUT_BINARY];
-		std::cout << "Vuoi l'output completo ascii? 1 si', 0 no: ";
-		std::cin >> p[OUT_ASCII];
+		std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
+		std::cin >> p[OUT_PROPAGA];
+		std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
+		std::cin >> p[OUT_CSV];
 		std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
 		std::cin >> p[OUT_PARAMS];
 	}
@@ -647,9 +833,14 @@ bool Parametri :: check_parametri()
 		printf("Attenzione: modalita` weight non definita\n");
 		test = false;
 	}
-	if ( (file_particelle_P || file_particelle_E) && p[OUT_ASCII]  != 0 && p[OUT_ASCII]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+	if ( (file_particelle_P || file_particelle_E) && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
-		printf("Attenzione: output ascii non definito\n");
+		printf("Attenzione: output csv non definito\n");
+		test = false;
+	}
+	if ( (file_particelle_P || file_particelle_E) && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+	{
+		printf("Attenzione: output ppg non definito\n");
 		test = false;
 	}
 	if ( (file_particelle_P || file_particelle_E) && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )

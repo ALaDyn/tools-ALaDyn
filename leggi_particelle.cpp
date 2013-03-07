@@ -22,7 +22,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		printf ( "file exists!\n" );
 	}
 	FILE *binary_all_out;
-	FILE *ascii_all_out;
+	FILE *ascii_propaga;
+	FILE *ascii_csv;
 	FILE *parameters;
 	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 	std::ifstream file_dat;
@@ -35,7 +36,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	int out_swap = parametri->p[SWAP];
 	int out_binary = parametri->p[OUT_BINARY];
-	int out_ascii = parametri->p[OUT_ASCII];
+	int out_ascii_propaga = parametri->p[OUT_PROPAGA];
+	int out_ascii_csv = parametri->p[OUT_CSV];
 	int out_parameters = parametri->p[OUT_PARAMS];
 	int fai_binning = parametri->p[DO_BINNING];
 	int cerca_minmax = parametri->p[FIND_MINMAX];
@@ -52,7 +54,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	float *particelle, *real_param;
 	float gamma, theta, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
-	char nomefile_ascii[MAX_LENGTH_FILENAME];
+	char nomefile_propaga[MAX_LENGTH_FILENAME];
+	char nomefile_csv[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 
 	size_t fread_size;
@@ -197,7 +200,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 	float *Espec = new float [parametri->nbin_E+3];
 
-	sprintf(nomefile_ascii,"%s.ascii",argv[1]);
+	sprintf(nomefile_propaga,"%s.ppg",argv[1]);
+	sprintf(nomefile_csv,"%s.csv",argv[1]);
 	sprintf(nomefile_binary,"%s.vtk",argv[1]);
 
 
@@ -227,7 +231,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	int contatori[] = {0,0,0};
 	float zero = 0.0f;
-	int particelle_accumulate = 0;
+	long long particelle_accumulate = 0;
 
 	if (out_binary)
 	{
@@ -238,7 +242,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		contatori[0] += fprintf(binary_all_out, "BINARY\n");
 		contatori[0] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[0] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
-		fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
+		fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
 		//		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[1] += fprintf(binary_all_out, "POINT_DATA %i\n",nptot);
 		//		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
@@ -247,7 +251,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 		if (weight_esiste)
 		{
-			fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
+			fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
 			//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
 			//			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
 			//			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
@@ -258,10 +262,15 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		}
 	}
 
-	if (out_ascii)
+	if (out_ascii_propaga)
 	{
-		printf("\nRichiesta scrittura file ASCII\n");
-		ascii_all_out=fopen(nomefile_ascii, "w");
+		printf("\nRichiesta scrittura file ASCII per Propaga\n");
+		ascii_propaga=fopen(nomefile_propaga, "w");
+	}
+	if (out_ascii_csv)
+	{
+		printf("\nRichiesta scrittura file ASCII CSV per Paraview\n");
+		ascii_csv=fopen(nomefile_csv, "w");
 	}
 
 	printf("\ninizio processori per davvero\n");
@@ -302,9 +311,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			//printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
 			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
 
+
 			if (cerca_minmax)
 			{
-				for (int i = 0; i < npart_loc; i++)
+				for (unsigned int i = 0; i < val[0]; i++)
 				{
 					if (ndv == 6 || ndv == 7)
 					{
@@ -363,20 +373,17 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (E > estremi_max[8]) estremi_max[8] = E;
 					}
 				}
-				_Binnaggio(particelle,npart_loc,ndv,parametri,xpx,"x","px");
-				_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
-				_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
 			}
-			_Binnaggio(particelle,npart_loc,ndv,parametri,xpx,"x","px");
-			_Binnaggio(particelle,npart_loc,ndv,parametri,Espec,"E");
-			_Binnaggio(particelle,npart_loc,ndv,parametri,Etheta,"E","theta");
+			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
+			_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
+			_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
 
 
-			if(out_ascii)
+			if(out_ascii_propaga)
 			{
 				if (ndv == 6 || ndv == 7)
 				{
-					for(int i=0;i<npart_loc;i++)
+					for(unsigned int i=0;i<val[0];i++)
 					{
 						rx=particelle[i*ndv+1]*((float)1.e-4);
 						ry=particelle[i*ndv+2]*((float)1.e-4);
@@ -387,17 +394,17 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (parametri->p[WEIGHT])
 						{
 							wgh=particelle[i*ndv+6];
-							fprintf(ascii_all_out,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+							fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
 						}
 						else
 						{
-							fprintf(ascii_all_out,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+							fprintf(ascii_propaga,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
 						}
 					}
 				}
 				else if (ndv == 4 || ndv == 5)
 				{
-					for(int i=0;i<npart_loc;i++)
+					for(unsigned int i=0;i<val[0];i++)
 					{
 						rx=particelle[i*ndv+1]*((float)1.e-4);
 						rz=particelle[i*ndv+0]*((float)1.e-4);
@@ -406,11 +413,57 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (parametri->p[WEIGHT])
 						{
 							wgh=particelle[i*ndv+4];
-							fprintf(ascii_all_out,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+							fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
 						}
 						else
 						{
-							fprintf(ascii_all_out,"%e 0 %e %e 0 %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+							fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+						}
+					}
+				}
+			}
+
+
+
+			if(out_ascii_csv)
+			{
+				if (ndv == 6 || ndv == 7)
+				{
+					for(unsigned int i=0;i<val[0];i++)
+					{
+						rx=particelle[i*ndv+0];
+						ry=particelle[i*ndv+1];
+						rz=particelle[i*ndv+2];
+						ux=particelle[i*ndv+3];
+						uy=particelle[i*ndv+4];
+						uz=particelle[i*ndv+5];
+						if (parametri->p[WEIGHT])
+						{
+							wgh=particelle[i*ndv+6];
+							fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
+						}
+						else
+						{
+							fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz);
+						}
+					}
+				}
+				else if (ndv == 4 || ndv == 5)
+				{
+					for(unsigned int i=0;i<val[0];i++)
+					{
+						rx=particelle[i*ndv+0];
+						rz=particelle[i*ndv+1];
+						ux=particelle[i*ndv+2];
+						uz=particelle[i*ndv+3];
+						if (parametri->p[WEIGHT])
+						{
+							wgh=particelle[i*ndv+4];
+							fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
+						}
+						else
+						{
+							fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e\n",rx, rz, ux, uz);
 						}
 					}
 				}
@@ -422,21 +475,21 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			{
 				if (parametri->endian_machine == 0)
 				{
-					swap_endian_f(particelle,npart_loc*ndv);
+					swap_endian_f(particelle,val[0]*ndv);
 				}
 				switch(ndv)
 				{
 				case 4:
 				case 5:
 					// scrittura coordinate x, y, z
-					fseek(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=0; i < npart_loc; i += ndv)
+					fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(unsigned int i=0; i < val[0]; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
 						fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
 
 					// scrittura momenti px, py, pz
-					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=2; i < npart_loc; i += ndv)
+					fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(unsigned int i=2; i < val[0]; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
 						fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
 
@@ -444,13 +497,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				case 6:
 				case 7:
 					// scrittura coordinate x, y, z
-					fseek(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=0; i < npart_loc; i += ndv)
+					fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(unsigned int i=0; i < val[0]; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
 
 					// scrittura momenti px, py, pz
-					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-					for(int i=3; i < npart_loc; i += ndv)
+					fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+					for(unsigned int i=3; i < val[0]; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
 
 					break;
@@ -462,8 +515,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				if(weight_esiste)
 				{
 					// scrittura pesi
-					fseek(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
-					for(int i=ndv-1; i < npart_loc; i += ndv)
+					fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+					for(unsigned int i=ndv-1; i < val[0]; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
 				}
 
@@ -473,7 +526,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 
 			free(particelle);
-			particelle_accumulate += npart_loc;
+			particelle_accumulate += val[0];
 		}
 	}
 
@@ -630,10 +683,16 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		fclose(binary_all_out);
 	}
 
-	if (out_ascii)
+	if (out_ascii_propaga)
 	{
-		fflush(ascii_all_out);
-		fclose(ascii_all_out);
+		fflush(ascii_propaga);
+		fclose(ascii_propaga);
+	}
+
+	if (out_ascii_csv)
+	{
+		fflush(ascii_csv);
+		fclose(ascii_csv);
 	}
 
 	if (!(parametri->old_fortran_bin)) file_dat.close();

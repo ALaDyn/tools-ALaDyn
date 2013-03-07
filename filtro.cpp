@@ -110,16 +110,16 @@ namespace cost
 	unsigned int pzmax =    __0X11;
 	unsigned int emin =     __0X12;
 	unsigned int emax =     __0X13;
-        unsigned int thetamin = __0X14;
-        unsigned int thetamax = __0X15;
+	unsigned int thetamin = __0X14;
+	unsigned int thetamax = __0X15;
 	unsigned int tutte[]=
 	{
 		xmin, ymin, zmin, 
-                pxmin, pymin, pzmin,
-                xmax, ymax, zmax,
-                pxmax, pymax, pzmax,
-                emin, emax,
-                thetamin, thetamax};
+		pxmin, pymin, pzmin,
+		xmax, ymax, zmax,
+		pxmax, pymax, pzmax,
+		emin, emax,
+		thetamin, thetamax};
 	// varie ed eventuali
 }
 
@@ -152,8 +152,8 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 			if(!flag) break;
 			if(tests[c] == __0X12 || tests[c] == __0X13)
 				E = (float) (parametri->massa_particella_MeV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
-                        else if(tests[c] == __0X14 || tests[c] == __0X15)
-			  theta=(float)(atan2(sqrt(p[1]*p[1]+p[2]*p[2]),p[0])*180./M_PI);//theta = 0.0; // definire espressione di theta
+			else if(tests[c] == __0X14 || tests[c] == __0X15)
+				theta=(float)(atan2(sqrt(p[1]*p[1]+p[2]*p[2]),p[0])*180./M_PI);//theta = 0.0; // definire espressione di theta
 			switch(tests[c])
 			{
 			case __0X00: // cost::xmin
@@ -228,13 +228,13 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 #endif
 				flag_filtri . piu_ener = E <= val[13],
 				flag = flag && flag_filtri . piu_ener;
-                        if(tests[c] == __0X14) // cost::thetamin
+			if(tests[c] == __0X14) // cost::thetamin
 #ifdef ENABLE_DEBUG
 				std :: cerr << "confronto thetamin " << theta << ' ' << val[14] << '\n',
 #endif
 				flag_filtri . meno_theta = theta >= val[14],
 				flag = flag && flag_filtri . meno_theta;
-                        if(tests[c] == __0X15) // cost::thetamin
+			if(tests[c] == __0X15) // cost::thetamin
 #ifdef ENABLE_DEBUG
 				std :: cerr << "confronto thetamax " << theta << ' ' << val[15] << '\n',
 #endif
@@ -266,8 +266,8 @@ const char * _Filtro :: descr[] =
 	"+pzmax",
 	"+Emin",
 	"+Emax",
-        "+thetamin",
-        "+thetamax"
+	"+thetamin",
+	"+thetamax"
 	// varie ed eventuali
 };
 
@@ -282,7 +282,7 @@ const unsigned int _Filtro :: cost[] =
 float * _Filtro :: costruisci_filtro(int narg, const char **args)
 {
 	char ** miei_args;
-        float * miei_val;
+	float * miei_val;
 	int indices[NUM_FILTRI], quanti = 0;
 	for(int i=1; i < narg; ++i)
 	{if(args[i][0] == '+')
@@ -290,10 +290,10 @@ float * _Filtro :: costruisci_filtro(int narg, const char **args)
 	indices[quanti] = -1;
 	if(!quanti) return (float *)NULL;
 	miei_args = new char * [NUM_FILTRI+1], miei_args[NUM_FILTRI] = 0;
-        miei_val = new float[NUM_FILTRI+1];
+	miei_val = new float[NUM_FILTRI+1];
 	for(int i=0; i < quanti; ++i)
 		miei_args[i] = const_cast<char*>(args[indices[i]]),
-		miei_val[i] = atof(args[indices[i]+1]);
+		miei_val[i] = (float) atof(args[indices[i]+1]);
 	miei_args[quanti] = 0;
 	return costruisci_filtro(
 		miei_args[0],  miei_val[0],
@@ -312,7 +312,7 @@ float * _Filtro :: costruisci_filtro(int narg, const char **args)
 		miei_args[13],  miei_val[13],
 		miei_args[14],  miei_val[14],
 		miei_args[15],  miei_val[15],
-                miei_args[NUM_FILTRI]);
+		miei_args[NUM_FILTRI]);
 }
 
 

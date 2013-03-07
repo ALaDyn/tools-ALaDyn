@@ -27,6 +27,16 @@
 typedef unsigned long int uint32_t;
 #endif
 
+
+
+#if defined (_MSC_VER)
+#include<wchar.h>
+#define fseeko _fseeki64
+#define ftello _ftelli64
+#endif
+
+
+
 //#define ENABLE_DEBUG
 
 
@@ -54,14 +64,15 @@ typedef unsigned long int uint32_t;
 #define MAX_LENGTH_FILENAME 200
 
 
-#define NPARAMETRI	7
+#define NPARAMETRI	8
 #define WEIGHT		0
 #define SWAP		1
 #define OUT_BINARY	2
-#define OUT_ASCII	3
+#define OUT_PROPAGA	3
 #define	FIND_MINMAX	4
 #define DO_BINNING	5
 #define OUT_PARAMS	6
+#define OUT_CSV		7
 
 
 
@@ -105,7 +116,7 @@ typedef unsigned long int uint32_t;
 struct Parametri
 {
 	float massa_particella_MeV;
-	int nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
+	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
 	int endian_file, endian_machine;
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
@@ -113,7 +124,7 @@ struct Parametri
 	float minimi[9], massimi[9];  // x, y, z, px, py, pz, gamma, theta, E
 	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
-		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
+		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
 	bool old_fortran_bin;
 	int fai_plot_xpx, fai_plot_Espec, fai_plot_Etheta;
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
@@ -179,8 +190,8 @@ struct _Filtro
 		unsigned piu_pzmax:1;
 		unsigned meno_ener:1;
 		unsigned piu_ener:1;
-                unsigned meno_theta:1;
-                unsigned piu_theta:1;
+		unsigned meno_theta:1;
+		unsigned piu_theta:1;
 		_flag_filtri operator=(int o)
 		{
 			meno_xmin = meno_ymin = meno_zmin =
