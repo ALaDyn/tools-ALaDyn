@@ -16,7 +16,8 @@ Parametri :: Parametri()
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = Emax = gammamax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetamin_b = thetamax_b = true;
-	nbin_E_b = nbin_theta_b = nbin_gamma_b = true;
+	nbin_b = true;
+        nbin_E_b = nbin_theta_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
 
@@ -115,7 +116,9 @@ void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 
 	if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
 	else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
-
+        else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
+        p[NCOLONNE] = ndv;
+        p_b[NCOLONNE] = false;
 	p_b[WEIGHT] = false;
 	endian_file = (i_end-1);
 

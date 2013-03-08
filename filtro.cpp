@@ -146,12 +146,15 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 	{
 		pntt_loc = dati + i*n_dati[1];
 		flag = true;
-		p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
+                if(parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
+                else if(parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
+                
 		for(unsigned char c=0; c < tot_test; ++c)
 		{
 			if(!flag) break;
 			if(tests[c] == __0X12 || tests[c] == __0X13)
 				E = (float) (parametri->massa_particella_MeV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
+                                
 			else if(tests[c] == __0X14 || tests[c] == __0X15)
 				theta=(float)(atan2(sqrt(p[1]*p[1]+p[2]*p[2]),p[0])*180./M_PI);//theta = 0.0; // definire espressione di theta
 			switch(tests[c])

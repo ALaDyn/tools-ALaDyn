@@ -64,7 +64,7 @@ typedef unsigned long int uint32_t;
 #define MAX_LENGTH_FILENAME 200
 
 
-#define NPARAMETRI	8
+#define NPARAMETRI	9
 #define WEIGHT		0
 #define SWAP		1
 #define OUT_BINARY	2
@@ -73,7 +73,7 @@ typedef unsigned long int uint32_t;
 #define DO_BINNING	5
 #define OUT_PARAMS	6
 #define OUT_CSV		7
-
+#define NCOLONNE        8
 
 
 # define __0X00 0x1

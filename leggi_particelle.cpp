@@ -307,9 +307,16 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
 			}
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
+# ifdef ENABLE_DEBUG
 
 			//printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
+                        printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
+# endif
 			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
+# ifdef ENABLE_DEBUG
+
+                        printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
+# endif
 
 
 			if (cerca_minmax)
