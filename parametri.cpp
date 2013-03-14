@@ -140,7 +140,7 @@ void Parametri :: chiedi_endian_file()
 {
 	std::cout << "Il file e' little [x86] (0) o big [ppc] (1) endian? ";
 	std::cin >> endian_file;
-	if (endian_file != 1 && endian_file != 2) exit(-4);
+	if (endian_file != 1 && endian_file != 0) exit(-4);
 }
 
 
@@ -259,7 +259,7 @@ void Parametri :: check_filename(const char *nomefile)
 
 }
 
-void Parametri :: leggi_batch(int argc, const char ** argv)
+void Parametri :: parse_command_line(int argc, const char ** argv)
 {
 	std::ifstream fileParametri;
 	std::string nomefile;
@@ -285,6 +285,10 @@ void Parametri :: leggi_batch(int argc, const char ** argv)
 		{
 			p[SWAP] = 1;
 			p_b[SWAP] = false;
+		}
+		else if (std::string(argv[i]) == "-force_new")
+		{
+                        old_fortran_bin = false;
 		}
 		else if (std::string(argv[i]) == "-ncol")
 		{

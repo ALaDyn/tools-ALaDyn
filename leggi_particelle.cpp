@@ -381,10 +381,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					}
 				}
 			}
+                        if (fai_binning)
+                        {
 			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
 			_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
 			_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
-
+                        }
 
 			if(out_ascii_propaga)
 			{

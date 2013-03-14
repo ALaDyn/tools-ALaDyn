@@ -9,7 +9,7 @@ int main (const int argc, const char *argv[])
 	Parametri parametri;
 	bool testParametri = true;;
 
-	std::cout << "Binary file reader v3.6" << std::endl;
+	std::cout << "Binary file reader v3.7" << std::endl;
 
 	if (argc == 1)
 	{
@@ -65,7 +65,7 @@ int main (const int argc, const char *argv[])
 	}
 
 	if (argc == 2) parametri.leggi_interattivo();
-	else parametri.leggi_batch(argc, argv);
+	else parametri.parse_command_line(argc, argv);
 
 	/*
 	if (std::string(argv[2]) == "-readParamsfromFile")

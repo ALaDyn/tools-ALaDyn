@@ -141,7 +141,7 @@ struct Parametri
 	float dimmi_dimtheta();
 	float dimmi_dimE();
 	float dimmi_dim(int);
-	void leggi_batch(int , const char ** );
+	void parse_command_line(int , const char ** );
 	void leggi_interattivo();
 	//	void leggi_da_shell(int, const char *[]);
 	void leggi_endian_e_ncol(std::ifstream & );
