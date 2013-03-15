@@ -28,6 +28,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 	std::ifstream file_dat;
 	bool dat_not_found = true;
+	int conta_processori=0;
 	if (!(parametri->old_fortran_bin)) 
 	{
 		file_dat.open(nomefile_dat.str().c_str());
@@ -45,7 +46,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int cerca_minmax = parametri->p[FIND_MINMAX];
 	int weight_esiste = parametri->p[WEIGHT];
 
-	int ipc,N_param, *int_param,npart_loc;
+	int N_param, *int_param,npart_loc;
 	int buff, pID;
 
 	int nelab=3;	//3 valori per ora: gamma, theta ed energia
@@ -128,7 +129,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		mass=real_param[18];			//massa particelle su massa elettrone
 	}
 
-	if (!old_fortran_bin && !dat_not_found)
+	if (!(parametri->old_fortran_bin) && !dat_not_found)
 	{
 		std::getline(file_dat,riga_persa);
 		file_dat >> npe;
@@ -293,7 +294,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		if (feof(file_in)) break;
 
 		particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
-		printf("proc number \t %i \t npart=%i\r",ipc,npart_loc);
+		printf("proc number \t %i \t npart=%i\r",conta_processori,npart_loc);
 		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(ndv)};
 		if(npart_loc>0)
 		{
@@ -541,6 +542,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			free(particelle);
 			particelle_accumulate += val[0];
 		}
+		conta_processori++;
 	}
 
 
