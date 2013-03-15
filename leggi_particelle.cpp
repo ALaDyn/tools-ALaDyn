@@ -27,10 +27,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	FILE *parameters;
 	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
 	std::ifstream file_dat;
+	bool dat_not_found = true;
 	if (!(parametri->old_fortran_bin)) 
 	{
 		file_dat.open(nomefile_dat.str().c_str());
 		if (file_dat.fail()) printf ( "file .dat non-existent!\n" );
+		else dat_not_found = false;
 	}
 
 
@@ -125,7 +127,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		charge=real_param[17];			//carica particella su carica elettrone
 		mass=real_param[18];			//massa particelle su massa elettrone
 	}
-	else
+
+	if (!old_fortran_bin && !dat_not_found)
 	{
 		std::getline(file_dat,riga_persa);
 		file_dat >> npe;
@@ -276,9 +279,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	printf("\ninizio processori per davvero\n");
 	fflush(stdout);
 
-	for(ipc=0;ipc<npe;ipc++)
+	while(1)
 	{
-
+	  
 		if (parametri->old_fortran_bin)
 		{
 			fread_size = std::fread(&buff,sizeof(int),1,file_in); 
@@ -287,6 +290,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			if (out_swap) swap_endian_i(&npart_loc,1);
 		}
 		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+		if (feof(file_in)) break;
 
 		particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
 		printf("proc number \t %i \t npart=%i\r",ipc,npart_loc);
