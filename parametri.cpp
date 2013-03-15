@@ -763,6 +763,24 @@ void Parametri :: leggi_interattivo()
 					std::cin >> nbin_x;
 					nbin_x_b = false;
 				}
+				if (pxmin_b)
+				{
+					std::cout << "pxmin = ";
+					std::cin >> pxmin;
+					pxmin_b = false;
+				}
+				if (pxmax_b)
+				{
+					std::cout << "pxmax = ";
+					std::cin >> pxmax;
+					pxmax_b = false;
+				}
+				if (nbin_px_b)
+				{
+					std::cout << "nbin_px = ";
+					std::cin >> nbin_px;
+					nbin_px_b = false;
+				}
 			}
 			if (fai_plot_Etheta)
 			{
