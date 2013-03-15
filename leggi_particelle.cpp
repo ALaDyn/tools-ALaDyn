@@ -289,10 +289,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			fread_size = std::fread(&buff,sizeof(int),1,file_in); 
 			fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			if (out_swap) swap_endian_i(&npart_loc,1);
+			
 		}
 		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 		if (feof(file_in)) break;
+		if (out_swap) swap_endian_i(&npart_loc,1);
 
 		particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
 		printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
@@ -311,9 +312,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				if (out_swap) swap_endian_s(buffshort,2);
 				fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
-				if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
+				
 			}
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
+if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
 # ifdef ENABLE_DEBUG
 
 			//printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
