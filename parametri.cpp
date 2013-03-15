@@ -33,6 +33,7 @@ Parametri :: Parametri()
 	file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = false;
 	file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
 	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = false;
+	file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false;
 }
 
 
@@ -114,14 +115,16 @@ void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 	file_dat >> trascura; // 19° parametro
 	file_dat >> i_end;	  // 20° parametro
 
-	if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
-	else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
-	else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
-	p[NCOLONNE] = ndv;
-	p_b[NCOLONNE] = false;
-	p_b[WEIGHT] = false;
+	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
+	  {
+	    if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
+	    else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
+	    else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
+	    p[NCOLONNE] = ndv;
+	    p_b[NCOLONNE] = false;
+	    p_b[WEIGHT] = false;
+	  }
 	endian_file = (i_end-1);
-
 }
 
 void Parametri :: chiedi_numero_colonne()
@@ -168,22 +171,32 @@ void Parametri :: check_filename(const char *nomefile)
 	{
 		if (nomefile[1] == 'i')
 		{
-			if (nomefile[2] == 'd')
-			{
-				file_densita_HI = true;
-				sprintf (support_label,"hiden");
-			}
+		  if (nomefile[2] == 'p')
+		    {
+		      massa_particella_MeV = (float) MP_MEV;
+		      file_particelle_HI = true;
+		    }
+		  else if (nomefile[2] == 'd')
+		    {
+		      file_densita_HI = true;
+		      sprintf (support_label,"hiden");
+		    }
 		}
 	}
 	else if (nomefile[0] == 'L')
 	{
 		if (nomefile[1] == 'i')
 		{
-			if (nomefile[2] == 'd')
-			{
-				file_densita_LI = true;
-				sprintf (support_label,"liden");
-			}
+                  if (nomefile[2] == 'p')
+                    {
+                      massa_particella_MeV = (float) MP_MEV;
+                      file_particelle_LI = true;
+                    }
+		  else if (nomefile[2] == 'd')
+		    {
+		      file_densita_LI = true;
+		      sprintf (support_label,"liden");
+		    }
 		}
 	}
 	else if (nomefile[0] == 'E')

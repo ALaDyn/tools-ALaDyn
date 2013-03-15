@@ -294,7 +294,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		if (feof(file_in)) break;
 
 		particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
-		printf("proc number \t %i \t npart=%i\r",conta_processori,npart_loc);
+		printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
+		fflush(stdout);
 		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(ndv)};
 		if(npart_loc>0)
 		{
