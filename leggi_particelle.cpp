@@ -64,6 +64,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	size_t fread_size;
 
 	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
+	ndv = parametri->p[NCOLONNE];
 	//	int ny;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
@@ -711,7 +712,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		fclose(ascii_csv);
 	}
 
-	if (!(parametri->old_fortran_bin)) file_dat.close();
+	if (!(dat_not_found)) file_dat.close();
 	fclose(file_in);
 	return 0;
 }
