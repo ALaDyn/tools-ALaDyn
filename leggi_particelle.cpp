@@ -275,7 +275,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	printf("\ninizio processori per davvero\n");
 	fflush(stdout);
-	
+
 	for(ipc=0;ipc<npe;ipc++)
 	{
 
@@ -310,12 +310,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 # ifdef ENABLE_DEBUG
 
 			//printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
-                        printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
+			printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
 # endif
 			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
 # ifdef ENABLE_DEBUG
 
-                        printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
+			printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
 # endif
 
 
@@ -381,12 +381,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					}
 				}
 			}
-                        if (fai_binning)
-                        {
-			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
-			_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
-			_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
-                        }
+			if (fai_binning)
+			{
+				_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
+				_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
+				_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
+			}
 
 			if(out_ascii_propaga)
 			{
