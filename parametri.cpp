@@ -21,6 +21,8 @@ Parametri :: Parametri()
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
 
+	last_cpu = 32768;
+
 	for (int i = 0; i < NPARAMETRI; i++) 
 	{
 		p_b[i] = true;
@@ -304,6 +306,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		else if (std::string(argv[i]) == "-force_new")
 		{
 			old_fortran_bin = false;
+		}
+                else if (std::string(argv[i]) == "-stop")
+		{
+ 		        last_cpu = atoi(argv[i+1]);
+		        if (last_cpu < 1) last_cpu = 1;
+		        i++;
 		}
 		else if (std::string(argv[i]) == "-ncol")
 		{
@@ -677,7 +685,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		if (p[DO_BINNING] == 1 && nbin_b)
 		{
-			std::cout << "Quanti bin per asse vuoi usare? (consiglio: 100): ";
+			std::cout << "Quanti bin per asse vuoi usare? (consiglio: 120): ";
 			std::cin >> nbin;
 			nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin;
 		}

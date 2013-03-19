@@ -118,6 +118,7 @@ struct Parametri
 	float massa_particella_MeV;
 	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
 	int endian_file, endian_machine;
+        int last_cpu;
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];

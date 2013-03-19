@@ -6,6 +6,7 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
+        int stop_at_cpu_number = parametri->last_cpu;
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 	nomefile_dat << std::string(argv[1]) << ".dat";
@@ -36,7 +37,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		else dat_not_found = false;
 	}
 
-
 	int out_swap = parametri->p[SWAP];
 	int out_binary = parametri->p[OUT_BINARY];
 	int out_ascii_propaga = parametri->p[OUT_PROPAGA];
@@ -65,7 +65,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
 	ndv = parametri->p[NCOLONNE];
-	//	int ny;
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	int tipo = 0;
@@ -187,9 +186,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		estremi_max[i] = (float) -NUMERO_MASSIMO;
 	}
 
-	//	ny=ny_loc*npe;
 	printf("nptot=%i\n",nptot); 
-	printf("\ninizio processori \n");
 	fflush(stdout);
 	float **xpx = new float* [parametri->nbin_x+3];
 	for (int i = 0; i < parametri->nbin_x+3; i++)
@@ -278,12 +275,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		ascii_csv=fopen(nomefile_csv, "w");
 	}
 
-	printf("\ninizio processori per davvero\n");
 	fflush(stdout);
 
 	while(1)
 	{
-	  
+	  if (conta_processori >= stop_at_cpu_number) break;
 		if (parametri->old_fortran_bin)
 		{
 			fread_size = std::fread(&buff,sizeof(int),1,file_in); 
@@ -301,31 +297,28 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		unsigned int val[] = {(unsigned int)npart_loc, (unsigned int)(ndv)};
 		if(npart_loc>0)
 		{
-			//printf("\tentro\t");
 			fflush(stdout);
 
 			if (parametri->old_fortran_bin)
 			{
 				fread_size = std::fread(buffshort,sizeof(short),2,file_in);
-				// buffshort[0] = ???
-				// buffshort[1] = ???
-				if (out_swap) swap_endian_s(buffshort,2);
 				fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
-				
 			}
 			else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
-if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
-# ifdef ENABLE_DEBUG
+			if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
 
-			//printf("lunghezza=%i    %hu\t%hu\r",npart_loc*(2*ndim+parametri->p[WEIGHT]),buffshort[0],buffshort[1]);
+
+#ifdef ENABLE_DEBUG
+			printf("lunghezza=%i    %hu\t%hu\r",npart_loc*ndv);
 			printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
-# endif
-			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
-# ifdef ENABLE_DEBUG
+#endif
 
+			_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
+
+#ifdef ENABLE_DEBUG
 			printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
-# endif
+#endif
 
 
 			if (cerca_minmax)
