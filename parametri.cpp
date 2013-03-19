@@ -291,8 +291,9 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		which is supposed to be given as the first argument and so is in argv[1]
 		************************************************************************/
 	{
+	  std::cout << argv[i] << std::endl;
 
-		if (std::string(argv[i]) == "-readParamsfromFile")
+	  if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
 			nomefile = std::string(argv[i+1]);
 			usa_file_parametri = true;

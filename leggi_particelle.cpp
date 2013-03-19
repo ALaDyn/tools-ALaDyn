@@ -310,7 +310,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 
 #ifdef ENABLE_DEBUG
-			printf("lunghezza=%i    %hu\t%hu\r",npart_loc*ndv);
+			printf("lunghezza=%i\n",npart_loc*ndv);
 			printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
 #endif
 
