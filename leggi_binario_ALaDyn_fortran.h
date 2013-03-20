@@ -118,7 +118,7 @@ struct Parametri
 	float massa_particella_MeV;
 	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
 	int endian_file, endian_machine;
-        int last_cpu;
+		int last_cpu;
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
@@ -131,7 +131,7 @@ struct Parametri
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;
-        bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI;
+		bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI;
 	Parametri();
 	float dimmi_dimx();
 	float dimmi_dimy();

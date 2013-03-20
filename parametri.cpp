@@ -119,12 +119,12 @@ void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	  {
-	    if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
-	    else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
-	    else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
-	    p[NCOLONNE] = ndv;
-	    p_b[NCOLONNE] = false;
-	    p_b[WEIGHT] = false;
+		if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
+		else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
+		else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
+		p[NCOLONNE] = ndv;
+		p_b[NCOLONNE] = false;
+		p_b[WEIGHT] = false;
 	  }
 	endian_file = (i_end-1);
 }
@@ -174,31 +174,31 @@ void Parametri :: check_filename(const char *nomefile)
 		if (nomefile[1] == 'i')
 		{
 		  if (nomefile[2] == 'p')
-		    {
-		      massa_particella_MeV = (float) MP_MEV;
-		      file_particelle_HI = true;
-		    }
+			{
+			  massa_particella_MeV = (float) MP_MEV;
+			  file_particelle_HI = true;
+			}
 		  else if (nomefile[2] == 'd')
-		    {
-		      file_densita_HI = true;
-		      sprintf (support_label,"hiden");
-		    }
+			{
+			  file_densita_HI = true;
+			  sprintf (support_label,"hiden");
+			}
 		}
 	}
 	else if (nomefile[0] == 'L')
 	{
 		if (nomefile[1] == 'i')
 		{
-                  if (nomefile[2] == 'p')
-                    {
-                      massa_particella_MeV = (float) MP_MEV;
-                      file_particelle_LI = true;
-                    }
+				  if (nomefile[2] == 'p')
+					{
+					  massa_particella_MeV = (float) MP_MEV;
+					  file_particelle_LI = true;
+					}
 		  else if (nomefile[2] == 'd')
-		    {
-		      file_densita_LI = true;
-		      sprintf (support_label,"liden");
-		    }
+			{
+			  file_densita_LI = true;
+			  sprintf (support_label,"liden");
+			}
 		}
 	}
 	else if (nomefile[0] == 'E')
@@ -308,11 +308,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			old_fortran_bin = false;
 		}
-                else if (std::string(argv[i]) == "-stop")
+				else if (std::string(argv[i]) == "-stop")
 		{
- 		        last_cpu = atoi(argv[i+1]);
-		        if (last_cpu < 1) last_cpu = 1;
-		        i++;
+				last_cpu = atoi(argv[i+1]);
+				if (last_cpu < 1) last_cpu = 1;
+				i++;
 		}
 		else if (std::string(argv[i]) == "-ncol")
 		{

@@ -6,7 +6,7 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
-        int stop_at_cpu_number = parametri->last_cpu;
+		int stop_at_cpu_number = parametri->last_cpu;
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 	nomefile_dat << std::string(argv[1]) << ".dat";
