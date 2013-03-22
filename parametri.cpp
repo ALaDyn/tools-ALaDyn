@@ -304,6 +304,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			p[SWAP] = 1;
 			p_b[SWAP] = false;
 		}
+		else if (std::string(argv[i]) == "-noswap")
+		{
+			p[SWAP] = 0;
+			p_b[SWAP] = false;
+		}
 		else if (std::string(argv[i]) == "-force_new")
 		{
 			old_fortran_bin = false;
