@@ -44,7 +44,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int out_parameters = parametri->p[OUT_PARAMS];
 	int fai_binning = parametri->p[DO_BINNING];
 	int cerca_minmax = parametri->p[FIND_MINMAX];
-	int weight_esiste = parametri->p[WEIGHT];
+//	int weight_esiste = parametri->p[WEIGHT];
 
 	int N_param, *int_param,npart_loc;
 	int buff, pID;
@@ -251,7 +251,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		contatori[1] += fprintf(binary_all_out, "VECTORS p float\n");
 		//		contatori[1] += fprintf(binary_all_out, "LOOKUP_TABLE default\n");
 
-		if (weight_esiste)
+		if (parametri->p[WEIGHT])
 		{
 			fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
 			//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
@@ -402,14 +402,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						ux=particelle[i*ndv+4];
 						uy=particelle[i*ndv+5];
 						uz=particelle[i*ndv+3];
-						if (parametri->p[WEIGHT])
+						if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
 						{
 							wgh=particelle[i*ndv+6];
 							fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
 						}
 						else
 						{
-							fprintf(ascii_propaga,"%e %e %e %e %e %e %d 1 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, i+1);
+							fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, parametri->overwrite_weight_value, i+1);
 						}
 					}
 				}
@@ -421,14 +421,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						rz=particelle[i*ndv+0]*((float)1.e-4);
 						ux=particelle[i*ndv+3];
 						uz=particelle[i*ndv+2];
-						if (parametri->p[WEIGHT])
+						if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
 						{
 							wgh=particelle[i*ndv+4];
 							fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
 						}
 						else
 						{
-							fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d 1 0 %d\n",rx, rz, ux, uz, tipo, i+1);
+							fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, parametri->overwrite_weight_value, i+1);
 						}
 					}
 				}
@@ -523,14 +523,20 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 
 
-				if(weight_esiste)
+				if(parametri->p[WEIGHT] && !parametri->overwrite_weight)
 				{
 					// scrittura pesi
 					fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
 					for(unsigned int i=ndv-1; i < val[0]; i += ndv)
 						fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
 				}
-
+				else if(parametri->p[WEIGHT] && parametri->overwrite_weight)
+				{
+					// scrittura pesi sovrascritti da linea comando
+					fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+					for(unsigned int i=ndv-1; i < val[0]; i += ndv)
+						fwrite((void*)(&(parametri->overwrite_weight_value)),sizeof(float),1,binary_all_out);
+				}
 			}
 
 

@@ -67,19 +67,7 @@ int main (const int argc, const char *argv[])
 	if (argc == 2) parametri.leggi_interattivo();
 	else parametri.parse_command_line(argc, argv);
 
-	/*
-	if (std::string(argv[2]) == "-readParamsfromFile")
-	{
-	parametri.leggi_da_file(argv[3]);
-	if (argc > 3) parametri.leggi_da_shell(argc,argv);
-	if (parametri.incompleto()) parametri.leggi_interattivo();
-	}
-	else
-	{
-	parametri.leggi_da_shell(argc, argv);
-	if (parametri.incompleto()) parametri.leggi_interattivo();
-	}
-	*/
+
 
 #ifdef ENABLE_DEBUG
 	for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << parametri.p[i] << std::endl;

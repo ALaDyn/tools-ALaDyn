@@ -20,6 +20,8 @@ Parametri :: Parametri()
 	nbin_E_b = nbin_theta_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
+	overwrite_weight = false;
+	overwrite_weight_value = 1.0;
 
 	last_cpu = 32768;
 
@@ -367,6 +369,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			xmax = (float) atof(argv[i+1]);
 			xmax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-weight")
+		{
+			overwrite_weight = true;
+			overwrite_weight_value = (float) atof(argv[i+1]);
 			i++;
 		}
 		else if (std::string(argv[i]) == "-ymin")

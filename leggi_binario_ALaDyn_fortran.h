@@ -127,6 +127,8 @@ struct Parametri
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
 		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
 	bool old_fortran_bin;
+	bool overwrite_weight;
+	float overwrite_weight_value;
 	int fai_plot_xpx, fai_plot_Espec, fai_plot_Etheta;
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;

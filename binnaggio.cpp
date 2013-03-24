@@ -101,8 +101,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 		{
 			whichbin_y = (int) (((dato_da_binnare_y - parametri->minimi[binnare_su_y]) / parametri->dimmi_dim(binnare_su_y)) +1.0);
 		}
-		if (parametri->p[WEIGHT])	data_binned[whichbin_x][whichbin_y] += fabs(*(particelle+i*ndv+ndv-1));
-		else						data_binned[whichbin_x][whichbin_y] += 1.0;
+		if (parametri->p[WEIGHT] && !parametri->overwrite_weight)	data_binned[whichbin_x][whichbin_y] += fabs(*(particelle+i*ndv+ndv-1));
+		else														data_binned[whichbin_x][whichbin_y] += parametri->overwrite_weight_value;
 	}
 }
 
@@ -172,8 +172,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 		{
 			whichbin_x = (int) (((dato_da_binnare_x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) +1.0);
 		}
-		if (parametri->p[WEIGHT])	data_binned[whichbin_x] += fabs(*(particelle+i*ndv+ndv-1));
-		else						data_binned[whichbin_x] += 1.0;
+		if (parametri->p[WEIGHT] && !parametri->overwrite_weight)	data_binned[whichbin_x] += fabs(*(particelle+i*ndv+ndv-1));
+		else														data_binned[whichbin_x] += parametri->overwrite_weight_value;
 	}
 }
 
