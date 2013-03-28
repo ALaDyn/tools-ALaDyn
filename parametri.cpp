@@ -22,6 +22,7 @@ Parametri :: Parametri()
 	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
 	overwrite_weight = false;
 	overwrite_weight_value = 1.0;
+	do_not_ask_missing = false;
 
 	last_cpu = 32768;
 
@@ -284,7 +285,6 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 	std::string nomefile;
 	bool usa_file_parametri = false;
 	bool failed_opening_file;
-	bool do_not_ask_missing = false;
 	for (int i = 2; i < argc; i++)	
 		/************************************************************************
 		We will iterate over argv[] to get the parameters stored inside.

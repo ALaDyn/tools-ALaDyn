@@ -76,7 +76,7 @@ int main (const int argc, const char *argv[])
 
 	testParametri = parametri.check_parametri();
 
-	if ( testParametri == false	)
+	if ( testParametri == false && !parametri.do_not_ask_missing )
 	{
 		std::cout << "Parametri non coerenti" << std::endl;
 		return -2;
