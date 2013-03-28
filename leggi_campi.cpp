@@ -16,6 +16,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	int i, ipy, ipz,  j, k, N_param, *int_param, np_loc, npoint_loc[3], loc_size;
 	int segnoy=0,segnoz=0, buff;
 	float *field,*buffer,  *real_param;
+	float *x_coordinates, *y_coordinates, *z_coordinates;
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 	char nomefile_campi[MAX_LENGTH_FILENAME];
 
@@ -179,17 +180,52 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		} 
 		segnoz+=nzloc;
 	}
-
-	printf("=========FINE LETTURE==========\n");
-	fflush(stdout);
-
+	
 	dx=(xmax-xmin)/(nx1-1);
 	dy=(ymax-ymin)/(ny1-1);
 	if(nz1<=1)
-		dz=(zmax-zmin);
+	  dz=(zmax-zmin);
 	else
-		dz=(zmax-zmin)/(nz1-1);
+	  dz=(zmax-zmin)/(nz1-1);
 
+	x_coordinates=new float[nx1];
+	y_coordinates=new float[ny1];
+	z_coordinates=new float[nz1];
+	
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	
+	if(!std::feof(file_in))
+	  {
+	    fread_size = std::fread(x_coordinates,sizeof(float),nx1,file_in);
+	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	    fread_size = std::fread(y_coordinates,sizeof(float),ny1,file_in);
+	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	    fread_size = std::fread(z_coordinates,sizeof(float),nz1,file_in);
+	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	    
+	    if(out_swap){
+	      swap_endian_f(x_coordinates,nx1);
+	      swap_endian_f(y_coordinates,ny1);
+	      swap_endian_f(z_coordinates,nz1);
+	    }
+	    
+	  }
+	else
+	  {
+	    for(i=0;i<nx1;i++)
+	      x_coordinates[i]=xmin+dx*i;
+	    for(i=0;i<ny1;i++)
+	      y_coordinates[i]=ymin+dy*i;
+	    for(i=0;i<nz1;i++)
+	      z_coordinates[i]=zmin+dz*i;
+	  }
+	
+	printf("=========FINE LETTURE==========\n");
+	fflush(stdout);
+		
+	
 
 	if(nz1<=1)
 	{
@@ -204,9 +240,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			for(j=0;j<ny1;j++)
 				for(i=0;i<nx1;i++)
 				{
-					xx=xmin+dx*i;
-					yy=ymin+dy*j;
-					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+				  xx=x_coordinates[i];
+				  //xmin+dx*i;
+				  yy=y_coordinates[j];//ymin+dy*j;
+				  fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
 				fclose(clean_fields);
 	}
@@ -224,30 +261,44 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		for(j=0;j<ny1;j++)
 			for(i=0;i<nx1;i++)
 			{
-				xx=xmin+dx*i;
-				yy=ymin+dy*j;
+				xx=x_coordinates[i];
+				yy=y_coordinates[j];
+				  //xx=xmin+dx*i;
+				  //yy=ymin+dy*j;
 				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 			}
 			fclose(clean_fields);
 	}
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
 
-
+	
 	if(parametri->endian_machine == 0)
 	{
 		swap_endian_f(field,nx1*ny1*nz1);
+		swap_endian_f(x_coordinates,nx1);
+		swap_endian_f(y_coordinates,ny1);
+		swap_endian_f(z_coordinates,nz1);
 	}
 
+	
 	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 	clean_fields=fopen(nomefile_campi, "w");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
 	fprintf(clean_fields,"titolo mio\n");
 	fprintf(clean_fields,"BINARY\n");
-	fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
 	fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
-	fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
-	fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+	//fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
+	//fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+	fprintf(clean_fields,"X_COORDINATES %i float\n",nx1);
+	fwrite((void*)x_coordinates,sizeof(float),nx1,clean_fields);
+	fprintf(clean_fields,"Y_COORDINATES %i float\n",ny1);
+	fwrite((void*)y_coordinates,sizeof(float),ny1,clean_fields);
+	fprintf(clean_fields,"Z_COORDINATES %i float\n",nz1);
+	fwrite((void*)z_coordinates,sizeof(float),nz1,clean_fields);
+
 	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
 	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
