@@ -29,7 +29,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	int nxloc, nx1, ny1, nyloc, nz1, nzloc;
 	float tnow,w0x,w0y,nrat,a0,lam0,B0,ompe,xt_in,xt_end,charge,mass;
 	float xmin,xmax,ymin,ymax,zmin,zmax,E0;
-	float dx, dy, dz, xx, yy;
+	float dx, dy, dz, xx, yy, zz;
 	//	float zz;
 	file_in=fopen(nomefile_bin.str().c_str(), "r");
 
@@ -280,8 +280,40 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		swap_endian_f(z_coordinates,nz1);
 	}
 
-	
+	//////// DATASET STRUCTURED_POINTS VERSION    ////////
+	/*
 	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+	clean_fields=fopen(nomefile_campi, "w");
+	printf("\nWriting the fields file\n");
+	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+	fprintf(clean_fields,"titolo mio\n");
+	fprintf(clean_fields,"BINARY\n");
+	//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
+	fprintf(clean_fields,"POINTS %i float\n",nx1*ny1*nz1);
+	float rr[3];
+	for(k=0;k<nz1;k++)
+	  {
+	    rr[2]=z_coordinates[k];
+	    for(j=0;j<ny1;j++)
+	      {
+		rr[1]=y_coordinates[j];
+		for(i=0;i<nx1;i++)
+		  {
+		    rr[0]=x_coordinates[i];
+	      	    fwrite((void*)rr,sizeof(float),3,clean_fields);
+		  }
+	      }
+	  }
+	
+	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+	fprintf(clean_fields,"LOOKUP_TABLE default\n");
+	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+	fclose(clean_fields);
+	*/
+	
+	  sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 	clean_fields=fopen(nomefile_campi, "w");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
@@ -304,7 +336,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);
-
+	
 	fclose(file_in);
 
 	return 0;
