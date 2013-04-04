@@ -29,7 +29,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	int nxloc, nx1, ny1, nyloc, nz1, nzloc;
 	float tnow,w0x,w0y,nrat,a0,lam0,B0,ompe,xt_in,xt_end,charge,mass;
 	float xmin,xmax,ymin,ymax,zmin,zmax,E0;
-	float dx, dy, dz, xx, yy, zz;
+	float dx, dy, dz, xx, yy;
 	//	float zz;
 	file_in=fopen(nomefile_bin.str().c_str(), "r");
 

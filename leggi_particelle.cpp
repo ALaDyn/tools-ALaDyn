@@ -6,8 +6,8 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
-		int stop_at_cpu_number = parametri->last_cpu;
-	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_Espec, nomefile_Estremi;
+	int stop_at_cpu_number = parametri->last_cpu;
+	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_EthetaT, nomefile_Espec, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 	nomefile_dat << std::string(argv[1]) << ".dat";
 	std::string riga_persa;
@@ -26,7 +26,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	FILE *ascii_propaga;
 	FILE *ascii_csv;
 	FILE *parameters;
-	std::ofstream xpx_out, Etheta_out, Espec_out, Estremi_out;
+	std::ofstream xpx_out, Etheta_out, EthetaT_out, Espec_out, Estremi_out;
 	std::ifstream file_dat;
 	bool dat_not_found = true;
 	int conta_processori=0;
@@ -37,25 +37,24 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		else dat_not_found = false;
 	}
 
-	int out_swap = parametri->p[SWAP];
-	int out_binary = parametri->p[OUT_BINARY];
-	int out_ascii_propaga = parametri->p[OUT_PROPAGA];
-	int out_ascii_csv = parametri->p[OUT_CSV];
-	int out_parameters = parametri->p[OUT_PARAMS];
-	int fai_binning = parametri->p[DO_BINNING];
-	int cerca_minmax = parametri->p[FIND_MINMAX];
-//	int weight_esiste = parametri->p[WEIGHT];
+	const int out_swap = parametri->p[SWAP];
+	const int out_binary = parametri->p[OUT_BINARY];
+	const int out_ascii_propaga = parametri->p[OUT_PROPAGA];
+	const int out_ascii_csv = parametri->p[OUT_CSV];
+	const int out_parameters = parametri->p[OUT_PARAMS];
+	const int fai_binning = parametri->p[DO_BINNING];
+	const int cerca_minmax = parametri->p[FIND_MINMAX];
+	//	const int weight_esiste = parametri->p[WEIGHT];
 
 	int N_param, *int_param,npart_loc;
 	int buff, pID;
 
-	int nelab=3;	//3 valori per ora: gamma, theta ed energia
 	float x,y,z,px,py,pz;
 	float *estremi_min, *estremi_max;
 
 	short buffshort[2];
 	float *particelle, *real_param;
-	float gamma, theta, E;
+	float gamma, theta, thetaT, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_propaga[MAX_LENGTH_FILENAME];
 	char nomefile_csv[MAX_LENGTH_FILENAME];
@@ -63,7 +62,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	size_t fread_size;
 
-	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndim,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
+	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
 	ndv = parametri->p[NCOLONNE];
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
@@ -100,7 +99,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		model=int_param[7];  //modello di laser utilizzato
 		dmodel=int_param[8]; //modello di condizioni iniziali
 		nsp=int_param[9];    //numero di speci
-		ndim=int_param[10];  //numero di componenti dello spazio dei momenti
+		ndimen=int_param[10];  //numero di componenti dello spazio dei momenti
 		np_loc=int_param[11];  //
 		lpord=int_param[12]; //ordine dello schema leapfrog
 		deord=int_param[13]; //ordine derivate
@@ -142,7 +141,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		file_dat >> model;
 		file_dat >> dmodel;
 		file_dat >> nsp;
-		file_dat >> ndim;
+		file_dat >> ndimen;
 		file_dat >> np_loc;
 		file_dat >> lpord;
 		file_dat >> deord;
@@ -178,9 +177,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 
 
-	estremi_min = new float[2*ndim+nelab];
-	estremi_max = new float[2*ndim+nelab];
-	for (int i = 0; i < (2*ndim+nelab); i++)
+	estremi_min = new float[SEI_DIMENSIONI+ALTRI_PARAMETRI];
+	estremi_max = new float[SEI_DIMENSIONI+ALTRI_PARAMETRI];
+	for (int i = 0; i < (ndv+ALTRI_PARAMETRI); i++)
 	{
 		estremi_min[i] = (float) NUMERO_MASSIMO;
 		estremi_max[i] = (float) -NUMERO_MASSIMO;
@@ -188,19 +187,32 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	printf("nptot=%i\n",nptot); 
 	fflush(stdout);
+
 	float **xpx = new float* [parametri->nbin_x+3];
 	for (int i = 0; i < parametri->nbin_x+3; i++)
 	{
 		xpx[i] = new float [parametri->nbin_px+3];
 		for (int j = 0; j < parametri->nbin_px+3; j++) xpx[i][j] = 0.0;
 	}
+	
 	float **Etheta = new float* [parametri->nbin_E+3];
 	for (int i = 0; i < parametri->nbin_E+3; i++)
 	{
 		Etheta[i] = new float [parametri->nbin_theta+3];
 		for (int j = 0; j < parametri->nbin_theta+3; j++) Etheta[i][j] = 0.0;
 	}
+	
+	float **EthetaT = new float* [parametri->nbin_E+3];
+	for (int i = 0; i < parametri->nbin_E+3; i++)
+	{
+		Etheta[i] = new float [parametri->nbin_thetaT+3];
+		for (int j = 0; j < parametri->nbin_thetaT+3; j++) EthetaT[i][j] = 0.0;
+	}
+	
 	float *Espec = new float [parametri->nbin_E+3];
+	for (int i = 0; i < parametri->nbin_E+3; i++) Espec[i] = 0.0;
+
+
 
 	sprintf(nomefile_propaga,"%s.ppg",argv[1]);
 	sprintf(nomefile_csv,"%s.csv",argv[1]);
@@ -226,6 +238,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		std::cout << "GAMMAMAX = " << parametri->gammamax << std::endl;
 		std::cout << "THETAMIN = " << parametri->thetamin << std::endl;
 		std::cout << "THETAMAX = " << parametri->thetamax << std::endl;
+		std::cout << "THETARADMIN = " << parametri->thetaTmin << std::endl;
+		std::cout << "THETARADMAX = " << parametri->thetaTmax << std::endl;
 		std::cout << "EMIN = " << parametri->Emin << std::endl;
 		std::cout << "EMAX = " << parametri->Emax << std::endl;
 	}
@@ -279,13 +293,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	while(1)
 	{
-	  if (conta_processori >= stop_at_cpu_number) break;
+		if (conta_processori >= stop_at_cpu_number) break;
 		if (parametri->old_fortran_bin)
 		{
 			fread_size = std::fread(&buff,sizeof(int),1,file_in); 
 			fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			
+
 		}
 		else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 		if (feof(file_in)) break;
@@ -335,6 +349,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						pz=*(particelle+i*ndv+5);
 						gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 						theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+						thetaT=(float) atan(sqrt( (py*py+pz*pz)/(px*px) ));
 						E=(float)(gamma*parametri->massa_particella_MeV);		//energia
 						if (x < estremi_min[0]) estremi_min[0] = x;
 						if (x > estremi_max[0]) estremi_max[0] = x;
@@ -354,6 +369,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (theta > estremi_max[7]) estremi_max[7] = theta;
 						if (E < estremi_min[8]) estremi_min[8] = E;
 						if (E > estremi_max[8]) estremi_max[8] = E;
+						if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
+						if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
 					}
 					else if (ndv == 4 || ndv == 5)
 					{
@@ -363,6 +380,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						py=*(particelle+i*ndv+3);
 						gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
 						theta=(float)(atan2(py,px)*180./M_PI);				//theta
+						thetaT=(float) atan(py/px);
 						E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 						if (x < estremi_min[0]) estremi_min[0] = x;
 						if (x > estremi_max[0]) estremi_max[0] = x;
@@ -380,14 +398,17 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						if (theta > estremi_max[7]) estremi_max[7] = theta;
 						if (E < estremi_min[8]) estremi_min[8] = E;
 						if (E > estremi_max[8]) estremi_max[8] = E;
+						if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
+						if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
 					}
 				}
 			}
 			if (fai_binning)
 			{
-				if (parametri->fai_plot_xpx)	_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
-				if (parametri->fai_plot_Espec)	_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
-				if (parametri->fai_plot_Etheta)	_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
+				if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
+				if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
+				if (parametri->fai_plot_Etheta)		_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
+				if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle,val[0],ndv,parametri,EthetaT,"E","thetaT");
 			}
 
 			if(out_ascii_propaga)
@@ -618,6 +639,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		Estremi_out << "GAMMAMAX = " << estremi_max[6] << std::endl;
 		Estremi_out << "THETAMIN = " << estremi_min[7] << std::endl;
 		Estremi_out << "THETAMAX = " << estremi_max[7] << std::endl;
+		Estremi_out << "THETARADMIN = " << estremi_min[9] << std::endl;
+		Estremi_out << "THETARADMAX = " << estremi_max[9] << std::endl;
 		Estremi_out << "EMIN = " << estremi_min[8] << std::endl;
 		Estremi_out << "EMAX = " << estremi_max[8] << std::endl;
 		Estremi_out.close();
@@ -626,71 +649,96 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	if (fai_binning)
 	{
-		nomefile_xpx << argv[1] << "_xpx";
-		nomefile_Etheta << argv[1] << "_Etheta";
-		nomefile_Espec << argv[1] << "_Espec";
-		xpx_out.open(nomefile_xpx.str().c_str());
-		Etheta_out.open(nomefile_Etheta.str().c_str());
-		Espec_out.open(nomefile_Espec.str().c_str());
-
 		float min1, min2, max1, max2;
 
-		min1=parametri->Emin-parametri->dimmi_dimE();
-		max1=parametri->Emin;
-		for (int i = 0; i < parametri->nbin_E+3; i++)
+		if (parametri->fai_plot_xpx)
 		{
-			Espec_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << Espec[i] << std::endl;
+			nomefile_xpx << argv[1] << "_xpx";
+			xpx_out.open(nomefile_xpx.str().c_str());
+			min1=parametri->xmin-parametri->dimmi_dimx();
+			max1=parametri->xmin;
+			min2=parametri->pxmin-parametri->dimmi_dimpx();
+			max2=parametri->pxmin;
 
-			min1 += parametri->dimmi_dimE();
-			max1 += parametri->dimmi_dimE();
-		}
-
-
-		min1=parametri->Emin-parametri->dimmi_dimE();
-		max1=parametri->Emin;
-		min2=parametri->thetamin-parametri->dimmi_dimtheta();
-		max2=parametri->thetamin;
-
-		for (int i = 0; i < parametri->nbin_E+3; i++)
-		{
-			for (int j = 0; j < parametri->nbin_theta+3; j++)
+			for (int i = 0; i < parametri->nbin_x+3; i++)
 			{
-				Etheta_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << Etheta[i][j] << std::endl;
-				min2 += parametri->dimmi_dimtheta();
-				max2 += parametri->dimmi_dimtheta();
+				for (int j = 0; j < parametri->nbin_px+3; j++)
+				{
+					xpx_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << xpx[i][j] << std::endl;
+					min2 += parametri->dimmi_dimpx();
+					max2 += parametri->dimmi_dimpx();
+				}
+				min1 += parametri->dimmi_dimx();
+				max1 += parametri->dimmi_dimx();
+				min2 = parametri->pxmin-parametri->dimmi_dimpx();
+				max2 = parametri->pxmin;
 			}
-			min1 += parametri->dimmi_dimE();
-			max1 += parametri->dimmi_dimE();
-			min2 = parametri->thetamin-parametri->dimmi_dimtheta();
-			max2 = parametri->thetamin;
-
+			xpx_out.close();
 		}
 
-
-		min1=parametri->xmin-parametri->dimmi_dimx();
-		max1=parametri->xmin;
-		min2=parametri->pxmin-parametri->dimmi_dimpx();
-		max2=parametri->pxmin;
-
-		for (int i = 0; i < parametri->nbin_x+3; i++)
+		if (parametri->fai_plot_Espec)
 		{
-			for (int j = 0; j < parametri->nbin_px+3; j++)
+			nomefile_Espec << argv[1] << "_Espec";
+			Espec_out.open(nomefile_Espec.str().c_str());
+			min1=parametri->Emin-parametri->dimmi_dimE();
+			max1=parametri->Emin;
+			for (int i = 0; i < parametri->nbin_E+3; i++)
 			{
-				xpx_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << xpx[i][j] << std::endl;
-				min2 += parametri->dimmi_dimpx();
-				max2 += parametri->dimmi_dimpx();
+				Espec_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << Espec[i] << std::endl;
+				min1 += parametri->dimmi_dimE();
+				max1 += parametri->dimmi_dimE();
 			}
-			min1 += parametri->dimmi_dimx();
-			max1 += parametri->dimmi_dimx();
-			min2 = parametri->pxmin-parametri->dimmi_dimpx();
-			max2 = parametri->pxmin;
-
+			Espec_out.close();
 		}
 
-		xpx_out.close();
-		Etheta_out.close();
-		Espec_out.close();
+		if (parametri->fai_plot_Etheta)
+		{
+			nomefile_Etheta << argv[1] << "_Etheta";
+			Etheta_out.open(nomefile_Etheta.str().c_str());
+			min1=parametri->Emin-parametri->dimmi_dimE();
+			max1=parametri->Emin;
+			min2=parametri->thetamin-parametri->dimmi_dimtheta();
+			max2=parametri->thetamin;
+			for (int i = 0; i < parametri->nbin_E+3; i++)
+			{
+				for (int j = 0; j < parametri->nbin_theta+3; j++)
+				{
+					Etheta_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << Etheta[i][j] << std::endl;
+					min2 += parametri->dimmi_dimtheta();
+					max2 += parametri->dimmi_dimtheta();
+				}
+				min1 += parametri->dimmi_dimE();
+				max1 += parametri->dimmi_dimE();
+				min2 = parametri->thetamin-parametri->dimmi_dimtheta();
+				max2 = parametri->thetamin;
+			}
+			Etheta_out.close();
+		}
 
+		if (parametri->fai_plot_EthetaT)
+		{
+			nomefile_EthetaT << argv[1] << "_EthetaT";
+			EthetaT_out.open(nomefile_EthetaT.str().c_str());
+			min1=parametri->Emin-parametri->dimmi_dimE();
+			max1=parametri->Emin;
+			min2=parametri->thetaTmin-parametri->dimmi_dimthetaT();
+			max2=parametri->thetaTmin;
+			for (int i = 0; i < parametri->nbin_E+3; i++)
+			{
+				for (int j = 0; j < parametri->nbin_thetaT+3; j++)
+				{
+					EthetaT_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << EthetaT[i][j] << std::endl;
+					min2 += parametri->dimmi_dimthetaT();
+					max2 += parametri->dimmi_dimthetaT();
+				}
+				min1 += parametri->dimmi_dimE();
+				max1 += parametri->dimmi_dimE();
+				min2 = parametri->thetaTmin-parametri->dimmi_dimthetaT();
+				max2 = parametri->thetaTmin;
+
+			}
+			EthetaT_out.close();
+		}
 	}
 
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);

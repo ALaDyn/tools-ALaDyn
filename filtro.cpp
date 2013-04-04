@@ -96,24 +96,24 @@ int    strcasecmp(const char* s1, const char* s2)
 
 namespace cost
 {
-	unsigned int xmin =     __0X00;
-	unsigned int ymin =     __0X01;
-	unsigned int zmin =     __0X02;
-	unsigned int pxmin =    __0X03;
-	unsigned int pymin =    __0X04;
-	unsigned int pzmin =    __0X05;
-	unsigned int xmax =     __0X06;
-	unsigned int ymax =     __0X07;
-	unsigned int zmax =     __0X08;
-	unsigned int pxmax =    __0X09;
-	unsigned int pymax =    __0X10;
-	unsigned int pzmax =    __0X11;
-	unsigned int emin =     __0X12;
-	unsigned int emax =     __0X13;
-	unsigned int thetamin = __0X14;
-	unsigned int thetamax = __0X15;
-	unsigned int thetamin = __0X;
-	unsigned int thetamax = __0X;
+	unsigned int xmin =      __0X00;
+	unsigned int ymin =      __0X01;
+	unsigned int zmin =      __0X02;
+	unsigned int pxmin =     __0X03;
+	unsigned int pymin =     __0X04;
+	unsigned int pzmin =     __0X05;
+	unsigned int xmax =      __0X06;
+	unsigned int ymax =      __0X07;
+	unsigned int zmax =      __0X08;
+	unsigned int pxmax =     __0X09;
+	unsigned int pymax =     __0X10;
+	unsigned int pzmax =     __0X11;
+	unsigned int emin =      __0X12;
+	unsigned int emax =      __0X13;
+	unsigned int thetamin =  __0X14;
+	unsigned int thetamax =  __0X15;
+	unsigned int thetaTmin = __0X16;
+	unsigned int thetaTmax = __0X17;
 	unsigned int tutte[]=
 	{
 		xmin, ymin, zmin, 
@@ -121,14 +121,16 @@ namespace cost
 		xmax, ymax, zmax,
 		pxmax, pymax, pzmax,
 		emin, emax,
-		thetamin, thetamax};
+		thetamin, thetamax,
+		thetaTmin, thetaTmax
+	};
 	// varie ed eventuali
 }
 
 
 _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
 {
-	float * pntt_loc, p[3], E, theta;
+	float * pntt_loc, p[3], E, theta, thetaT;
 	unsigned int corrente = 0, tests[32];
 	bool flag;
 	unsigned char tot_test = 0;
@@ -154,11 +156,16 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 		for(unsigned char c=0; c < tot_test; ++c)
 		{
 			if(!flag) break;
+
 			if(tests[c] == __0X12 || tests[c] == __0X13)
 				E = (float) (parametri->massa_particella_MeV * (sqrtf(1.0f + p[0]*p[0]+p[1]*p[1]+p[2]*p[2])-1.f));
 
 			else if(tests[c] == __0X14 || tests[c] == __0X15)
-				theta=(float)(atan2(sqrt(p[1]*p[1]+p[2]*p[2]),p[0])*180./M_PI);//theta = 0.0; // definire espressione di theta
+				theta=(float)(atan2(sqrt(p[1]*p[1]+p[2]*p[2]),p[0])*180./M_PI);
+
+			else if(tests[c] == __0X16 || tests[c] == __0X17)
+				thetaT=(float) atan(sqrt( (p[1]*p[1]/(p[0]*p[0])) + (p[2]*p[2]/(p[0]*p[0])) ));
+
 			switch(tests[c])
 			{
 			case __0X00: // cost::xmin
@@ -220,31 +227,32 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 				nomi = pzmax;
 				flag_filtri . piu_pzmax = pntt_loc[(int)nomi-6] <= val[(int)nomi];
 				flag = flag && flag_filtri . piu_pzmax;
-			}
-			if(tests[c] == __0X12) // cost::emin
-#ifdef ENABLE_DEBUG
-				std :: cerr << "confronto emin " << E << ' ' << val[12] << '\n',
-#endif
-				flag_filtri . meno_ener = E >= val[12],
+				break;
+			case __0X12: // cost::emin
+				flag_filtri . meno_ener = E >= val[12];
 				flag = flag && flag_filtri . meno_ener;
-			if(tests[c] == __0X13)  // cost::emax
-#ifdef ENABLE_DEBUG
-				std :: cerr << "confronto emax " << E << ' ' << val[13] << '\n',
-#endif
-				flag_filtri . piu_ener = E <= val[13],
+				break;
+			case __0X13:  // cost::emax
+				flag_filtri . piu_ener = E <= val[13];
 				flag = flag && flag_filtri . piu_ener;
-			if(tests[c] == __0X14) // cost::thetamin
-#ifdef ENABLE_DEBUG
-				std :: cerr << "confronto thetamin " << theta << ' ' << val[14] << '\n',
-#endif
-				flag_filtri . meno_theta = theta >= val[14],
+				break;
+			case __0X14: // cost::thetamin
+				flag_filtri . meno_theta = theta >= val[14];
 				flag = flag && flag_filtri . meno_theta;
-			if(tests[c] == __0X15) // cost::thetamin
-#ifdef ENABLE_DEBUG
-				std :: cerr << "confronto thetamax " << theta << ' ' << val[15] << '\n',
-#endif
-				flag_filtri . piu_theta = theta <= val[15],
+				break;
+			case __0X15: // cost::thetamin
+				flag_filtri . piu_theta = theta <= val[15];
 				flag = flag && flag_filtri . piu_theta;
+				break;
+			case __0X16: // cost::thetamin
+				flag_filtri . meno_thetaT = thetaT >= val[16];
+				flag = flag && flag_filtri . meno_thetaT;
+				break;
+			case __0X17: // cost::thetamin
+				flag_filtri . piu_thetaT = thetaT <= val[17];
+				flag = flag && flag_filtri . piu_thetaT;
+				break;
+			}
 
 		}
 		if(!flag) continue;
@@ -319,6 +327,8 @@ float * _Filtro :: costruisci_filtro(int narg, const char **args)
 		miei_args[13],  miei_val[13],
 		miei_args[14],  miei_val[14],
 		miei_args[15],  miei_val[15],
+		miei_args[16],  miei_val[16],
+		miei_args[17],  miei_val[17],
 		miei_args[NUM_FILTRI]);
 }
 

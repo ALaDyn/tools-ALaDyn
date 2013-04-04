@@ -73,8 +73,15 @@ typedef unsigned long int uint32_t;
 #define DO_BINNING	5
 #define OUT_PARAMS	6
 #define OUT_CSV		7
-#define NCOLONNE        8
+#define NCOLONNE    8
 
+#define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
+#define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E
+
+// definizione numero filtri "abilitati"
+# ifndef NUM_FILTRI
+# define NUM_FILTRI 18
+# endif
 
 # define __0X00 0x1
 # define __0X01 0x2
@@ -94,6 +101,7 @@ typedef unsigned long int uint32_t;
 # define __0X15 0x8000
 # define __0X16 0x10000
 # define __0X17 0x20000
+// fine filtri in uso, i prossimi sono codici liberi
 # define __0X18 0x40000
 # define __0X19 0x80000
 # define __0X20 0x100000
@@ -108,33 +116,30 @@ typedef unsigned long int uint32_t;
 # define __0X29 0x20000000
 # define __0X30 0x40000000
 # define __0X31 0x80000000
-# ifndef NUM_FILTRI
-# define NUM_FILTRI 16
-# endif
 
 
 struct Parametri
 {
 	float massa_particella_MeV;
-	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_gamma;
+	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_thetaT, nbin_gamma;
 	int endian_file, endian_machine;
-		int last_cpu;
+	int last_cpu;
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
-	float minimi[9], massimi[9];  // x, y, z, px, py, pz, gamma, theta, E
-	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax;
+	float minimi[SEI_DIMENSIONI+ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI+ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E
+	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
-		gammamin_b, gammamax_b, thetamin_b, thetamax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_gamma_b;
+		gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
 	bool old_fortran_bin;
 	bool overwrite_weight;
 	bool do_not_ask_missing;
 	float overwrite_weight_value;
-	int fai_plot_xpx, fai_plot_Espec, fai_plot_Etheta;
+	int fai_plot_xpx, fai_plot_Espec, fai_plot_Etheta, fai_plot_EthetaT;
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;
-		bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI;
+	bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI;
 	Parametri();
 	float dimmi_dimx();
 	float dimmi_dimy();
@@ -144,6 +149,7 @@ struct Parametri
 	float dimmi_dimpz();
 	float dimmi_dimgamma();
 	float dimmi_dimtheta();
+	float dimmi_dimthetaT();
 	float dimmi_dimE();
 	float dimmi_dim(int);
 	void parse_command_line(int , const char ** );
@@ -172,7 +178,7 @@ struct _Filtro
 	{
 		xmin, ymin, zmin, xmax, ymax, zmax,
 		pxmin, pymin, pzmin, pxmax, pymax, pzmax,
-		emin, emax, thetamin, thetamax
+		emin, emax, thetamin, thetamax, thetaTmin, thetaTmax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
 	static float * costruisci_filtro(int, const char **);
@@ -197,13 +203,16 @@ struct _Filtro
 		unsigned piu_ener:1;
 		unsigned meno_theta:1;
 		unsigned piu_theta:1;
+		unsigned meno_thetaT:1;
+		unsigned piu_thetaT:1;
 		_flag_filtri operator=(int o)
 		{
 			meno_xmin = meno_ymin = meno_zmin =
 				meno_pxmin = meno_pymin = meno_pzmin =
 				piu_xmax = piu_ymax = piu_zmax =
 				piu_pxmax = piu_pymax = piu_pzmax =
-				meno_ener = piu_ener = meno_theta = piu_theta = 0;
+				meno_ener = piu_ener = meno_theta = piu_theta =
+				meno_thetaT = piu_thetaT = 0;
 			return *this;
 		}
 		// varie ed eventuali

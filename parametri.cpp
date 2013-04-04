@@ -12,14 +12,14 @@ Parametri :: Parametri()
 {
 	massa_particella_MeV = 0.;
 	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = 120;
-	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = Emin = gammamin = 0.0;
-	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = Emax = gammamax = 1.0;
+	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
+	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
-	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetamin_b = thetamax_b = true;
+	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = true;
 	nbin_b = true;
-	nbin_E_b = nbin_theta_b = nbin_gamma_b = true;
+	nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
-	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = false;
+	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = fai_plot_EthetaT = false;
 	overwrite_weight = false;
 	overwrite_weight_value = 1.0;
 	do_not_ask_missing = false;
@@ -75,6 +75,10 @@ float Parametri :: dimmi_dimtheta()
 {
 	return (thetamax - thetamin) / static_cast <float> (nbin_theta);
 }
+float Parametri :: dimmi_dimthetaT()
+{
+	return (thetaTmax - thetaTmin) / static_cast <float> (nbin_thetaT);
+}
 float Parametri :: dimmi_dimE()
 {
 	return (Emax - Emin) / static_cast <float> (nbin_E);
@@ -90,6 +94,7 @@ float Parametri :: dimmi_dim(int colonna)
 	else if (colonna == 6)	return dimmi_dimgamma();
 	else if (colonna == 7)	return dimmi_dimtheta();
 	else if (colonna == 8)	return dimmi_dimE();
+	else if (colonna == 9)	return dimmi_dimthetaT();
 	else return 1.0;
 }
 
@@ -293,7 +298,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		which is supposed to be given as the first argument and so is in argv[1]
 		************************************************************************/
 	{
-	  std::cout << argv[i] << std::endl;
+//	  std::cout << argv[i] << std::endl;
 
 	  if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
@@ -485,6 +490,10 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			fai_plot_Etheta = 1;
 		}
+		else if (std::string(argv[i]) == "-plot_ethetaT")
+		{
+			fai_plot_EthetaT = 1;
+		}
 		else if (std::string(argv[i]) == "-nbin")
 		{
 			nbin = atoi(argv[i+1]);
@@ -546,6 +555,13 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			nbin_theta = atoi(argv[i+1]);
 			nbin_theta_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinthetaT")
+		{
+			nbin_thetaT = atoi(argv[i+1]);
+			nbin_thetaT_b = false;
 			nbin_b = false;
 			i++;
 		}
@@ -666,6 +682,16 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 					thetamax = (float) std::atof(leggi.c_str());
 					thetamax_b = false;
 				}
+				else if ((nomepar == "thetaradmin" || nomepar == "THETARADMIN") && thetaTmin_b)
+				{
+					thetaTmin = (float) std::atof(leggi.c_str());
+					thetaTmin_b = false;
+				}
+				else if ((nomepar == "thetaradmax" || nomepar == "THETARADMAX") && thetaTmax_b)
+				{
+					thetaTmax = (float) std::atof(leggi.c_str());
+					thetaTmax_b = false;
+				}
 				else if ((nomepar == "emin" || nomepar == "EMIN") && Emin_b)
 				{
 					Emin = (float) std::atof(leggi.c_str());
@@ -721,6 +747,8 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		std::cout << "GAMMAMAX = " << gammamax << std::endl;
 		std::cout << "THETAMIN = " << thetamin << std::endl;
 		std::cout << "THETAMAX = " << thetamax << std::endl;
+		std::cout << "THETARADMIN = " << thetaTmin << std::endl;
+		std::cout << "THETARADMAX = " << thetaTmax << std::endl;
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
 #endif
@@ -761,8 +789,10 @@ void Parametri :: leggi_interattivo()
 		{
 			std::cout << "Vuoi fare il plot x-px? 0 per no, 1 per si': ";
 			std::cin >> fai_plot_xpx;
-			std::cout << "Vuoi fare il plot E-theta? 0 per no, 1 per si': ";
+			std::cout << "Vuoi fare il plot E-theta (deg)? 0 per no, 1 per si': ";
 			std::cin >> fai_plot_Etheta;
+			std::cout << "Vuoi fare il plot E-theta (rad)? 0 per no, 1 per si': ";
+			std::cin >> fai_plot_EthetaT;
 			std::cout << "Vuoi fare lo spettro in energia? 0 per no, 1 per si': ";
 			std::cin >> fai_plot_Espec;
 			if (fai_plot_xpx)
@@ -825,7 +855,28 @@ void Parametri :: leggi_interattivo()
 					nbin_theta_b = false;
 				}
 			}
-			if (fai_plot_Etheta || fai_plot_Espec)
+			if (fai_plot_EthetaT)
+			{
+				if (thetaTmin_b)
+				{
+					std::cout << "thetaRADmin = ";
+					std::cin >> thetaTmin;
+					thetaTmin_b = false;
+				}
+				if (thetaTmax_b)
+				{
+					std::cout << "thetaRADmax = ";
+					std::cin >> thetaTmax;
+					thetaTmax_b = false;
+				}
+				if (nbin_thetaT_b)
+				{
+					std::cout << "nbin_thetaRAD = ";
+					std::cin >> nbin_thetaT;
+					nbin_thetaT_b = false;
+				}
+			}
+			if (fai_plot_Etheta || fai_plot_Espec || fai_plot_EthetaT)
 			{
 				if (Emin_b)
 				{
@@ -865,6 +916,8 @@ void Parametri :: leggi_interattivo()
 		std::cout << "GAMMAMAX = " << gammamax << std::endl;
 		std::cout << "THETAMIN = " << thetamin << std::endl;
 		std::cout << "THETAMAX = " << thetamax << std::endl;
+		std::cout << "THETARADMIN = " << thetaTmin << std::endl;
+		std::cout << "THETARADMAX = " << thetaTmax << std::endl;
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
 #endif		
@@ -917,7 +970,7 @@ bool Parametri :: check_parametri()
 	}
 	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_PROPAGA] && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
-		printf("Attenzione: output ppg non definito\n");
+		printf("Attenzione: output ppg mal definito\n");
 		test = false;
 	}
 	else
@@ -927,7 +980,7 @@ bool Parametri :: check_parametri()
 	}
 	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_BINARY] && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
 	{
-		printf("Attenzione: output binario non definito\n");
+		printf("Attenzione: output binario mal definito\n");
 		test = false;
 	}
 	else
@@ -995,6 +1048,13 @@ bool Parametri :: check_parametri()
 		printf("Attenzione: nbin_pz < 0\n");
 		test = false;
 	}
+
+/*******************************************************
+**** MOLTO PERICOLOSO QUANTO SEGUE *********************
+*******************************************************/
+	if (do_not_ask_missing) test=true;
+
+
 	return test;
 }
 
