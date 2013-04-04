@@ -16,6 +16,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (binx == "gamma") binnare_su_x = 6;
 	else if (binx == "theta") binnare_su_x = 7;
 	else if (binx == "E") binnare_su_x = 8;
+	else if (binx == "thetaT") binnare_su_x = 9;
 	else printf("variabile x non riconosciuta\n");
 
 	if (biny == "x") binnare_su_y = 0;
@@ -27,10 +28,11 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (biny == "gamma") binnare_su_y = 6;
 	else if (biny == "theta") binnare_su_y = 7;
 	else if (biny == "E") binnare_su_y = 8;
+	else if (biny == "thetaT") binnare_su_x = 9;
 	else printf("variabile y non riconosciuta\n");
 
 	//	float z;
-	float x, y, px, py, pz, gamma, theta, E;
+	float x, y, px, py, pz, gamma, theta, thetaT, E;
 	float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
 	for (int i = 0; i < npart; i++)
 	{
@@ -40,8 +42,9 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			y=*(particelle+i*ndv+1);
 			px=*(particelle+i*ndv+2);
 			py=*(particelle+i*ndv+3);
-			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
-			theta=(float)(atan2(py,px)*180./M_PI);				//theta
+			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma-1
+			theta=(float)(atan2(py,px)*180./M_PI);				//theta sgatto
+			thetaT=(float) atan(py/px);							//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
@@ -63,9 +66,10 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			px=*(particelle+i*ndv+3);
 			py=*(particelle+i*ndv+4);
 			pz=*(particelle+i*ndv+5);
-			gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+			gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);					//gamma-1
+			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);			//theta sgatto
+			thetaT=(float) atan(sqrt((py*py/(px*px)) + (pz*pz/(px*px))));	//theta turch
+			E=(float)(gamma*parametri->massa_particella_MeV);				//energia
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;

@@ -112,6 +112,8 @@ namespace cost
 	unsigned int emax =     __0X13;
 	unsigned int thetamin = __0X14;
 	unsigned int thetamax = __0X15;
+	unsigned int thetamin = __0X;
+	unsigned int thetamax = __0X;
 	unsigned int tutte[]=
 	{
 		xmin, ymin, zmin, 
@@ -270,7 +272,9 @@ const char * _Filtro :: descr[] =
 	"+Emin",
 	"+Emax",
 	"+thetamin",
-	"+thetamax"
+	"+thetamax",
+	"+thetaTmin",
+	"+thetaTmax"
 	// varie ed eventuali
 };
 

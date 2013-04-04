@@ -885,57 +885,82 @@ void Parametri :: leggi_interattivo()
 bool Parametri :: check_parametri()
 {
 	bool test = true;
-	if ( p[SWAP]     != 0 && p[SWAP]       != 1 )		// check swap o non-swap
+	if ( !p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1 )		// check swap o non-swap
 	{
-		printf("Attenzione: modalita` swap non definita\n");
+		printf("Attenzione: modalita` swap mal definita\n");
 		test = false;
 	}
-	if ( (file_particelle_P || file_particelle_E) && p[WEIGHT]     != 0 && p[WEIGHT]     != 1 )	// check leggi_particelle: weight o non-weight
+	else
 	{
-		printf("Attenzione: modalita` weight non definita\n");
+		p[SWAP] = 0;
+		p_b[SWAP] = false;
+	}
+	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1 )
+	{
+		printf("Attenzione: modalita` weight mal definita\n");
 		test = false;
 	}
-	if ( (file_particelle_P || file_particelle_E) && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+	else
 	{
-		printf("Attenzione: output csv non definito\n");
+		p[WEIGHT] = 1;
+		p_b[WEIGHT] = false;
+	}
+	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_CSV] && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+	{
+		printf("Attenzione: output csv mal definito\n");
 		test = false;
 	}
-	if ( (file_particelle_P || file_particelle_E) && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+	else
+	{
+		p[OUT_CSV] = 0;
+		p_b[OUT_CSV] = false;
+	}
+	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_PROPAGA] && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
 		printf("Attenzione: output ppg non definito\n");
 		test = false;
 	}
-	if ( (file_particelle_P || file_particelle_E) && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
+	else
+	{
+		p[OUT_PROPAGA] = 0;
+		p_b[OUT_PROPAGA] = false;
+	}
+	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_BINARY] && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
 	{
 		printf("Attenzione: output binario non definito\n");
 		test = false;
 	}
-	if ( xmin >= xmax )
+	else
+	{
+		p[OUT_BINARY] = 0;
+		p_b[OUT_BINARY] = false;
+	}
+	if ( xmin > xmax )
 	{
 		printf("Attenzione: xmin > xmax\n");
 		test = false;
 	}
-	if ( ymin >= ymax ) 
+	if ( ymin > ymax ) 
 	{
 		printf("Attenzione: ymin > ymax\n");
 		test = false;
 	}
-	if ( zmin >= zmax )
+	if ( zmin > zmax )
 	{
 		printf("Attenzione: zmin > zmax\n");
 		test = false;
 	}
-	if (pxmin >= pxmax)
+	if (pxmin > pxmax)
 	{
 		printf("Attenzione: pxmin > pxmax\n");
 		test = false;
 	}
-	if (pymin >= pymax)
+	if (pymin > pymax)
 	{
 		printf("Attenzione: pymin > pymax\n");
 		test = false;
 	}
-	if (pzmin >= pzmax)
+	if (pzmin > pzmax)
 	{
 		printf("Attenzione: pzmin > pzmax\n");
 		test = false;
