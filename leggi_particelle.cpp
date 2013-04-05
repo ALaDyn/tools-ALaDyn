@@ -586,7 +586,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		fprintf(parameters,"model=%i\n",model);  //modello di laser utilizzato
 		fprintf(parameters,"dmodel=%i\n",dmodel); //modello di condizioni iniziali
 		fprintf(parameters,"nsp=%i\n",nsp);    //numero di speci
-		fprintf(parameters,"ndim=%i\n",ndim);   
+		fprintf(parameters,"ndim=%i\n",ndimen);   
 		fprintf(parameters,"np_loc=%i\n",np_loc);  
 		fprintf(parameters,"lpord=%i\n",lpord); //ordine dello schema leapfrog
 		fprintf(parameters,"deord=%i\n",deord); //ordine derivate
