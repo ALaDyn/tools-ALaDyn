@@ -60,7 +60,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	char nomefile_csv[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 
-	size_t fread_size;
+	size_t fread_size = 0;
 
 	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
 	ndv = parametri->p[NCOLONNE];
@@ -205,7 +205,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	float **EthetaT = new float* [parametri->nbin_E+3];
 	for (int i = 0; i < parametri->nbin_E+3; i++)
 	{
-		Etheta[i] = new float [parametri->nbin_thetaT+3];
+		EthetaT[i] = new float [parametri->nbin_thetaT+3];
 		for (int j = 0; j < parametri->nbin_thetaT+3; j++) EthetaT[i][j] = 0.0;
 	}
 	

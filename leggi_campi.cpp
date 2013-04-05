@@ -33,7 +33,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	//	float zz;
 	file_in=fopen(nomefile_bin.str().c_str(), "r");
 
-	size_t fread_size;
+	size_t fread_size = 0;
 
 	fread_size = std::fread(&buff,sizeof(int),1,file_in);
 	fread_size = std::fread(&N_param,sizeof(int),1,file_in);
