@@ -945,8 +945,16 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		p[SWAP] = 0;
-		p_b[SWAP] = false;
+		if (p_b[SWAP] && do_not_ask_missing)
+		{
+			p[SWAP] = 0;
+			p_b[SWAP] = false;
+		}
+		else
+		{
+			printf("Attenzione: modalita` swap non definita\n");
+			test = false;
+		}
 	}
 	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1 )
 	{
@@ -955,8 +963,16 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		p[WEIGHT] = 1;
-		p_b[WEIGHT] = false;
+		if (p_b[WEIGHT] && do_not_ask_missing)
+		{
+			p[WEIGHT] = 1;
+			p_b[WEIGHT] = false;
+		}
+		else
+		{
+			printf("Attenzione: modalita` weight non definita\n");
+			test = false;
+		}
 	}
 	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_CSV] && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
@@ -965,8 +981,16 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		p[OUT_CSV] = 0;
-		p_b[OUT_CSV] = false;
+		if (p_b[OUT_CSV] && do_not_ask_missing)
+		{
+			p[OUT_CSV] = 0;
+			p_b[OUT_CSV] = false;
+		}
+		else
+		{
+			printf("Attenzione: output csv non definito\n");
+			test = false;
+		}
 	}
 	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_PROPAGA] && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
 	{
@@ -975,8 +999,16 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		p[OUT_PROPAGA] = 0;
-		p_b[OUT_PROPAGA] = false;
+		if (p_b[OUT_PROPAGA] && do_not_ask_missing)
+		{
+			p[OUT_PROPAGA] = 0;
+			p_b[OUT_PROPAGA] = false;
+		}
+		else
+		{
+			printf("Attenzione: output ppg non definito\n");
+			test = false;
+		}
 	}
 	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_BINARY] && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
 	{
@@ -985,8 +1017,16 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		p[OUT_BINARY] = 0;
-		p_b[OUT_BINARY] = false;
+		if (p_b[OUT_PROPAGA] && do_not_ask_missing)
+		{
+			p[OUT_BINARY] = 0;
+			p_b[OUT_BINARY] = false;
+		}
+		else
+		{
+			printf("Attenzione: output binario non definito\n");
+			test = false;
+		}
 	}
 	if ( xmin > xmax )
 	{
