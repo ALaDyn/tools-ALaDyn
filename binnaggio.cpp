@@ -164,6 +164,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			pz=*(particelle+i*ndv+5);
 			gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
 			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+			thetaT=(float) atan(py/px);							//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;

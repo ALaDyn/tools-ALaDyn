@@ -189,11 +189,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	fflush(stdout);
 
 #ifdef ENABLE_DEBUG
-	std::cout << "XMIN = " << parametri->nbin_x << std::endl;
-	std::cout << "XMAX = " << parametri->nbin_px << std::endl;
-	std::cout << "YMIN = " << parametri->nbin_E << std::endl;
-	std::cout << "YMIN = " << parametri->nbin_theta << std::endl;
-	std::cout << "YMIN = " << parametri->nbin_thetaT << std::endl;
+	std::cout << "NBINX = " << parametri->nbin_x << std::endl;
+	std::cout << "NBINPX = " << parametri->nbin_px << std::endl;
+	std::cout << "NBINE = " << parametri->nbin_E << std::endl;
+	std::cout << "NBINTHETA = " << parametri->nbin_theta << std::endl;
+	std::cout << "NBINTHETAT = " << parametri->nbin_thetaT << std::endl;
 #endif
 	
 	float **xpx = new float* [parametri->nbin_x+3];
