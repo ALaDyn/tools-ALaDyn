@@ -945,7 +945,11 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		if (p_b[SWAP] && do_not_ask_missing)
+		if (!p_b[SWAP] && (p[SWAP] == 0 || p[SWAP] == 1))
+		{
+			test = true;		// tutto ok, in questo caso il parametro va bene!
+		}
+		else if (p_b[SWAP] && do_not_ask_missing)
 		{
 			p[SWAP] = 0;
 			p_b[SWAP] = false;
@@ -963,7 +967,11 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		if (p_b[WEIGHT] && do_not_ask_missing)
+		if (!p_b[WEIGHT] && (p_b[WEIGHT] == 0 || p_b[WEIGHT] == 1))
+		{
+			test = true;		// tutto ok, in questo caso il parametro va bene!
+		}
+		else if (p_b[WEIGHT] && do_not_ask_missing)
 		{
 			p[WEIGHT] = 1;
 			p_b[WEIGHT] = false;
@@ -981,7 +989,11 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		if (p_b[OUT_CSV] && do_not_ask_missing)
+		if (!p_b[OUT_CSV] && (p_b[OUT_CSV] == 0 || p_b[OUT_CSV] == 1))
+		{
+			test = true;		// tutto ok, in questo caso il parametro va bene!
+		}
+		else if (p_b[OUT_CSV] && do_not_ask_missing)
 		{
 			p[OUT_CSV] = 0;
 			p_b[OUT_CSV] = false;
@@ -999,7 +1011,11 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		if (p_b[OUT_PROPAGA] && do_not_ask_missing)
+		if (!p_b[OUT_PROPAGA] && (p_b[OUT_PROPAGA] == 0 || p_b[OUT_PROPAGA] == 1))
+		{
+			test = true;		// tutto ok, in questo caso il parametro va bene!
+		}
+		else if (p_b[OUT_PROPAGA] && do_not_ask_missing)
 		{
 			p[OUT_PROPAGA] = 0;
 			p_b[OUT_PROPAGA] = false;
@@ -1017,7 +1033,11 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		if (p_b[OUT_PROPAGA] && do_not_ask_missing)
+		if (!p[OUT_BINARY] && (p[OUT_BINARY] == 0 || p[OUT_BINARY] == 1))
+		{
+			test = true;		// tutto ok, in questo caso il parametro va bene!
+		}
+		else if (p[OUT_BINARY] && do_not_ask_missing)
 		{
 			p[OUT_BINARY] = 0;
 			p_b[OUT_BINARY] = false;
