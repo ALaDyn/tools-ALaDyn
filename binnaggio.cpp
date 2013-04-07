@@ -53,6 +53,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
 			if (binnare_su_y == 0) dato_da_binnare_y = x;
 			else if (binnare_su_y == 1) dato_da_binnare_y = y;
 			else if (binnare_su_y == 3) dato_da_binnare_y = px;
@@ -60,6 +61,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
+			else if (binnare_su_y == 9) dato_da_binnare_y = thetaT;
 		}
 		else if (ndv == 6 || ndv == 7)
 		{
@@ -74,10 +76,12 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
 			if (binnare_su_y < 6) dato_da_binnare_y = *(particelle+i*ndv+binnare_su_y);
 			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
+			else if (binnare_su_y == 9) dato_da_binnare_x = thetaT;
 		}
 
 
@@ -124,10 +128,11 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (binx == "gamma") binnare_su_x = 6;
 	else if (binx == "theta") binnare_su_x = 7;
 	else if (binx == "E") binnare_su_x = 8;
+	else if (binx == "thetaT") binnare_su_x = 9;
 	else printf("variabile x non riconosciuta\n");
 
 	//	float z;
-	float x, y, px, py, pz, gamma, theta, E;
+	float x, y, px, py, pz, gamma, theta, thetaT, E;
 	float dato_da_binnare_x = 0.;
 	//printf("AIUTO binnare_su_x=%i     min=%g    max=%g   dim=%g\n",binnare_su_x, parametri->minimi[binnare_su_x], parametri->massimi[binnare_su_x], parametri->dimmi_dim(binnare_su_x));
 	fflush(stdout);
@@ -141,6 +146,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			py=*(particelle+i*ndv+3);
 			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
 			theta=(float)(atan2(py,px)*180./M_PI);				//theta
+			thetaT=(float) atan(py/px);							//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
@@ -149,6 +155,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
 		}
 		else if (ndv == 6 || ndv == 7)
 		{
@@ -162,6 +169,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
+			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
 		}
 
 		if (dato_da_binnare_x < parametri->minimi[binnare_su_x])

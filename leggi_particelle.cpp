@@ -179,7 +179,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	estremi_min = new float[SEI_DIMENSIONI+ALTRI_PARAMETRI];
 	estremi_max = new float[SEI_DIMENSIONI+ALTRI_PARAMETRI];
-	for (int i = 0; i < (ndv+ALTRI_PARAMETRI); i++)
+	for (int i = 0; i < (SEI_DIMENSIONI+ALTRI_PARAMETRI); i++)
 	{
 		estremi_min[i] = (float) NUMERO_MASSIMO;
 		estremi_max[i] = (float) -NUMERO_MASSIMO;
@@ -188,6 +188,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	printf("nptot=%i\n",nptot); 
 	fflush(stdout);
 
+#ifdef ENABLE_DEBUG
+	std::cout << "XMIN = " << parametri->nbin_x << std::endl;
+	std::cout << "XMAX = " << parametri->nbin_px << std::endl;
+	std::cout << "YMIN = " << parametri->nbin_E << std::endl;
+	std::cout << "YMIN = " << parametri->nbin_theta << std::endl;
+	std::cout << "YMIN = " << parametri->nbin_thetaT << std::endl;
+#endif
+	
 	float **xpx = new float* [parametri->nbin_x+3];
 	for (int i = 0; i < parametri->nbin_x+3; i++)
 	{
