@@ -237,18 +237,30 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 				flag = flag && flag_filtri . piu_ener;
 				break;
 			case __0X14: // cost::thetamin
+#ifdef ENABLE_DEBUG
+				std::cout << "test thetamin" << std::endl;
+#endif
 				flag_filtri . meno_theta = theta >= val[14];
 				flag = flag && flag_filtri . meno_theta;
 				break;
-			case __0X15: // cost::thetamin
+			case __0X15: // cost::thetamax
+#ifdef ENABLE_DEBUG
+				std::cout << "test thetamax" << std::endl;
+#endif
 				flag_filtri . piu_theta = theta <= val[15];
 				flag = flag && flag_filtri . piu_theta;
 				break;
-			case __0X16: // cost::thetamin
+			case __0X16: // cost::thetaTmin
+#ifdef ENABLE_DEBUG
+				std::cout << "test thetaTmin" << std::endl;
+#endif
 				flag_filtri . meno_thetaT = thetaT >= val[16];
 				flag = flag && flag_filtri . meno_thetaT;
 				break;
-			case __0X17: // cost::thetamin
+			case __0X17: // cost::thetaTmax
+#ifdef ENABLE_DEBUG
+				std::cout << "test thetaTmax" << std::endl;
+#endif
 				flag_filtri . piu_thetaT = thetaT <= val[17];
 				flag = flag && flag_filtri . piu_thetaT;
 				break;

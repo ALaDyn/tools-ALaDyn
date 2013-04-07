@@ -9,7 +9,7 @@ int main (const int argc, const char *argv[])
 	Parametri parametri;
 	bool testParametri = true;;
 
-	std::cout << "Binary file reader v3.8" << std::endl;
+	std::cout << "Binary file reader v3.9" << std::endl;
 
 	if (argc == 1)
 	{

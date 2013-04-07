@@ -38,7 +38,7 @@ Parametri :: Parametri()
 	file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = false;
 	file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
 	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = false;
-	file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false;
+	file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false; // ancora non riconosciuti
 }
 
 
@@ -126,14 +126,14 @@ void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 	file_dat >> i_end;	  // 20° parametro
 
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
-	  {
+	{
 		if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
 		else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
 		else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
 		p[NCOLONNE] = ndv;
 		p_b[NCOLONNE] = false;
 		p_b[WEIGHT] = false;
-	  }
+	}
 	endian_file = (i_end-1);
 }
 
@@ -181,15 +181,15 @@ void Parametri :: check_filename(const char *nomefile)
 	{
 		if (nomefile[1] == 'i')
 		{
-		  if (nomefile[2] == 'p')
+			if (nomefile[2] == 'p')
 			{
-			  massa_particella_MeV = (float) MP_MEV;
-			  file_particelle_HI = true;
+				massa_particella_MeV = (float) MP_MEV;
+				file_particelle_HI = true;
 			}
-		  else if (nomefile[2] == 'd')
+			else if (nomefile[2] == 'd')
 			{
-			  file_densita_HI = true;
-			  sprintf (support_label,"hiden");
+				file_densita_HI = true;
+				sprintf (support_label,"hiden");
 			}
 		}
 	}
@@ -197,15 +197,15 @@ void Parametri :: check_filename(const char *nomefile)
 	{
 		if (nomefile[1] == 'i')
 		{
-				  if (nomefile[2] == 'p')
-					{
-					  massa_particella_MeV = (float) MP_MEV;
-					  file_particelle_LI = true;
-					}
-		  else if (nomefile[2] == 'd')
+			if (nomefile[2] == 'p')
 			{
-			  file_densita_LI = true;
-			  sprintf (support_label,"liden");
+				massa_particella_MeV = (float) MP_MEV;
+				file_particelle_LI = true;
+			}
+			else if (nomefile[2] == 'd')
+			{
+				file_densita_LI = true;
+				sprintf (support_label,"liden");
 			}
 		}
 	}
@@ -245,7 +245,7 @@ void Parametri :: check_filename(const char *nomefile)
 		}
 		else if (nomefile[1] == 'd')
 		{
-			file_campi_Ez = true;
+			file_densita_elettroni = true;
 			sprintf (support_label,"eden");
 		}
 	}
@@ -298,9 +298,9 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		which is supposed to be given as the first argument and so is in argv[1]
 		************************************************************************/
 	{
-//	  std::cout << argv[i] << std::endl;
+		//	  std::cout << argv[i] << std::endl;
 
-	  if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
+		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
 			nomefile = std::string(argv[i+1]);
 			usa_file_parametri = true;
@@ -320,11 +320,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			old_fortran_bin = false;
 		}
-				else if (std::string(argv[i]) == "-stop")
+		else if (std::string(argv[i]) == "-stop")
 		{
-				last_cpu = atoi(argv[i+1]);
-				if (last_cpu < 1) last_cpu = 1;
-				i++;
+			last_cpu = atoi(argv[i+1]);
+			if (last_cpu < 1) last_cpu = 1;
+			i++;
 		}
 		else if (std::string(argv[i]) == "-ncol")
 		{
@@ -1049,9 +1049,9 @@ bool Parametri :: check_parametri()
 		test = false;
 	}
 
-/*******************************************************
-**** MOLTO PERICOLOSO QUANTO SEGUE *********************
-*******************************************************/
+	/*******************************************************
+	**** MOLTO PERICOLOSO QUANTO SEGUE *********************
+	*******************************************************/
 	if (do_not_ask_missing) test=true;
 
 

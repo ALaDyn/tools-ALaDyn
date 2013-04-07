@@ -194,21 +194,21 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		xpx[i] = new float [parametri->nbin_px+3];
 		for (int j = 0; j < parametri->nbin_px+3; j++) xpx[i][j] = 0.0;
 	}
-	
+
 	float **Etheta = new float* [parametri->nbin_E+3];
 	for (int i = 0; i < parametri->nbin_E+3; i++)
 	{
 		Etheta[i] = new float [parametri->nbin_theta+3];
 		for (int j = 0; j < parametri->nbin_theta+3; j++) Etheta[i][j] = 0.0;
 	}
-	
+
 	float **EthetaT = new float* [parametri->nbin_E+3];
 	for (int i = 0; i < parametri->nbin_E+3; i++)
 	{
 		EthetaT[i] = new float [parametri->nbin_thetaT+3];
 		for (int j = 0; j < parametri->nbin_thetaT+3; j++) EthetaT[i][j] = 0.0;
 	}
-	
+
 	float *Espec = new float [parametri->nbin_E+3];
 	for (int i = 0; i < parametri->nbin_E+3; i++) Espec[i] = 0.0;
 

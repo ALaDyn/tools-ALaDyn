@@ -180,52 +180,52 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		} 
 		segnoz+=nzloc;
 	}
-	
+
 	dx=(xmax-xmin)/(nx1-1);
 	dy=(ymax-ymin)/(ny1-1);
 	if(nz1<=1)
-	  dz=(zmax-zmin);
+		dz=(zmax-zmin);
 	else
-	  dz=(zmax-zmin)/(nz1-1);
+		dz=(zmax-zmin)/(nz1-1);
 
 	x_coordinates=new float[nx1];
 	y_coordinates=new float[ny1];
 	z_coordinates=new float[nz1];
-	
+
 	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	
+
 	if(!std::feof(file_in))
-	  {
-	    fread_size = std::fread(x_coordinates,sizeof(float),nx1,file_in);
-	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	    fread_size = std::fread(y_coordinates,sizeof(float),ny1,file_in);
-	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	    fread_size = std::fread(z_coordinates,sizeof(float),nz1,file_in);
-	    fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	    
-	    if(out_swap){
-	      swap_endian_f(x_coordinates,nx1);
-	      swap_endian_f(y_coordinates,ny1);
-	      swap_endian_f(z_coordinates,nz1);
-	    }
-	    
-	  }
+	{
+		fread_size = std::fread(x_coordinates,sizeof(float),nx1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(y_coordinates,sizeof(float),ny1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(z_coordinates,sizeof(float),nz1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+		if(out_swap){
+			swap_endian_f(x_coordinates,nx1);
+			swap_endian_f(y_coordinates,ny1);
+			swap_endian_f(z_coordinates,nz1);
+		}
+
+	}
 	else
-	  {
-	    for(i=0;i<nx1;i++)
-	      x_coordinates[i]=xmin+dx*i;
-	    for(i=0;i<ny1;i++)
-	      y_coordinates[i]=ymin+dy*i;
-	    for(i=0;i<nz1;i++)
-	      z_coordinates[i]=zmin+dz*i;
-	  }
-	
+	{
+		for(i=0;i<nx1;i++)
+			x_coordinates[i]=xmin+dx*i;
+		for(i=0;i<ny1;i++)
+			y_coordinates[i]=ymin+dy*i;
+		for(i=0;i<nz1;i++)
+			z_coordinates[i]=zmin+dz*i;
+	}
+
 	printf("=========FINE LETTURE==========\n");
 	fflush(stdout);
-		
-	
+
+
 
 	if(nz1<=1)
 	{
@@ -240,10 +240,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			for(j=0;j<ny1;j++)
 				for(i=0;i<nx1;i++)
 				{
-				  xx=x_coordinates[i];
-				  //xmin+dx*i;
-				  yy=y_coordinates[j];//ymin+dy*j;
-				  fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					xx=x_coordinates[i];
+					//xmin+dx*i;
+					yy=y_coordinates[j];//ymin+dy*j;
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
 				fclose(clean_fields);
 	}
@@ -263,15 +263,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			{
 				xx=x_coordinates[i];
 				yy=y_coordinates[j];
-				  //xx=xmin+dx*i;
-				  //yy=ymin+dy*j;
+				//xx=xmin+dx*i;
+				//yy=ymin+dy*j;
 				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 			}
 			fclose(clean_fields);
 	}
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
 
-	
+
 	if(parametri->endian_machine == 0)
 	{
 		swap_endian_f(field,nx1*ny1*nz1);
@@ -293,27 +293,27 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	fprintf(clean_fields,"POINTS %i float\n",nx1*ny1*nz1);
 	float rr[3];
 	for(k=0;k<nz1;k++)
-	  {
-	    rr[2]=z_coordinates[k];
-	    for(j=0;j<ny1;j++)
-	      {
-		rr[1]=y_coordinates[j];
-		for(i=0;i<nx1;i++)
-		  {
-		    rr[0]=x_coordinates[i];
-	      	    fwrite((void*)rr,sizeof(float),3,clean_fields);
-		  }
-	      }
-	  }
-	
+	{
+	rr[2]=z_coordinates[k];
+	for(j=0;j<ny1;j++)
+	{
+	rr[1]=y_coordinates[j];
+	for(i=0;i<nx1;i++)
+	{
+	rr[0]=x_coordinates[i];
+	fwrite((void*)rr,sizeof(float),3,clean_fields);
+	}
+	}
+	}
+
 	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
 	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);
 	*/
-	
-	  sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+
+	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 	clean_fields=fopen(nomefile_campi, "w");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
@@ -336,7 +336,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	fprintf(clean_fields,"LOOKUP_TABLE default\n");
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);
-	
+
 	fclose(file_in);
 
 	return 0;
