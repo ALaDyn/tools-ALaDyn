@@ -723,7 +723,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cin >> p[DO_BINNING];
 			p_b[DO_BINNING] = false;
 		}
-		if (p[DO_BINNING] == 1 && nbin_b)
+		if (p[DO_BINNING] == 1 && nbin_b && !do_not_ask_missing)
 		{
 			std::cout << "Quanti bin per asse vuoi usare? (consiglio: 120): ";
 			std::cin >> nbin;
