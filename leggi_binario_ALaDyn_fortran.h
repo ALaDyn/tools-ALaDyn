@@ -1,18 +1,24 @@
 #ifndef __LEGGI_ALADYN_FORTRAN
 #define __LEGGI_ALADYN_FORTRAN
 
-#define _USE_MATH_DEFINES
+// #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
+#define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
-#include<cstdio>
-#include<iostream>
-#include<cstdlib>
-#include<cmath>
-#include<cstring>
-#include<string>
-#include<fstream>
-#include<sstream>
-#include<iomanip>
-#include<cstdarg>
+#include <iostream>
+#include <vector>
+#include <cstdio>
+#include <cstdlib>
+#include <algorithm>
+#include <functional>
+#include <iomanip>
+#include <cmath>
+#include <fstream>
+#include <sstream>
+#include <cstring>
+#include <string>
+#include <limits> // for declaration of 'numeric_limits'
+#include <ios>    // for declaration of 'streamsize'
+#include <cstdarg>
 
 #ifdef USE_CPP_11
 #if defined (_MSC_VER)
