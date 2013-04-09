@@ -1221,6 +1221,7 @@ void Parametri :: organizza_minimi_massimi()
 	minimi[6] = gammamin;
 	minimi[7] = thetamin;
 	minimi[8] = Emin;
+	minimi[9] = thetaTmin;
 
 	massimi[0] = xmax;
 	massimi[1] = ymax;
@@ -1231,6 +1232,7 @@ void Parametri :: organizza_minimi_massimi()
 	massimi[6] = gammamax;
 	massimi[7] = thetamax;
 	massimi[8] = Emax;
+	massimi[9] = thetaTmax;
 
 #ifdef ENABLE_DEBUG
 	std::cout << "---- organizza_minimi_massimi() -----" << std::endl;
