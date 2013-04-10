@@ -454,6 +454,18 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			thetamax_b = false;
 			i++;
 		}
+		else if (std::string(argv[i]) == "-thetaTmin")
+		{
+			thetaTmin = (float) atof(argv[i+1]);
+			thetaTmin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-thetaTmax")
+		{
+			thetaTmax = (float) atof(argv[i+1]);
+			thetaTmax_b = false;
+			i++;
+		}
 		else if (std::string(argv[i]) == "-gammamin")
 		{
 			gammamin = (float) atof(argv[i+1]);

@@ -94,6 +94,24 @@ int main (const int argc, const char *argv[])
 	}
 
 
+#ifdef ENABLE_DEBUG
+		printf("Tipo file: file_campi_Ex? %i\n", parametri.file_campi_Ex);
+		printf("Tipo file: file_campi_Ey? %i\n", parametri.file_campi_Ey);
+		printf("Tipo file: file_campi_Ez? %i\n", parametri.file_campi_Ez);
+		printf("Tipo file: file_campi_Bx? %i\n", parametri.file_campi_Bx);
+		printf("Tipo file: file_campi_By? %i\n", parametri.file_campi_By);
+		printf("Tipo file: file_campi_Bz? %i\n", parametri.file_campi_Bz);
+		printf("Tipo file: file_eden? %i\n", parametri.file_densita_elettroni);
+		printf("Tipo file: file_pden? %i\n", parametri.file_densita_protoni);
+		printf("Tipo file: file_hiden? %i\n", parametri.file_densita_HI);
+		printf("Tipo file: file_liden? %i\n", parametri.file_densita_LI);
+		printf("Tipo file: file_Prpout? %i\n", parametri.file_particelle_P);
+		printf("Tipo file: file_Elpout? %i\n", parametri.file_particelle_E);
+		printf("Tipo file: file_Hipout? %i\n", parametri.file_particelle_HI);
+		printf("Tipo file: file_Lipout? %i\n", parametri.file_particelle_LI);
+		fflush(stdout);
+#endif
+
 
 	if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
 		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 

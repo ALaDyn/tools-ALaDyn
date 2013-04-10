@@ -43,7 +43,7 @@ typedef unsigned long int uint32_t;
 
 
 
-// #define ENABLE_DEBUG
+#define ENABLE_DEBUG
 
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
