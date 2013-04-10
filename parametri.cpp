@@ -972,244 +972,248 @@ bool Parametri :: check_parametri()
 			test = false;
 		}
 	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1 )
+	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) 
 	{
-		printf("Attenzione: modalita` weight mal definita\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[WEIGHT] && (p_b[WEIGHT] == 0 || p_b[WEIGHT] == 1))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[WEIGHT] && do_not_ask_missing)
-		{
-			p[WEIGHT] = 1;
-			p_b[WEIGHT] = false;
-		}
-		else
-		{
-			printf("Attenzione: modalita` weight non definita\n");
-			test = false;
-		}
-	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_CSV] && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
-	{
-		printf("Attenzione: output csv mal definito\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[OUT_CSV] && (p_b[OUT_CSV] == 0 || p_b[OUT_CSV] == 1))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[OUT_CSV] && do_not_ask_missing)
-		{
-			p[OUT_CSV] = 0;
-			p_b[OUT_CSV] = false;
-		}
-		else
-		{
-			printf("Attenzione: output csv non definito\n");
-			test = false;
-		}
-	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_PROPAGA] && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
-	{
-		printf("Attenzione: output ppg mal definito\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[OUT_PROPAGA] && (p_b[OUT_PROPAGA] == 0 || p_b[OUT_PROPAGA] == 1))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[OUT_PROPAGA] && do_not_ask_missing)
-		{
-			p[OUT_PROPAGA] = 0;
-			p_b[OUT_PROPAGA] = false;
-		}
-		else
-		{
-			printf("Attenzione: output ppg non definito\n");
-			test = false;
-		}
-	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_BINARY] && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
-	{
-		printf("Attenzione: output binario mal definito\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[OUT_BINARY] && (p[OUT_BINARY] == 0 || p[OUT_BINARY] == 1))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[OUT_BINARY] && do_not_ask_missing)
-		{
-			p[OUT_BINARY] = 0;
-			p_b[OUT_BINARY] = false;
-		}
-		else
-		{
-			printf("Attenzione: output binario non definito\n");
-			test = false;
-		}
-	}
 
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[FIND_MINMAX] && p[FIND_MINMAX] != 0 && p[FIND_MINMAX] != 1  )
-	{
-		printf("Attenzione: ricerca minimi/massimi mal definita\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[FIND_MINMAX] && (p[FIND_MINMAX] == 0 || p[FIND_MINMAX] == 1))
+		if ( !p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1 )
 		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[FIND_MINMAX] && do_not_ask_missing)
-		{
-			p[FIND_MINMAX] = 0;
-			p_b[FIND_MINMAX] = false;
+			printf("Attenzione: modalita` weight mal definita\n");
+			test = false;
 		}
 		else
 		{
-			printf("Attenzione: ricerca minimi/massimi non definita\n");
+			if (!p_b[WEIGHT] && (p_b[WEIGHT] == 0 || p_b[WEIGHT] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[WEIGHT] && do_not_ask_missing)
+			{
+				p[WEIGHT] = 1;
+				p_b[WEIGHT] = false;
+			}
+			else
+			{
+				printf("Attenzione: modalita` weight non definita\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_CSV] && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+		{
+			printf("Attenzione: output csv mal definito\n");
 			test = false;
-		}
-	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[DO_BINNING] && p[DO_BINNING] != 0 && p[DO_BINNING] != 1  )
-	{
-		printf("Attenzione: parametro binnaggio mal definito\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[DO_BINNING] && (p[DO_BINNING] == 0 || p[DO_BINNING] == 1))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[DO_BINNING] && do_not_ask_missing)
-		{
-			p[DO_BINNING] = 0;
-			p_b[DO_BINNING] = false;
 		}
 		else
 		{
-			printf("Attenzione: parametro binnaggio non definito\n");
+			if (!p_b[OUT_CSV] && (p_b[OUT_CSV] == 0 || p_b[OUT_CSV] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_CSV] && do_not_ask_missing)
+			{
+				p[OUT_CSV] = 0;
+				p_b[OUT_CSV] = false;
+			}
+			else
+			{
+				printf("Attenzione: output csv non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_PROPAGA] && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+		{
+			printf("Attenzione: output ppg mal definito\n");
 			test = false;
-		}
-	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1  )
-	{
-		printf("Attenzione: output parametri mal definito\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[OUT_PARAMS] && do_not_ask_missing)
-		{
-			p[OUT_PARAMS] = 0;
-			p_b[OUT_PARAMS] = false;
 		}
 		else
 		{
-			printf("Attenzione: output parametri non definito\n");
+			if (!p_b[OUT_PROPAGA] && (p_b[OUT_PROPAGA] == 0 || p_b[OUT_PROPAGA] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_PROPAGA] && do_not_ask_missing)
+			{
+				p[OUT_PROPAGA] = 0;
+				p_b[OUT_PROPAGA] = false;
+			}
+			else
+			{
+				printf("Attenzione: output ppg non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_BINARY] && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
+		{
+			printf("Attenzione: output binario mal definito\n");
 			test = false;
-		}
-	}
-	if ( (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) && !p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7  )
-	{
-		printf("Attenzione: ncolonne mal definite\n");
-		test = false;
-	}
-	else
-	{
-		if (!p_b[NCOLONNE] && (p[NCOLONNE] == 4 || p[NCOLONNE] == 5 || p[NCOLONNE] == 6 || p[NCOLONNE] == 7))
-		{
-			test = true;		// tutto ok, in questo caso il parametro va bene!
-		}
-		else if (p_b[NCOLONNE] && do_not_ask_missing)
-		{
-			p[NCOLONNE] = 7;
-			p_b[NCOLONNE] = false;
 		}
 		else
 		{
-			printf("Attenzione: output binario non definito\n");
+			if (!p_b[OUT_BINARY] && (p[OUT_BINARY] == 0 || p[OUT_BINARY] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_BINARY] && do_not_ask_missing)
+			{
+				p[OUT_BINARY] = 0;
+				p_b[OUT_BINARY] = false;
+			}
+			else
+			{
+				printf("Attenzione: output binario non definito\n");
+				test = false;
+			}
+		}
+
+		if ( !p_b[FIND_MINMAX] && p[FIND_MINMAX] != 0 && p[FIND_MINMAX] != 1  )
+		{
+			printf("Attenzione: ricerca minimi/massimi mal definita\n");
 			test = false;
 		}
-	}
+		else
+		{
+			if (!p_b[FIND_MINMAX] && (p[FIND_MINMAX] == 0 || p[FIND_MINMAX] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[FIND_MINMAX] && do_not_ask_missing)
+			{
+				p[FIND_MINMAX] = 0;
+				p_b[FIND_MINMAX] = false;
+			}
+			else
+			{
+				printf("Attenzione: ricerca minimi/massimi non definita\n");
+				test = false;
+			}
+		}
+		if ( !p_b[DO_BINNING] && p[DO_BINNING] != 0 && p[DO_BINNING] != 1  )
+		{
+			printf("Attenzione: parametro binnaggio mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[DO_BINNING] && (p[DO_BINNING] == 0 || p[DO_BINNING] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[DO_BINNING] && do_not_ask_missing)
+			{
+				p[DO_BINNING] = 0;
+				p_b[DO_BINNING] = false;
+			}
+			else
+			{
+				printf("Attenzione: parametro binnaggio non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1  )
+		{
+			printf("Attenzione: output parametri mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_PARAMS] && do_not_ask_missing)
+			{
+				p[OUT_PARAMS] = 0;
+				p_b[OUT_PARAMS] = false;
+			}
+			else
+			{
+				printf("Attenzione: output parametri non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7  )
+		{
+			printf("Attenzione: ncolonne mal definite\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[NCOLONNE] && (p[NCOLONNE] == 4 || p[NCOLONNE] == 5 || p[NCOLONNE] == 6 || p[NCOLONNE] == 7))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[NCOLONNE] && do_not_ask_missing)
+			{
+				p[NCOLONNE] = 7;
+				p_b[NCOLONNE] = false;
+			}
+			else
+			{
+				printf("Attenzione: output binario non definito\n");
+				test = false;
+			}
+		}
 
 
-	if ( xmin > xmax )
-	{
-		printf("Attenzione: xmin > xmax\n");
-		test = false;
-	}
-	if ( ymin > ymax ) 
-	{
-		printf("Attenzione: ymin > ymax\n");
-		test = false;
-	}
-	if ( zmin > zmax )
-	{
-		printf("Attenzione: zmin > zmax\n");
-		test = false;
-	}
-	if (pxmin > pxmax)
-	{
-		printf("Attenzione: pxmin > pxmax\n");
-		test = false;
-	}
-	if (pymin > pymax)
-	{
-		printf("Attenzione: pymin > pymax\n");
-		test = false;
-	}
-	if (pzmin > pzmax)
-	{
-		printf("Attenzione: pzmin > pzmax\n");
-		test = false;
-	}
-	if ( nbin_x <= 0 )
-	{
-		printf("Attenzione: nbin_x < 0\n");
-		test = false;
-	}
-	if ( nbin_y <= 0 )
-	{
-		printf("Attenzione: nbin_y < 0\n");
-		test = false;
-	}
-	if ( nbin_z <= 0 )
-	{
-		printf("Attenzione: nbin_z < 0\n");
-		test = false;
-	}
-	if ( nbin_px <= 0 )
-	{
-		printf("Attenzione: nbin_px < 0\n");
-		test = false;
-	}
-	if ( nbin_py <= 0 )
-	{
-		printf("Attenzione: nbin_py < 0\n");
-		test = false;
-	}
-	if (nbin_pz <= 0)
-	{
-		printf("Attenzione: nbin_pz < 0\n");
-		test = false;
+		if ( xmin > xmax )
+		{
+			printf("Attenzione: xmin > xmax\n");
+			test = false;
+		}
+		if ( ymin > ymax ) 
+		{
+			printf("Attenzione: ymin > ymax\n");
+			test = false;
+		}
+		if ( zmin > zmax )
+		{
+			printf("Attenzione: zmin > zmax\n");
+			test = false;
+		}
+		if (pxmin > pxmax)
+		{
+			printf("Attenzione: pxmin > pxmax\n");
+			test = false;
+		}
+		if (pymin > pymax)
+		{
+			printf("Attenzione: pymin > pymax\n");
+			test = false;
+		}
+		if (pzmin > pzmax)
+		{
+			printf("Attenzione: pzmin > pzmax\n");
+			test = false;
+		}
+		if ( nbin_x <= 0 )
+		{
+			printf("Attenzione: nbin_x < 0\n");
+			test = false;
+		}
+		if ( nbin_y <= 0 )
+		{
+			printf("Attenzione: nbin_y < 0\n");
+			test = false;
+		}
+		if ( nbin_z <= 0 )
+		{
+			printf("Attenzione: nbin_z < 0\n");
+			test = false;
+		}
+		if ( nbin_px <= 0 )
+		{
+			printf("Attenzione: nbin_px < 0\n");
+			test = false;
+		}
+		if ( nbin_py <= 0 )
+		{
+			printf("Attenzione: nbin_py < 0\n");
+			test = false;
+		}
+		if (nbin_pz <= 0)
+		{
+			printf("Attenzione: nbin_pz < 0\n");
+			test = false;
+		}
 	}
 
 	/*******************************************************
