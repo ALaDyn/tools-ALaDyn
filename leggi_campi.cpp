@@ -9,6 +9,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	std::ostringstream nomefile_bin;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 
+	bool new_vtk = false;
+
 	int out_swap = parametri->p[SWAP];
 
 	int N_param = 0, np_loc, npoint_loc[3] = {0,0,0}, loc_size = 0;
@@ -311,32 +313,53 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	fclose(clean_fields);
 	*/
 
-	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
-	clean_fields=fopen(nomefile_campi, "w");
-	printf("\nWriting the fields file\n");
-	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
-	fprintf(clean_fields,"titolo mio\n");
-	fprintf(clean_fields,"BINARY\n");
-	//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
-	fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
-	fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
-	//fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
-	//fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
-	fprintf(clean_fields,"X_COORDINATES %i float\n",nx1);
-	fwrite((void*)x_coordinates,sizeof(float),nx1,clean_fields);
-	fprintf(clean_fields,"Y_COORDINATES %i float\n",ny1);
-	fwrite((void*)y_coordinates,sizeof(float),ny1,clean_fields);
-	fprintf(clean_fields,"Z_COORDINATES %i float\n",nz1);
-	fwrite((void*)z_coordinates,sizeof(float),nz1,clean_fields);
-
-	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
-	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
-	fprintf(clean_fields,"LOOKUP_TABLE default\n");
-	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
-	fclose(clean_fields);
-
+	if (new_vtk)
+	  {
+	    sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+	    clean_fields=fopen(nomefile_campi, "w");
+	    printf("\nWriting the fields file\n");
+	    fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+	    fprintf(clean_fields,"titolo mio\n");
+	    fprintf(clean_fields,"BINARY\n");
+	    //fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	    fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
+	    fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
+	    //fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
+	    //fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+	    fprintf(clean_fields,"X_COORDINATES %i float\n",nx1);
+	    fwrite((void*)x_coordinates,sizeof(float),nx1,clean_fields);
+	    fprintf(clean_fields,"Y_COORDINATES %i float\n",ny1);
+	    fwrite((void*)y_coordinates,sizeof(float),ny1,clean_fields);
+	    fprintf(clean_fields,"Z_COORDINATES %i float\n",nz1);
+	    fwrite((void*)z_coordinates,sizeof(float),nz1,clean_fields);
+	    
+	    fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+	    fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+	    fprintf(clean_fields,"LOOKUP_TABLE default\n");
+	    fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+	    fclose(clean_fields);
+	  }
+	else
+	  {
+	    sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+	    clean_fields=fopen(nomefile_campi, "w");
+	    printf("\nWriting the fields file\n");
+	    fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+	    fprintf(clean_fields,"titolo mio\n");
+	    fprintf(clean_fields,"BINARY\n");
+	    fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	    fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
+	    fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
+	    fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+	    fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+	    fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+	    fprintf(clean_fields,"LOOKUP_TABLE default\n");
+	    fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+	    fclose(clean_fields);
+	  }
+	
 	fclose(file_in);
-
+	
 	return 0;
 
 }
