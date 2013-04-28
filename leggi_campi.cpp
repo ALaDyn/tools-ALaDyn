@@ -10,13 +10,21 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	nomefile_bin << std::string(argv[1]) << ".bin";
 
 	int out_swap = parametri->p[SWAP];
-	//	int out_parameters = parametri.p[OUT_PARAMS];
 
-	//	int kk, segnox=0;
-	int i, ipy, ipz,  j, k, N_param, *int_param, np_loc, npoint_loc[3], loc_size;
-	int segnoy=0,segnoz=0, buff;
-	float *field,*buffer,  *real_param;
+	int N_param = 0, np_loc, npoint_loc[3] = {0,0,0}, loc_size = 0;
+	int segnoy = 0, segnoz = 0, buff = 0;
+	int nx = 0, ibx = 0, iby = 0, ibz = 0, model = 0, dmodel = 0, nsp = 0, lpord = 0, deord = 0, npe = 0, fvar = 0;
+	int npe_y = 0, npe_z = 0, nxloc = 0, nx1 = 0, ny1 = 0, nyloc = 0, nz1 = 0, nzloc = 0;
+	
+	float tnow = 0., w0x = 0., w0y = 0., nrat = 0., a0 = 0., lam0 = 0., B0 = 0., ompe = 0.;
+	float xt_in = 0., xt_end = 0., charge = 0., mass = 0., xmin = 0., xmax = 0., ymin = 0., ymax = 0., zmin = 0., zmax = 0.;
+	float E0 = 0., dx = 0., dy = 0., dz = 0., xx = 0., yy = 0.;
+
+	int *int_param;
+	float *real_param;
+	float *field,*buffer;
 	float *x_coordinates, *y_coordinates, *z_coordinates;
+
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 	char nomefile_campi[MAX_LENGTH_FILENAME];
 
@@ -24,13 +32,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	FILE *parameters;
 	FILE *clean_fields;
 
-	int nx,ibx,iby,ibz,model,dmodel,nsp,lpord,deord,npe,fvar;
-	int npe_y, npe_z;
-	int nxloc, nx1, ny1, nyloc, nz1, nzloc;
-	float tnow,w0x,w0y,nrat,a0,lam0,B0,ompe,xt_in,xt_end,charge,mass;
-	float xmin,xmax,ymin,ymax,zmin,zmax,E0;
-	float dx, dy, dz, xx, yy;
-	//	float zz;
 	file_in=fopen(nomefile_bin.str().c_str(), "r");
 
 	size_t fread_size = 0;
@@ -143,13 +144,14 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,nx1*ny1*nz1);
 	fflush(stdout);
 
-	field=(float*)malloc(nx1*ny1*nz1*sizeof(float));
+	int size_of_field = nx1*ny1*nz1*sizeof(float);
+	field=(float*)malloc(size_of_field);
 	//	segnox=0;
 	segnoy=segnoz=0;
-	for(ipz=0;ipz<npe_z;ipz++)
+	for(int ipz=0; ipz < npe_z; ipz++)
 	{
 		segnoy=0;
-		for(ipy=0;ipy<npe_y;ipy++)
+		for(int ipy=0; ipy < npe_y; ipy++)
 		{
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			fread_size = std::fread(npoint_loc,sizeof(int),3,file_in);
@@ -172,9 +174,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 			if(out_swap) swap_endian_f(buffer,loc_size);
 
-			for(k=0;k<nzloc;k++)
-				for(j=0;j<nyloc;j++)
-					for(i=0;i<nxloc;i++)
+			for(int k=0; k < nzloc; k++)
+				for(int j=0; j < nyloc; j++)
+					for(int i=0; i < nxloc; i++)
 						field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
 			segnoy+=nyloc;
 		} 
@@ -214,11 +216,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	}
 	else
 	{
-		for(i=0;i<nx1;i++)
+		for(int i=0; i < nx1; i++)
 			x_coordinates[i]=xmin+dx*i;
-		for(i=0;i<ny1;i++)
+		for(int i=0; i < ny1; i++)
 			y_coordinates[i]=ymin+dy*i;
-		for(i=0;i<nz1;i++)
+		for(int i=0; i < nz1; i++)
 			z_coordinates[i]=zmin+dz*i;
 	}
 
@@ -236,12 +238,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-		for(k=0;k<nz1;k++)
-			for(j=0;j<ny1;j++)
-				for(i=0;i<nx1;i++)
+		for(int k=0; k < nz1; k++)
+			for(int j=0; j < ny1; j++)
+				for(int i=0; i < nx1; i++)
 				{
-					xx=x_coordinates[i];
-					//xmin+dx*i;
+					xx=x_coordinates[i];//xmin+dx*i;
 					yy=y_coordinates[j];//ymin+dy*j;
 					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
@@ -254,18 +255,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-		k=nz1/2;
-		fprintf(clean_fields,"# 2D cut at z=%g\n",k*dz+zmin); 
+		fprintf(clean_fields,"# 2D cut at z=%g\n",(nz1/2)*dz+zmin); 
 		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-		for(j=0;j<ny1;j++)
-			for(i=0;i<nx1;i++)
+		for(int j=0; j < ny1; j++)
+			for(int i=0; i < nx1; i++)
 			{
-				xx=x_coordinates[i];
-				yy=y_coordinates[j];
-				//xx=xmin+dx*i;
-				//yy=ymin+dy*j;
-				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+				xx=x_coordinates[i]; //xx=xmin+dx*i;
+				yy=y_coordinates[j]; //yy=ymin+dy*j;
+				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+(nz1/2)*nx1*ny1]);
 			}
 			fclose(clean_fields);
 	}

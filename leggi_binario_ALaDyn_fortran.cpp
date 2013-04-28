@@ -3,13 +3,21 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-
+#ifndef ENABLE_DEBUG_WIN32
 int main (const int argc, const char *argv[])
+#else
+int main ()
+#endif
 {
+#ifdef ENABLE_DEBUG_WIN32
+	const int argc = 5;
+	const char *argv[] = {"./reader", "C:\\Users\\Stefano\\Dropbox\\Projects\\bin2ascii\\x64\\Debug\\Edenout00", "-dontask", "-find_minmax", "-swap"};
+#endif
+
 	Parametri parametri;
 	bool testParametri = true;;
 
-	std::cout << "Binary file reader v3.9.1" << std::endl;
+	std::cout << "Binary file reader v3.9.2" << std::endl;
 
 	if (argc == 1)
 	{
@@ -29,7 +37,8 @@ int main (const int argc, const char *argv[])
 	if ( file_bin.fail() )
 	{
 		std::cout << "Input file non trovato" << std::endl;
-		return -3;
+		std::cin.get(); std::cin.get();
+		return -33;
 	}
 	else
 	{
