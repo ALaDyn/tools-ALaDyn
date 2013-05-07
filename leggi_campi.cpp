@@ -249,7 +249,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	}
 	else
 	{
-		sprintf(nomefile_campi,"%s_out.only2D",argv[1]);
+		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
@@ -312,13 +312,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 	fclose(clean_fields);
 	*/
-
-	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
-	clean_fields=fopen(nomefile_campi, "w");
-	printf("\nWriting the fields file\n");
-	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
-	fprintf(clean_fields,"titolo mio\n");
-	fprintf(clean_fields,"BINARY\n");
+	if(int new_vtk=0)
+	  {
+	    printf("new vtk ...\n");
+	    fflush(stdout);
+	    sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+	    clean_fields=fopen(nomefile_campi, "w");
+	    printf("\nWriting the fields file\n");
+	    fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+	    fprintf(clean_fields,"titolo mio\n");
+	    fprintf(clean_fields,"BINARY\n");
 	//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
 	fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
 	fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
@@ -338,7 +341,31 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	fclose(clean_fields);
 
 	fclose(file_in);
-
+	}
+	else
+	{
+	  printf("OLD vtk ...\n");
+	    fflush(stdout);
+	    sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+	  clean_fields=fopen(nomefile_campi, "w");
+	  printf("\nWriting the fields file\n");
+	  fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+	  fprintf(clean_fields,"titolo mio\n");
+	  fprintf(clean_fields,"BINARY\n");
+	  fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+	  
+	  fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
+	  fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
+	  fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+	  	  
+	  fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+	  fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+	  fprintf(clean_fields,"LOOKUP_TABLE default\n");
+	  fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+	  fclose(clean_fields);
+	  
+	fclose(file_in);
+	}
 	return 0;
 
 }
