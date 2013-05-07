@@ -363,7 +363,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		    NP_RESTO=NP_TOT%LIMITE;
 		    
 		    particelle=(float*)malloc(LIMITE*(ndv)*sizeof(float));
-		   
 		  }
 		if(npart_loc>0||NP_TOT>0)
 		{

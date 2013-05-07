@@ -1,7 +1,7 @@
 #ifndef __LEGGI_ALADYN_FORTRAN
 #define __LEGGI_ALADYN_FORTRAN
 
-// #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
+#define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #include <iostream>
@@ -44,6 +44,7 @@ typedef unsigned long int uint32_t;
 
 
 // #define ENABLE_DEBUG
+#define ENABLE_DEBUG_WIN32
 
 
 #define MAX(x,y) ((x)>(y)?(x):(y))

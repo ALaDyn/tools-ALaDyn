@@ -11,7 +11,7 @@ Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri :: Parametri()
 {
 	massa_particella_MeV = 0.;
-	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = 120;
+	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
@@ -24,7 +24,7 @@ Parametri :: Parametri()
 	overwrite_weight_value = 1.0;
 	do_not_ask_missing = false;
 
-	last_cpu = 32768;
+	last_cpu = 32768;		// il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
 
 	for (int i = 0; i < NPARAMETRI; i++) 
 	{
@@ -278,8 +278,13 @@ void Parametri :: check_filename(const char *nomefile)
 	}
 	else
 	{
+#ifndef ENABLE_DEBUG_WIN32
 		std::cout << "File non riconosciuto" << std::endl;
 		exit(-15);
+#else
+		file_densita_elettroni = true;
+		sprintf (support_label,"eden");
+#endif
 	}
 
 }
