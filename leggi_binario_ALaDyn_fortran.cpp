@@ -8,8 +8,9 @@ int main (const int argc, const char *argv[])
 {
 	Parametri parametri;
 	bool testParametri = true;;
-
-	std::cout << "Binary file reader v3.9.1" << std::endl;
+	bool flag_multifile = false;
+		
+	std::cout << "Binary file reader v3.9.1.1" << std::endl;
 
 	if (argc == 1)
 	{
@@ -26,13 +27,23 @@ int main (const int argc, const char *argv[])
 
 	/* Controllo file binario */
 	file_bin.open(nomefile_bin.str().c_str());
+	bool no_bin_file = false;
 	if ( file_bin.fail() )
 	{
-		std::cout << "Input file non trovato" << std::endl;
-		return -3;
+	        nomefile_bin.str("");
+	        nomefile_bin << std::string(argv[1]) << "_000.bin";
+		std::cout << nomefile_bin.str().c_str() << std::endl;
+		file_bin.open(nomefile_bin.str().c_str());
+		if ( file_bin.fail() )
+		  {
+		    std::cout << "Input file non trovato" << std::endl;
+		    no_bin_file= true;
+		    return -3;
+		  }
 	}
-	else
+	if(!no_bin_file)
 	{
+	  std::cout << "nome file di input e' " << argv[1] << std::endl;
 		parametri.check_filename(argv[1]);
 	}
 	file_bin.close();
@@ -41,7 +52,7 @@ int main (const int argc, const char *argv[])
 	file_dat.open(nomefile_dat.str().c_str());
 	if (file_dat.fail()) 
 	{
-		parametri.old_fortran_bin = true;
+	  parametri.old_fortran_bin = true;
 		parametri.chiedi_endian_file();
 		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) parametri.chiedi_numero_colonne();
 	}
@@ -72,7 +83,6 @@ int main (const int argc, const char *argv[])
 #ifdef ENABLE_DEBUG
 	for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << parametri.p[i] << std::endl;
 #endif
-
 
 	testParametri = parametri.check_parametri();
 
@@ -120,12 +130,12 @@ int main (const int argc, const char *argv[])
 
 		leggi_campi(argc, argv, &parametri);
 
-
+	
 	else if (parametri.file_particelle_P || parametri.file_particelle_E 
 		|| parametri.file_particelle_HI || parametri.file_particelle_LI) 
-
-		leggi_particelle(argc, argv, &parametri);
-
+	  
+	    leggi_particelle(argc, argv, &parametri);
+	  
 
 
 
