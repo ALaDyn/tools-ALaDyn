@@ -746,63 +746,8 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cin >> nbin;
 			nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin;
 		}
-#ifdef ENABLE_DEBUG
-		std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
-		std::cout << "XMIN = " << xmin << std::endl;
-		std::cout << "XMAX = " << xmax << std::endl;
-		std::cout << "YMIN = " << ymin << std::endl;
-		std::cout << "YMAX = " << ymax << std::endl;
-		std::cout << "ZMIN = " << zmin << std::endl;
-		std::cout << "ZMAX = " << zmax << std::endl;
-		std::cout << "PXMIN = " << pxmin << std::endl;
-		std::cout << "PXMAX = " << pxmax << std::endl;
-		std::cout << "PYMIN = " << pymin << std::endl;
-		std::cout << "PYMAX = " << pymax << std::endl;
-		std::cout << "PZMIN = " << pzmin << std::endl;
-		std::cout << "PZMAX = " << pzmax << std::endl;
-		std::cout << "GAMMAMIN = " << gammamin << std::endl;
-		std::cout << "GAMMAMAX = " << gammamax << std::endl;
-		std::cout << "THETAMIN = " << thetamin << std::endl;
-		std::cout << "THETAMAX = " << thetamax << std::endl;
-		std::cout << "THETARADMIN = " << thetaTmin << std::endl;
-		std::cout << "THETARADMAX = " << thetaTmax << std::endl;
-		std::cout << "EMIN = " << Emin << std::endl;
-		std::cout << "EMAX = " << Emax << std::endl;
-#endif
-		if (p_b[OUT_BINARY] && !do_not_ask_missing)
-		{
-			std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
-			std::cin >> p[OUT_BINARY];
-		}
-		if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
-		{
-			std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
-			std::cin >> p[OUT_PROPAGA];
-		}
-		if (p_b[OUT_CSV] && !do_not_ask_missing)
-		{
-			std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
-			std::cin >> p[OUT_CSV];
-		}
-		if (p_b[OUT_PARAMS] && !do_not_ask_missing)
-		{
-			std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
-			std::cin >> p[OUT_PARAMS];
-		}
-	}
-	fileParametri.close();
-}
 
-
-void Parametri :: leggi_interattivo()
-{
-	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
-	{
-		std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
-		std::cin >> p[FIND_MINMAX];
-		std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
-		std::cin >> p[DO_BINNING];
-		if (p[DO_BINNING] == 1)
+		if (p[DO_BINNING] == 1 && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi fare il plot x-px? 0 per no, 1 per si': ";
 			std::cin >> fai_plot_xpx;
@@ -915,8 +860,12 @@ void Parametri :: leggi_interattivo()
 				}
 			}
 		}
+
+
+
+
 #ifdef ENABLE_DEBUG
-		std::cout << "Ora ho i seguenti estremi:" << std::endl;
+		std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
 		std::cout << "XMIN = " << xmin << std::endl;
 		std::cout << "XMAX = " << xmax << std::endl;
 		std::cout << "YMIN = " << ymin << std::endl;
@@ -937,17 +886,29 @@ void Parametri :: leggi_interattivo()
 		std::cout << "THETARADMAX = " << thetaTmax << std::endl;
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
-#endif		
-		std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
-		std::cin >> p[OUT_BINARY];
-		std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
-		std::cin >> p[OUT_PROPAGA];
-		std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
-		std::cin >> p[OUT_CSV];
-		std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
-		std::cin >> p[OUT_PARAMS];
+#endif
+		if (p_b[OUT_BINARY] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
+			std::cin >> p[OUT_BINARY];
+		}
+		if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
+			std::cin >> p[OUT_PROPAGA];
+		}
+		if (p_b[OUT_CSV] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
+			std::cin >> p[OUT_CSV];
+		}
+		if (p_b[OUT_PARAMS] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
+			std::cin >> p[OUT_PARAMS];
+		}
 	}
-
+	fileParametri.close();
 }
 
 

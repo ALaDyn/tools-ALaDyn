@@ -18,18 +18,17 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	bool flag_multifile = false;
 	if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
 	{
-	  nomefile_bin.str("");
-	  nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
-	  std::cout << "Il nome file appena costruito e': " <<nomefile_bin.str().c_str() << std::endl;
+		nomefile_bin.str("");
+		nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
 		if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
-	    {
-	      printf ( "file non-existent!\n" );
-	    }
-	  else
-	    {
-	      flag_multifile = true;
-	      printf ( "multi files exist!\n" );
-	    }
+		{
+			printf ( "file non-existent!\n" );
+		}
+		else
+		{
+			flag_multifile = true;
+			printf ( "multi files exist!\n" );
+		}
 	}
 	else
 	{
@@ -208,7 +207,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	std::cout << "NBINTHETA = " << parametri->nbin_theta << std::endl;
 	std::cout << "NBINTHETAT = " << parametri->nbin_thetaT << std::endl;
 #endif
-	
+
 	float **xpx = new float* [parametri->nbin_x+3];
 	for (int i = 0; i < parametri->nbin_x+3; i++)
 	{
@@ -315,334 +314,334 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	indice_multifile=0;
 	while(1)
 	{
-	  int N, QUANTI, NP_TOT, INDICE_LETTURE=0;
-	  int N_LETTURE, NP_RESTO,LIMITE=10000000;
-	  unsigned int val[2];
-	        if(!flag_multifile)
-		  {
-		   if (conta_processori >= stop_at_cpu_number) break;
-		   if (parametri->old_fortran_bin)
-		     {
-		       fread_size = std::fread(&buff,sizeof(int),1,file_in); 
-		       fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-		       fread_size = std::fread(&buff,sizeof(int),1,file_in);
-		       
-		     }
-		   else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-		   if (feof(file_in)) break;
-		   if (out_swap) swap_endian_i(&npart_loc,1);
-		   
-		   particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
-		   printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
-		   fflush(stdout);
-		   val[0] = (unsigned int)npart_loc;
-		   val[1] = (unsigned int)ndv;
-		   N_LETTURE=0;
-		  }
+		int N, QUANTI, NP_TOT = 0, INDICE_LETTURE=0;
+		int N_LETTURE, NP_RESTO = 0, LIMITE=10000000;
+		unsigned int val[2];
+		if(!flag_multifile)
+		{
+			if (conta_processori >= stop_at_cpu_number) break;
+			if (parametri->old_fortran_bin)
+			{
+				fread_size = std::fread(&buff,sizeof(int),1,file_in); 
+				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+			}
+			else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+			if (feof(file_in)) break;
+			if (out_swap) swap_endian_i(&npart_loc,1);
+
+			particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
+			printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
+			fflush(stdout);
+			val[0] = (unsigned int)npart_loc;
+			val[1] = (unsigned int)ndv;
+			N_LETTURE=0;
+		}
 		else  //we do have multifiles i.e. Prpout00_000.bin
-		  {
-		    //set filename to be read
-		    fclose(file_in);
-		    nomefile_bin.str("");
-		    nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
-		    if ( (file_in=fopen(nomefile_bin.str().c_str(), "r"))== NULL)
-		      {
-			printf("Sono finiti i files! \n");
-			break;
-		      }
-		    indice_multifile++;
-		    fseeko(file_in,0,SEEK_END);
-		    N=ftello(file_in);
-		    rewind(file_in);
-		    QUANTI=(N/sizeof(float));
-		    NP_TOT=(int)(QUANTI/ndv);
-		    printf("Il file  %s_%.3i.bin particelle \n",argv[1], indice_multifile, NP_TOT);
-		    fflush(stdout);
-		    val[1] = (unsigned int)ndv;
-		    N_LETTURE=NP_TOT/LIMITE;
-		    NP_RESTO=NP_TOT%LIMITE;
-		    
-		    particelle=(float*)malloc(LIMITE*(ndv)*sizeof(float));
-		  }
+		{
+			//set filename to be read
+			fclose(file_in);
+			nomefile_bin.str("");
+			nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
+			if ( (file_in=fopen(nomefile_bin.str().c_str(), "r"))== NULL)
+			{
+				printf("Sono finiti i files! \n");
+				break;
+			}
+			indice_multifile++;
+			fseeko(file_in,0,SEEK_END);
+			N=(int)ftello(file_in);
+			rewind(file_in);
+			QUANTI=(N/sizeof(float));
+			NP_TOT=(int)(QUANTI/ndv);
+			printf("Il file %s_%.3i.bin contiene %i particelle\n",argv[1], indice_multifile, NP_TOT);
+			fflush(stdout);
+			val[1] = (unsigned int)ndv;
+			N_LETTURE=NP_TOT/LIMITE;
+			NP_RESTO=NP_TOT%LIMITE;
+
+			particelle=(float*)malloc(LIMITE*(ndv)*sizeof(float));
+		}
 		if(npart_loc>0||NP_TOT>0)
 		{
 			fflush(stdout);
 			while(1)
-			  {
-			    if(INDICE_LETTURE>N_LETTURE) break;
-			    printf("Inzio il ciclo per il file %s_%.3i.bin \n",argv[1], indice_multifile);
-			    fflush(stdout);
-			    if(!flag_multifile)
-			      {
-				if (parametri->old_fortran_bin)
-				  {
-				    fread_size = std::fread(buffshort,sizeof(short),2,file_in);
-				    fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
-				    fread_size = std::fread(&buff,sizeof(int),1,file_in);
-				  }
-				else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
-				if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
-			      }
-			    else
-			      {
-				printf("E' un multifile \n");
+			{
+				if(INDICE_LETTURE>N_LETTURE) break;
+				printf("Inzio il ciclo per il file %s_%.3i.bin \n",argv[1], indice_multifile);
 				fflush(stdout);
-				if(INDICE_LETTURE<N_LETTURE) npart_loc=LIMITE;
-				else npart_loc=NP_RESTO;
-				printf("npart_loc = %i\t\t ndv=%i\n",npart_loc, ndv);
-				fflush(stdout);
-				val[0] = (unsigned int)npart_loc;
-				fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
-				if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
-			      }
+				if(!flag_multifile)
+				{
+					if (parametri->old_fortran_bin)
+					{
+						fread_size = std::fread(buffshort,sizeof(short),2,file_in);
+						fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
+						fread_size = std::fread(&buff,sizeof(int),1,file_in);
+					}
+					else fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
+					if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
+				}
+				else
+				{
+					printf("E' un multifile \n");
+					fflush(stdout);
+					if(INDICE_LETTURE<N_LETTURE) npart_loc=LIMITE;
+					else npart_loc=NP_RESTO;
+					printf("npart_loc = %i\t\t ndv=%i\n",npart_loc, ndv);
+					fflush(stdout);
+					val[0] = (unsigned int)npart_loc;
+					fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
+					if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
+				}
 #ifdef ENABLE_DEBUG
-			    printf("lunghezza=%i\n",npart_loc*ndv);
-			    printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
+				printf("lunghezza=%i\n",npart_loc*ndv);
+				printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
 #endif
-			    
-			    _Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
-			    
+
+				_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
+
 #ifdef ENABLE_DEBUG
-			    printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
+				printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
 #endif
-			    
-			    
-			    if (cerca_minmax)
-			      {
-				for (unsigned int i = 0; i < val[0]; i++)
-				  {
-				    if (ndv == 6 || ndv == 7)
-				      {
-					x=*(particelle+i*ndv);
-					y=*(particelle+i*ndv+1);
-					z=*(particelle+i*ndv+2);
-					px=*(particelle+i*ndv+3);
-					py=*(particelle+i*ndv+4);
-					pz=*(particelle+i*ndv+5);
-					gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
-					theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-					thetaT=(float) atan(sqrt( (py*py+pz*pz)/(px*px) ));
-					E=(float)(gamma*parametri->massa_particella_MeV);		//energia
-					if (x < estremi_min[0]) estremi_min[0] = x;
-					if (x > estremi_max[0]) estremi_max[0] = x;
-					if (y < estremi_min[1]) estremi_min[1] = y;
-					if (y > estremi_max[1]) estremi_max[1] = y;
-					if (z < estremi_min[2]) estremi_min[2] = z;
-					if (z > estremi_max[2]) estremi_max[2] = z;
-					if (px < estremi_min[3]) estremi_min[3] = px;
-					if (px > estremi_max[3]) estremi_max[3] = px;
-					if (py < estremi_min[4]) estremi_min[4] = py;
-					if (py > estremi_max[4]) estremi_max[4] = py;
-					if (pz < estremi_min[5]) estremi_min[5] = pz;
-					if (pz > estremi_max[5]) estremi_max[5] = pz;
-					if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-					if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-					if (theta < estremi_min[7]) estremi_min[7] = theta;
-					if (theta > estremi_max[7]) estremi_max[7] = theta;
-					if (E < estremi_min[8]) estremi_min[8] = E;
-					if (E > estremi_max[8]) estremi_max[8] = E;
-					if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
-					if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
-				      }
-				    else if (ndv == 4 || ndv == 5)
-				      {
-					x=*(particelle+i*ndv);
-					y=*(particelle+i*ndv+1);
-					px=*(particelle+i*ndv+2);
-					py=*(particelle+i*ndv+3);
-					gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
-					theta=(float)(atan2(py,px)*180./M_PI);				//theta
-					thetaT=(float) atan(py/px);
-					E=(float)(gamma*parametri->massa_particella_MeV);	//energia
-					if (x < estremi_min[0]) estremi_min[0] = x;
-					if (x > estremi_max[0]) estremi_max[0] = x;
-					if (y < estremi_min[1]) estremi_min[1] = y;
-					if (y > estremi_max[1]) estremi_max[1] = y;
-					estremi_min[2] = 0., estremi_max[2] = 1.;
-					if (px < estremi_min[3]) estremi_min[3] = px;
-					if (px > estremi_max[3]) estremi_max[3] = px;
-					if (py < estremi_min[4]) estremi_min[4] = py;
-					if (py > estremi_max[4]) estremi_max[4] = py;
-					estremi_min[5] = 0., estremi_max[5] = 1.;
-					if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-					if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-					if (theta < estremi_min[7]) estremi_min[7] = theta;
-					if (theta > estremi_max[7]) estremi_max[7] = theta;
-					if (E < estremi_min[8]) estremi_min[8] = E;
-					if (E > estremi_max[8]) estremi_max[8] = E;
-					if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
-					if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
-				      }
-				  }
-			      }
-			    if (fai_binning)
-			      {
-				if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
-				if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
-				if (parametri->fai_plot_Etheta)		_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
-				if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle,val[0],ndv,parametri,EthetaT,"E","thetaT");
-			      }
-
-			    if(out_ascii_propaga)
-			      {
-				if (ndv == 6 || ndv == 7)
-				  {
-				    for(unsigned int i=0;i<val[0];i++)
-				      {
-					rx=particelle[i*ndv+1]*((float)1.e-4);
-					ry=particelle[i*ndv+2]*((float)1.e-4);
-					rz=particelle[i*ndv+0]*((float)1.e-4);
-					ux=particelle[i*ndv+4];
-					uy=particelle[i*ndv+5];
-					uz=particelle[i*ndv+3];
-					if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-					  {
-					    wgh=particelle[i*ndv+6];
-					    fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
-					  }
-					else
-					  {
-					    fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, parametri->overwrite_weight_value, i+1);
-					  }
-				      }
-				  }
-				else if (ndv == 4 || ndv == 5)
-				  {
-				    for(unsigned int i=0;i<val[0];i++)
-				      {
-					rx=particelle[i*ndv+1]*((float)1.e-4);
-					rz=particelle[i*ndv+0]*((float)1.e-4);
-					ux=particelle[i*ndv+3];
-					uz=particelle[i*ndv+2];
-					if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-					  {
-					    wgh=particelle[i*ndv+4];
-					    fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
-					  }
-					else
-					  {
-					    fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, parametri->overwrite_weight_value, i+1);
-					  }
-				      }
-				  }
-			      }
 
 
+				if (cerca_minmax)
+				{
+					for (unsigned int i = 0; i < val[0]; i++)
+					{
+						if (ndv == 6 || ndv == 7)
+						{
+							x=*(particelle+i*ndv);
+							y=*(particelle+i*ndv+1);
+							z=*(particelle+i*ndv+2);
+							px=*(particelle+i*ndv+3);
+							py=*(particelle+i*ndv+4);
+							pz=*(particelle+i*ndv+5);
+							gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+							theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
+							thetaT=(float) atan(sqrt( (py*py+pz*pz)/(px*px) ));
+							E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+							if (x < estremi_min[0]) estremi_min[0] = x;
+							if (x > estremi_max[0]) estremi_max[0] = x;
+							if (y < estremi_min[1]) estremi_min[1] = y;
+							if (y > estremi_max[1]) estremi_max[1] = y;
+							if (z < estremi_min[2]) estremi_min[2] = z;
+							if (z > estremi_max[2]) estremi_max[2] = z;
+							if (px < estremi_min[3]) estremi_min[3] = px;
+							if (px > estremi_max[3]) estremi_max[3] = px;
+							if (py < estremi_min[4]) estremi_min[4] = py;
+							if (py > estremi_max[4]) estremi_max[4] = py;
+							if (pz < estremi_min[5]) estremi_min[5] = pz;
+							if (pz > estremi_max[5]) estremi_max[5] = pz;
+							if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+							if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+							if (theta < estremi_min[7]) estremi_min[7] = theta;
+							if (theta > estremi_max[7]) estremi_max[7] = theta;
+							if (E < estremi_min[8]) estremi_min[8] = E;
+							if (E > estremi_max[8]) estremi_max[8] = E;
+							if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
+							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
+						}
+						else if (ndv == 4 || ndv == 5)
+						{
+							x=*(particelle+i*ndv);
+							y=*(particelle+i*ndv+1);
+							px=*(particelle+i*ndv+2);
+							py=*(particelle+i*ndv+3);
+							gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
+							theta=(float)(atan2(py,px)*180./M_PI);				//theta
+							thetaT=(float) atan(py/px);
+							E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+							if (x < estremi_min[0]) estremi_min[0] = x;
+							if (x > estremi_max[0]) estremi_max[0] = x;
+							if (y < estremi_min[1]) estremi_min[1] = y;
+							if (y > estremi_max[1]) estremi_max[1] = y;
+							estremi_min[2] = 0., estremi_max[2] = 1.;
+							if (px < estremi_min[3]) estremi_min[3] = px;
+							if (px > estremi_max[3]) estremi_max[3] = px;
+							if (py < estremi_min[4]) estremi_min[4] = py;
+							if (py > estremi_max[4]) estremi_max[4] = py;
+							estremi_min[5] = 0., estremi_max[5] = 1.;
+							if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+							if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+							if (theta < estremi_min[7]) estremi_min[7] = theta;
+							if (theta > estremi_max[7]) estremi_max[7] = theta;
+							if (E < estremi_min[8]) estremi_min[8] = E;
+							if (E > estremi_max[8]) estremi_max[8] = E;
+							if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
+							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
+						}
+					}
+				}
+				if (fai_binning)
+				{
+					if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
+					if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
+					if (parametri->fai_plot_Etheta)		_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
+					if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle,val[0],ndv,parametri,EthetaT,"E","thetaT");
+				}
 
-			    if(out_ascii_csv)
-			      {
-				if (ndv == 6 || ndv == 7)
-				  {
-				    for(unsigned int i=0;i<val[0];i++)
-				      {
-					rx=particelle[i*ndv+0];
-					ry=particelle[i*ndv+1];
-					rz=particelle[i*ndv+2];
-					ux=particelle[i*ndv+3];
-					uy=particelle[i*ndv+4];
-					uz=particelle[i*ndv+5];
-					if (parametri->p[WEIGHT])
-					  {
-					    wgh=particelle[i*ndv+6];
-					    fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
-					  }
-					else
-					  {
-					    fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz);
-					  }
-				      }
-				  }
-				else if (ndv == 4 || ndv == 5)
-				  {
-				    for(unsigned int i=0;i<val[0];i++)
-				      {
-					rx=particelle[i*ndv+0];
-					rz=particelle[i*ndv+1];
-					ux=particelle[i*ndv+2];
-					uz=particelle[i*ndv+3];
-					if (parametri->p[WEIGHT])
-					  {
-					    wgh=particelle[i*ndv+4];
-					    fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
-					  }
-					else
-					  {
-					    fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e\n",rx, rz, ux, uz);
-					  }
-				      }
-				  }
-			      }
+				if(out_ascii_propaga)
+				{
+					if (ndv == 6 || ndv == 7)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							rx=particelle[i*ndv+1]*((float)1.e-4);
+							ry=particelle[i*ndv+2]*((float)1.e-4);
+							rz=particelle[i*ndv+0]*((float)1.e-4);
+							ux=particelle[i*ndv+4];
+							uy=particelle[i*ndv+5];
+							uz=particelle[i*ndv+3];
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+							{
+								wgh=particelle[i*ndv+6];
+								fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+							}
+							else
+							{
+								fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, parametri->overwrite_weight_value, i+1);
+							}
+						}
+					}
+					else if (ndv == 4 || ndv == 5)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							rx=particelle[i*ndv+1]*((float)1.e-4);
+							rz=particelle[i*ndv+0]*((float)1.e-4);
+							ux=particelle[i*ndv+3];
+							uz=particelle[i*ndv+2];
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+							{
+								wgh=particelle[i*ndv+4];
+								fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+							}
+							else
+							{
+								fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, parametri->overwrite_weight_value, i+1);
+							}
+						}
+					}
+				}
 
 
 
-			    if (out_binary)
-			      {
-				if (parametri->endian_machine == 0)
-				  {
-				    swap_endian_f(particelle,val[0]*ndv);
-				  }
-				switch(ndv)
-				  {
-				  case 4:
-				  case 5:
-				    // scrittura coordinate x, y, z
-				    fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-				    for(unsigned int i=0; i < val[0]; i += ndv)
-				      fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
-					fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
-
-				    // scrittura momenti px, py, pz
-				    fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-				    for(unsigned int i=2; i < val[0]; i += ndv)
-				      fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
-					fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
-
-				    break;
-				  case 6:
-				  case 7:
-				    // scrittura coordinate x, y, z
-				    fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-				    for(unsigned int i=0; i < val[0]; i += ndv)
-				      fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
-
-				    // scrittura momenti px, py, pz
-				    fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
-				    for(unsigned int i=3; i < val[0]; i += ndv)
-				      fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
-
-				    break;
-				  default:
-				    printf("ndv imprevisto: %i\n", ndv);
-				  }
-
-
-				if(parametri->p[WEIGHT] && !parametri->overwrite_weight)
-				  {
-				    // scrittura pesi
-				    fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
-				    for(unsigned int i=ndv-1; i < val[0]; i += ndv)
-				      fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
-				  }
-				else if(parametri->p[WEIGHT] && parametri->overwrite_weight)
-				  {
-				    // scrittura pesi sovrascritti da linea comando
-				    fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
-				    for(unsigned int i=ndv-1; i < val[0]; i += ndv)
-				      fwrite((void*)(&(parametri->overwrite_weight_value)),sizeof(float),1,binary_all_out);
-				  }
-			      }
+				if(out_ascii_csv)
+				{
+					if (ndv == 6 || ndv == 7)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							rx=particelle[i*ndv+0];
+							ry=particelle[i*ndv+1];
+							rz=particelle[i*ndv+2];
+							ux=particelle[i*ndv+3];
+							uy=particelle[i*ndv+4];
+							uz=particelle[i*ndv+5];
+							if (parametri->p[WEIGHT])
+							{
+								wgh=particelle[i*ndv+6];
+								fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
+							}
+							else
+							{
+								fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz);
+							}
+						}
+					}
+					else if (ndv == 4 || ndv == 5)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							rx=particelle[i*ndv+0];
+							rz=particelle[i*ndv+1];
+							ux=particelle[i*ndv+2];
+							uz=particelle[i*ndv+3];
+							if (parametri->p[WEIGHT])
+							{
+								wgh=particelle[i*ndv+4];
+								fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
+							}
+							else
+							{
+								fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e\n",rx, rz, ux, uz);
+							}
+						}
+					}
+				}
 
 
 
+				if (out_binary)
+				{
+					if (parametri->endian_machine == 0)
+					{
+						swap_endian_f(particelle,val[0]*ndv);
+					}
+					switch(ndv)
+					{
+					case 4:
+					case 5:
+						// scrittura coordinate x, y, z
+						fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						for(unsigned int i=0; i < val[0]; i += ndv)
+							fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
+							fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
 
-			    //free(particelle);
-			    particelle_accumulate += val[0];
-			    INDICE_LETTURE++;
-			  }
+						// scrittura momenti px, py, pz
+						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						for(unsigned int i=2; i < val[0]; i += ndv)
+							fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
+							fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
+
+						break;
+					case 6:
+					case 7:
+						// scrittura coordinate x, y, z
+						fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						for(unsigned int i=0; i < val[0]; i += ndv)
+							fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+
+						// scrittura momenti px, py, pz
+						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						for(unsigned int i=3; i < val[0]; i += ndv)
+							fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+
+						break;
+					default:
+						printf("ndv imprevisto: %i\n", ndv);
+					}
+
+
+					if(parametri->p[WEIGHT] && !parametri->overwrite_weight)
+					{
+						// scrittura pesi
+						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+						for(unsigned int i=ndv-1; i < val[0]; i += ndv)
+							fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
+					}
+					else if(parametri->p[WEIGHT] && parametri->overwrite_weight)
+					{
+						// scrittura pesi sovrascritti da linea comando
+						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+						for(unsigned int i=ndv-1; i < val[0]; i += ndv)
+							fwrite((void*)(&(parametri->overwrite_weight_value)),sizeof(float),1,binary_all_out);
+					}
+				}
+
+
+
+
+				//free(particelle);
+				particelle_accumulate += val[0];
+				INDICE_LETTURE++;
+			}
 			free(particelle);
-			    
+
 		}
-		
+
 		conta_processori++;
 	}
 
@@ -817,10 +816,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			EthetaT_out.close();
 		}
 	}
-		    
+
 	printf("fread_size=%lu\nFine\n\n",(unsigned long) fread_size);
 
-	
+
 	if (out_binary)
 	{
 		fflush(binary_all_out);
@@ -840,7 +839,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 
 	if (!(dat_not_found)) file_dat.close();
-	fclose(file_in);
+	if (!flag_multifile) fclose(file_in);
+
 	return 0;
 }
 

@@ -16,9 +16,8 @@ int main ()
 
 	Parametri parametri;
 	bool testParametri = true;;
-	bool flag_multifile = false;
-		
-	std::cout << "Binary file reader v3.9.1.1" << std::endl;
+
+	std::cout << "Binary file reader v3.9.3" << std::endl;
 
 	if (argc == 1)
 	{
@@ -38,20 +37,20 @@ int main ()
 	bool no_bin_file = false;
 	if ( file_bin.fail() )
 	{
-	        nomefile_bin.str("");
-	        nomefile_bin << std::string(argv[1]) << "_000.bin";
-		std::cout << nomefile_bin.str().c_str() << std::endl;
+		nomefile_bin.str("");
+		nomefile_bin << std::string(argv[1]) << "_000.bin";
+		// std::cout << nomefile_bin.str().c_str() << std::endl;
 		file_bin.open(nomefile_bin.str().c_str());
 		if ( file_bin.fail() )
-		  {
-		    std::cout << "Input file non trovato" << std::endl;
-		    no_bin_file= true;
-		    return -3;
-		  }
+		{
+			std::cout << "Input file non trovato" << std::endl;
+			no_bin_file= true;
+			return -3;
+		}
 	}
 	if(!no_bin_file)
 	{
-	  std::cout << "nome file di input e' " << argv[1] << std::endl;
+		std::cout << "nome file di input e' " << argv[1] << std::endl;
 		parametri.check_filename(argv[1]);
 	}
 	file_bin.close();
@@ -83,8 +82,7 @@ int main ()
 		parametri.p_b[SWAP] = false;
 	}
 
-	if (argc == 2) parametri.leggi_interattivo();
-	else parametri.parse_command_line(argc, argv);
+	parametri.parse_command_line(argc, argv);
 
 
 
@@ -114,21 +112,21 @@ int main ()
 
 
 #ifdef ENABLE_DEBUG
-		printf("Tipo file: file_campi_Ex? %i\n", parametri.file_campi_Ex);
-		printf("Tipo file: file_campi_Ey? %i\n", parametri.file_campi_Ey);
-		printf("Tipo file: file_campi_Ez? %i\n", parametri.file_campi_Ez);
-		printf("Tipo file: file_campi_Bx? %i\n", parametri.file_campi_Bx);
-		printf("Tipo file: file_campi_By? %i\n", parametri.file_campi_By);
-		printf("Tipo file: file_campi_Bz? %i\n", parametri.file_campi_Bz);
-		printf("Tipo file: file_eden? %i\n", parametri.file_densita_elettroni);
-		printf("Tipo file: file_pden? %i\n", parametri.file_densita_protoni);
-		printf("Tipo file: file_hiden? %i\n", parametri.file_densita_HI);
-		printf("Tipo file: file_liden? %i\n", parametri.file_densita_LI);
-		printf("Tipo file: file_Prpout? %i\n", parametri.file_particelle_P);
-		printf("Tipo file: file_Elpout? %i\n", parametri.file_particelle_E);
-		printf("Tipo file: file_Hipout? %i\n", parametri.file_particelle_HI);
-		printf("Tipo file: file_Lipout? %i\n", parametri.file_particelle_LI);
-		fflush(stdout);
+	printf("Tipo file: file_campi_Ex? %i\n", parametri.file_campi_Ex);
+	printf("Tipo file: file_campi_Ey? %i\n", parametri.file_campi_Ey);
+	printf("Tipo file: file_campi_Ez? %i\n", parametri.file_campi_Ez);
+	printf("Tipo file: file_campi_Bx? %i\n", parametri.file_campi_Bx);
+	printf("Tipo file: file_campi_By? %i\n", parametri.file_campi_By);
+	printf("Tipo file: file_campi_Bz? %i\n", parametri.file_campi_Bz);
+	printf("Tipo file: file_eden? %i\n", parametri.file_densita_elettroni);
+	printf("Tipo file: file_pden? %i\n", parametri.file_densita_protoni);
+	printf("Tipo file: file_hiden? %i\n", parametri.file_densita_HI);
+	printf("Tipo file: file_liden? %i\n", parametri.file_densita_LI);
+	printf("Tipo file: file_Prpout? %i\n", parametri.file_particelle_P);
+	printf("Tipo file: file_Elpout? %i\n", parametri.file_particelle_E);
+	printf("Tipo file: file_Hipout? %i\n", parametri.file_particelle_HI);
+	printf("Tipo file: file_Lipout? %i\n", parametri.file_particelle_LI);
+	fflush(stdout);
 #endif
 
 

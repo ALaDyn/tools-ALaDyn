@@ -9,8 +9,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	std::ostringstream nomefile_bin;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 
-	bool new_vtk = false;
-
 	int out_swap = parametri->p[SWAP];
 	//	int out_parameters = parametri.p[OUT_PARAMS];
 
@@ -18,11 +16,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	int segnoy = 0, segnoz = 0, buff = 0;
 	int nx = 0, ibx = 0, iby = 0, ibz = 0, model = 0, dmodel = 0, nsp = 0, lpord = 0, deord = 0, npe = 0, fvar = 0;
 	int npe_y = 0, npe_z = 0, nxloc = 0, nx1 = 0, ny1 = 0, nyloc = 0, nz1 = 0, nzloc = 0;
-	
+
 	float tnow = 0., w0x = 0., w0y = 0., nrat = 0., a0 = 0., lam0 = 0., B0 = 0., ompe = 0.;
 	float xt_in = 0., xt_end = 0., charge = 0., mass = 0., xmin = 0., xmax = 0., ymin = 0., ymax = 0., zmin = 0., zmax = 0.;
 	float E0 = 0., dx = 0., dy = 0., dz = 0., xx = 0., yy = 0.;
-	
+
 	int i, j, k, ipy, ipz;
 	int *int_param;
 	float *real_param;
