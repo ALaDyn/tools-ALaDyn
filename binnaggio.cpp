@@ -44,8 +44,9 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			py=*(particelle+i*ndv+3);
 			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma-1
 			theta=(float)(atan2(py,px)*180./M_PI);				//theta sgatto
-			thetaT=(float) atan(py/px);							//theta turch
-			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+                        thetaT=(float) atan(sqrt((py*py/(px*px))));			//theta turch                                                                        
+//			thetaT=(float) atan(py/px);					//theta turch
+			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
 			else if (binnare_su_x == 3) dato_da_binnare_x = px;
