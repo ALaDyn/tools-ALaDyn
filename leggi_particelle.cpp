@@ -451,7 +451,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							py=*(particelle+i*ndv+3);
 							gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
 							theta=(float)(atan2(py,px)*180./M_PI);				//theta
-							thetaT=(float) atan(py/px);
+							thetaT=(float) atan(sqrt((py*py)/(px*px)));
 							E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 							if (x < estremi_min[0]) estremi_min[0] = x;
 							if (x > estremi_max[0]) estremi_max[0] = x;
