@@ -1,8 +1,10 @@
 #ifndef __LEGGI_ALADYN_FORTRAN
 #define __LEGGI_ALADYN_FORTRAN
 
+
 #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
+
 
 #include <iostream>
 #include <vector>
@@ -159,6 +161,7 @@ struct Parametri
 	float dimmi_dimthetaT();
 	float dimmi_dimE();
 	float dimmi_dim(int);
+	int dimmi_nbin(int);
 	void parse_command_line(int , const char ** );
 	void leggi_interattivo();
 	//	void leggi_da_shell(int, const char *[]);

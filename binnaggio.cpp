@@ -28,7 +28,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (biny == "gamma") binnare_su_y = 6;
 	else if (biny == "theta") binnare_su_y = 7;
 	else if (biny == "E") binnare_su_y = 8;
-	else if (biny == "thetaT") binnare_su_x = 9;
+	else if (biny == "thetaT") binnare_su_y = 9;
 	else printf("variabile y non riconosciuta\n");
 
 	//	float z;
@@ -44,21 +44,25 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			py=*(particelle+i*ndv+3);
 			gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma-1
 			theta=(float)(atan2(py,px)*180./M_PI);				//theta sgatto
-                        thetaT=(float) atan(sqrt((py*py/(px*px))));			//theta turch                                                                        
-//			thetaT=(float) atan(py/px);					//theta turch
-			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+			thetaT=(float) atan(sqrt((py*py/(px*px))));			//theta turch                                                                        
+			//			thetaT=(float) atan(py/px);				//theta turch
+			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
+			else if (binnare_su_x == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
 			else if (binnare_su_x == 3) dato_da_binnare_x = px;
 			else if (binnare_su_x == 4) dato_da_binnare_x = py;
+			else if (binnare_su_x == 5) std::cout << "Unable to bin on pz in 2D" << std::endl;
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
 			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
 			if (binnare_su_y == 0) dato_da_binnare_y = x;
 			else if (binnare_su_y == 1) dato_da_binnare_y = y;
+			else if (binnare_su_y == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
 			else if (binnare_su_y == 3) dato_da_binnare_y = px;
 			else if (binnare_su_y == 4) dato_da_binnare_y = py;
+			else if (binnare_su_y == 5) std::cout << "Unable to bin on pz in 2D" << std::endl;
 			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
@@ -82,7 +86,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
-			else if (binnare_su_y == 9) dato_da_binnare_x = thetaT;
+			else if (binnare_su_y == 9) dato_da_binnare_y = thetaT;
 		}
 
 
@@ -92,7 +96,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 		}
 		else if (dato_da_binnare_x > parametri->massimi[binnare_su_x])
 		{
-			whichbin_x = parametri->nbin_x + 2;
+			whichbin_x = parametri->dimmi_nbin(binnare_su_x) + 2;
 		}
 		else
 		{
@@ -104,7 +108,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 		}
 		else if (dato_da_binnare_y > parametri->massimi[binnare_su_y])
 		{
-			whichbin_y = parametri->nbin_px + 2;
+			whichbin_y = parametri->dimmi_nbin(binnare_su_y) + 2;
 		}
 		else
 		{
@@ -151,8 +155,10 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
+			else if (binnare_su_x == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
 			else if (binnare_su_x == 3) dato_da_binnare_x = px;
 			else if (binnare_su_x == 4) dato_da_binnare_x = py;
+			else if (binnare_su_x == 5) std::cout << "Unable to bin on pz in 2D" << std::endl;
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
@@ -180,7 +186,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 		}
 		else if (dato_da_binnare_x > parametri->massimi[binnare_su_x])
 		{
-			whichbin_x = parametri->nbin_x + 2;
+			whichbin_x = parametri->dimmi_nbin(binnare_su_x) + 2;
 		}
 		else
 		{

@@ -83,6 +83,25 @@ float Parametri :: dimmi_dimE()
 {
 	return (Emax - Emin) / static_cast <float> (nbin_E);
 }
+
+
+int Parametri :: dimmi_nbin(int colonna)
+{
+	if (colonna == 0)		return nbin_x;
+	else if (colonna == 1)	return nbin_y;
+	else if (colonna == 2)	return nbin_z;
+	else if (colonna == 3)	return nbin_px;
+	else if (colonna == 4)	return nbin_py;
+	else if (colonna == 5)	return nbin_pz;
+	else if (colonna == 6)	return nbin_gamma;
+	else if (colonna == 7)	return nbin_theta;
+	else if (colonna == 8)	return nbin_E;
+	else if (colonna == 9)	return nbin_thetaT;
+	else return 120;
+}
+
+
+
 float Parametri :: dimmi_dim(int colonna)
 {
 	if (colonna == 0)		return dimmi_dimx();
