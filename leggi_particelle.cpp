@@ -357,7 +357,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			fflush(stdout);
 			num_of_passes = (int) ((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) +1;
 			num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
-			dimensione_array_particelle = MAX(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
+			dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
 			val[0] = (unsigned int)dimensione_array_particelle;
 			val[1] = (unsigned int)ndv;
 		}
