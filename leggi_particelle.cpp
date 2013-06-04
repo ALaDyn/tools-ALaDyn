@@ -385,7 +385,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle = num_residual_particles;
 					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
 					//	printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
-					npart_loc=dimensione_array_particelle;
+					val[0] = (unsigned int)dimensione_array_particelle;
+					npart_loc = val[0];
 					printf("npart_loc = %i\t\t ndv=%i\n",npart_loc, ndv);
 					fflush(stdout);
 					fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
