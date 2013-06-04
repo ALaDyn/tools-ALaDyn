@@ -382,7 +382,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				else
 				{
-					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle == num_residual_particles;
+					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle = num_residual_particles;
 					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
 					//	printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
 					npart_loc=dimensione_array_particelle;
