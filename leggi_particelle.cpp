@@ -3,6 +3,7 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
 
+#define MAX_NUM_OF_PARTICLES_PER_SHOT 10000000			// in realta' il numero massimo che viene caricato in memoria e' il doppio di questo -1
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
@@ -16,6 +17,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	FILE *file_in;
 	int indice_multifile=0;
 	bool flag_multifile = false;
+	int contatori[] = {0,0,0};
+	float zero = 0.0f;
+	long long particelle_accumulate = 0;
+	int dim_file_in_bytes, num_of_floats_in_file, num_of_particles_in_file, num_of_passes, num_residual_particles;
+	int dimensione_array_particelle;
+	unsigned int val[2];
+
 	if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
 	{
 		nomefile_bin.str("");
@@ -265,10 +273,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 #endif
 
-	int contatori[] = {0,0,0};
-	float zero = 0.0f;
-	long long particelle_accumulate = 0;
-
 	if (out_binary)
 	{
 		printf("\nRichiesta scrittura file .vtk\n");
@@ -311,12 +315,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	fflush(stdout);
 
-	indice_multifile=0;
 	while(1)
 	{
-		int N, QUANTI, NP_TOT = 0, INDICE_LETTURE=0;
-		int N_LETTURE, NP_RESTO = 0, LIMITE=10000000;
-		unsigned int val[2];
 		if(!flag_multifile)
 		{
 			if (conta_processori >= stop_at_cpu_number) break;
@@ -330,13 +330,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
 			if (feof(file_in)) break;
 			if (out_swap) swap_endian_i(&npart_loc,1);
-
-			particelle=(float*)malloc(npart_loc*(ndv)*sizeof(float));
-			printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
-			fflush(stdout);
 			val[0] = (unsigned int)npart_loc;
 			val[1] = (unsigned int)ndv;
-			N_LETTURE=0;
+			particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
+			printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
+			fflush(stdout);
+			num_of_passes = 1;
 		}
 		else  //we do have multifiles i.e. Prpout00_000.bin
 		{
@@ -349,30 +348,28 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				printf("Sono finiti i files! \n");
 				break;
 			}
-			indice_multifile++;
 			fseeko(file_in,0,SEEK_END);
-			N=(int)ftello(file_in);
+			dim_file_in_bytes =(int)ftello(file_in);
 			rewind(file_in);
-			QUANTI=(N/sizeof(float));
-			NP_TOT=(int)(QUANTI/ndv);
-			printf("Il file %s_%.3i.bin contiene %i particelle\n",argv[1], indice_multifile, NP_TOT);
+			num_of_floats_in_file=(dim_file_in_bytes/sizeof(float));
+			num_of_particles_in_file=(int)(num_of_floats_in_file/ndv);
+			printf("Il file %s_%.3i.bin contiene %i particelle\n",argv[1], indice_multifile, num_of_particles_in_file);
 			fflush(stdout);
+			num_of_passes = num_of_particles_in_file / MAX_NUM_OF_PARTICLES_PER_SHOT;
+			num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
+			dimensione_array_particelle = MAX(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
+			val[0] = (unsigned int)dimensione_array_particelle;
 			val[1] = (unsigned int)ndv;
-			N_LETTURE=NP_TOT/LIMITE;
-			NP_RESTO=NP_TOT%LIMITE;
-
-			particelle=(float*)malloc(LIMITE*(ndv)*sizeof(float));
 		}
-		if(npart_loc>0||NP_TOT>0)
+
+		if(val[0] > 0)
 		{
 			fflush(stdout);
-			while(1)
+			for (int h = 0; h < num_of_passes; h++)
 			{
-				if(INDICE_LETTURE>N_LETTURE) break;
-				printf("Inzio il ciclo per il file %s_%.3i.bin \n",argv[1], indice_multifile);
-				fflush(stdout);
 				if(!flag_multifile)
 				{
+					printf("Reading file %s.bin \n",argv[1]);
 					if (parametri->old_fortran_bin)
 					{
 						fread_size = std::fread(buffshort,sizeof(short),2,file_in);
@@ -384,13 +381,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				else
 				{
-					printf("E' un multifile \n");
-					fflush(stdout);
-					if(INDICE_LETTURE<N_LETTURE) npart_loc=LIMITE;
-					else npart_loc=NP_RESTO;
+					if (h == num_of_passes-1) dimensione_array_particelle += num_residual_particles;
+					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
+					printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
+					npart_loc=dimensione_array_particelle;
 					printf("npart_loc = %i\t\t ndv=%i\n",npart_loc, ndv);
 					fflush(stdout);
-					val[0] = (unsigned int)npart_loc;
 					fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
 					if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
 				}
@@ -630,18 +626,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							fwrite((void*)(&(parametri->overwrite_weight_value)),sizeof(float),1,binary_all_out);
 					}
 				}
-
-
-
-
-				//free(particelle);
 				particelle_accumulate += val[0];
-				INDICE_LETTURE++;
+				free(particelle);
 			}
-			free(particelle);
-
 		}
-
+		indice_multifile++;
 		conta_processori++;
 	}
 
