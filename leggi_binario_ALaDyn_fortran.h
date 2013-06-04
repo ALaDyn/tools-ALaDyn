@@ -144,7 +144,9 @@ struct Parametri
 	bool overwrite_weight;
 	bool do_not_ask_missing;
 	float overwrite_weight_value;
-	int fai_plot_xpx, fai_plot_Espec, fai_plot_Etheta, fai_plot_EthetaT;
+	int fai_plot_Espec, fai_plot_Etheta, fai_plot_EthetaT;
+	int fai_plot_xy, fai_plot_xz, fai_plot_yz, fai_plot_xpx, fai_plot_xpy, fai_plot_xpz, fai_plot_ypx;
+	int fai_plot_ypy, fai_plot_ypz, fai_plot_zpx, fai_plot_zpy, fai_plot_zpz, fai_plot_pxpy, fai_plot_pxpz, fai_plot_pypz;
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;

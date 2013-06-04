@@ -19,7 +19,9 @@ Parametri :: Parametri()
 	nbin_b = true;
 	nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
-	fai_plot_xpx = fai_plot_Espec = fai_plot_Etheta = fai_plot_EthetaT = false;
+	fai_plot_Espec = fai_plot_Etheta = fai_plot_EthetaT = false;
+	fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
+	fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = false;
 	overwrite_weight = false;
 	overwrite_weight_value = 1.0;
 	do_not_ask_missing = false;
@@ -514,9 +516,65 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			Emax_b = false;
 			i++;
 		}
+		else if (std::string(argv[i]) == "-plot_xy")
+		{
+			fai_plot_xy = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_xz")
+		{
+			fai_plot_xz = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_yz")
+		{
+			fai_plot_yz = 1;
+		}
 		else if (std::string(argv[i]) == "-plot_xpx")
 		{
 			fai_plot_xpx = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_xpy")
+		{
+			fai_plot_xpy = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_xpz")
+		{
+			fai_plot_xpz = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_ypx")
+		{
+			fai_plot_ypx = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_ypy")
+		{
+			fai_plot_ypy = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_ypz")
+		{
+			fai_plot_ypz = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_zpx")
+		{
+			fai_plot_zpx = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_zpy")
+		{
+			fai_plot_zpy = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_zpz")
+		{
+			fai_plot_zpz = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_pxpy")
+		{
+			fai_plot_pxpy = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_pxpz")
+		{
+			fai_plot_pxpz = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_pypz")
+		{
+			fai_plot_pypz = 1;
 		}
 		else if (std::string(argv[i]) == "-plot_espec")
 		{

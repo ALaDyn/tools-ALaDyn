@@ -474,7 +474,21 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				if (fai_binning)
 				{
+					if (parametri->fai_plot_xy)			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","y");
+					if (parametri->fai_plot_xz)			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","z");
+					if (parametri->fai_plot_yz)			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","z");
 					if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
+					if (parametri->fai_plot_xpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","py");
+					if (parametri->fai_plot_xpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","pz");
+					if (parametri->fai_plot_ypx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","px");
+					if (parametri->fai_plot_ypy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","py");
+					if (parametri->fai_plot_ypz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","pz");
+					if (parametri->fai_plot_zpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"z","px");
+					if (parametri->fai_plot_zpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"z","py");
+					if (parametri->fai_plot_zpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"z","pz");
+					if (parametri->fai_plot_pxpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"px","py");
+					if (parametri->fai_plot_pxpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"px","pz");
+					if (parametri->fai_plot_pypz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"py","pz");
 					if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
 					if (parametri->fai_plot_Etheta)		_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
 					if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle,val[0],ndv,parametri,EthetaT,"E","thetaT");
