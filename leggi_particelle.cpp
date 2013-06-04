@@ -370,7 +370,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				printf("File is very big, will be splitted in multiple readings: step %i of %i\n",h+1, num_of_passes);
 				if(!flag_multifile)
 				{
-					printf("Reading file %s.bin \n",argv[1]);
+					//	printf("Reading file %s.bin \n",argv[1]);
 					if (parametri->old_fortran_bin)
 					{
 						fread_size = std::fread(buffshort,sizeof(short),2,file_in);
@@ -382,9 +382,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				else
 				{
-					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle += num_residual_particles;
+					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle == num_residual_particles;
 					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
-					printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
+					//	printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
 					npart_loc=dimensione_array_particelle;
 					printf("npart_loc = %i\t\t ndv=%i\n",npart_loc, ndv);
 					fflush(stdout);
