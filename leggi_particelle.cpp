@@ -355,7 +355,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			num_of_particles_in_file=(int)(num_of_floats_in_file/ndv);
 			printf("Il file %s_%.3i.bin contiene %i particelle\n",argv[1], indice_multifile, num_of_particles_in_file);
 			fflush(stdout);
-			num_of_passes = num_of_particles_in_file / MAX_NUM_OF_PARTICLES_PER_SHOT;
+			num_of_passes = (int) ((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) +1;
 			num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
 			dimensione_array_particelle = MAX(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
 			val[0] = (unsigned int)dimensione_array_particelle;
@@ -367,6 +367,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			fflush(stdout);
 			for (int h = 0; h < num_of_passes; h++)
 			{
+				printf("File is very big, will be splitted in multiple readings: step %i of %i\n",h+1, num_of_passes);
 				if(!flag_multifile)
 				{
 					printf("Reading file %s.bin \n",argv[1]);
@@ -381,7 +382,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				else
 				{
-					if (h == num_of_passes-1) dimensione_array_particelle += num_residual_particles;
+					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle += num_residual_particles;
 					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
 					printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
 					npart_loc=dimensione_array_particelle;
