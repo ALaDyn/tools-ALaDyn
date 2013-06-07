@@ -7,6 +7,7 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
+	int debug_counter = 1;
 	int stop_at_cpu_number = parametri->last_cpu;
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_EthetaT, nomefile_Espec, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
@@ -14,7 +15,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	std::string riga_persa;
 	char* trascura;
 	trascura = new char[MAX_LENGTH_FILENAME];
-	FILE *file_in;
+	std::FILE *file_in;
 	int indice_multifile=0;
 	bool flag_multifile = false;
 	int contatori[] = {0,0,0};
@@ -24,11 +25,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int dimensione_array_particelle;
 	unsigned int val[2];
 
-	if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
+	if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb")) == NULL )
 	{
 		nomefile_bin.str("");
 		nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
-		if ( (file_in=fopen(nomefile_bin.str().c_str(), "r")) == NULL )
+		if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb")) == NULL )
 		{
 			printf ( "file non-existent!\n" );
 		}
@@ -42,10 +43,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	{
 		printf ( "file exists!\n" );
 	}
-	FILE *binary_all_out;
-	FILE *ascii_propaga;
-	FILE *ascii_csv;
-	FILE *parameters;
+	std::FILE *binary_all_out;
+	std::FILE *ascii_propaga;
+	std::FILE *ascii_csv;
+	std::FILE *parameters;
 	std::ofstream xpx_out, Etheta_out, EthetaT_out, Espec_out, Estremi_out;
 	std::ifstream file_dat;
 	bool dat_not_found = true;
@@ -66,7 +67,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	const int cerca_minmax = parametri->p[FIND_MINMAX];
 	//	const int weight_esiste = parametri->p[WEIGHT];
 
-	int N_param, *int_param,npart_loc;
+	int N_param, *int_param, npart_loc;
+	unsigned char* char_npart_loc;
+	char_npart_loc = (unsigned char*) malloc (sizeof(int));
 	int buff, pID;
 
 	float x,y,z,px,py,pz;
@@ -81,8 +84,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 
 	size_t fread_size = 0;
-
-	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot, ny_loc, np_loc,ndv, i_end;
+	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot,np_loc,ny_loc,ndv,i_end;
 	ndv = parametri->p[NCOLONNE];
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	float rx, ry, rz, ux, uy, uz, wgh;
@@ -276,7 +278,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	if (out_binary)
 	{
 		printf("\nRichiesta scrittura file .vtk\n");
-		binary_all_out=fopen(nomefile_binary, "w");
+		binary_all_out=fopen(nomefile_binary, "wb");
 		contatori[0] += fprintf(binary_all_out, "# vtk DataFile Version 2.0\n");
 		contatori[0] += fprintf(binary_all_out, "titolo nostro\n");
 		contatori[0] += fprintf(binary_all_out, "BINARY\n");
@@ -324,15 +326,26 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			{
 				fread_size = std::fread(&buff,sizeof(int),1,file_in); 
 				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
+//				npart_loc=(int)(char_npart_loc);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 			}
-			else fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+			else
+			{
+				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
+//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
+//				npart_loc=(int)(char_npart_loc);
+			}
 			if (feof(file_in)) break;
 			if (out_swap) swap_endian_i(&npart_loc,1);
+			if (npart_loc > nptot || npart_loc < 0)
+			{
+				printf("Read a npart=%i, non valid. Exiting!",npart_loc);
+				break;
+			}
 			val[0] = (unsigned int)npart_loc;
 			val[1] = (unsigned int)ndv;
-			particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
 			printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
 			fflush(stdout);
 			num_of_passes = 1;
@@ -343,7 +356,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			fclose(file_in);
 			nomefile_bin.str("");
 			nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
-			if ( (file_in=fopen(nomefile_bin.str().c_str(), "r"))== NULL)
+			if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb"))== NULL)
 			{
 				printf("Sono finiti i files! \n");
 				break;
@@ -358,6 +371,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			num_of_passes = (int) ((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) +1;
 			num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
 			dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
+			if (dimensione_array_particelle > nptot || dimensione_array_particelle < 0)
+			{
+				printf("Read a npart=%i, non valid. Exiting!",dimensione_array_particelle);
+				break;
+			}
 			val[0] = (unsigned int)dimensione_array_particelle;
 			val[1] = (unsigned int)ndv;
 		}
@@ -367,9 +385,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			fflush(stdout);
 			for (int h = 0; h < num_of_passes; h++)
 			{
-				printf("File is very big, will be splitted in multiple readings: step %i of %i\n",h+1, num_of_passes);
+				if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %i of %i\n",h+1, num_of_passes);
 				if(!flag_multifile)
 				{
+					particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
 					//	printf("Reading file %s.bin \n",argv[1]);
 					if (parametri->old_fortran_bin)
 					{
@@ -386,23 +405,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
 					//	printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
 					val[0] = (unsigned int)dimensione_array_particelle;
-					npart_loc = val[0];
-					printf("npart_loc = %i\t\t ndv=%i\n",npart_loc, ndv);
+					printf("npart_loc = %i\t\t ndv=%i\n",val[0], ndv);
 					fflush(stdout);
-					fread_size = std::fread(particelle,sizeof(float),npart_loc*ndv,file_in);
-					if (out_swap) swap_endian_f(particelle,npart_loc*ndv);
+					fread_size = std::fread(particelle,sizeof(float),val[0]*ndv,file_in);
+					if (out_swap) swap_endian_f(particelle,val[0]*ndv);
 				}
-#ifdef ENABLE_DEBUG
-				printf("lunghezza=%i\n",npart_loc*ndv);
-				printf("prima di chiamare _Filtro val = %i %i\n", val[0], val[1]);                         
-#endif
 
 				_Filtro(parametri, particelle,val,_Filtro::costruisci_filtro(argc, argv));
-
-#ifdef ENABLE_DEBUG
-				printf("dopo aver eseguito _Filtro val = %i %i\n", val[0], val[1]);                         
-#endif
-
 
 				if (cerca_minmax)
 				{
@@ -643,9 +652,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					}
 				}
 				particelle_accumulate += val[0];
-				free(particelle);
+				//				free(particelle);
 			}
 		}
+		//		free(particelle);
 		indice_multifile++;
 		conta_processori++;
 	}

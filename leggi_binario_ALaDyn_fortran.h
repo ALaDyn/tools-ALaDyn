@@ -43,10 +43,14 @@ typedef unsigned long int uint32_t;
 #define ftello _ftelli64
 #endif
 
+#if defined (__MINGW32__)
+#define fseeko fseeko64
+#define ftello ftello64
+#endif
 
 
 // #define ENABLE_DEBUG
-//#define ENABLE_DEBUG_WIN32
+// #define ENABLE_DEBUG_WIN32
 
 
 #define MAX(x,y) ((x)>(y)?(x):(y))

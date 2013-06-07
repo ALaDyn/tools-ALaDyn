@@ -30,9 +30,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 	char nomefile_campi[MAX_LENGTH_FILENAME];
 
-	FILE *file_in;
-	FILE *parameters;
-	FILE *clean_fields;
+	std::FILE *file_in;
+	std::FILE *parameters;
+	std::FILE *clean_fields;
 
 	//int nx,ibx,iby,ibz,model,dmodel,nsp,lpord,deord,npe,fvar;
 	//int npe_y, npe_z;
@@ -41,7 +41,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	//float xmin,xmax,ymin,ymax,zmin,zmax,E0;
 	//float dx, dy, dz, xx, yy;
 	//	float zz;
-	file_in=fopen(nomefile_bin.str().c_str(), "r");
+	file_in=fopen(nomefile_bin.str().c_str(), "rb");
 
 	size_t fread_size = 0;
 
@@ -240,7 +240,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	if(nz1<=1)
 	{
 		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
-		clean_fields=fopen(nomefile_campi, "w");
+		clean_fields=fopen(nomefile_campi, "wb");
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
@@ -260,7 +260,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	else
 	{
 		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
-		clean_fields=fopen(nomefile_campi, "w");
+		clean_fields=fopen(nomefile_campi, "wb");
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
@@ -324,7 +324,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	*/
 
 	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
-	clean_fields=fopen(nomefile_campi, "w");
+	clean_fields=fopen(nomefile_campi, "wb");
 	printf("\nWriting the fields file\n");
 	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
 	fprintf(clean_fields,"titolo mio\n");

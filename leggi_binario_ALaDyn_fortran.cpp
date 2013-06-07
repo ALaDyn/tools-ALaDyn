@@ -11,7 +11,7 @@ int main ()
 {
 #ifdef ENABLE_DEBUG_WIN32
 	const int argc = 5;
-	const char *argv[] = {"./reader", "C:\\Users\\Stefano\\Dropbox\\Projects\\bin2ascii\\x64\\Debug\\Edenout00", "-dontask", "-find_minmax", "-swap"};
+	const char *argv[] = {"./reader", "Prpout08", "-dontask", "-find_minmax", "-noswap"};
 #endif
 
 	Parametri parametri;
@@ -33,18 +33,20 @@ int main ()
 	std::ifstream file_dat, file_bin;
 
 	/* Controllo file binario */
-	file_bin.open(nomefile_bin.str().c_str());
+	file_bin.open(nomefile_bin.str().c_str(),std::ios::binary|std::ios::in);
 	bool no_bin_file = false;
 	if ( file_bin.fail() )
 	{
 		nomefile_bin.str("");
 		nomefile_bin << std::string(argv[1]) << "_000.bin";
 		// std::cout << nomefile_bin.str().c_str() << std::endl;
-		file_bin.open(nomefile_bin.str().c_str());
+		file_bin.open(nomefile_bin.str().c_str(),std::ios::binary|std::ios::in);
 		if ( file_bin.fail() )
 		{
 			std::cout << "Input file non trovato" << std::endl;
 			no_bin_file= true;
+			system("cd");
+			std::cin.get();
 			return -3;
 		}
 	}
@@ -144,8 +146,9 @@ int main ()
 		leggi_particelle(argc, argv, &parametri);
 
 
-
-
+#ifdef ENABLE_DEBUG_WIN32
+	std::cin.get();
+#endif
 	return 0;
 }
 
