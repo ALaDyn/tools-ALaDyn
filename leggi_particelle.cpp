@@ -9,7 +9,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
 	int debug_counter = 1;
 	int stop_at_cpu_number = parametri->last_cpu;
-	std::ostringstream nomefile_bin, nomefile_dat, nomefile_xpx, nomefile_Etheta, nomefile_EthetaT, nomefile_Espec, nomefile_Estremi;
+	std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 	nomefile_dat << std::string(argv[1]) << ".dat";
 	std::string riga_persa;
@@ -47,7 +47,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	std::FILE *ascii_propaga;
 	std::FILE *ascii_csv;
 	std::FILE *parameters;
-	std::ofstream xpx_out, Etheta_out, EthetaT_out, Espec_out, Estremi_out;
+	std::ofstream Estremi_out;
 	std::ifstream file_dat;
 	bool dat_not_found = true;
 	int conta_processori=0;
@@ -82,6 +82,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	char nomefile_propaga[MAX_LENGTH_FILENAME];
 	char nomefile_csv[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
+	char nomefile_binnato[MAX_LENGTH_FILENAME];
 
 	size_t fread_size = 0;
 	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot,np_loc,ny_loc,ndv,i_end;
@@ -210,19 +211,112 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	printf("nptot=%i\n",nptot); 
 	fflush(stdout);
 
-#ifdef ENABLE_DEBUG
-	std::cout << "NBINX = " << parametri->nbin_x << std::endl;
-	std::cout << "NBINPX = " << parametri->nbin_px << std::endl;
-	std::cout << "NBINE = " << parametri->nbin_E << std::endl;
-	std::cout << "NBINTHETA = " << parametri->nbin_theta << std::endl;
-	std::cout << "NBINTHETAT = " << parametri->nbin_thetaT << std::endl;
-#endif
+
+	float **xy = new float* [parametri->nbin_x+3];
+	for (int i = 0; i < parametri->nbin_x+3; i++)
+	{
+		xy[i] = new float [parametri->nbin_y+3];
+		for (int j = 0; j < parametri->nbin_y+3; j++) xy[i][j] = 0.0;
+	}
+
+	float **xz = new float* [parametri->nbin_x+3];
+	for (int i = 0; i < parametri->nbin_x+3; i++)
+	{
+		xz[i] = new float [parametri->nbin_z+3];
+		for (int j = 0; j < parametri->nbin_z+3; j++) xz[i][j] = 0.0;
+	}
+
+	float **yz = new float* [parametri->nbin_y+3];
+	for (int i = 0; i < parametri->nbin_y+3; i++)
+	{
+		yz[i] = new float [parametri->nbin_z+3];
+		for (int j = 0; j < parametri->nbin_z+3; j++) yz[i][j] = 0.0;
+	}
 
 	float **xpx = new float* [parametri->nbin_x+3];
 	for (int i = 0; i < parametri->nbin_x+3; i++)
 	{
 		xpx[i] = new float [parametri->nbin_px+3];
 		for (int j = 0; j < parametri->nbin_px+3; j++) xpx[i][j] = 0.0;
+	}
+
+	float **xpy = new float* [parametri->nbin_x+3];
+	for (int i = 0; i < parametri->nbin_x+3; i++)
+	{
+		xpy[i] = new float [parametri->nbin_py+3];
+		for (int j = 0; j < parametri->nbin_py+3; j++) xpy[i][j] = 0.0;
+	}
+
+	float **xpz = new float* [parametri->nbin_x+3];
+	for (int i = 0; i < parametri->nbin_x+3; i++)
+	{
+		xpz[i] = new float [parametri->nbin_pz+3];
+		for (int j = 0; j < parametri->nbin_pz+3; j++) xpz[i][j] = 0.0;
+	}
+
+	float **ypx = new float* [parametri->nbin_y+3];
+	for (int i = 0; i < parametri->nbin_y+3; i++)
+	{
+		ypx[i] = new float [parametri->nbin_px+3];
+		for (int j = 0; j < parametri->nbin_px+3; j++) ypx[i][j] = 0.0;
+	}
+
+	float **ypy = new float* [parametri->nbin_y+3];
+	for (int i = 0; i < parametri->nbin_y+3; i++)
+	{
+		ypy[i] = new float [parametri->nbin_py+3];
+		for (int j = 0; j < parametri->nbin_py+3; j++) ypy[i][j] = 0.0;
+	}
+
+	float **ypz = new float* [parametri->nbin_y+3];
+	for (int i = 0; i < parametri->nbin_y+3; i++)
+	{
+		ypz[i] = new float [parametri->nbin_pz+3];
+		for (int j = 0; j < parametri->nbin_pz+3; j++) ypz[i][j] = 0.0;
+	}
+
+	float **zpx = new float* [parametri->nbin_z+3];
+	for (int i = 0; i < parametri->nbin_z+3; i++)
+	{
+		zpx[i] = new float [parametri->nbin_px+3];
+		for (int j = 0; j < parametri->nbin_px+3; j++) zpx[i][j] = 0.0;
+	}
+
+	float **zpy = new float* [parametri->nbin_z+3];
+	for (int i = 0; i < parametri->nbin_z+3; i++)
+	{
+		zpy[i] = new float [parametri->nbin_py+3];
+		for (int j = 0; j < parametri->nbin_py+3; j++) zpy[i][j] = 0.0;
+	}
+
+	float **zpz = new float* [parametri->nbin_z+3];
+	for (int i = 0; i < parametri->nbin_z+3; i++)
+	{
+		zpz[i] = new float [parametri->nbin_pz+3];
+		for (int j = 0; j < parametri->nbin_pz+3; j++) zpz[i][j] = 0.0;
+	}
+
+	float **pxpy = new float* [parametri->nbin_px+3];
+	for (int i = 0; i < parametri->nbin_px+3; i++)
+	{
+		pxpy[i] = new float [parametri->nbin_py+3];
+		for (int j = 0; j < parametri->nbin_py+3; j++) pxpy[i][j] = 0.0;
+	}
+
+	//	fai_plot_pxpz = fai_plot_pypz = false;
+
+	float **pxpz = new float* [parametri->nbin_px+3];
+	for (int i = 0; i < parametri->nbin_px+3; i++)
+	{
+		pxpz[i] = new float [parametri->nbin_pz+3];
+		for (int j = 0; j < parametri->nbin_pz+3; j++) pxpz[i][j] = 0.0;
+	}
+
+	float **pypz = new float* [parametri->nbin_py+3];
+	for (int i = 0; i < parametri->nbin_py+3; i++)
+	{
+		pypz[i] = new float [parametri->nbin_pz+3];
+		for (int j = 0; j < parametri->nbin_pz+3; j++) pypz[i][j] = 0.0;
 	}
 
 	float **Etheta = new float* [parametri->nbin_E+3];
@@ -326,16 +420,16 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			{
 				fread_size = std::fread(&buff,sizeof(int),1,file_in); 
 				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
-//				npart_loc=(int)(char_npart_loc);
+				//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
+				//				npart_loc=(int)(char_npart_loc);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 			}
 			else
 			{
 				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
-//				npart_loc=(int)(char_npart_loc);
+				//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
+				//				npart_loc=(int)(char_npart_loc);
 			}
 			if (feof(file_in)) break;
 			if (out_swap) swap_endian_i(&npart_loc,1);
@@ -483,21 +577,21 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				if (fai_binning)
 				{
-					if (parametri->fai_plot_xy)			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","y");
-					if (parametri->fai_plot_xz)			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","z");
-					if (parametri->fai_plot_yz)			_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","z");
+					if (parametri->fai_plot_xy)			_Binnaggio(particelle,val[0],ndv,parametri,xy,"x","y");
+					if (parametri->fai_plot_xz)			_Binnaggio(particelle,val[0],ndv,parametri,xz,"x","z");
+					if (parametri->fai_plot_yz)			_Binnaggio(particelle,val[0],ndv,parametri,yz,"y","z");
 					if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
-					if (parametri->fai_plot_xpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","py");
-					if (parametri->fai_plot_xpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","pz");
-					if (parametri->fai_plot_ypx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","px");
-					if (parametri->fai_plot_ypy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","py");
-					if (parametri->fai_plot_ypz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"y","pz");
-					if (parametri->fai_plot_zpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"z","px");
-					if (parametri->fai_plot_zpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"z","py");
-					if (parametri->fai_plot_zpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"z","pz");
-					if (parametri->fai_plot_pxpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"px","py");
-					if (parametri->fai_plot_pxpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"px","pz");
-					if (parametri->fai_plot_pypz)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"py","pz");
+					if (parametri->fai_plot_xpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpy,"x","py");
+					if (parametri->fai_plot_xpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpz,"x","pz");
+					if (parametri->fai_plot_ypx)		_Binnaggio(particelle,val[0],ndv,parametri,ypx,"y","px");
+					if (parametri->fai_plot_ypy)		_Binnaggio(particelle,val[0],ndv,parametri,ypy,"y","py");
+					if (parametri->fai_plot_ypz)		_Binnaggio(particelle,val[0],ndv,parametri,ypz,"y","pz");
+					if (parametri->fai_plot_zpx)		_Binnaggio(particelle,val[0],ndv,parametri,zpx,"z","px");
+					if (parametri->fai_plot_zpy)		_Binnaggio(particelle,val[0],ndv,parametri,zpy,"z","py");
+					if (parametri->fai_plot_zpz)		_Binnaggio(particelle,val[0],ndv,parametri,zpz,"z","pz");
+					if (parametri->fai_plot_pxpy)		_Binnaggio(particelle,val[0],ndv,parametri,pxpy,"px","py");
+					if (parametri->fai_plot_pxpz)		_Binnaggio(particelle,val[0],ndv,parametri,pxpz,"px","pz");
+					if (parametri->fai_plot_pypz)		_Binnaggio(particelle,val[0],ndv,parametri,pypz,"py","pz");
 					if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
 					if (parametri->fai_plot_Etheta)		_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
 					if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle,val[0],ndv,parametri,EthetaT,"E","thetaT");
@@ -740,95 +834,95 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	if (fai_binning)
 	{
-		float min1, min2, max1, max2;
-
+		if (parametri->fai_plot_xy)
+		{
+			sprintf(nomefile_binnato,"%s_xy.txt",argv[1]);
+			_Scrittura(parametri, xy,"x","y",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_xz)
+		{
+			sprintf(nomefile_binnato,"%s_xz.txt",argv[1]);
+			_Scrittura(parametri, xz,"x","z",std::string(nomefile_binnato));
+		}
 		if (parametri->fai_plot_xpx)
 		{
-			nomefile_xpx << argv[1] << "_xpx";
-			xpx_out.open(nomefile_xpx.str().c_str());
-			min1=parametri->xmin-parametri->dimmi_dimx();
-			max1=parametri->xmin;
-			min2=parametri->pxmin-parametri->dimmi_dimpx();
-			max2=parametri->pxmin;
-
-			for (int i = 0; i < parametri->nbin_x+3; i++)
-			{
-				for (int j = 0; j < parametri->nbin_px+3; j++)
-				{
-					xpx_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << xpx[i][j] << std::endl;
-					min2 += parametri->dimmi_dimpx();
-					max2 += parametri->dimmi_dimpx();
-				}
-				min1 += parametri->dimmi_dimx();
-				max1 += parametri->dimmi_dimx();
-				min2 = parametri->pxmin-parametri->dimmi_dimpx();
-				max2 = parametri->pxmin;
-			}
-			xpx_out.close();
+			sprintf(nomefile_binnato,"%s_yz.txt",argv[1]);
+			_Scrittura(parametri, yz,"y","z",std::string(nomefile_binnato));
 		}
-
+		if (parametri->fai_plot_xpx)
+		{
+			sprintf(nomefile_binnato,"%s_xpx.txt",argv[1]);
+			_Scrittura(parametri, xpx,"x","px",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_xpy)
+		{
+			sprintf(nomefile_binnato,"%s_xpy.txt",argv[1]);
+			_Scrittura(parametri, xpy,"x","py",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_xpz)
+		{
+			sprintf(nomefile_binnato,"%s_xpz.txt",argv[1]);
+			_Scrittura(parametri, xpz,"x","pz",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_ypx)
+		{
+			sprintf(nomefile_binnato,"%s_ypx.txt",argv[1]);
+			_Scrittura(parametri, ypx,"y","px",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_ypy)
+		{
+			sprintf(nomefile_binnato,"%s_ypy.txt",argv[1]);
+			_Scrittura(parametri, ypy,"y","py",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_ypz)
+		{
+			sprintf(nomefile_binnato,"%s_ypz.txt",argv[1]);
+			_Scrittura(parametri, ypz,"y","pz",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_zpx)
+		{
+			sprintf(nomefile_binnato,"%s_zpx.txt",argv[1]);
+			_Scrittura(parametri, zpx,"z","px",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_zpy)
+		{
+			sprintf(nomefile_binnato,"%s_zpy.txt",argv[1]);
+			_Scrittura(parametri, zpy,"z","py",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_xpz)
+		{
+			sprintf(nomefile_binnato,"%s_zpz.txt",argv[1]);
+			_Scrittura(parametri, zpz,"z","pz",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_pxpy)
+		{
+			sprintf(nomefile_binnato,"%s_pxpy.txt",argv[1]);
+			_Scrittura(parametri, pxpy,"px","py",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_pxpz)
+		{
+			sprintf(nomefile_binnato,"%s_pxpz.txt",argv[1]);
+			_Scrittura(parametri, pxpz,"px","pz",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_pypz)
+		{
+			sprintf(nomefile_binnato,"%s_pypz.txt",argv[1]);
+			_Scrittura(parametri, pypz,"py","pz",std::string(nomefile_binnato));
+		}
 		if (parametri->fai_plot_Espec)
 		{
-			nomefile_Espec << argv[1] << "_Espec";
-			Espec_out.open(nomefile_Espec.str().c_str());
-			min1=parametri->Emin-parametri->dimmi_dimE();
-			max1=parametri->Emin;
-			for (int i = 0; i < parametri->nbin_E+3; i++)
-			{
-				Espec_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << Espec[i] << std::endl;
-				min1 += parametri->dimmi_dimE();
-				max1 += parametri->dimmi_dimE();
-			}
-			Espec_out.close();
+			sprintf(nomefile_binnato,"%s_Espec.txt",argv[1]);
+			_Scrittura(parametri, Espec,"E",std::string(nomefile_binnato));
 		}
-
 		if (parametri->fai_plot_Etheta)
 		{
-			nomefile_Etheta << argv[1] << "_Etheta";
-			Etheta_out.open(nomefile_Etheta.str().c_str());
-			min1=parametri->Emin-parametri->dimmi_dimE();
-			max1=parametri->Emin;
-			min2=parametri->thetamin-parametri->dimmi_dimtheta();
-			max2=parametri->thetamin;
-			for (int i = 0; i < parametri->nbin_E+3; i++)
-			{
-				for (int j = 0; j < parametri->nbin_theta+3; j++)
-				{
-					Etheta_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << Etheta[i][j] << std::endl;
-					min2 += parametri->dimmi_dimtheta();
-					max2 += parametri->dimmi_dimtheta();
-				}
-				min1 += parametri->dimmi_dimE();
-				max1 += parametri->dimmi_dimE();
-				min2 = parametri->thetamin-parametri->dimmi_dimtheta();
-				max2 = parametri->thetamin;
-			}
-			Etheta_out.close();
+			sprintf(nomefile_binnato,"%s_Etheta.txt",argv[1]);
+			_Scrittura(parametri, Etheta,"E","theta",std::string(nomefile_binnato));
 		}
-
 		if (parametri->fai_plot_EthetaT)
 		{
-			nomefile_EthetaT << argv[1] << "_EthetaT";
-			EthetaT_out.open(nomefile_EthetaT.str().c_str());
-			min1=parametri->Emin-parametri->dimmi_dimE();
-			max1=parametri->Emin;
-			min2=parametri->thetaTmin-parametri->dimmi_dimthetaT();
-			max2=parametri->thetaTmin;
-			for (int i = 0; i < parametri->nbin_E+3; i++)
-			{
-				for (int j = 0; j < parametri->nbin_thetaT+3; j++)
-				{
-					EthetaT_out << std::setprecision(7) << min1 << "\t" << max1 << "\t" << min2 << "\t" << max2 << "\t" << EthetaT[i][j] << std::endl;
-					min2 += parametri->dimmi_dimthetaT();
-					max2 += parametri->dimmi_dimthetaT();
-				}
-				min1 += parametri->dimmi_dimE();
-				max1 += parametri->dimmi_dimE();
-				min2 = parametri->thetaTmin-parametri->dimmi_dimthetaT();
-				max2 = parametri->thetaTmin;
-
-			}
-			EthetaT_out.close();
+			sprintf(nomefile_binnato,"%s_EthetaT.txt",argv[1]);
+			_Scrittura(parametri, EthetaT,"E","thetaT",std::string(nomefile_binnato));
 		}
 	}
 

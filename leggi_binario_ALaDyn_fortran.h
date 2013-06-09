@@ -183,8 +183,15 @@ struct Parametri
 
 struct _Binnaggio
 {
-	_Binnaggio(float *, int, int, Parametri *, float ** , std::string, std::string);
-	_Binnaggio(float *, int, int, Parametri *, float * , std::string);
+	_Binnaggio(float * , int , int , Parametri * , float ** , std::string , std::string);
+	_Binnaggio(float * , int , int , Parametri * , float * , std::string);
+};
+
+
+struct _Scrittura
+{
+	_Scrittura(Parametri * , float ** , std::string  , std::string , std::string );
+	_Scrittura(Parametri * , float * , std::string , std::string );
 };
 
 
