@@ -10,8 +10,8 @@ int main ()
 #endif
 {
 #ifdef ENABLE_DEBUG_WIN32
-	const int argc = 5;
-	const char *argv[] = {"./reader", "Prpout08", "-dontask", "-find_minmax", "-noswap"};
+	const int argc = 9;
+	const char *argv[] = {"./bin2ascii", "Prpout08", "-dontask", "-find_minmax", "-noswap", "-do_binning", "-plot_xpx", "-readparamsfromfile", "Prpout08.extremes"};
 #endif
 
 	Parametri parametri;
