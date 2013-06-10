@@ -452,10 +452,6 @@ _Scrittura :: _Scrittura(Parametri * parametri, float * data_binned, std::string
 	else printf("variabile x non riconosciuta\n");
 
 
-
-
-	file_out.open(nomefile_out.c_str());
-
 	for (int i = 0; i < nbinx; i++)
 	{
 		file_out << std::setprecision(6) << xmin << "\t" << xmax << "\t" << data_binned[i] << std::endl;
