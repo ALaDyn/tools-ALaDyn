@@ -7,7 +7,7 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
-	int debug_counter = 1;
+//	int debug_counter = 1;
 	int stop_at_cpu_number = parametri->last_cpu;
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
@@ -68,8 +68,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	//	const int weight_esiste = parametri->p[WEIGHT];
 
 	int N_param, *int_param, npart_loc;
-	unsigned char* char_npart_loc;
-	char_npart_loc = (unsigned char*) malloc (sizeof(int));
+//	unsigned char* char_npart_loc;
+//	char_npart_loc = (unsigned char*) malloc (sizeof(int));
 	int buff, pID;
 
 	float x,y,z,px,py,pz;
@@ -438,6 +438,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				printf("Read a npart=%i, non valid. Exiting!",npart_loc);
 				break;
 			}
+			dimensione_array_particelle = npart_loc;
 			val[0] = (unsigned int)npart_loc;
 			val[1] = (unsigned int)ndv;
 			printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);

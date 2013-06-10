@@ -203,7 +203,7 @@ _Scrittura :: _Scrittura(Parametri * parametri, float ** data_binned, std::strin
 	float xmin, xmax, dimx, ymin, ymax, dimy;
 	int nbinx, nbiny;
 	std::ofstream file_out;
-	file_out.open(nomefile_out);
+	file_out.open(nomefile_out.c_str());
 
 	if (x == "x")
 	{
@@ -379,7 +379,7 @@ _Scrittura :: _Scrittura(Parametri * parametri, float * data_binned, std::string
 	float xmin, xmax, dimx;
 	int nbinx;
 	std::ofstream file_out;
-	file_out.open(nomefile_out);
+	file_out.open(nomefile_out.c_str());
 
 	if (x == "x")
 	{
