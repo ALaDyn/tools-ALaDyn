@@ -845,7 +845,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			sprintf(nomefile_binnato,"%s_xz.txt",argv[1]);
 			_Scrittura(parametri, xz,"x","z",std::string(nomefile_binnato));
 		}
-		if (parametri->fai_plot_xpx)
+		if (parametri->fai_plot_yz)
 		{
 			sprintf(nomefile_binnato,"%s_yz.txt",argv[1]);
 			_Scrittura(parametri, yz,"y","z",std::string(nomefile_binnato));
