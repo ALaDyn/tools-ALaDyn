@@ -7,7 +7,7 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
-//	int debug_counter = 1;
+	//	int debug_counter = 1;
 	int stop_at_cpu_number = parametri->last_cpu;
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
@@ -45,6 +45,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 	std::FILE *binary_all_out;
 	std::FILE *ascii_propaga;
+	std::FILE *ascii_xyze;
 	std::FILE *ascii_csv;
 	std::FILE *parameters;
 	std::ofstream Estremi_out;
@@ -65,11 +66,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	const int out_parameters = parametri->p[OUT_PARAMS];
 	const int fai_binning = parametri->p[DO_BINNING];
 	const int cerca_minmax = parametri->p[FIND_MINMAX];
-	//	const int weight_esiste = parametri->p[WEIGHT];
+	const int out_xyzE = parametri->p[OUT_XYZE];
+
 
 	int N_param, *int_param, npart_loc;
-//	unsigned char* char_npart_loc;
-//	char_npart_loc = (unsigned char*) malloc (sizeof(int));
+	//	unsigned char* char_npart_loc;
+	//	char_npart_loc = (unsigned char*) malloc (sizeof(int));
 	int buff, pID;
 
 	float x,y,z,px,py,pz;
@@ -80,6 +82,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	float gamma, theta, thetaT, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_propaga[MAX_LENGTH_FILENAME];
+	char nomefile_xyze[MAX_LENGTH_FILENAME];
 	char nomefile_csv[MAX_LENGTH_FILENAME];
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 	char nomefile_binnato[MAX_LENGTH_FILENAME];
@@ -345,6 +348,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 
 	sprintf(nomefile_propaga,"%s.ppg",argv[1]);
+	sprintf(nomefile_xyze,"%s_xyzE.ppg",argv[1]);
 	sprintf(nomefile_csv,"%s.csv",argv[1]);
 	sprintf(nomefile_binary,"%s.vtk",argv[1]);
 
@@ -409,6 +413,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		printf("\nRichiesta scrittura file ASCII per Propaga\n");
 		ascii_propaga=fopen(nomefile_propaga, "w");
 	}
+
+	if (out_xyzE)
+	{
+		printf("\nRichiesta scrittura file ASCII con x, y, z, E\n");
+		ascii_xyze=fopen(nomefile_xyze, "w");
+	}
+
 	if (out_ascii_csv)
 	{
 		printf("\nRichiesta scrittura file ASCII CSV per Paraview\n");
@@ -646,6 +657,35 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							{
 								fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, parametri->overwrite_weight_value, i+1);
 							}
+						}
+					}
+				}
+
+
+
+				if(out_xyzE)
+				{
+					if (ndv == 6 || ndv == 7)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							rx=particelle[i*ndv+1]*((float)1.e-4);
+							ry=particelle[i*ndv+2]*((float)1.e-4);
+							rz=particelle[i*ndv+0]*((float)1.e-4);
+							gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+							E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+							fprintf(ascii_xyze,"%e %e %e %e\n",rx, ry, rz, E);
+						}
+					}
+					else if (ndv == 4 || ndv == 5)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							rx=particelle[i*ndv+1]*((float)1.e-4);
+							rz=particelle[i*ndv+0]*((float)1.e-4);
+							gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
+							E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+							fprintf(ascii_xyze,"%e %e %e\n",rx, rz, E);
 						}
 					}
 				}
@@ -940,7 +980,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		}
 		if (parametri->fai_plot_thetaTspec)
 		{
-			sprintf(nomefile_binnato,"%s_thetaT.txt",argv[1]);
+			sprintf(nomefile_binnato,"%s_thetaTspec.txt",argv[1]);
 			_Scrittura(parametri, thetaTspec,"thetaT",std::string(nomefile_binnato));
 		}
 	}
@@ -958,6 +998,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	{
 		fflush(ascii_propaga);
 		fclose(ascii_propaga);
+	}
+
+	if (out_xyzE)
+	{
+		fflush(ascii_xyze);
+		fclose(ascii_xyze);
 	}
 
 	if (out_ascii_csv)

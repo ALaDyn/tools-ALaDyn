@@ -77,7 +77,7 @@ typedef unsigned long int uint32_t;
 #define MAX_LENGTH_FILENAME 200
 
 
-#define NPARAMETRI	9
+#define NPARAMETRI	10
 #define WEIGHT		0
 #define SWAP		1
 #define OUT_BINARY	2
@@ -87,6 +87,7 @@ typedef unsigned long int uint32_t;
 #define OUT_PARAMS	6
 #define OUT_CSV		7
 #define NCOLONNE    8
+#define OUT_XYZE	9
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E

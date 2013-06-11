@@ -375,6 +375,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			p[OUT_CSV] = 1;
 			p_b[OUT_CSV] = false;
 		}
+		else if (std::string(argv[i]) == "-dump_xyzE")
+		{
+			p[OUT_XYZE] = 1;
+			p_b[OUT_XYZE] = false;
+		}
 		else if (std::string(argv[i]) == "-parameters")
 		{
 			p[OUT_PARAMS] = 1;
