@@ -336,6 +336,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	float *Espec = new float [parametri->nbin_E+3];
 	for (int i = 0; i < parametri->nbin_E+3; i++) Espec[i] = 0.0;
 
+	float *thetaspec = new float [parametri->nbin_theta+3];
+	for (int i = 0; i < parametri->nbin_theta+3; i++) thetaspec[i] = 0.0;
+
+	float *thetaTspec = new float [parametri->nbin_thetaT+3];
+	for (int i = 0; i < parametri->nbin_thetaT+3; i++) thetaTspec[i] = 0.0;
+
 
 
 	sprintf(nomefile_propaga,"%s.ppg",argv[1]);
@@ -593,9 +599,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if (parametri->fai_plot_pxpy)		_Binnaggio(particelle,val[0],ndv,parametri,pxpy,"px","py");
 					if (parametri->fai_plot_pxpz)		_Binnaggio(particelle,val[0],ndv,parametri,pxpz,"px","pz");
 					if (parametri->fai_plot_pypz)		_Binnaggio(particelle,val[0],ndv,parametri,pypz,"py","pz");
-					if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
 					if (parametri->fai_plot_Etheta)		_Binnaggio(particelle,val[0],ndv,parametri,Etheta,"E","theta");
 					if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle,val[0],ndv,parametri,EthetaT,"E","thetaT");
+					if (parametri->fai_plot_Espec)		_Binnaggio(particelle,val[0],ndv,parametri,Espec,"E");
+					if (parametri->fai_plot_thetaspec)	_Binnaggio(particelle,val[0],ndv,parametri,thetaspec,"theta");
+					if (parametri->fai_plot_thetaTspec)	_Binnaggio(particelle,val[0],ndv,parametri,thetaTspec,"thetaT");
 				}
 
 				if(out_ascii_propaga)
@@ -910,11 +918,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			sprintf(nomefile_binnato,"%s_pypz.txt",argv[1]);
 			_Scrittura(parametri, pypz,"py","pz",std::string(nomefile_binnato));
 		}
-		if (parametri->fai_plot_Espec)
-		{
-			sprintf(nomefile_binnato,"%s_Espec.txt",argv[1]);
-			_Scrittura(parametri, Espec,"E",std::string(nomefile_binnato));
-		}
 		if (parametri->fai_plot_Etheta)
 		{
 			sprintf(nomefile_binnato,"%s_Etheta.txt",argv[1]);
@@ -924,6 +927,21 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		{
 			sprintf(nomefile_binnato,"%s_EthetaT.txt",argv[1]);
 			_Scrittura(parametri, EthetaT,"E","thetaT",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_Espec)
+		{
+			sprintf(nomefile_binnato,"%s_Espec.txt",argv[1]);
+			_Scrittura(parametri, Espec,"E",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_thetaspec)
+		{
+			sprintf(nomefile_binnato,"%s_thetaspec.txt",argv[1]);
+			_Scrittura(parametri, thetaspec,"theta",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_thetaTspec)
+		{
+			sprintf(nomefile_binnato,"%s_thetaT.txt",argv[1]);
+			_Scrittura(parametri, thetaTspec,"thetaT",std::string(nomefile_binnato));
 		}
 	}
 

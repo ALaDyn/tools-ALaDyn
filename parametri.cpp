@@ -19,7 +19,7 @@ Parametri :: Parametri()
 	nbin_b = true;
 	nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
-	fai_plot_Espec = fai_plot_Etheta = fai_plot_EthetaT = false;
+	fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
 	fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
 	fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = false;
 	overwrite_weight = false;
@@ -576,10 +576,6 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			fai_plot_pypz = 1;
 		}
-		else if (std::string(argv[i]) == "-plot_espec")
-		{
-			fai_plot_Espec = 1;
-		}
 		else if (std::string(argv[i]) == "-plot_etheta")
 		{
 			fai_plot_Etheta = 1;
@@ -587,6 +583,18 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		else if (std::string(argv[i]) == "-plot_ethetaT")
 		{
 			fai_plot_EthetaT = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_espec")
+		{
+			fai_plot_Espec = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_thetaspec")
+		{
+			fai_plot_thetaspec = 1;
+		}
+		else if (std::string(argv[i]) == "-plot_thetaTspec")
+		{
+			fai_plot_thetaTspec = 1;
 		}
 		else if (std::string(argv[i]) == "-nbin")
 		{
