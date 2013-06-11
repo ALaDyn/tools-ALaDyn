@@ -75,11 +75,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int buff, pID;
 
 	float x,y,z,px,py,pz;
+	float gamma, theta, thetaT, E;
+	float rx, ry, rz, ux, uy, uz, wgh;
 	float *estremi_min, *estremi_max;
 
 	short buffshort[2];
 	float *particelle, *real_param;
-	float gamma, theta, thetaT, E;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_propaga[MAX_LENGTH_FILENAME];
 	char nomefile_xyze[MAX_LENGTH_FILENAME];
@@ -91,7 +92,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot,np_loc,ny_loc,ndv,i_end;
 	ndv = parametri->p[NCOLONNE];
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
-	float rx, ry, rz, ux, uy, uz, wgh;
 	int tipo = 0;
 	if (argv[1][0] == 'E') tipo = 3;
 	else if (argv[1][0] == 'P') tipo = 1;
@@ -672,7 +672,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							rx=particelle[i*ndv+1]*((float)1.e-4);
 							ry=particelle[i*ndv+2]*((float)1.e-4);
 							rz=particelle[i*ndv+0]*((float)1.e-4);
-							gamma=(float)(sqrt(1.+px*px+py*py+pz*pz)-1.);			//gamma
+							ux=particelle[i*ndv+4];
+							uy=particelle[i*ndv+5];
+							uz=particelle[i*ndv+3];
+							gamma=(float)(sqrt(1.+ux*ux+uy*uy+uz*uz)-1.);			//gamma
 							E=(float)(gamma*parametri->massa_particella_MeV);		//energia
 							fprintf(ascii_xyze,"%e %e %e %e\n",rx, ry, rz, E);
 						}
@@ -683,7 +686,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 						{
 							rx=particelle[i*ndv+1]*((float)1.e-4);
 							rz=particelle[i*ndv+0]*((float)1.e-4);
-							gamma=(float)(sqrt(1.+px*px+py*py)-1.);				//gamma
+							ux=particelle[i*ndv+3];
+							uz=particelle[i*ndv+2];
+							gamma=(float)(sqrt(1.+ux*ux+uy*uy)-1.);				//gamma
 							E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 							fprintf(ascii_xyze,"%e %e %e\n",rx, rz, E);
 						}
