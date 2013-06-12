@@ -316,8 +316,6 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 	std::string nomefile;
 	bool usa_file_parametri = false;
 	bool failed_opening_file;
-	
-	p[OUT_XYZE] = 0;
 	for (int i = 2; i < argc; i++)	
 		/************************************************************************
 		We will iterate over argv[] to get the parameters stored inside.
@@ -327,7 +325,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		************************************************************************/
 	{
 		//	  std::cout << argv[i] << std::endl;
-	  
+
 		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
 			nomefile = std::string(argv[i+1]);
@@ -1092,6 +1090,28 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_PROPAGA] = 0;
 				p_b[OUT_PROPAGA] = false;
+			}
+			else
+			{
+				printf("Attenzione: output ppg non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_XYZE] && p[OUT_XYZE]  != 0 && p[OUT_XYZE]  != 1 )
+		{
+			printf("Attenzione: output xyzE mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_XYZE] && (p_b[OUT_XYZE] == 0 || p_b[OUT_XYZE] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_XYZE] && do_not_ask_missing)
+			{
+				p[OUT_XYZE] = 0;
+				p_b[OUT_XYZE] = false;
 			}
 			else
 			{
