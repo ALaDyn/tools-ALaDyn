@@ -987,6 +987,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
 			std::cin >> p[OUT_PROPAGA];
 		}
+		if (p_b[OUT_XYZE] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output di un file ASCII contenente x y z ed energia? 1 si', 0 no: ";
+			std::cin >> p[OUT_XYZE];
+		}
 		if (p_b[OUT_CSV] && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
