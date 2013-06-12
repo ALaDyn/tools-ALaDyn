@@ -316,6 +316,8 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 	std::string nomefile;
 	bool usa_file_parametri = false;
 	bool failed_opening_file;
+	
+	p[OUT_XYZE] = 0;
 	for (int i = 2; i < argc; i++)	
 		/************************************************************************
 		We will iterate over argv[] to get the parameters stored inside.
@@ -325,7 +327,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		************************************************************************/
 	{
 		//	  std::cout << argv[i] << std::endl;
-
+	  
 		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
 			nomefile = std::string(argv[i+1]);
