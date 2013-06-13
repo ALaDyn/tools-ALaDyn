@@ -258,26 +258,67 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 				fclose(clean_fields);
 	}
 	else
-	{
-		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
-		clean_fields=fopen(nomefile_campi, "wb");
-		printf("\nWriting the fields file 2D (not vtk)\n");
-
-		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-		k=nz1/2;
-		fprintf(clean_fields,"# 2D cut at z=%g\n",k*dz+zmin); 
-		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
-		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-		for(j=0;j<ny1;j++)
-			for(i=0;i<nx1;i++)
-			{
-				xx=x_coordinates[i];
-				yy=y_coordinates[j];
-				//xx=xmin+dx*i;
-				//yy=ymin+dy*j;
-				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
-			}
+		{
+			sprintf(nomefile_campi,"%s_out.2D",argv[1]);
+			clean_fields=fopen(nomefile_campi, "wb");
+			printf("\nWriting the fields file 2D (not vtk)\n");
+			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
+			k=nz1/2;
+			fprintf(clean_fields,"# 2D cut at z=%g\n", z_coordinates[k]); 
+			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
+			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
+			for(j=0;j<ny1;j++)
+				for(i=0;i<nx1;i++)
+					{
+						xx=x_coordinates[i];
+						yy=y_coordinates[j];
+						//xx=xmin+dx*i;
+						//yy=ymin+dy*j;
+						fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					}
 			fclose(clean_fields);
+
+			sprintf(nomefile_campi,"%s_out_y.2D",argv[1]);
+			clean_fields=fopen(nomefile_campi, "wb");
+			printf("\nWriting the fields file 2D (not vtk)\n");
+			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
+			j=ny1/2;
+			fprintf(clean_fields,"# 2D cut at z=%g\n", y_coordinates[j]); 
+			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, nz1, 1); 
+			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, zmin, xmax, zmax);
+			for(k=0;k<nz1;k++)
+				for(i=0;i<nx1;i++)
+					{
+						xx=x_coordinates[i];
+						yy=z_coordinates[k];
+						//xx=xmin+dx*i;
+						//yy=ymin+dy*j;
+						fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					}
+			fclose(clean_fields);
+
+			sprintf(nomefile_campi,"%s_out_x.2D",argv[1]);
+			clean_fields=fopen(nomefile_campi, "wb");
+			printf("\nWriting the fields file 2D (not vtk)\n");
+			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
+			i=nx1/2;
+			fprintf(clean_fields,"# 2D cut at x=%g\n", x_coordinates[i]); 
+			fprintf(clean_fields,"# %i\n#%i\n#%i\n",ny1, nz1, 1); 
+			fprintf(clean_fields,"#%f %f\n#%f %f\n",ymin, zmin, ymax, zmax);
+			for(k=0;k<nz1;k++)
+				for(j=0;j<ny1;j++)
+					{
+						xx=y_coordinates[j];
+						yy=z_coordinates[k];
+						//xx=xmin+dx*i;
+						//yy=ymin+dy*j;
+						fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					}
+			fclose(clean_fields);
+
+			
+
+
 	}
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
 
