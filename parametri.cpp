@@ -10,8 +10,12 @@ non puo' nemmeno calcolare le le dimensioni dei bin!
 Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri :: Parametri()
 {
+	ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
+	ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
+	endianness = 0;
 	massa_particella_MeV = 0.;
 	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
+	tnow = 0.0;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
@@ -26,7 +30,7 @@ Parametri :: Parametri()
 	overwrite_weight_value = 1.0;
 	do_not_ask_missing = false;
 
-	last_cpu = 32768;		// il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
+	last_cpu = MAX_NUMBER_OF_CPUS;		// il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
 
 	for (int i = 0; i < NPARAMETRI; i++) 
 	{
@@ -123,39 +127,81 @@ float Parametri :: dimmi_dim(int colonna)
 void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 {
 	std::string riga_persa;
-	int trascura, ndv, i_end;
-	std::getline(file_dat,riga_persa);
-	file_dat >> trascura; // 1° parametro
-	file_dat >> trascura; // 2° parametro
-	file_dat >> trascura; // 3° parametro
-	file_dat >> trascura; // 4° parametro
-	file_dat >> trascura; // 5° parametro
-	file_dat >> trascura; // 6° parametro
-	file_dat >> trascura; // 7° parametro
-	file_dat >> trascura; // 8° parametro
-	file_dat >> trascura; // 9° parametro
-	file_dat >> trascura; // 10° parametro
-	file_dat >> trascura; // 11° parametro
-	file_dat >> trascura; // 12° parametro
-	file_dat >> trascura; // 13° parametro
-	file_dat >> trascura; // 14° parametro
-	file_dat >> trascura; // 15° parametro
-	file_dat >> trascura; // 16° parametro
-	file_dat >> trascura; // 17° parametro
-	file_dat >> ndv;	  // 18° parametro
-	file_dat >> trascura; // 19° parametro
-	file_dat >> i_end;	  // 20° parametro
+	int trascura_int;
+	int trascura_float;
+	int fattore_ricampionamento;
+
+	std::getline(file_dat,riga_persa);	// per leggere la riga Integer parameters
+
+	ncpu_x = 1;
+	file_dat >> ncpu_y;					// 1° parametro
+	file_dat >> ncpu_z;					// 2° parametro
+	ncpu = ncpu_x * ncpu_y * ncpu_z;
+	file_dat >> npunti_x;				// 3° parametro
+	file_dat >> npunti_x_ricampionati;	// 4° parametro
+	fattore_ricampionamento = npunti_x / npunti_x_ricampionati;
+	npx_per_cpu = npunti_x_ricampionati;
+	file_dat >> npunti_y_ricampionati;	// 5° parametro
+	file_dat >> npy_per_cpu;			// 6° parametro
+	file_dat >> npunti_z_ricampionati;	// 7° parametro
+	file_dat >> npz_per_cpu;			// 8° parametro
+	file_dat >> trascura_int;			// 9° parametro
+	file_dat >> trascura_int;			// 10° parametro
+	file_dat >> trascura_int;			// 11° parametro
+	file_dat >> trascura_int;			// 12° parametro
+	file_dat >> trascura_int;			// 13° parametro
+	file_dat >> trascura_int;			// 14° parametro
+	file_dat >> trascura_int;			// 15° parametro
+	file_dat >> trascura_int;			// 16° parametro
+	file_dat >> trascura_int;			// 17° parametro
+	file_dat >> ndv;					// 18° parametro
+	file_dat >> trascura_int;			// 19° parametro
+	file_dat >> endianness;				// 20° parametro
+
+	std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
+	std::getline(file_dat,riga_persa);	// per leggere la riga Real parameters
+
+	file_dat >> tnow;					// 1° parametro
+	file_dat >> xmin;					// 2° parametro
+	file_dat >> xmax;					// 3° parametro
+	file_dat >> ymin;					// 4° parametro
+	file_dat >> ymax;					// 5° parametro
+	file_dat >> zmin;					// 6° parametro
+	file_dat >> zmax;					// 7° parametro
+	file_dat >> trascura_float;			// 8° parametro
+	file_dat >> trascura_float;			// 9° parametro
+	file_dat >> trascura_float;			// 10° parametro
+	file_dat >> trascura_float;			// 11° parametro
+	file_dat >> trascura_float;			// 12° parametro
+	file_dat >> trascura_float;			// 13° parametro
+	file_dat >> trascura_float;			// 14° parametro
+	file_dat >> trascura_float;			// 15° parametro
+	file_dat >> trascura_float;			// 16° parametro
+	file_dat >> trascura_float;			// 17° parametro
+	file_dat >> trascura_float;			// 18° parametro
+	file_dat >> trascura_float;			// 19° parametro
+	file_dat >> trascura_float;			// 20° parametro
+
 
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
 		if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
 		else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
 		else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
+		if (ndv == 4 || ndv == 5) zmin = 0.0, zmax = 1.0;
 		p[NCOLONNE] = ndv;
 		p_b[NCOLONNE] = false;
 		p_b[WEIGHT] = false;
 	}
-	endian_file = (i_end-1);
+	else
+	{
+		if (npunti_z_ricampionati == 1) zmin = 0.0, zmax = 1.0;
+		p[WEIGHT] = 0;
+		p[NCOLONNE] = npunti_z_ricampionati;
+		p_b[NCOLONNE] = false;
+		p_b[WEIGHT] = false;
+	}
+	endian_file = (endianness-1);
 }
 
 void Parametri :: chiedi_numero_colonne()
@@ -360,10 +406,60 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			p_b[WEIGHT] = false;
 			i++;
 		}
-		else if (std::string(argv[i]) == "-dump_binary")
+		else if (std::string(argv[i]) == "-dump_vtk")
 		{
-			p[OUT_BINARY] = 1;
-			p_b[OUT_BINARY] = false;
+			p[OUT_VTK] = 1;
+			p_b[OUT_VTK] = false;
+		}
+		else if (std::string(argv[i]) == "-dump_cutx")
+		{
+			if (p[NCOLONNE]>1)
+			{
+				float posizione_taglio = (float) atof(argv[i+1]);
+				posizioni_taglio_griglia_x.push_back(posizione_taglio);
+				p[OUT_CUTX] = 1;
+				p_b[OUT_CUTX] = false;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
+			}
+			i++;
+		}
+		else if (std::string(argv[i]) == "-dump_cuty")
+		{
+			if (p[NCOLONNE]>1)
+			{
+				float posizione_taglio = (float) atof(argv[i+1]);
+				posizioni_taglio_griglia_y.push_back(posizione_taglio);
+				p[OUT_CUTY] = 1;
+				p_b[OUT_CUTY] = false;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
+			}
+			i++;
+		}
+		else if (std::string(argv[i]) == "-dump_cutz")
+		{
+			if (p[NCOLONNE]>1)
+			{
+				float posizione_taglio = (float) atof(argv[i+1]);
+				posizioni_taglio_griglia_z.push_back(posizione_taglio);
+				p[OUT_CUTZ] = 1;
+				p_b[OUT_CUTZ] = false;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
+			}
+			i++;
+		}
+		else if (std::string(argv[i]) == "-dump_gnuplot")
+		{
+			p[OUT_GRID2D] = 1;
+			p_b[OUT_GRID2D] = false;
 		}
 		else if (std::string(argv[i]) == "-dump_propaga")
 		{
@@ -427,15 +523,29 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-zmin")
 		{
-			zmin = (float) atof(argv[i+1]);
-			zmin_b = false;
-			i++;
+			if (p[NCOLONNE]>5)
+			{
+				zmin = (float) atof(argv[i+1]);
+				zmin_b = false;
+				i++;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-zmax")
 		{
-			zmax = (float) atof(argv[i+1]);
-			zmax_b = false;
-			i++;
+			if (p[NCOLONNE]>5)
+			{
+				zmax = (float) atof(argv[i+1]);
+				zmax_b = false;
+				i++;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-pxmin")
 		{
@@ -463,15 +573,29 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-pzmin")
 		{
-			pzmin = (float) atof(argv[i+1]);
-			pzmin_b = false;
-			i++;
+			if (p[NCOLONNE]>5)
+			{
+				pzmin = (float) atof(argv[i+1]);
+				pzmin_b = false;
+				i++;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-pzmax")
 		{
-			pzmax = (float) atof(argv[i+1]);
-			pzmax_b = false;
-			i++;
+			if (p[NCOLONNE]>5)
+			{
+				pzmax = (float) atof(argv[i+1]);
+				pzmax_b = false;
+				i++;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-thetamin")
 		{
@@ -527,11 +651,25 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_xz")
 		{
-			fai_plot_xz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_xz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_yz")
 		{
-			fai_plot_yz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_yz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_xpx")
 		{
@@ -543,7 +681,14 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_xpz")
 		{
-			fai_plot_xpz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_xpz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_ypx")
 		{
@@ -555,19 +700,47 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_ypz")
 		{
-			fai_plot_ypz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_ypz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_zpx")
 		{
-			fai_plot_zpx = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_zpx = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_zpy")
 		{
-			fai_plot_zpy = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_zpy = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_zpz")
 		{
-			fai_plot_zpz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_zpz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_pxpy")
 		{
@@ -575,11 +748,25 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_pxpz")
 		{
-			fai_plot_pxpz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_pxpz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_pypz")
 		{
-			fai_plot_pypz = 1;
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_pypz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-plot_etheta")
 		{
@@ -977,30 +1164,103 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
 #endif
-		if (p_b[OUT_BINARY] && !do_not_ask_missing)
+		if (p_b[OUT_VTK] && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
-			std::cin >> p[OUT_BINARY];
+			std::cin >> p[OUT_VTK];
+			p_b[OUT_VTK] = false;
 		}
 		if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
 			std::cin >> p[OUT_PROPAGA];
+			p_b[OUT_PROPAGA] = false;
 		}
 		if (p_b[OUT_XYZE] && !do_not_ask_missing)
 		{
-			std::cout << "Vuoi l'output di un file ASCII contenente x y z ed energia? 1 si', 0 no: ";
+			std::cout << "Vuoi l'output di un file ASCII contenente x y (z) ed energia? 1 si', 0 no: ";
 			std::cin >> p[OUT_XYZE];
+			p_b[OUT_XYZE] = false;
 		}
 		if (p_b[OUT_CSV] && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
 			std::cin >> p[OUT_CSV];
+			p_b[OUT_CSV] = false;
 		}
 		if (p_b[OUT_PARAMS] && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
 			std::cin >> p[OUT_PARAMS];
+			p_b[OUT_PARAMS] = false;
+		}
+	}
+	else
+	{
+		if (p_b[OUT_VTK] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
+			std::cin >> p[OUT_VTK];
+			p_b[OUT_VTK] = false;
+		}
+		if (p[NCOLONNE] > 1)
+		{
+			if (p_b[OUT_CUTX] && !do_not_ask_missing)
+			{
+				std::cout << "Vuoi l'output di una slice tagliata lungo x per gnuplot? 1 si', 0 no: ";
+				std::cin >> p[OUT_CUTX];
+				p_b[OUT_CUTX] = false;
+				float posizione_taglio = 0.0;
+				if (p[OUT_CUTX] == 1)
+				{
+					std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
+					std::cin >> posizione_taglio;
+					posizioni_taglio_griglia_x.push_back(posizione_taglio);
+				}
+			}
+			if (p_b[OUT_CUTY] && !do_not_ask_missing)
+			{
+				std::cout << "Vuoi l'output di una slice tagliata lungo y per gnuplot? 1 si', 0 no: ";
+				std::cin >> p[OUT_CUTY];
+				p_b[OUT_CUTY] = false;
+				float posizione_taglio = 0.0;
+				if (p[OUT_CUTY] == 1)
+				{
+					std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
+					std::cin >> posizione_taglio;
+					posizioni_taglio_griglia_x.push_back(posizione_taglio);
+				}
+			}
+			if (p_b[OUT_CUTZ] && !do_not_ask_missing)
+			{
+				std::cout << "Vuoi l'output di una slice tagliata lungo z per gnuplot? 1 si', 0 no: ";
+				std::cin >> p[OUT_CUTZ];
+				p_b[OUT_CUTZ] = false;
+				float posizione_taglio = 0.0;
+				if (p[OUT_CUTZ] == 1)
+				{
+					std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
+					std::cin >> posizione_taglio;
+					posizioni_taglio_griglia_x.push_back(posizione_taglio);
+				}
+			}
+			p[OUT_GRID2D] = 0;
+			p_b[OUT_GRID2D] = false;
+		}
+		else
+		{
+			if (p_b[OUT_GRID2D] && !do_not_ask_missing)
+			{
+				std::cout << "Vuoi l'output di una slice tagliata lungo z per gnuplot? 1 si', 0 no: ";
+				std::cin >> p[OUT_CUTZ];
+				p_b[OUT_CUTZ] = false;
+			}
+			p[OUT_CUTX] = 0;
+			p_b[OUT_CUTX] = false;
+			p[OUT_CUTY] = 0;
+			p_b[OUT_CUTY] = false;
+			p[OUT_CUTZ] = 0;
+			p_b[OUT_CUTZ] = false;
 		}
 	}
 	fileParametri.close();
@@ -1026,6 +1286,7 @@ bool Parametri :: check_parametri()
 		{
 			p[SWAP] = 0;
 			p_b[SWAP] = false;
+			test=true;
 		}
 		else
 		{
@@ -1035,7 +1296,6 @@ bool Parametri :: check_parametri()
 	}
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) 
 	{
-
 		if ( !p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1 )
 		{
 			printf("Attenzione: modalita` weight mal definita\n");
@@ -1051,6 +1311,7 @@ bool Parametri :: check_parametri()
 			{
 				p[WEIGHT] = 1;
 				p_b[WEIGHT] = false;
+				test=true;
 			}
 			else
 			{
@@ -1073,6 +1334,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_CSV] = 0;
 				p_b[OUT_CSV] = false;
+				test=true;
 			}
 			else
 			{
@@ -1095,6 +1357,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_PROPAGA] = 0;
 				p_b[OUT_PROPAGA] = false;
+				test=true;
 			}
 			else
 			{
@@ -1117,28 +1380,30 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_XYZE] = 0;
 				p_b[OUT_XYZE] = false;
+				test=true;
 			}
 			else
 			{
-				printf("Attenzione: output ppg non definito\n");
+				printf("Attenzione: output xyzE non definito\n");
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_BINARY] && p[OUT_BINARY] != 0 && p[OUT_BINARY] != 1  )
+		if ( !p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1  )
 		{
 			printf("Attenzione: output binario mal definito\n");
 			test = false;
 		}
 		else
 		{
-			if (!p_b[OUT_BINARY] && (p[OUT_BINARY] == 0 || p[OUT_BINARY] == 1))
+			if (!p_b[OUT_VTK] && (p[OUT_VTK] == 0 || p[OUT_VTK] == 1))
 			{
 				test = true;		// tutto ok, in questo caso il parametro va bene!
 			}
-			else if (p_b[OUT_BINARY] && do_not_ask_missing)
+			else if (p_b[OUT_VTK] && do_not_ask_missing)
 			{
-				p[OUT_BINARY] = 0;
-				p_b[OUT_BINARY] = false;
+				p[OUT_VTK] = 0;
+				p_b[OUT_VTK] = false;
+				test=true;
 			}
 			else
 			{
@@ -1162,6 +1427,7 @@ bool Parametri :: check_parametri()
 			{
 				p[FIND_MINMAX] = 0;
 				p_b[FIND_MINMAX] = false;
+				test=true;
 			}
 			else
 			{
@@ -1184,6 +1450,7 @@ bool Parametri :: check_parametri()
 			{
 				p[DO_BINNING] = 0;
 				p_b[DO_BINNING] = false;
+				test=true;
 			}
 			else
 			{
@@ -1206,6 +1473,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_PARAMS] = 0;
 				p_b[OUT_PARAMS] = false;
+				test=true;
 			}
 			else
 			{
@@ -1228,6 +1496,7 @@ bool Parametri :: check_parametri()
 			{
 				p[NCOLONNE] = 7;
 				p_b[NCOLONNE] = false;
+				test=true;
 			}
 			else
 			{
@@ -1298,11 +1567,130 @@ bool Parametri :: check_parametri()
 			test = false;
 		}
 	}
+	else
+	{
+		if ( !p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1  )
+		{
+			printf("Attenzione: output binario mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_VTK] && (p[OUT_VTK] == 0 || p[OUT_VTK] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_VTK] && do_not_ask_missing)
+			{
+				p[OUT_VTK] = 0;
+				p_b[OUT_VTK] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output binario non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_CUTX] && p[OUT_CUTX] != 0 && p[OUT_CUTX] != 1  )
+		{
+			printf("Attenzione: output slice mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_CUTX] && (p[OUT_CUTX] == 0 || p[OUT_CUTX] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_CUTX] && do_not_ask_missing)
+			{
+				p[OUT_CUTX] = 0;
+				p_b[OUT_CUTX] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output slice non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_CUTY] && p[OUT_CUTY] != 0 && p[OUT_CUTY] != 1  )
+		{
+			printf("Attenzione: output slice mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_CUTY] && (p[OUT_CUTY] == 0 || p[OUT_CUTY] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_CUTY] && do_not_ask_missing)
+			{
+				p[OUT_CUTY] = 0;
+				p_b[OUT_CUTY] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output slice non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_CUTZ] && p[OUT_CUTZ] != 0 && p[OUT_CUTZ] != 1  )
+		{
+			printf("Attenzione: output slice mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_CUTZ] && (p[OUT_CUTZ] == 0 || p[OUT_CUTZ] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_CUTZ] && do_not_ask_missing)
+			{
+				p[OUT_CUTZ] = 0;
+				p_b[OUT_CUTZ] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output slice non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_GRID2D] && p[OUT_GRID2D] != 0 && p[OUT_GRID2D] != 1  )
+		{
+			printf("Attenzione: output griglia 2D mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_GRID2D] && (p[OUT_GRID2D] == 0 || p[OUT_GRID2D] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_GRID2D] && do_not_ask_missing)
+			{
+				p[OUT_GRID2D] = 0;
+				p_b[OUT_GRID2D] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output griglia 2D non definito\n");
+				test = false;
+			}
+		}
+	}
 
 	/*******************************************************
 	**** MOLTO PERICOLOSO QUANTO SEGUE *********************
+	**** commentato perche' non piu' necessario ************
 	*******************************************************/
-	if (do_not_ask_missing) test=true;
+	//if (do_not_ask_missing) test=true;
 
 
 	return test;

@@ -75,19 +75,25 @@ typedef unsigned long int uint32_t;
 
 #define NUMERO_MASSIMO	1.0e30
 #define MAX_LENGTH_FILENAME 200
+#define MAX_NUMBER_OF_CPUS	32768
 
-
-#define NPARAMETRI	10
+#define NPARAMETRI	14
 #define WEIGHT		0
 #define SWAP		1
-#define OUT_BINARY	2
+#define OUT_VTK		2
 #define OUT_PROPAGA	3
 #define	FIND_MINMAX	4
 #define DO_BINNING	5
 #define OUT_PARAMS	6
 #define OUT_CSV		7
-#define NCOLONNE    8
+#define NCOLONNE    8	// per i dump degli spazi delle fasi qui memorizziamo il numero di colonne presenti nel file binario [dovrebbe coincidere con ndv] 
+						// (valori pari a 4 o 5 significano simulazioni 2D con o senza weight, valori tipo 6 o 7 invece sono per sim 3D con o senza weight)
+						// per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (ricampionati) lungo z (> 1 significa che la griglia e' 3D)
 #define OUT_XYZE	9
+#define OUT_CUTX	10
+#define OUT_CUTY	11
+#define OUT_CUTZ	12
+#define OUT_GRID2D	13
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E
@@ -134,6 +140,9 @@ typedef unsigned long int uint32_t;
 
 struct Parametri
 {
+	int ncpu_x, ncpu_y, ncpu_z, ncpu;
+	int ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
+	int endianness;
 	float massa_particella_MeV;
 	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_thetaT, nbin_gamma;
 	int endian_file, endian_machine;
@@ -142,9 +151,11 @@ struct Parametri
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
 	float minimi[SEI_DIMENSIONI+ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI+ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E
-	float xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax;
+	float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax;
+	std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
-		gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
+		gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, 
+		nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
 	bool old_fortran_bin;
 	bool overwrite_weight;
 	bool do_not_ask_missing;

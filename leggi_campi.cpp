@@ -9,8 +9,33 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	std::ostringstream nomefile_bin;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 
-	int out_swap = parametri->p[SWAP];
-	//	int out_parameters = parametri.p[OUT_PARAMS];
+	const int out_swap = parametri->p[SWAP];
+	const int out_parameters = parametri->p[OUT_PARAMS];
+	const int out_vtk = parametri->p[OUT_VTK];
+	const int out_cutx = parametri->p[OUT_CUTX];
+	const int out_cuty = parametri->p[OUT_CUTY];
+	const int out_cutz = parametri->p[OUT_CUTZ];
+	const int out_2d = parametri->p[OUT_GRID2D];
+
+	int npunti_x = parametri->npunti_x_ricampionati;
+	int npunti_y = parametri->npunti_y_ricampionati;
+	int npunti_z = parametri->npunti_z_ricampionati;
+	int npunti_x_per_cpu = parametri->npx_per_cpu;
+	int npunti_y_per_cpu = parametri->npy_per_cpu;
+	int npunti_z_per_cpu = parametri->npz_per_cpu;
+	int ncpu_x = parametri->ncpu_x;
+	int ncpu_y = parametri->ncpu_y;
+	int ncpu_z = parametri->ncpu_z;
+	float xminimo = parametri->xmin;
+	float xmaximo = parametri->xmax;
+	float yminimo = parametri->ymin;
+	float ymaximo = parametri->ymax;
+	float zminimo = parametri->zmin;
+	float zmaximo = parametri->zmax;
+	float taglio;
+	std::vector<float> cutx, cuty, cutz;
+	std::vector<int> gridIndex_cutx, gridIndex_cuty, gridIndex_cutz;
+
 
 	int N_param = 0, np_loc, npoint_loc[3] = {0,0,0}, loc_size = 0;
 	int segnoy = 0, segnoz = 0, buff = 0;
@@ -21,7 +46,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	float xt_in = 0., xt_end = 0., charge = 0., mass = 0., xmin = 0., xmax = 0., ymin = 0., ymax = 0., zmin = 0., zmax = 0.;
 	float E0 = 0., dx = 0., dy = 0., dz = 0., xx = 0., yy = 0.;
 
-	int i, j, k, ipy, ipz;
+
 	int *int_param;
 	float *real_param;
 	float *field,*buffer;
@@ -34,13 +59,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	std::FILE *parameters;
 	std::FILE *clean_fields;
 
-	//int nx,ibx,iby,ibz,model,dmodel,nsp,lpord,deord,npe,fvar;
-	//int npe_y, npe_z;
-	//int nxloc, nx1, ny1, nyloc, nz1, nzloc;
-	//float tnow,w0x,w0y,nrat,a0,lam0,B0,ompe,xt_in,xt_end,charge,mass;
-	//float xmin,xmax,ymin,ymax,zmin,zmax,E0;
-	//float dx, dy, dz, xx, yy;
-	//	float zz;
 	file_in=fopen(nomefile_bin.str().c_str(), "rb");
 
 	size_t fread_size = 0;
@@ -64,8 +82,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	if (out_swap) swap_endian_i(int_param,N_param);
 	if (out_swap) swap_endian_f(real_param,N_param);
 
-	npe_y=int_param[0];     //numero processori
-	npe_z=int_param[1];     //numero processori
+	npe_y=int_param[0];     //numero processori lungo y
+	npe_z=int_param[1];     //numero processori lungo z
 	npe=npe_y*npe_z;     //numero processori
 	nx=int_param[2];
 	nx1=int_param[3];
@@ -153,13 +171,35 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,nx1*ny1*nz1);
 	fflush(stdout);
 
-	field=(float*)malloc(nx1*ny1*nz1*sizeof(float));
-	//	segnox=0;
-	segnoy=segnoz=0;
-	for(ipz=0;ipz<npe_z;ipz++)
+
+	if (parametri->old_fortran_bin)
+	{
+		npunti_x = nx1;
+		npunti_y = ny1;
+		npunti_z = nz1;
+		ncpu_x = 1;
+		ncpu_y = npe_y;
+		ncpu_z = npe_z;
+		npunti_x_per_cpu = nx1;
+		npunti_y_per_cpu = nyloc;
+		npunti_z_per_cpu = nzloc;
+		xminimo = xmin;
+		xmaximo = xmax;
+		yminimo = ymin;
+		ymaximo = ymax;
+		zminimo = zmin;
+		zmaximo = zmax;
+	}
+
+
+	field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
+
+
+
+	for(int ipz = 0; ipz < ncpu_z; ipz++)
 	{
 		segnoy=0;
-		for(ipy=0;ipy<npe_y;ipy++)
+		for(int ipy=0; ipy < ncpu_y; ipy++)
 		{
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			fread_size = std::fread(npoint_loc,sizeof(int),3,file_in);
@@ -168,9 +208,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			if(out_swap) swap_endian_i(npoint_loc,3);
 
 			loc_size=npoint_loc[0]*npoint_loc[1]*npoint_loc[2];
-			nxloc=npoint_loc[0];
-			nyloc=npoint_loc[1];
-			nzloc=npoint_loc[2];
+
+			nxloc=npoint_loc[0];	// ma non dovrebbero essere gia' noti? possono variare da cpu a cpu? non credo...
+			nyloc=npoint_loc[1];	// comunque a questo punto lascio i "vecchi" nxloc, nyloc ed nzloc, in attesa di rimuoverli in futuro con le versioni aggiornate
+			nzloc=npoint_loc[2];	// che leggono dal binario se necessario oppure dal dat allegato per i nuovi
 
 			printf("processore ipz=%i/%i  ipy=%i/%i     segnoz=%i     segnoy=%i\r",ipz,npe_z, ipy,npe_y,segnoz,segnoy );
 			fflush(stdout);
@@ -182,27 +223,36 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 			if(out_swap) swap_endian_f(buffer,loc_size);
 
-			for(k=0;k<nzloc;k++)
-				for(j=0;j<nyloc;j++)
-					for(i=0;i<nxloc;i++)
+			for(int k=0; k<nzloc; k++)
+				for(int j=0; j<nyloc; j++)
+					for(int i=0; i<nxloc; i++)
 						field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
-			segnoy+=nyloc;
+			segnoy += nyloc;
 		} 
-		segnoz+=nzloc;
+		segnoz += nzloc;
 	}
 
-	dx=(xmax-xmin)/(nx1-1);
-	dy=(ymax-ymin)/(ny1-1);
-	if(nz1<=1)
-		dz=(zmax-zmin);
+
+
+	dx=(xmax-xmin)/(npunti_x-1);
+	dy=(ymax-ymin)/(npunti_y-1);
+	if(npunti_z == 1)
+		dz = (zmax-zmin);
 	else
-		dz=(zmax-zmin)/(nz1-1);
+		dz = (zmax-zmin) / (npunti_z-1);
 
-	x_coordinates=new float[nx1];
-	y_coordinates=new float[ny1];
-	z_coordinates=new float[nz1];
+	x_coordinates=new float[npunti_x];
+	y_coordinates=new float[npunti_y];
+	z_coordinates=new float[npunti_z];
 
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+
+	// leggiamo ora le coordinate dei punti di griglia, presenti solo nelle nuove versioni che possono prevedere griglia stretchata
+	// se non ci sono, le posizioni vengono create, sotto, nell'"else", come struttura regolare a partire dagli indici di griglia e dai dx, dy, dz
+
+	fread_size = std::fread(&buff,sizeof(int),1,file_in);	// facciamo il test sul buffer Fortran della prima coordinata, cosi' se c'e' non dobbiamo nemmeno tornare indietro
+	// in futuro, con un output pulito, andra' modificata, facendo il test di lettura della prima coordinata ed eventualmente
+	// tornando indietro se c'e' per poi entrare correttamente nella lettura seguente
 
 	if(!std::feof(file_in))
 	{
@@ -224,12 +274,12 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	}
 	else
 	{
-		for(i=0;i<nx1;i++)
-			x_coordinates[i]=xmin+dx*i;
-		for(i=0;i<ny1;i++)
-			y_coordinates[i]=ymin+dy*i;
-		for(i=0;i<nz1;i++)
-			z_coordinates[i]=zmin+dz*i;
+		for(int i = 0; i < nx1; i++)
+			x_coordinates[i] = xmin + dx*i;
+		for(int i = 0; i < ny1; i++)
+			y_coordinates[i] = ymin + dy*i;
+		for(int i = 0; i < nz1; i++)
+			z_coordinates[i] = zmin + dz*i;
 	}
 
 	printf("=========FINE LETTURE==========\n");
@@ -237,158 +287,237 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 
 
-	if(nz1<=1)
+	if(npunti_z == 1 && out_2d)
 	{
-		sprintf(nomefile_campi,"%s_out.2D",argv[1]);
-		clean_fields=fopen(nomefile_campi, "wb");
+		printf("\nScrittura file gnuplot 2D\n",(unsigned long) fread_size);
+		sprintf(nomefile_campi,"%s.txt",argv[1]);
+		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-		for(k=0;k<nz1;k++)
-			for(j=0;j<ny1;j++)
-				for(i=0;i<nx1;i++)
-				{
-					xx=x_coordinates[i];
-					//xmin+dx*i;
-					yy=y_coordinates[j];//ymin+dy*j;
-					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
-				}
-				fclose(clean_fields);
-	}
-	else
+		for(int j = 0; j < ny1; j++)
 		{
-			sprintf(nomefile_campi,"%s_out.2D",argv[1]);
+			for(int i = 0; i < nx1; i++)
+			{
+				xx=x_coordinates[i];//xmin+dx*i;
+				yy=y_coordinates[j];//ymin+dy*j;
+				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1]);
+			}
+		}
+		fclose(clean_fields);
+	}
+
+
+	if (npunti_z > 1 && out_cutz)
+	{
+		if (parametri->posizioni_taglio_griglia_z.size() == 0)
+		{
+			taglio = z_coordinates[nz1/2];
+			cutz.push_back(taglio);
+			gridIndex_cutz.push_back(nz1/2);
+		}
+		else
+		{
+			taglio = 0.0;
+			int i = 0;
+			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_z.size(); j++)
+			{
+				while (taglio < parametri->posizioni_taglio_griglia_z.at(j)) taglio = z_coordinates[i], i++;
+				cutz.push_back(taglio);
+				gridIndex_cutz.push_back(i-1);
+				i = 0;
+			}
+		}
+		for (size_t n = 0; n < cutz.size(); n++)
+		{
+			sprintf(nomefile_campi,"%s_cutz_%g.txt",argv[1], cutz[n]);
+			printf("\nScrittura file gnuplot taglio z=%g\n",cutz[n]);
 			clean_fields=fopen(nomefile_campi, "wb");
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-			k=nz1/2;
-			fprintf(clean_fields,"# 2D cut at z=%g\n", z_coordinates[k]); 
+			fprintf(clean_fields,"# 2D cut at z=%g\n", cutz[n]); 
 			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-			for(j=0;j<ny1;j++)
-				for(i=0;i<nx1;i++)
-					{
-						xx=x_coordinates[i];
-						yy=y_coordinates[j];
-						//xx=xmin+dx*i;
-						//yy=ymin+dy*j;
-						fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
-					}
+			int k = gridIndex_cutz[n];
+			for(int j = 0; j < ny1; j++)
+			{
+				for(int i = 0; i < nx1; i++)
+				{
+					xx=x_coordinates[i];//xx=xmin+dx*i;
+					yy=y_coordinates[j];//yy=ymin+dy*j;
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+				}
+			}
 			fclose(clean_fields);
+		}
+	}
 
-			sprintf(nomefile_campi,"%s_out_y.2D",argv[1]);
+	if (npunti_z > 1 && out_cuty)
+	{
+		if (parametri->posizioni_taglio_griglia_y.size() == 0)
+		{
+			taglio = y_coordinates[ny1/2];
+			cuty.push_back(taglio);
+			gridIndex_cuty.push_back(ny1/2);
+		}
+		else
+		{
+			taglio = 0.0;
+			int i = 0;
+			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_y.size(); j++)
+			{
+				while (taglio < parametri->posizioni_taglio_griglia_y.at(j)) taglio = y_coordinates[i], i++;
+				cuty.push_back(taglio);
+				gridIndex_cuty.push_back(i-1);
+				i = 0;
+			}
+		}
+		for (size_t n = 0; n < cuty.size(); n++)
+		{
+			sprintf(nomefile_campi,"%s_cuty_%g.txt",argv[1], cuty[n]);
+			printf("\nScrittura file gnuplot taglio y=%g\n",cuty[n]);
 			clean_fields=fopen(nomefile_campi, "wb");
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-			j=ny1/2;
-			fprintf(clean_fields,"# 2D cut at z=%g\n", y_coordinates[j]); 
+			fprintf(clean_fields,"# 2D cut at y=%g\n", cuty[n]); 
 			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, nz1, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, zmin, xmax, zmax);
-			for(k=0;k<nz1;k++)
-				for(i=0;i<nx1;i++)
-					{
-						xx=x_coordinates[i];
-						yy=z_coordinates[k];
-						//xx=xmin+dx*i;
-						//yy=ymin+dy*j;
-						fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
-					}
+			int j = gridIndex_cuty[n];
+			for(int k = 0; k < nz1; k++)
+			{
+				for(int i = 0; i < nx1; i++)
+				{
+					xx=x_coordinates[i];//xx=xmin+dx*i;
+					yy=z_coordinates[k];//yy=ymin+dy*j;
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+				}
+			}
 			fclose(clean_fields);
+		}
+	}
 
-			sprintf(nomefile_campi,"%s_out_x.2D",argv[1]);
+	if (npunti_z > 1 && out_cutx)
+	{
+		if (parametri->posizioni_taglio_griglia_x.size() == 0)
+		{
+			taglio = x_coordinates[nx1/2];
+			cutx.push_back(taglio);
+			gridIndex_cutx.push_back(nx1/2);
+		}
+		else
+		{
+			taglio = 0.0;
+			int i = 0;
+			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_x.size(); j++)
+			{
+				while (taglio < parametri->posizioni_taglio_griglia_x.at(j)) taglio = x_coordinates[i], i++;
+				cutx.push_back(taglio);
+				gridIndex_cutx.push_back(i-1);
+				i = 0;
+			}
+		}
+		for (size_t n = 0; n < cutx.size(); n++)
+		{
+			sprintf(nomefile_campi,"%s_cutx_%g.txt",argv[1], cutx[n]);
+			printf("\nScrittura file gnuplot taglio x=%g\n",cutx[n]);
 			clean_fields=fopen(nomefile_campi, "wb");
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-			i=nx1/2;
-			fprintf(clean_fields,"# 2D cut at x=%g\n", x_coordinates[i]); 
+			fprintf(clean_fields,"# 2D cut at x=%g\n", cutx[n]); 
 			fprintf(clean_fields,"# %i\n#%i\n#%i\n",ny1, nz1, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",ymin, zmin, ymax, zmax);
-			for(k=0;k<nz1;k++)
-				for(j=0;j<ny1;j++)
-					{
-						xx=y_coordinates[j];
-						yy=z_coordinates[k];
-						//xx=xmin+dx*i;
-						//yy=ymin+dy*j;
-						fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
-					}
+			int i = gridIndex_cutx[n];
+			for(int k = 0; k < nz1; k++)
+			{
+				for(int j = 0; j < ny1; j++)
+				{
+					xx=y_coordinates[j];//xx=xmin+dx*i;
+					yy=z_coordinates[k];//yy=ymin+dy*j;
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+				}
+			}
 			fclose(clean_fields);
-
-			
-
-
+		}
 	}
+
+
+	if (out_vtk)
+	{
+		printf("%lu\nScrittura vtk\n\n",(unsigned long) fread_size);
+
+		if(parametri->endian_machine == 0)
+		{
+			swap_endian_f(field,nx1*ny1*nz1);
+			swap_endian_f(x_coordinates,nx1);
+			swap_endian_f(y_coordinates,ny1);
+			swap_endian_f(z_coordinates,nz1);
+		}
+
+		//////// DATASET STRUCTURED_POINTS VERSION    ////////
+		/*
+		sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+		clean_fields=fopen(nomefile_campi, "w");
+		printf("\nWriting the fields file\n");
+		fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+		fprintf(clean_fields,"titolo mio\n");
+		fprintf(clean_fields,"BINARY\n");
+		//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+		fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
+		fprintf(clean_fields,"POINTS %i float\n",nx1*ny1*nz1);
+		float rr[3];
+		for(k=0;k<nz1;k++)
+		{
+		rr[2]=z_coordinates[k];
+		for(j=0;j<ny1;j++)
+		{
+		rr[1]=y_coordinates[j];
+		for(i=0;i<nx1;i++)
+		{
+		rr[0]=x_coordinates[i];
+		fwrite((void*)rr,sizeof(float),3,clean_fields);
+		}
+		}
+		}
+
+		fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+		fprintf(clean_fields,"LOOKUP_TABLE default\n");
+		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+		fclose(clean_fields);
+		*/
+
+		sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+		clean_fields=fopen(nomefile_campi, "wb");
+		printf("\nWriting the fields file\n");
+		fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
+		fprintf(clean_fields,"titolo mio\n");
+		fprintf(clean_fields,"BINARY\n");
+		//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
+		fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
+		fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
+		//fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
+		//fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
+		fprintf(clean_fields,"X_COORDINATES %i float\n",nx1);
+		fwrite((void*)x_coordinates,sizeof(float),nx1,clean_fields);
+		fprintf(clean_fields,"Y_COORDINATES %i float\n",ny1);
+		fwrite((void*)y_coordinates,sizeof(float),ny1,clean_fields);
+		fprintf(clean_fields,"Z_COORDINATES %i float\n",nz1);
+		fwrite((void*)z_coordinates,sizeof(float),nz1,clean_fields);
+
+		fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
+		fprintf(clean_fields,"LOOKUP_TABLE default\n");
+		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+		fclose(clean_fields);
+
+		fclose(file_in);
+	}
+
+
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
 
-
-	if(parametri->endian_machine == 0)
-	{
-		swap_endian_f(field,nx1*ny1*nz1);
-		swap_endian_f(x_coordinates,nx1);
-		swap_endian_f(y_coordinates,ny1);
-		swap_endian_f(z_coordinates,nz1);
-	}
-
-	//////// DATASET STRUCTURED_POINTS VERSION    ////////
-	/*
-	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
-	clean_fields=fopen(nomefile_campi, "w");
-	printf("\nWriting the fields file\n");
-	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
-	fprintf(clean_fields,"titolo mio\n");
-	fprintf(clean_fields,"BINARY\n");
-	//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
-	fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
-	fprintf(clean_fields,"POINTS %i float\n",nx1*ny1*nz1);
-	float rr[3];
-	for(k=0;k<nz1;k++)
-	{
-	rr[2]=z_coordinates[k];
-	for(j=0;j<ny1;j++)
-	{
-	rr[1]=y_coordinates[j];
-	for(i=0;i<nx1;i++)
-	{
-	rr[0]=x_coordinates[i];
-	fwrite((void*)rr,sizeof(float),3,clean_fields);
-	}
-	}
-	}
-
-	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
-	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
-	fprintf(clean_fields,"LOOKUP_TABLE default\n");
-	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
-	fclose(clean_fields);
-	*/
-
-	sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
-	clean_fields=fopen(nomefile_campi, "wb");
-	printf("\nWriting the fields file\n");
-	fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
-	fprintf(clean_fields,"titolo mio\n");
-	fprintf(clean_fields,"BINARY\n");
-	//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
-	fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
-	fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
-	//fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
-	//fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
-	fprintf(clean_fields,"X_COORDINATES %i float\n",nx1);
-	fwrite((void*)x_coordinates,sizeof(float),nx1,clean_fields);
-	fprintf(clean_fields,"Y_COORDINATES %i float\n",ny1);
-	fwrite((void*)y_coordinates,sizeof(float),ny1,clean_fields);
-	fprintf(clean_fields,"Z_COORDINATES %i float\n",nz1);
-	fwrite((void*)z_coordinates,sizeof(float),nz1,clean_fields);
-
-	fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
-	fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
-	fprintf(clean_fields,"LOOKUP_TABLE default\n");
-	fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
-	fclose(clean_fields);
-
-	fclose(file_in);
 
 	return 0;
 

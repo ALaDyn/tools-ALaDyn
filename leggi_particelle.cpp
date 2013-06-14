@@ -60,7 +60,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 
 	const int out_swap = parametri->p[SWAP];
-	const int out_binary = parametri->p[OUT_BINARY];
+	const int out_binary = parametri->p[OUT_VTK];
 	const int out_ascii_propaga = parametri->p[OUT_PROPAGA];
 	const int out_ascii_csv = parametri->p[OUT_CSV];
 	const int out_parameters = parametri->p[OUT_PARAMS];
