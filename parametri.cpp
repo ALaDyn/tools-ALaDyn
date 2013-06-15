@@ -374,28 +374,37 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 
 		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
-			nomefile = std::string(argv[i+1]);
-			usa_file_parametri = true;
-			i++;
+			if (i < argc-1) 
+			{
+				nomefile = std::string(argv[i+1]);
+				usa_file_parametri = true;
+				i++;
+				std::cout << "Using " << argv[i+1] << "as the binning parameters file" << std::endl;
+			}
+			else std::cout << "Unable to find the binning parameters file on command line" << std::endl;
 		}
 		else if (std::string(argv[i]) == "-swap")
 		{
+			std::cout << "Forcing a bit endianness swapping" << std::endl;
 			p[SWAP] = 1;
 			p_b[SWAP] = false;
 		}
 		else if (std::string(argv[i]) == "-noswap")
 		{
+			std::cout << "Forcing a bit endianness NON swapping" << std::endl;
 			p[SWAP] = 0;
 			p_b[SWAP] = false;
 		}
 		else if (std::string(argv[i]) == "-force_new")
 		{
+			std::cout << "Forced using new files routine even without .dat file" << std::endl;
 			old_fortran_bin = false;
 		}
 		else if (std::string(argv[i]) == "-stop")
 		{
 			last_cpu = atoi(argv[i+1]);
 			if (last_cpu < 1) last_cpu = 1;
+			std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-ncol")
@@ -403,11 +412,13 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			int ncolumns = atoi(argv[i+1]);
 			if (ncolumns == 6) p[WEIGHT] = 0;
 			else if (ncolumns == 7) p[WEIGHT] = 1;
+			std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
 			p_b[WEIGHT] = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-dump_vtk")
 		{
+			std::cout << "You asked to have a VTK dump of the input file" << last_cpu << std::endl;
 			p[OUT_VTK] = 1;
 			p_b[OUT_VTK] = false;
 		}
@@ -415,79 +426,131 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			if (p[NCOLONNE]>1)
 			{
-				float posizione_taglio = (float) atof(argv[i+1]);
-				posizioni_taglio_griglia_x.push_back(posizione_taglio);
+				if (argv[i+1][0] != '-')
+				{
+					float posizione_taglio = (float) atof(argv[i+1]);
+					posizioni_taglio_griglia_x.push_back(posizione_taglio);
+					std::cout << "You asked to cut the grid at x = " << posizione_taglio << std::endl;
+					i++;
+				}
+				else
+				{
+					std::cout << "You asked to cut the grid at the middle of the x-axis" << std::endl;
+				}
 				p[OUT_CUTX] = 1;
 				p_b[OUT_CUTX] = false;
 			}
 			else
 			{
 				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
+				if (argv[i+1][0] != '-') i++;
+				p[OUT_CUTX] = 0;
+				p_b[OUT_CUTX] = false;
 			}
-			i++;
 		}
+
 		else if (std::string(argv[i]) == "-dump_cuty")
 		{
 			if (p[NCOLONNE]>1)
 			{
-				float posizione_taglio = (float) atof(argv[i+1]);
-				posizioni_taglio_griglia_y.push_back(posizione_taglio);
+				if (argv[i+1][0] != '-')
+				{
+					float posizione_taglio = (float) atof(argv[i+1]);
+					posizioni_taglio_griglia_y.push_back(posizione_taglio);
+					std::cout << "You asked to cut the grid at y = " << posizione_taglio << std::endl;
+					i++;
+				}
+				else
+				{
+					std::cout << "You asked to cut the grid at the middle of the y-axis" << std::endl;
+				}
 				p[OUT_CUTY] = 1;
 				p_b[OUT_CUTY] = false;
 			}
 			else
 			{
 				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
+				if (argv[i+1][0] != '-') i++;
+				p[OUT_CUTY] = 0;
+				p_b[OUT_CUTY] = false;
 			}
-			i++;
 		}
+
 		else if (std::string(argv[i]) == "-dump_cutz")
 		{
 			if (p[NCOLONNE]>1)
 			{
-				float posizione_taglio = (float) atof(argv[i+1]);
-				posizioni_taglio_griglia_z.push_back(posizione_taglio);
+				if (argv[i+1][0] != '-')
+				{
+					float posizione_taglio = (float) atof(argv[i+1]);
+					posizioni_taglio_griglia_z.push_back(posizione_taglio);
+					std::cout << "You asked to cut the grid at z = " << posizione_taglio << std::endl;
+					i++;
+				}
+				else
+				{
+					std::cout << "You asked to cut the grid at the middle of the z-axis" << std::endl;
+				}
 				p[OUT_CUTZ] = 1;
 				p_b[OUT_CUTZ] = false;
 			}
 			else
 			{
 				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
+				if (argv[i+1][0] != '-') i++;
+				p[OUT_CUTZ] = 0;
+				p_b[OUT_CUTZ] = false;
 			}
-			i++;
 		}
+
 		else if (std::string(argv[i]) == "-dump_gnuplot")
 		{
-			p[OUT_GRID2D] = 1;
-			p_b[OUT_GRID2D] = false;
+			if (p[NCOLONNE] == 1)
+			{
+				std::cout << "You asked to rewrite the 2D grid in ASCII format for gnuplot" << std::endl;
+				p[OUT_GRID2D] = 1;
+				p_b[OUT_GRID2D] = false;
+			}
+			else
+			{
+				std::cout << "Unable to write a 3D grid for gnuplot without slicing it, please use dump_cutx/y/z" << std::endl;
+				p[OUT_GRID2D] = 0;
+				p_b[OUT_GRID2D] = false;
+			}
 		}
 		else if (std::string(argv[i]) == "-dump_propaga")
 		{
+			std::cout << "You asked to have a .ppg dump of the input phase space" << std::endl;
 			p[OUT_PROPAGA] = 1;
 			p_b[OUT_PROPAGA] = false;
 		}
 		else if (std::string(argv[i]) == "-dump_csv")
 		{
+			std::cout << "You asked to have a .csv dump of the input phase space" << std::endl;
 			p[OUT_CSV] = 1;
 			p_b[OUT_CSV] = false;
 		}
 		else if (std::string(argv[i]) == "-dump_xyzE")
 		{
+			std::cout << "You asked to have a xy(z)E dump of the input phase space" << std::endl;
 			p[OUT_XYZE] = 1;
 			p_b[OUT_XYZE] = false;
 		}
 		else if (std::string(argv[i]) == "-parameters")
 		{
+			std::cout << "You asked to write the simulation parameters file" << std::endl;
 			p[OUT_PARAMS] = 1;
 			p_b[OUT_PARAMS] = false;
 		}
 		else if (std::string(argv[i]) == "-find_minmax")
 		{
+			std::cout << "You asked to search for minima and maxima" << std::endl;
 			p[FIND_MINMAX] = 1;
 			p_b[FIND_MINMAX] = false;
 		}
 		else if (std::string(argv[i]) == "-do_binning")
 		{
+			std::cout << "You asked to enable plotting functions" << std::endl;
 			p[DO_BINNING] = 1;
 			p_b[DO_BINNING] = false;
 		}
