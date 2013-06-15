@@ -1319,9 +1319,9 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			if (p_b[OUT_GRID2D] && !do_not_ask_missing)
 			{
-				std::cout << "Vuoi l'output di una slice tagliata lungo z per gnuplot? 1 si', 0 no: ";
-				std::cin >> p[OUT_CUTZ];
-				p_b[OUT_CUTZ] = false;
+				std::cout << "Vuoi riscrivere la griglia in ASCII per gnuplot? 1 si', 0 no: ";
+				std::cin >> p[OUT_GRID2D];
+				p_b[OUT_GRID2D] = false;
 			}
 			p[OUT_CUTX] = 0;
 			p_b[OUT_CUTX] = false;
