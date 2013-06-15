@@ -374,14 +374,19 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 
 		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
 		{
-			if (i < argc-1) 
+			if (i < argc-1 && argv[i+1][0] != '-') 
 			{
 				nomefile = std::string(argv[i+1]);
 				usa_file_parametri = true;
 				i++;
-				std::cout << "Using " << nomefile << "as the binning parameters file" << std::endl;
+				std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
 			}
-			else std::cout << "Unable to find the binning parameters file on command line" << std::endl;
+			else
+			{
+				nomefile = std::string(argv[1])+".extremes";
+				usa_file_parametri = true;
+				std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
+			}
 		}
 		else if (std::string(argv[i]) == "-swap")
 		{
