@@ -379,7 +379,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 				nomefile = std::string(argv[i+1]);
 				usa_file_parametri = true;
 				i++;
-				std::cout << "Using " << argv[i+1] << "as the binning parameters file" << std::endl;
+				std::cout << "Using " << nomefile << "as the binning parameters file" << std::endl;
 			}
 			else std::cout << "Unable to find the binning parameters file on command line" << std::endl;
 		}

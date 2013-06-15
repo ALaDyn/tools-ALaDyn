@@ -5,6 +5,9 @@
 #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
+#define MAJOR_RELEASE  4
+#define MINOR_RELEASE  0
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>

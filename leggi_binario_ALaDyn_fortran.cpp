@@ -15,9 +15,9 @@ int main ()
 #endif
 
 	Parametri parametri;
-	bool testParametri = true;;
+	bool testParametri = true;
 
-	std::cout << "Binary file reader v3.9.3" << std::endl;
+	std::cout << "Binary file reader v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
 
 	if (argc == 1)
 	{
@@ -45,14 +45,12 @@ int main ()
 		{
 			std::cout << "Input file non trovato" << std::endl;
 			no_bin_file= true;
-			system("cd");
-			std::cin.get();
 			return -3;
 		}
 	}
 	if(!no_bin_file)
 	{
-		std::cout << "nome file di input e' " << argv[1] << std::endl;
+		std::cout << "Input file is " << argv[1] << ".bin" << std::endl;
 		parametri.check_filename(argv[1]);
 	}
 	file_bin.close();
@@ -62,11 +60,13 @@ int main ()
 	if (file_dat.fail()) 
 	{
 		parametri.old_fortran_bin = true;
+		std::cout << "Unable to find " << argv[1] << ".dat, using old routines" << std::endl;
 		parametri.chiedi_endian_file();
 		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) parametri.chiedi_numero_colonne();
 	}
 	else
 	{
+		std::cout << "Found " << argv[1] << ".dat, using new routines" << std::endl;
 		parametri.old_fortran_bin = false;
 		parametri.leggi_endian_e_ncol(file_dat);
 	}
@@ -95,7 +95,7 @@ int main ()
 
 	testParametri = parametri.check_parametri();
 
-	if ( testParametri == false && !parametri.do_not_ask_missing )
+	if ( testParametri == false )
 	{
 		std::cout << "Parametri non coerenti" << std::endl;
 		return -2;
