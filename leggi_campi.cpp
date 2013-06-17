@@ -70,8 +70,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	if(out_swap) swap_endian_i(&N_param,1);
 
 	printf("numero parametri=%i\n",N_param);
-	int_param=(int*)malloc(N_param*sizeof(int));
-	real_param=(float*)malloc(N_param*sizeof(float));
+	int_param = new int[N_param];
+	real_param = new float[N_param];
+	//	int_param=(int*)malloc(N_param*sizeof(int));
+	//	real_param=(float*)malloc(N_param*sizeof(float));
 	fread_size = std::fread(&buff,sizeof(int),1,file_in);
 	fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
 	fread_size = std::fread(&buff,sizeof(int),1,file_in);
@@ -192,7 +194,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	}
 
 
-	field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
+	field = new float[npunti_x*npunti_y*npunti_z];
+	// field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
 
 
 
@@ -216,7 +219,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("processore ipz=%i/%i  ipy=%i/%i     segnoz=%i     segnoy=%i\r",ipz,npe_z, ipy,npe_y,segnoz,segnoy );
 			fflush(stdout);
 
-			buffer=(float*)malloc(loc_size*sizeof(float));
+			buffer = new float[loc_size];
+			//	buffer=(float*)malloc(loc_size*sizeof(float));
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);

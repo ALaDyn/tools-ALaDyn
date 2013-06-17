@@ -104,8 +104,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		if (out_swap) swap_endian_i(&N_param,1);
 		printf("numero parametri %i\n",N_param);
 		fflush(stdout);
-		int_param=(int*)malloc(N_param*sizeof(int));
-		real_param=(float*)malloc(N_param*sizeof(float));
+		int_param = new int[N_param];
+		real_param = new float[N_param];
+		//	int_param=(int*)malloc(N_param*sizeof(int));
+		//	real_param=(float*)malloc(N_param*sizeof(float));
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
@@ -499,7 +501,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %i of %i\n",h+1, num_of_passes);
 				if(!flag_multifile)
 				{
-					particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
+					particelle = new float[npart_loc*ndv];
+					//	particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
 					//	printf("Reading file %s.bin \n",argv[1]);
 					if (parametri->old_fortran_bin)
 					{
@@ -513,7 +516,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				else
 				{
 					if (h == num_of_passes-1 && num_of_passes>1) dimensione_array_particelle = num_residual_particles;
-					particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
+					particelle= new float[dimensione_array_particelle*ndv];
+					//	particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
 					//	printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
 					val[0] = (unsigned int)dimensione_array_particelle;
 					printf("npart_loc = %i\t\t ndv=%i\n",val[0], ndv);
@@ -799,10 +803,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					}
 				}
 				particelle_accumulate += val[0];
-				//				free(particelle);
+				delete[] particelle;
 			}
 		}
-		//		free(particelle);
 		indice_multifile++;
 		conta_processori++;
 	}
