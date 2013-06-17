@@ -7,8 +7,6 @@
 
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
-	//	int debug_counter = 1;
-	int stop_at_cpu_number = parametri->last_cpu;
 	std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
 	nomefile_bin << std::string(argv[1]) << ".bin";
 	nomefile_dat << std::string(argv[1]) << ".dat";
@@ -68,10 +66,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	const int cerca_minmax = parametri->p[FIND_MINMAX];
 	const int out_xyzE = parametri->p[OUT_XYZE];
 
+	const int stop_at_cpu_number = parametri->last_cpu;
+	const int sottocampionamento = parametri->subsample;
+
 
 	int N_param, *int_param, npart_loc;
-	//	unsigned char* char_npart_loc;
-	//	char_npart_loc = (unsigned char*) malloc (sizeof(int));
 	int buff, pID;
 
 	float x,y,z,px,py,pz;
@@ -115,43 +114,43 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		if (out_swap) swap_endian_i(int_param,N_param);
 		if (out_swap) swap_endian_f(real_param,N_param);
-		npe=int_param[0];     //numero processori
+		npe=int_param[0];				//numero processori
 		nx=int_param[1];
 		ny_loc=int_param[2];
 		nz=int_param[3];
 		ibx=int_param[4];
 		iby=int_param[5];
 		ibz=int_param[6];
-		model=int_param[7];  //modello di laser utilizzato
-		dmodel=int_param[8]; //modello di condizioni iniziali
-		nsp=int_param[9];    //numero di speci
-		ndimen=int_param[10];  //numero di componenti dello spazio dei momenti
-		np_loc=int_param[11];  //
-		lpord=int_param[12]; //ordine dello schema leapfrog
-		deord=int_param[13]; //ordine derivate
-		//current type
-		pID=int_param[15];  //tipo delle particelle
-		nptot=int_param[16]; //numero di particelle da leggere nella specie
-		ndv=int_param[17]; //numero di particelle da leggere nella specie
-		tnow=real_param[0];  /*tempo dell'output*/
-		xmin=real_param[1];  //estremi della griglia
-		xmax=real_param[2];  //estremi della griglia
-		ymin=real_param[3];  //estremi della griglia
-		ymax=real_param[4];  //estremi della griglia
-		zmin=real_param[5];  //estremi della griglia
-		zmax=real_param[6];  //estremi della griglia
-		w0x=real_param[7];      //waist del laser in x
-		w0y=real_param[8];      //waist del laser in y
-		nrat=real_param[9];     //n over n critical
-		a0=real_param[10];      // a0 laser
-		lam0=real_param[11];    // lambda
-		E0=real_param[12];      //conversione da campi numerici a TV/m
-		ompe=real_param[13];    //costante accoppiamento correnti campi
-		np_over_nm=real_param[14];		//numerical2physical particles 14 
-		xt_in=real_param[15];			//inizio plasma
+		model=int_param[7];				//modello di laser utilizzato
+		dmodel=int_param[8];			//modello di condizioni iniziali
+		nsp=int_param[9];				//numero di speci
+		ndimen=int_param[10];			//numero di componenti dello spazio dei momenti
+		np_loc=int_param[11];
+		lpord=int_param[12];			//ordine dello schema leapfrog
+		deord=int_param[13];			//ordine derivate
+//		int_param[14];					// current type
+		pID=int_param[15];				// tipo delle particelle
+		nptot=int_param[16];			// numero di particelle da leggere nella specie
+		ndv=int_param[17];				// numero di particelle da leggere nella specie
+		tnow=real_param[0];				// tempo dell'output
+		xmin=real_param[1];				// estremi della griglia
+		xmax=real_param[2];				// estremi della griglia
+		ymin=real_param[3];				// estremi della griglia
+		ymax=real_param[4];				// estremi della griglia
+		zmin=real_param[5];				// estremi della griglia
+		zmax=real_param[6];				// estremi della griglia
+		w0x=real_param[7];				// waist del laser in x
+		w0y=real_param[8];				// waist del laser in y
+		nrat=real_param[9];				// n over n critical
+		a0=real_param[10];				// a0 laser
+		lam0=real_param[11];			// lambda
+		E0=real_param[12];				// conversione da campi numerici a TV/m
+		ompe=real_param[13];			// costante accoppiamento correnti campi
+		np_over_nm=real_param[14];		// numerical2physical particles 14 
+		xt_in=real_param[15];			// inizio plasma
 		xt_end=real_param[16];
-		charge=real_param[17];			//carica particella su carica elettrone
-		mass=real_param[18];			//massa particelle su massa elettrone
+		charge=real_param[17];			// carica particella su carica elettrone
+		mass=real_param[18];			// massa particelle su massa elettrone
 	}
 
 	if (!(parametri->old_fortran_bin) && !dat_not_found)
@@ -306,8 +305,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		for (int j = 0; j < parametri->nbin_py+3; j++) pxpy[i][j] = 0.0;
 	}
 
-	//	fai_plot_pxpz = fai_plot_pypz = false;
-
 	float **pxpz = new float* [parametri->nbin_px+3];
 	for (int i = 0; i < parametri->nbin_px+3; i++)
 	{
@@ -383,12 +380,17 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	{
 		printf("\nRichiesta scrittura file .vtk\n");
 		binary_all_out=fopen(nomefile_binary, "wb");
+
+		// Scrittura primo Header VTK e memorizzazione sua dimensione in contatori[0]
 		contatori[0] += fprintf(binary_all_out, "# vtk DataFile Version 2.0\n");
 		contatori[0] += fprintf(binary_all_out, "titolo nostro\n");
 		contatori[0] += fprintf(binary_all_out, "BINARY\n");
 		contatori[0] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[0] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+
 		fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
+
+		// Scrittura secondo Header VTK e memorizzazione sua dimensione in contatori[1]
 		//		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
 		contatori[1] += fprintf(binary_all_out, "POINT_DATA %i\n",nptot);
 		//		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
@@ -398,6 +400,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		if (parametri->p[WEIGHT])
 		{
 			fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
+
+			// Scrittura terzo Header VTK e memorizzazione sua dimensione in contatori[2]
 			//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
 			//			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
 			//			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
@@ -437,16 +441,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			{
 				fread_size = std::fread(&buff,sizeof(int),1,file_in); 
 				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-				//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
-				//				npart_loc=(int)(char_npart_loc);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
-
 			}
 			else
 			{
 				fread_size = std::fread(&npart_loc,sizeof(int),1,file_in);
-				//				fread_size = std::fread(&char_npart_loc[0], sizeof(int), 1, file_in);
-				//				npart_loc=(int)(char_npart_loc);
 			}
 			if (feof(file_in)) break;
 			if (out_swap) swap_endian_i(&npart_loc,1);
@@ -632,11 +631,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
 							{
 								wgh=particelle[i*ndv+6];
-								fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
+								if (i % sottocampionamento == 0) fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, wgh, i+1);
 							}
 							else
 							{
-								fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, parametri->overwrite_weight_value, i+1);
+								if (i % sottocampionamento == 0) fprintf(ascii_propaga,"%e %e %e %e %e %e %d %e 0 %d\n",rx, ry, rz, ux, uy, uz, tipo, parametri->overwrite_weight_value, i+1);
 							}
 						}
 					}
@@ -651,11 +650,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
 							{
 								wgh=particelle[i*ndv+4];
-								fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
+								if (i % sottocampionamento == 0) fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, wgh, i+1);
 							}
 							else
 							{
-								fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, parametri->overwrite_weight_value, i+1);
+								if (i % sottocampionamento == 0) fprintf(ascii_propaga,"%e 0 %e %e 0 %e %d %e 0 %d\n",rx, rz, ux, uz, tipo, parametri->overwrite_weight_value, i+1);
 							}
 						}
 					}
@@ -677,7 +676,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							uz=particelle[i*ndv+3];
 							gamma=(float)(sqrt(1.+ux*ux+uy*uy+uz*uz)-1.);			//gamma
 							E=(float)(gamma*parametri->massa_particella_MeV);		//energia
-							fprintf(ascii_xyze,"%e %e %e %e\n",rx, ry, rz, E);
+							if (i % sottocampionamento == 0) fprintf(ascii_xyze,"%e %e %e %e\n",rx, ry, rz, E);
 						}
 					}
 					else if (ndv == 4 || ndv == 5)
@@ -690,7 +689,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							uz=particelle[i*ndv+2];
 							gamma=(float)(sqrt(1.+ux*ux+uy*uy)-1.);				//gamma
 							E=(float)(gamma*parametri->massa_particella_MeV);	//energia
-							fprintf(ascii_xyze,"%e %e %e\n",rx, rz, E);
+							if (i % sottocampionamento == 0) fprintf(ascii_xyze,"%e %e %e\n",rx, rz, E);
 						}
 					}
 				}
@@ -712,11 +711,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (parametri->p[WEIGHT])
 							{
 								wgh=particelle[i*ndv+6];
-								fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
+								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
 							}
 							else
 							{
-								fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz);
+								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz);
 							}
 						}
 					}
@@ -731,11 +730,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (parametri->p[WEIGHT])
 							{
 								wgh=particelle[i*ndv+4];
-								fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
+								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
 							}
 							else
 							{
-								fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e\n",rx, rz, ux, uz);
+								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e\n",rx, rz, ux, uz);
 							}
 						}
 					}

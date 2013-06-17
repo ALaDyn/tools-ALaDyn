@@ -10,6 +10,7 @@ non puo' nemmeno calcolare le le dimensioni dei bin!
 Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri :: Parametri()
 {
+	subsample = 1;
 	ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
 	ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
 	endianness = 0;
@@ -410,6 +411,27 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			last_cpu = atoi(argv[i+1]);
 			if (last_cpu < 1) last_cpu = 1;
 			std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-subsample")
+		{
+			subsample = atoi(argv[i+1]);
+			if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
+			{
+				if (subsample < 1)
+				{
+					subsample = 1;
+					std::cout << "Value for subsampling not valid, disabled" << std::endl;
+				}
+				else
+				{
+					std::cout << "Will subsample with a ratio of 1:" << subsample << " if any ASCII dump will be requested" << std::endl;
+				}
+			}
+			else
+			{
+				std::cout << "Subsample factor is valid only for phase space files and will be used only for ASCII output" << std::endl;
+			}
 			i++;
 		}
 		else if (std::string(argv[i]) == "-ncol")

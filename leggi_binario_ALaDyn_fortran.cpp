@@ -39,7 +39,6 @@ int main ()
 	{
 		nomefile_bin.str("");
 		nomefile_bin << std::string(argv[1]) << "_000.bin";
-		// std::cout << nomefile_bin.str().c_str() << std::endl;
 		file_bin.open(nomefile_bin.str().c_str(),std::ios::binary|std::ios::in);
 		if ( file_bin.fail() )
 		{
