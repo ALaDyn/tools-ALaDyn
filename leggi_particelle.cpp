@@ -79,7 +79,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	float *estremi_min, *estremi_max;
 
 	short buffshort[2];
-	float *particelle, *real_param;
+	float *particelle = NULL;
+	float *real_param = NULL;
 	char nomefile_binary[MAX_LENGTH_FILENAME];
 	char nomefile_propaga[MAX_LENGTH_FILENAME];
 	char nomefile_xyze[MAX_LENGTH_FILENAME];
@@ -130,7 +131,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		np_loc=int_param[11];
 		lpord=int_param[12];			//ordine dello schema leapfrog
 		deord=int_param[13];			//ordine derivate
-//		int_param[14];					// current type
+		//		int_param[14];					// current type
 		pID=int_param[15];				// tipo delle particelle
 		nptot=int_param[16];			// numero di particelle da leggere nella specie
 		ndv=int_param[17];				// numero di particelle da leggere nella specie
@@ -804,6 +805,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 				}
 				particelle_accumulate += val[0];
 				delete[] particelle;
+				particelle = NULL;
 			}
 		}
 		indice_multifile++;

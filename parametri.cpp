@@ -45,7 +45,7 @@ Parametri :: Parametri()
 	file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = false;
 	file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
 	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = false;
-	file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false; // ancora non riconosciuti
+	file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false;
 }
 
 
@@ -238,6 +238,11 @@ void Parametri :: check_filename(const char *nomefile)
 				massa_particella_MeV = (float) MP_MEV;
 				file_particelle_P = true;
 			}
+			else if (nomefile[2] == 'e')
+			{
+				file_densita_energia_griglia_protoni = true;
+				sprintf (support_label,"pren");
+			}
 		}
 		else if (nomefile[1] == 'd')
 		{
@@ -257,7 +262,12 @@ void Parametri :: check_filename(const char *nomefile)
 			else if (nomefile[2] == 'd')
 			{
 				file_densita_HI = true;
-				sprintf (support_label,"hiden");
+				sprintf (support_label,"hidn");
+			}
+			else if (nomefile[2] == 'e')
+			{
+				file_densita_energia_griglia_HI = true;
+				sprintf (support_label,"hien");
 			}
 		}
 	}
@@ -273,7 +283,12 @@ void Parametri :: check_filename(const char *nomefile)
 			else if (nomefile[2] == 'd')
 			{
 				file_densita_LI = true;
-				sprintf (support_label,"liden");
+				sprintf (support_label,"lidn");
+			}
+			else if (nomefile[2] == 'e')
+			{
+				file_densita_energia_griglia_LI = true;
+				sprintf (support_label,"lien");
 			}
 		}
 	}
@@ -285,6 +300,11 @@ void Parametri :: check_filename(const char *nomefile)
 			{
 				massa_particella_MeV = (float) ME_MEV;
 				file_particelle_E = true;
+			}
+			else if (nomefile[2] == 'e')
+			{
+				file_densita_energia_griglia_elettroni = true;
+				sprintf (support_label,"elen");
 			}
 		}
 		else if (nomefile[1] == 'x')

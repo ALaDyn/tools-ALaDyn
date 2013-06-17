@@ -6,8 +6,8 @@
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  4
-#define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 1
+#define MINOR_RELEASE  2
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
