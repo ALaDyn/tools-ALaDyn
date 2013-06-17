@@ -1372,6 +1372,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			p[OUT_CUTZ] = 0;
 			p_b[OUT_CUTZ] = false;
 		}
+		if (p_b[OUT_PARAMS] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
+			std::cin >> p[OUT_PARAMS];
+			p_b[OUT_PARAMS] = false;
+		}
 	}
 	fileParametri.close();
 }
@@ -1699,6 +1705,29 @@ bool Parametri :: check_parametri()
 			else
 			{
 				printf("Attenzione: output binario non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1  )
+		{
+			printf("Attenzione: output parametri mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_PARAMS] && do_not_ask_missing)
+			{
+				p[OUT_PARAMS] = 0;
+				p_b[OUT_PARAMS] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output parametri non definito\n");
 				test = false;
 			}
 		}

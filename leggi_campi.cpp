@@ -17,6 +17,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	const int out_cutz = parametri->p[OUT_CUTZ];
 	const int out_2d = parametri->p[OUT_GRID2D];
 
+
 	int npunti_x = parametri->npunti_x_ricampionati;
 	int npunti_y = parametri->npunti_y_ricampionati;
 	int npunti_z = parametri->npunti_z_ricampionati;
@@ -123,51 +124,55 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	charge=real_param[16];  //carica particella su carica elettrone
 	mass=real_param[17];    //massa particelle su massa elettrone
 
-	sprintf(nomefile_parametri,"%s.parameters",argv[1]);
-	parameters=fopen(nomefile_parametri, "w");
-	printf("\nWriting the parameters file\n");
-	fprintf(parameters,"interi\n");
-	fprintf(parameters,"npe_y=%i\n",npe_y);     //numero processori
-	fprintf(parameters,"npe_z=%i\n",npe_z);     //numero processori
-	fprintf(parameters,"npe=%i\n",npe);     //numero processori
-	fprintf(parameters,"nx=%i\n",nx);
-	fprintf(parameters,"nx1=%i\n",nx1);
-	fprintf(parameters,"ny1=%i\n",ny1);
-	fprintf(parameters,"nyloc=%i\n",nyloc);
-	fprintf(parameters,"nz1=%i\n",nz1);
-	fprintf(parameters,"nzloc=%i\n",nzloc);
-	fprintf(parameters,"ibx=%i\n",ibx);
-	fprintf(parameters,"iby=%i\n",iby);
-	fprintf(parameters,"ibz=%i\n",ibz);
-	fprintf(parameters,"model=%i\n",model);  //modello di laser utilizzato
-	fprintf(parameters,"dmodel=%i\n",dmodel); //modello di condizioni iniziali
-	fprintf(parameters,"nsp=%i\n",nsp);    //numero di speci
-	fprintf(parameters,"np_loc=%i\n",np_loc);  //numero di componenti dello spazio dei momenti
-	fprintf(parameters,"lpord=%i\n",lpord); //ordine dello schema leapfrog
-	fprintf(parameters,"deord=%i\n",deord); //ordine derivate
-	fprintf(parameters,"fvar=%i\n",fvar); 
-	fprintf(parameters,"========= fine interi\n");
-	fprintf(parameters,"\n floating\n");
-	fprintf(parameters,"tnow=%f\n",tnow);  //tempo dell'output
-	fprintf(parameters,"xmin=%f\n",xmin);  //estremi della griglia
-	fprintf(parameters,"xmax=%f\n",xmax);  //estremi della griglia
-	fprintf(parameters,"ymin=%f\n",ymin);  //estremi della griglia
-	fprintf(parameters,"ymax=%f\n",ymax);  //estremi della griglia
-	fprintf(parameters,"zmin=%f\n",zmin);  //estremi della griglia
-	fprintf(parameters,"zmax=%f\n",zmax);  //estremi della griglia
-	fprintf(parameters,"w0x=%f\n",w0x);      //waist del laser in x
-	fprintf(parameters,"w0y=%f\n",w0y);      //waist del laser in y
-	fprintf(parameters,"nrat=%f\n",nrat);     //n orver n critical
-	fprintf(parameters,"a0=%f\n",a0);      // a0 laser
-	fprintf(parameters,"lam0=%f\n",lam0);    // lambda
-	fprintf(parameters,"E0=%f\n",E0);      //conversione da campi numerici a TV/m
-	fprintf(parameters,"B0=%f\n",B0);
-	fprintf(parameters,"ompe=%f\n",ompe);    //costante accoppiamento correnti campi
-	fprintf(parameters,"xt_in=%f\n",xt_in);   //inizio plasma
-	fprintf(parameters,"xt_end=%f\n",xt_end);
-	fprintf(parameters,"charge=%f\n",charge);  //carica particella su carica elettrone
-	fprintf(parameters,"mass=%f\n",mass);    //massa particelle su massa elettrone
-	fclose(parameters);
+	if (out_parameters)
+	{
+		sprintf(nomefile_parametri,"%s.parameters",argv[1]);
+		parameters=fopen(nomefile_parametri, "w");
+		printf("\nWriting the parameters file\n");
+		fprintf(parameters,"interi\n");
+		fprintf(parameters,"npe_y=%i\n",npe_y);     //numero processori
+		fprintf(parameters,"npe_z=%i\n",npe_z);     //numero processori
+		fprintf(parameters,"npe=%i\n",npe);     //numero processori
+		fprintf(parameters,"nx=%i\n",nx);
+		fprintf(parameters,"nx1=%i\n",nx1);
+		fprintf(parameters,"ny1=%i\n",ny1);
+		fprintf(parameters,"nyloc=%i\n",nyloc);
+		fprintf(parameters,"nz1=%i\n",nz1);
+		fprintf(parameters,"nzloc=%i\n",nzloc);
+		fprintf(parameters,"ibx=%i\n",ibx);
+		fprintf(parameters,"iby=%i\n",iby);
+		fprintf(parameters,"ibz=%i\n",ibz);
+		fprintf(parameters,"model=%i\n",model);  //modello di laser utilizzato
+		fprintf(parameters,"dmodel=%i\n",dmodel); //modello di condizioni iniziali
+		fprintf(parameters,"nsp=%i\n",nsp);    //numero di speci
+		fprintf(parameters,"np_loc=%i\n",np_loc);  //numero di componenti dello spazio dei momenti
+		fprintf(parameters,"lpord=%i\n",lpord); //ordine dello schema leapfrog
+		fprintf(parameters,"deord=%i\n",deord); //ordine derivate
+		fprintf(parameters,"fvar=%i\n",fvar); 
+		fprintf(parameters,"========= fine interi\n");
+		fprintf(parameters,"\n floating\n");
+		fprintf(parameters,"tnow=%f\n",tnow);  //tempo dell'output
+		fprintf(parameters,"xmin=%f\n",xmin);  //estremi della griglia
+		fprintf(parameters,"xmax=%f\n",xmax);  //estremi della griglia
+		fprintf(parameters,"ymin=%f\n",ymin);  //estremi della griglia
+		fprintf(parameters,"ymax=%f\n",ymax);  //estremi della griglia
+		fprintf(parameters,"zmin=%f\n",zmin);  //estremi della griglia
+		fprintf(parameters,"zmax=%f\n",zmax);  //estremi della griglia
+		fprintf(parameters,"w0x=%f\n",w0x);      //waist del laser in x
+		fprintf(parameters,"w0y=%f\n",w0y);      //waist del laser in y
+		fprintf(parameters,"nrat=%f\n",nrat);     //n orver n critical
+		fprintf(parameters,"a0=%f\n",a0);      // a0 laser
+		fprintf(parameters,"lam0=%f\n",lam0);    // lambda
+		fprintf(parameters,"E0=%f\n",E0);      //conversione da campi numerici a TV/m
+		fprintf(parameters,"B0=%f\n",B0);
+		fprintf(parameters,"ompe=%f\n",ompe);    //costante accoppiamento correnti campi
+		fprintf(parameters,"xt_in=%f\n",xt_in);   //inizio plasma
+		fprintf(parameters,"xt_end=%f\n",xt_end);
+		fprintf(parameters,"charge=%f\n",charge);  //carica particella su carica elettrone
+		fprintf(parameters,"mass=%f\n",mass);    //massa particelle su massa elettrone
+		fclose(parameters);
+	}
+
 
 	printf("=========INIZIO LETTURE==========\n");
 	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,nx1*ny1*nz1);
