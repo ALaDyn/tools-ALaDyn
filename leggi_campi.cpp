@@ -298,7 +298,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 	if(npunti_z == 1 && out_2d)
 	{
-		printf("\nScrittura file gnuplot 2D\n",(unsigned long) fread_size);
+		printf("\nScrittura file gnuplot 2D\n");
 		sprintf(nomefile_campi,"%s.txt",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file 2D (not vtk)\n");
