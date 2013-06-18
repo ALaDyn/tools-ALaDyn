@@ -6,8 +6,8 @@
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  4
-#define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 3
+#define MINOR_RELEASE  3
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -88,23 +88,27 @@
 #define MAX_LENGTH_FILENAME 200
 #define MAX_NUMBER_OF_CPUS	32768
 
-#define NPARAMETRI	14
-#define WEIGHT		0
-#define SWAP		1
-#define OUT_VTK		2
-#define OUT_PROPAGA	3
-#define	FIND_MINMAX	4
-#define DO_BINNING	5
-#define OUT_PARAMS	6
-#define OUT_CSV		7
-#define NCOLONNE    8	// per i dump degli spazi delle fasi qui memorizziamo il numero di colonne presenti nel file binario [dovrebbe coincidere con ndv] 
-// (valori pari a 4 o 5 significano simulazioni 2D con o senza weight, valori tipo 6 o 7 invece sono per sim 3D con o senza weight)
-// per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (ricampionati) lungo z (> 1 significa che la griglia e' 3D)
-#define OUT_XYZE	9
-#define OUT_CUTX	10
-#define OUT_CUTY	11
-#define OUT_CUTZ	12
-#define OUT_GRID2D	13
+#define NPARAMETRI			15
+#define WEIGHT				0
+#define SWAP				1
+#define OUT_VTK				2
+#define OUT_PROPAGA			3
+#define	FIND_MINMAX			4
+#define DO_BINNING			5
+#define OUT_PARAMS			6
+#define OUT_CSV				7
+
+#define NCOLONNE			8	
+/*	per i dump degli spazi delle fasi qui memorizziamo il numero di colonne presenti nel file binario [dovrebbe coincidere con ndv] 
+(valori pari a 4 o 5 significano simulazioni 2D con o senza weight, valori tipo 6 o 7 invece sono per sim 3D con o senza weight)
+per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (ricampionati) lungo z (> 1 significa che la griglia e' 3D) */
+
+#define OUT_XYZE			9
+#define OUT_CUTX			10
+#define OUT_CUTY			11
+#define OUT_CUTZ			12
+#define OUT_GRID2D			13
+#define OUT_CLEAN_BINARY	14
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E

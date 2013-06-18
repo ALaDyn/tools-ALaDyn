@@ -597,6 +597,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			p[OUT_XYZE] = 1;
 			p_b[OUT_XYZE] = false;
 		}
+		else if (std::string(argv[i]) == "-dump_clean")
+		{
+			std::cout << "You asked to have a unique, clean binary file as the output" << std::endl;
+			p[OUT_CLEAN_BINARY] = 1;
+			p_b[OUT_CLEAN_BINARY] = false;
+		}
 		else if (std::string(argv[i]) == "-parameters")
 		{
 			std::cout << "You asked to write the simulation parameters file" << std::endl;
@@ -1294,6 +1300,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cin >> p[OUT_VTK];
 			p_b[OUT_VTK] = false;
 		}
+		if (p_b[OUT_CLEAN_BINARY] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output completo binario pulito? 1 si', 0 no: ";
+			std::cin >> p[OUT_CLEAN_BINARY];
+			p_b[OUT_CLEAN_BINARY] = false;
+		}
 		if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
 		{
 			std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
@@ -1520,7 +1532,7 @@ bool Parametri :: check_parametri()
 		}
 		if ( !p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1  )
 		{
-			printf("Attenzione: output binario mal definito\n");
+			printf("Attenzione: output vtk mal definito\n");
 			test = false;
 		}
 		else
@@ -1537,7 +1549,30 @@ bool Parametri :: check_parametri()
 			}
 			else
 			{
-				printf("Attenzione: output binario non definito\n");
+				printf("Attenzione: output vtk non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_CLEAN_BINARY] && p[OUT_CLEAN_BINARY] != 0 && p[OUT_CLEAN_BINARY] != 1  )
+		{
+			printf("Attenzione: output binario pulito mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_CLEAN_BINARY] && (p[OUT_CLEAN_BINARY] == 0 || p[OUT_CLEAN_BINARY] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_CLEAN_BINARY] && do_not_ask_missing)
+			{
+				p[OUT_CLEAN_BINARY] = 0;
+				p_b[OUT_CLEAN_BINARY] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output binario pulito non definito\n");
 				test = false;
 			}
 		}

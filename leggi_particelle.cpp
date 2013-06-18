@@ -22,6 +22,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int dim_file_in_bytes, num_of_floats_in_file, num_of_particles_in_file, num_of_passes, num_residual_particles;
 	int dimensione_array_particelle;
 	unsigned int val[2];
+	float array_supporto7[7];
+	float array_supporto5[5];
 
 	if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb")) == NULL )
 	{
@@ -41,7 +43,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	{
 		printf ( "file exists!\n" );
 	}
-	std::FILE *binary_all_out;
+	std::FILE *binary_vtk;
+	std::FILE *binary_clean;
 	std::FILE *ascii_propaga;
 	std::FILE *ascii_xyze;
 	std::FILE *ascii_csv;
@@ -58,13 +61,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 
 	const int out_swap = parametri->p[SWAP];
-	const int out_binary = parametri->p[OUT_VTK];
+	const int out_vtk = parametri->p[OUT_VTK];
 	const int out_ascii_propaga = parametri->p[OUT_PROPAGA];
 	const int out_ascii_csv = parametri->p[OUT_CSV];
 	const int out_parameters = parametri->p[OUT_PARAMS];
 	const int fai_binning = parametri->p[DO_BINNING];
 	const int cerca_minmax = parametri->p[FIND_MINMAX];
 	const int out_xyzE = parametri->p[OUT_XYZE];
+	const int out_clean_binary = parametri->p[OUT_CLEAN_BINARY];
 
 	const int stop_at_cpu_number = parametri->last_cpu;
 	const int sottocampionamento = parametri->subsample;
@@ -81,7 +85,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	short buffshort[2];
 	float *particelle = NULL;
 	float *real_param = NULL;
-	char nomefile_binary[MAX_LENGTH_FILENAME];
+	char nomefile_vtk[MAX_LENGTH_FILENAME];
+	char nomefile_bin_clean[MAX_LENGTH_FILENAME];
 	char nomefile_propaga[MAX_LENGTH_FILENAME];
 	char nomefile_xyze[MAX_LENGTH_FILENAME];
 	char nomefile_csv[MAX_LENGTH_FILENAME];
@@ -350,7 +355,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	sprintf(nomefile_propaga,"%s.ppg",argv[1]);
 	sprintf(nomefile_xyze,"%s_xyzE.ppg",argv[1]);
 	sprintf(nomefile_csv,"%s.csv",argv[1]);
-	sprintf(nomefile_binary,"%s.vtk",argv[1]);
+	sprintf(nomefile_vtk,"%s.vtk",argv[1]);
+	sprintf(nomefile_bin_clean,"%s_clean.bin",argv[1]);
 
 
 #ifdef ENABLE_DEBUG
@@ -379,42 +385,49 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	}
 #endif
 
-	if (out_binary)
+	if (out_vtk)
 	{
 		printf("\nRichiesta scrittura file .vtk\n");
-		binary_all_out=fopen(nomefile_binary, "wb");
+		binary_vtk=fopen(nomefile_vtk, "wb");
 
 		// Scrittura primo Header VTK e memorizzazione sua dimensione in contatori[0]
-		contatori[0] += fprintf(binary_all_out, "# vtk DataFile Version 2.0\n");
-		contatori[0] += fprintf(binary_all_out, "titolo nostro\n");
-		contatori[0] += fprintf(binary_all_out, "BINARY\n");
-		contatori[0] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
-		contatori[0] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
+		contatori[0] += fprintf(binary_vtk, "# vtk DataFile Version 2.0\n");
+		contatori[0] += fprintf(binary_vtk, "titolo nostro\n");
+		contatori[0] += fprintf(binary_vtk, "BINARY\n");
+		contatori[0] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
+		contatori[0] += fprintf(binary_vtk, "POINTS %i float\n", nptot);
 
-		fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
+		fseeko(binary_vtk,contatori[0]+nptot*sizeof(float)*3,SEEK_SET);
 
 		// Scrittura secondo Header VTK e memorizzazione sua dimensione in contatori[1]
-		//		contatori[1] += fprintf(binary_all_out, "DATASET UNSTRUCTURED_GRID\n");
-		contatori[1] += fprintf(binary_all_out, "POINT_DATA %i\n",nptot);
-		//		contatori[1] += fprintf(binary_all_out, "POINTS %i float\n", nptot);
-		contatori[1] += fprintf(binary_all_out, "VECTORS p float\n");
-		//		contatori[1] += fprintf(binary_all_out, "LOOKUP_TABLE default\n");
+		//		contatori[1] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
+		contatori[1] += fprintf(binary_vtk, "POINT_DATA %i\n",nptot);
+		//		contatori[1] += fprintf(binary_vtk, "POINTS %i float\n", nptot);
+		contatori[1] += fprintf(binary_vtk, "VECTORS p float\n");
+		//		contatori[1] += fprintf(binary_vtk, "LOOKUP_TABLE default\n");
 
 		if (parametri->p[WEIGHT])
 		{
-			fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
+			fseeko(binary_vtk,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3,SEEK_SET);
 
 			// Scrittura terzo Header VTK e memorizzazione sua dimensione in contatori[2]
-			//			contatori[2] += fprintf(binary_all_out,"DATASET STRUCTURED_POINTS\n");
-			//			contatori[2] += fprintf(binary_all_out,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
-			//			contatori[2] += fprintf(binary_all_out,"ORIGIN 0 0 0\n");
-			//			contatori[2] += fprintf(binary_all_out,"SPACING 1 1 1\n");
-			//			contatori[2] += fprintf(binary_all_out,"POINT_DATA %i\n",nptot);
-			contatori[2] += fprintf(binary_all_out,"SCALARS w float 1\n");
-			contatori[2] += fprintf(binary_all_out,"LOOKUP_TABLE default\n");
+			//			contatori[2] += fprintf(binary_vtk,"DATASET STRUCTURED_POINTS\n");
+			//			contatori[2] += fprintf(binary_vtk,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
+			//			contatori[2] += fprintf(binary_vtk,"ORIGIN 0 0 0\n");
+			//			contatori[2] += fprintf(binary_vtk,"SPACING 1 1 1\n");
+			//			contatori[2] += fprintf(binary_vtk,"POINT_DATA %i\n",nptot);
+			contatori[2] += fprintf(binary_vtk,"SCALARS w float 1\n");
+			contatori[2] += fprintf(binary_vtk,"LOOKUP_TABLE default\n");
 		}
 	}
 
+	if (out_vtk)
+	{
+		printf("\nRichiesta scrittura file binario unico e pulito\n");
+		binary_clean=fopen(nomefile_bin_clean, "wb");
+	}
+
+		
 	if (out_ascii_propaga)
 	{
 		printf("\nRichiesta scrittura file ASCII per Propaga\n");
@@ -713,15 +726,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							ux=particelle[i*ndv+3];
 							uy=particelle[i*ndv+4];
 							uz=particelle[i*ndv+5];
-							if (parametri->p[WEIGHT])
-							{
-								wgh=particelle[i*ndv+6];
-								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
-							}
-							else
-							{
-								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz);
-							}
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight) wgh=particelle[i*ndv+6];
+							else wgh=parametri->overwrite_weight_value;
+							if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, %e, %e, %e, %e, %e, %e\n",rx, ry, rz, ux, uy, uz, wgh);
 						}
 					}
 					else if (ndv == 4 || ndv == 5)
@@ -732,22 +739,49 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							rz=particelle[i*ndv+1];
 							ux=particelle[i*ndv+2];
 							uz=particelle[i*ndv+3];
-							if (parametri->p[WEIGHT])
-							{
-								wgh=particelle[i*ndv+4];
-								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
-							}
-							else
-							{
-								if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e\n",rx, rz, ux, uz);
-							}
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight) wgh=particelle[i*ndv+4];
+							else wgh=parametri->overwrite_weight_value;
+							if (i % sottocampionamento == 0) fprintf(ascii_csv,"%e, 0, %e, %e, 0, %e, %e\n",rx, rz, ux, uz, wgh);
 						}
 					}
 				}
 
 
 
-				if (out_binary)
+				if (out_clean_binary)
+				{
+					if (ndv == 6 || ndv == 7)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							array_supporto7[0]=particelle[i*ndv+0];
+							array_supporto7[1]=particelle[i*ndv+1];
+							array_supporto7[2]=particelle[i*ndv+2];
+							array_supporto7[3]=particelle[i*ndv+3];
+							array_supporto7[4]=particelle[i*ndv+4];
+							array_supporto7[5]=particelle[i*ndv+5];
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto7[6]=particelle[i*ndv+6];
+							else array_supporto7[6]=parametri->overwrite_weight_value;
+							if (i % sottocampionamento == 0) fwrite((void*)(array_supporto7),sizeof(float),7,binary_clean);
+						}
+					}
+					else if (ndv == 4 || ndv == 5)
+					{
+						for(unsigned int i=0;i<val[0];i++)
+						{
+							array_supporto5[0]=particelle[i*ndv+0];
+							array_supporto5[1]=particelle[i*ndv+1];
+							array_supporto5[2]=particelle[i*ndv+2];
+							array_supporto5[3]=particelle[i*ndv+3];
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto5[4]=particelle[i*ndv+4];
+							else array_supporto5[4]=parametri->overwrite_weight_value;
+							if (i % sottocampionamento == 0) fwrite((void*)(array_supporto5),sizeof(float),5,binary_clean);
+						}
+					}
+				}
+
+
+				if (out_vtk)
 				{
 					if (parametri->endian_machine == 0)
 					{
@@ -758,29 +792,29 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					case 4:
 					case 5:
 						// scrittura coordinate x, y, z
-						fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						fseeko(binary_vtk,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
 						for(unsigned int i=0; i < val[0]; i += ndv)
-							fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
-							fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
+							fwrite((void*)(particelle+i),sizeof(float),2,binary_vtk),
+							fwrite((void*)&zero, sizeof(float), 1, binary_vtk);
 
 						// scrittura momenti px, py, pz
-						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						fseeko(binary_vtk,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
 						for(unsigned int i=2; i < val[0]; i += ndv)
-							fwrite((void*)(particelle+i),sizeof(float),2,binary_all_out),
-							fwrite((void*)&zero, sizeof(float), 1, binary_all_out);
+							fwrite((void*)(particelle+i),sizeof(float),2,binary_vtk),
+							fwrite((void*)&zero, sizeof(float), 1, binary_vtk);
 
 						break;
 					case 6:
 					case 7:
 						// scrittura coordinate x, y, z
-						fseeko(binary_all_out,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						fseeko(binary_vtk,contatori[0]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
 						for(unsigned int i=0; i < val[0]; i += ndv)
-							fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+							fwrite((void*)(particelle+i),sizeof(float),3,binary_vtk);
 
 						// scrittura momenti px, py, pz
-						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
+						fseeko(binary_vtk,contatori[0]+nptot*sizeof(float)*3+contatori[1]+particelle_accumulate*sizeof(float)*3,SEEK_SET);
 						for(unsigned int i=3; i < val[0]; i += ndv)
-							fwrite((void*)(particelle+i),sizeof(float),3,binary_all_out);
+							fwrite((void*)(particelle+i),sizeof(float),3,binary_vtk);
 
 						break;
 					default:
@@ -791,16 +825,16 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if(parametri->p[WEIGHT] && !parametri->overwrite_weight)
 					{
 						// scrittura pesi
-						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+						fseeko(binary_vtk,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
 						for(unsigned int i=ndv-1; i < val[0]; i += ndv)
-							fwrite((void*)(particelle+i),sizeof(float),1,binary_all_out);
+							fwrite((void*)(particelle+i),sizeof(float),1,binary_vtk);
 					}
 					else if(parametri->p[WEIGHT] && parametri->overwrite_weight)
 					{
 						// scrittura pesi sovrascritti da linea comando
-						fseeko(binary_all_out,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
+						fseeko(binary_vtk,contatori[0]+nptot*sizeof(float)*3+contatori[1]+nptot*sizeof(float)*3+contatori[2]+particelle_accumulate*sizeof(float),SEEK_SET);
 						for(unsigned int i=ndv-1; i < val[0]; i += ndv)
-							fwrite((void*)(&(parametri->overwrite_weight_value)),sizeof(float),1,binary_all_out);
+							fwrite((void*)(&(parametri->overwrite_weight_value)),sizeof(float),1,binary_vtk);
 					}
 				}
 				particelle_accumulate += val[0];
@@ -997,10 +1031,16 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	printf("fread_size=%lu\nFine\n\n",(unsigned long) fread_size);
 
 
-	if (out_binary)
+	if (out_vtk)
 	{
-		fflush(binary_all_out);
-		fclose(binary_all_out);
+		fflush(binary_vtk);
+		fclose(binary_vtk);
+	}
+
+	if (out_clean_binary)
+	{
+		fflush(binary_clean);
+		fclose(binary_clean);
 	}
 
 	if (out_ascii_propaga)
