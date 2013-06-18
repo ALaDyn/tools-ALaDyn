@@ -421,7 +421,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		}
 	}
 
-	if (out_vtk)
+	if (out_clean_binary)
 	{
 		printf("\nRichiesta scrittura file binario unico e pulito\n");
 		binary_clean=fopen(nomefile_bin_clean, "wb");
