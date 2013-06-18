@@ -7,7 +7,7 @@
 
 #define MAJOR_RELEASE  4
 #define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 1
+#define BUGFIX_RELEASE 2
 
 #include <iostream>
 #include <vector>
@@ -37,7 +37,8 @@
 #endif
 
 #if (!defined CINECA) && (defined __GNUC__)
-#if GCC_VERSION >= 4.7
+/* Test for GCC > 4.6.0 */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && (__GNUC_MINOR__ > 6))
 #include<cstdint>
 #else
 #include <inttypes.h>
@@ -46,8 +47,6 @@
 //typedef unsigned __int32 uint32_t;
 #endif
 #endif
-
-
 
 #if defined (_MSC_VER)
 #include<wchar.h>
@@ -99,8 +98,8 @@
 #define OUT_PARAMS	6
 #define OUT_CSV		7
 #define NCOLONNE    8	// per i dump degli spazi delle fasi qui memorizziamo il numero di colonne presenti nel file binario [dovrebbe coincidere con ndv] 
-						// (valori pari a 4 o 5 significano simulazioni 2D con o senza weight, valori tipo 6 o 7 invece sono per sim 3D con o senza weight)
-						// per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (ricampionati) lungo z (> 1 significa che la griglia e' 3D)
+// (valori pari a 4 o 5 significano simulazioni 2D con o senza weight, valori tipo 6 o 7 invece sono per sim 3D con o senza weight)
+// per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (ricampionati) lungo z (> 1 significa che la griglia e' 3D)
 #define OUT_XYZE	9
 #define OUT_CUTX	10
 #define OUT_CUTY	11
