@@ -7,7 +7,7 @@
 
 #define MAJOR_RELEASE  4
 #define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 2
+#define BUGFIX_RELEASE 3
 
 #include <iostream>
 #include <vector>
@@ -198,6 +198,7 @@ struct Parametri
 	void leggi_endian_e_ncol(std::ifstream & );
 	void chiedi_endian_file();
 	void chiedi_numero_colonne();
+	void chiedi_2Do3D();
 	bool check_parametri();
 	void check_filename(const char *);
 	bool incompleto();

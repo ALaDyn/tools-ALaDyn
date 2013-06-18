@@ -61,7 +61,21 @@ int main ()
 		parametri.old_fortran_bin = true;
 		std::cout << "Unable to find " << argv[1] << ".dat, using old routines" << std::endl;
 		parametri.chiedi_endian_file();
-		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) parametri.chiedi_numero_colonne();
+
+		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) 
+
+			parametri.chiedi_numero_colonne();
+
+
+
+		if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
+		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
+		|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
+		|| parametri.file_densita_HI || parametri.file_densita_LI
+		|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni 
+		|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI)
+
+			parametri.chiedi_2Do3D();
 	}
 	else
 	{

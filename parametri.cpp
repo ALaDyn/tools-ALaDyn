@@ -219,6 +219,18 @@ void Parametri :: chiedi_numero_colonne()
 }
 
 
+void Parametri :: chiedi_2Do3D()
+{
+	int dimensioni;
+	std::cout << "E' una griglia 3D (3) o 2D (2)? ";
+	std::cin >> dimensioni;
+	if (dimensioni==2) p[NCOLONNE] = 1;
+	else if (dimensioni==3) p[NCOLONNE] = 3;
+	else exit(-5);
+	p_b[NCOLONNE] = false;
+}
+
+
 void Parametri :: chiedi_endian_file()
 {
 	std::cout << "Il file e' little [x86] (0) o big [ppc] (1) endian? ";
@@ -457,9 +469,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		else if (std::string(argv[i]) == "-ncol")
 		{
 			int ncolumns = atoi(argv[i+1]);
+			p[NCOLONNE] = ncolumns;
 			if (ncolumns == 6) p[WEIGHT] = 0;
 			else if (ncolumns == 7) p[WEIGHT] = 1;
-			std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
+			std::cout << "Forced number of columns in binary file to " << ncolumns << std::endl;
+			p_b[NCOLONNE] = false;
 			p_b[WEIGHT] = false;
 			i++;
 		}
@@ -1616,7 +1630,7 @@ bool Parametri :: check_parametri()
 			}
 			else
 			{
-				printf("Attenzione: output binario non definito\n");
+				printf("Attenzione: numero colonne nel file binario non definito\n");
 				test = false;
 			}
 		}
@@ -1728,6 +1742,23 @@ bool Parametri :: check_parametri()
 			else
 			{
 				printf("Attenzione: output parametri non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[NCOLONNE] && p[NCOLONNE] < 1 )
+		{
+			printf("Attenzione: dimensioni griglia mal definite\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[NCOLONNE] && p[NCOLONNE] >= 1 )
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else
+			{
+				printf("Attenzione: non capisco se la griglia e' 2D o 3D\n");
 				test = false;
 			}
 		}
