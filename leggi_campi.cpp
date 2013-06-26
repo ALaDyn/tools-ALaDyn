@@ -476,13 +476,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
 		fprintf(clean_fields,"POINTS %i float\n",nx1*ny1*nz1);
 		float rr[3];
-		for(k=0;k<nz1;k++)
+		for(int k=0;k<nz1;k++)
 		{
 		rr[2]=z_coordinates[k];
-		for(j=0;j<ny1;j++)
+		for(int j=0;j<ny1;j++)
 		{
 		rr[1]=y_coordinates[j];
-		for(i=0;i<nx1;i++)
+		for(int i=0;i<nx1;i++)
 		{
 		rr[0]=x_coordinates[i];
 		fwrite((void*)rr,sizeof(float),3,clean_fields);
