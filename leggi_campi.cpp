@@ -465,7 +465,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		}
 
 		//////// DATASET STRUCTURED_POINTS VERSION    ////////
-		/*
+		
 		sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file\n");
@@ -495,9 +495,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
 		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 		fclose(clean_fields);
-		*/
+		
 
-		sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+		/*
+			sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 		clean_fields=fopen(nomefile_campi, "wb");
 		printf("\nWriting the fields file\n");
 		fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
@@ -520,7 +521,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
 		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 		fclose(clean_fields);
-
+		*/
 		fclose(file_in);
 	}
 
