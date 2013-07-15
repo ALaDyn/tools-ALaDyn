@@ -338,14 +338,18 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 						break;
 					}
 			}
+
+		fprintf(clean_fields,"#");
 		int SPAN=5;
 		for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
 			{
+				fprintf(clean_fields,"%.4g\t",y_coordinates[j]);
 				for(int i = 0; i < nx1; i++)
 					{
 						x_lineout[i]+=field[i+j*nx1]/(2*SPAN+1.0);
 					}
 			}
+		fprintf(clean_fields,"\n");
 		for(int i = 0; i < nx1; i++)
 			{
 				xx=x_coordinates[i];//xmin+dx*i;
@@ -371,15 +375,21 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 						break;
 					}
 			}
+		fprintf(clean_fields,"#");
 		int SPAN=5;
 		for(int k = myj-SPAN; k < (myj+SPAN+1); k++)
-			for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
-				{
-					for(int i = 0; i < nx1; i++)
-						{
-							x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*SPAN+1.0)*(2*SPAN+1.0));
-						}
-				}
+			{
+				fprintf(clean_fields,"%.4g\t",z_coordinates[k]);
+				
+				for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
+					{
+						for(int i = 0; i < nx1; i++)
+							{
+								x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*SPAN+1.0)*(2*SPAN+1.0));
+							}
+					}
+			}
+		fprintf(clean_fields,"\n");
 		for(int i = 0; i < nx1; i++)
 			{
 				xx=x_coordinates[i];//xmin+dx*i;
