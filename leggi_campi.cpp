@@ -15,6 +15,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	const int out_cutx = parametri->p[OUT_CUTX];
 	const int out_cuty = parametri->p[OUT_CUTY];
 	const int out_cutz = parametri->p[OUT_CUTZ];
+	const int out_lineoutx = parametri->p[OUT_LINEOUT_X];
 	const int out_2d = parametri->p[OUT_GRID2D];
 
 
@@ -52,7 +53,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	float *real_param;
 	float *field,*buffer;
 	float *x_coordinates, *y_coordinates, *z_coordinates;
-
+	double *x_lineout;
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 	char nomefile_campi[MAX_LENGTH_FILENAME];
 
@@ -253,6 +254,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	x_coordinates=new float[npunti_x];
 	y_coordinates=new float[npunti_y];
 	z_coordinates=new float[npunti_z];
+	x_lineout=new double[npunti_x];
 
 
 
@@ -315,6 +317,74 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1]);
 			}
 		}
+		fclose(clean_fields);
+	}
+	//avg of the 10 points aorund the focal axis
+	if(npunti_z == 1 && out_lineoutx)
+	{
+		int myj;
+		printf("\nScrittura lineout 1D\n");
+		sprintf(nomefile_campi,"lineout_%s.txt",argv[1]);
+		clean_fields=fopen(nomefile_campi, "w");
+		printf("\nWriting the lineout file 1D (not vtk)\n");
+		
+		for(int i = 0; i < nx1; i++)
+			x_lineout[i]=0;
+		for(int j = 0; j < ny1; j++)
+			{
+				if(y_coordinates[j]>=0)
+					{
+						myj=j;
+						break;
+					}
+			}
+		int SPAN=5;
+		for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
+			{
+				for(int i = 0; i < nx1; i++)
+					{
+						x_lineout[i]+=field[i+j*nx1]/(2*SPAN+1.0);
+					}
+			}
+		for(int i = 0; i < nx1; i++)
+			{
+				xx=x_coordinates[i];//xmin+dx*i;
+				fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
+			}
+		fclose(clean_fields);
+	}
+	if(npunti_z > 1 && out_lineoutx)
+	{
+		int myj;
+		printf("\nScrittura lineout 1D\n");
+		sprintf(nomefile_campi,"lineout_%s.txt",argv[1]);
+		clean_fields=fopen(nomefile_campi, "w");
+		printf("\nWriting the lineout file 1D (not vtk)\n");
+		
+		for(int i = 0; i < nx1; i++)
+			x_lineout[i]=0;
+		for(int j = 0; j < ny1; j++)
+			{
+				if(y_coordinates[j]>=0)
+					{
+						myj=j;
+						break;
+					}
+			}
+		int SPAN=5;
+		for(int k = myj-SPAN; k < (myj+SPAN+1); k++)
+			for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
+				{
+					for(int i = 0; i < nx1; i++)
+						{
+							x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*SPAN+1.0)*(2*SPAN+1.0));
+						}
+				}
+		for(int i = 0; i < nx1; i++)
+			{
+				xx=x_coordinates[i];//xmin+dx*i;
+				fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
+			}
 		fclose(clean_fields);
 	}
 

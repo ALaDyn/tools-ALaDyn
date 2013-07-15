@@ -88,7 +88,7 @@
 #define MAX_LENGTH_FILENAME 200
 #define MAX_NUMBER_OF_CPUS	32768
 
-#define NPARAMETRI			15
+#define NPARAMETRI			16
 #define WEIGHT				0
 #define SWAP				1
 #define OUT_VTK				2
@@ -109,6 +109,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define OUT_CUTZ			12
 #define OUT_GRID2D			13
 #define OUT_CLEAN_BINARY	14
+#define OUT_LINEOUT_X	15
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E

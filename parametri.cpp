@@ -564,6 +564,15 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			}
 		}
 
+		else if (std::string(argv[i]) == "-dump_lineoutx")
+		{
+			std::cout << "You asked to have a lineout of the grid along the x-axis" << std::endl;
+			
+			p[OUT_LINEOUT_X] = 1;
+			p_b[OUT_LINEOUT_X] = false;
+			
+		}
+
 		else if (std::string(argv[i]) == "-dump_gnuplot")
 		{
 			if (p[NCOLONNE] == 1)
