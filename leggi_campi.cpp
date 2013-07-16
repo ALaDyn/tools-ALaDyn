@@ -18,7 +18,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	const int out_lineoutx = parametri->p[OUT_LINEOUT_X];
 	const int out_2d = parametri->p[OUT_GRID2D];
 
-
 	int npunti_x = parametri->npunti_x_ricampionati;
 	int npunti_y = parametri->npunti_y_ricampionati;
 	int npunti_z = parametri->npunti_z_ricampionati;
@@ -28,6 +27,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	int ncpu_x = parametri->ncpu_x;
 	int ncpu_y = parametri->ncpu_y;
 	int ncpu_z = parametri->ncpu_z;
+	int span = parametri->span;
 	float xminimo = parametri->xmin;
 	float xmaximo = parametri->xmax;
 	float yminimo = parametri->ymin;
@@ -319,6 +319,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		}
 		fclose(clean_fields);
 	}
+
+
 	//avg of the 10 points aorund the focal axis
 	if(npunti_z == 1 && out_lineoutx)
 	{
@@ -327,36 +329,36 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		sprintf(nomefile_campi,"lineout_%s.txt",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the lineout file 1D (not vtk)\n");
-		
-		for(int i = 0; i < nx1; i++)
-			x_lineout[i]=0;
+
+		for(int i = 0; i < nx1; i++) x_lineout[i]=0;
+
 		for(int j = 0; j < ny1; j++)
+		{
+			if(y_coordinates[j]>=0)
 			{
-				if(y_coordinates[j]>=0)
-					{
-						myj=j;
-						break;
-					}
+				myj=j;
+				break;
 			}
+		}
 
 		fprintf(clean_fields,"#");
-		int SPAN=5;
-		for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
+		for(int j = myj-span; j < (myj+span+1); j++)
+		{
+			fprintf(clean_fields,"%.4g\t",y_coordinates[j]);
+			for(int i = 0; i < nx1; i++)
 			{
-				fprintf(clean_fields,"%.4g\t",y_coordinates[j]);
-				for(int i = 0; i < nx1; i++)
-					{
-						x_lineout[i]+=field[i+j*nx1]/(2*SPAN+1.0);
-					}
+				x_lineout[i]+=field[i+j*nx1]/(2*span+1.0);
 			}
+		}
 		fprintf(clean_fields,"\n");
 		for(int i = 0; i < nx1; i++)
-			{
-				xx=x_coordinates[i];//xmin+dx*i;
-				fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
-			}
+		{
+			xx=x_coordinates[i];//xmin+dx*i;
+			fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
+		}
 		fclose(clean_fields);
 	}
+
 	if(npunti_z > 1 && out_lineoutx)
 	{
 		int myj;
@@ -364,37 +366,36 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		sprintf(nomefile_campi,"lineout_%s.txt",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the lineout file 1D (not vtk)\n");
-		
+
 		for(int i = 0; i < nx1; i++)
 			x_lineout[i]=0;
 		for(int j = 0; j < ny1; j++)
+		{
+			if(y_coordinates[j]>=0)
 			{
-				if(y_coordinates[j]>=0)
-					{
-						myj=j;
-						break;
-					}
+				myj=j;
+				break;
 			}
+		}
 		fprintf(clean_fields,"#");
-		int SPAN=5;
-		for(int k = myj-SPAN; k < (myj+SPAN+1); k++)
+		for(int k = myj-span; k < (myj+span+1); k++)
+		{
+			fprintf(clean_fields,"%.4g\t",z_coordinates[k]);
+
+			for(int j = myj-span; j < (myj+span+1); j++)
 			{
-				fprintf(clean_fields,"%.4g\t",z_coordinates[k]);
-				
-				for(int j = myj-SPAN; j < (myj+SPAN+1); j++)
-					{
-						for(int i = 0; i < nx1; i++)
-							{
-								x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*SPAN+1.0)*(2*SPAN+1.0));
-							}
-					}
+				for(int i = 0; i < nx1; i++)
+				{
+					x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*span+1.0)*(2*span+1.0));
+				}
 			}
+		}
 		fprintf(clean_fields,"\n");
 		for(int i = 0; i < nx1; i++)
-			{
-				xx=x_coordinates[i];//xmin+dx*i;
-				fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
-			}
+		{
+			xx=x_coordinates[i];//xmin+dx*i;
+			fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
+		}
 		fclose(clean_fields);
 	}
 
@@ -545,7 +546,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		}
 
 		//////// DATASET STRUCTURED_POINTS VERSION    ////////
-		
+
 		sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the fields file\n");
@@ -558,16 +559,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		float rr[3];
 		for(int k=0;k<nz1;k++)
 		{
-		rr[2]=z_coordinates[k];
-		for(int j=0;j<ny1;j++)
-		{
-		rr[1]=y_coordinates[j];
-		for(int i=0;i<nx1;i++)
-		{
-		rr[0]=x_coordinates[i];
-		fwrite((void*)rr,sizeof(float),3,clean_fields);
-		}
-		}
+			rr[2]=z_coordinates[k];
+			for(int j=0;j<ny1;j++)
+			{
+				rr[1]=y_coordinates[j];
+				for(int i=0;i<nx1;i++)
+				{
+					rr[0]=x_coordinates[i];
+					fwrite((void*)rr,sizeof(float),3,clean_fields);
+				}
+			}
 		}
 
 		fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
@@ -575,10 +576,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
 		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
 		fclose(clean_fields);
-		
+
 
 		/*
-			sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+		sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
 		clean_fields=fopen(nomefile_campi, "wb");
 		printf("\nWriting the fields file\n");
 		fprintf(clean_fields,"# vtk DataFile Version 2.0\n");

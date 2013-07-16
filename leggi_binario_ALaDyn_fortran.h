@@ -6,8 +6,8 @@
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  4
-#define MINOR_RELEASE  3
-#define BUGFIX_RELEASE 1
+#define MINOR_RELEASE  4
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -109,7 +109,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define OUT_CUTZ			12
 #define OUT_GRID2D			13
 #define OUT_CLEAN_BINARY	14
-#define OUT_LINEOUT_X	15
+#define OUT_LINEOUT_X		15
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E
@@ -180,6 +180,7 @@ struct Parametri
 	int fai_plot_xy, fai_plot_xz, fai_plot_yz, fai_plot_xpx, fai_plot_xpy, fai_plot_xpz, fai_plot_ypx;
 	int fai_plot_ypy, fai_plot_ypz, fai_plot_zpx, fai_plot_zpy, fai_plot_zpz, fai_plot_pxpy, fai_plot_pxpz, fai_plot_pypz;
 	int subsample;
+	int span;
 	bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
 	bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
 	bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI;

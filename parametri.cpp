@@ -11,6 +11,7 @@ Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri :: Parametri()
 {
 	subsample = 1;
+	span = 5;
 	ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
 	ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
 	endianness = 0;
@@ -226,7 +227,11 @@ void Parametri :: chiedi_2Do3D()
 	std::cin >> dimensioni;
 	if (dimensioni==2) p[NCOLONNE] = 1;
 	else if (dimensioni==3) p[NCOLONNE] = 3;
-	else exit(-5);
+	else
+	{
+		std::cout << "Choice not valid" << std::endl;
+		exit(-5);
+	}
 	p_b[NCOLONNE] = false;
 }
 
@@ -445,6 +450,13 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
 			i++;
 		}
+		else if (std::string(argv[i]) == "-span")
+		{
+			span = atoi(argv[i+1]);
+			if (span < 1) span = 1;
+			std::cout << "Span factor for lineout: " << span << std::endl;
+			i++;
+		}
 		else if (std::string(argv[i]) == "-subsample")
 		{
 			subsample = atoi(argv[i+1]);
@@ -567,10 +579,8 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		else if (std::string(argv[i]) == "-dump_lineoutx")
 		{
 			std::cout << "You asked to have a lineout of the grid along the x-axis" << std::endl;
-			
 			p[OUT_LINEOUT_X] = 1;
 			p_b[OUT_LINEOUT_X] = false;
-			
 		}
 
 		else if (std::string(argv[i]) == "-dump_gnuplot")
@@ -1413,6 +1423,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cin >> p[OUT_PARAMS];
 			p_b[OUT_PARAMS] = false;
 		}
+		if (p_b[OUT_LINEOUT_X] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output di un lineout della griglia lungo x? 1 si', 0 no: ";
+			std::cin >> p[OUT_LINEOUT_X];
+			p_b[OUT_LINEOUT_X] = false;
+		}
 	}
 	fileParametri.close();
 }
@@ -1786,6 +1802,29 @@ bool Parametri :: check_parametri()
 			else
 			{
 				printf("Attenzione: output parametri non definito\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_LINEOUT_X] && p[OUT_LINEOUT_X] != 0 && p[OUT_LINEOUT_X] != 1  )
+		{
+			printf("Attenzione: output lineout mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_LINEOUT_X] && (p[OUT_LINEOUT_X] == 0 || p[OUT_LINEOUT_X] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_LINEOUT_X] && do_not_ask_missing)
+			{
+				p[OUT_LINEOUT_X] = 0;
+				p_b[OUT_LINEOUT_X] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output lineout non definito\n");
 				test = false;
 			}
 		}

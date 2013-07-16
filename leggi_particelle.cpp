@@ -427,7 +427,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		binary_clean=fopen(nomefile_bin_clean, "wb");
 	}
 
-		
+
 	if (out_ascii_propaga)
 	{
 		printf("\nRichiesta scrittura file ASCII per Propaga\n");

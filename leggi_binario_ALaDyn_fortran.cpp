@@ -69,11 +69,11 @@ int main ()
 
 
 		if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
-		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
-		|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
-		|| parametri.file_densita_HI || parametri.file_densita_LI
-		|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni 
-		|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI)
+			|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
+			|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
+			|| parametri.file_densita_HI || parametri.file_densita_LI
+			|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni 
+			|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI)
 
 			parametri.chiedi_2Do3D();
 	}
