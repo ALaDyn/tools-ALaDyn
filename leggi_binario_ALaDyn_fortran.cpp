@@ -23,6 +23,20 @@ int main ()
 	{
 		std::cout << "Si usa:\n-manuale: ./reader Nomefile (senza estensione!)" << std::endl;
 		std::cout << "-batch: ./reader Nomefile  --parameters (see source code for details, for now)" << std::endl;
+		std::cout <<"----------Argument list------------------- " << std::endl;
+
+		std::cout << "-swap/-noswap (endianess swap) -force_new (force new format)" << std::endl;
+		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
+		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
+		std::cout << "-xmin #xmin -xmax #xmax -[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
+		std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
+		std::cout << "-plot_xy -plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
+		std::cout << "-plot_etheta -plot_ethetaT -plot_espec -plot_thetaspec -plot_thetaTspec" << std::endl;
+		std::cout << "-nbin #num" << std::endl;
+		std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E] #num" << std::endl;
+		std::cout << "-dontask" << std::endl;
+		std::cout << "Filters: \n +xmin #num +xmax #num  +[x,y,z,px,py,pz,theta,thetarad,gamma,e]min/max #num" << std::endl;
+		std::cout <<"----------Argument list------------------- " << std::endl;
 		return -1;
 	}
 
