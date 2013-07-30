@@ -453,7 +453,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		else if (std::string(argv[i]) == "-span")
 		{
 			span = atoi(argv[i+1]);
-			if (span < 1) span = 1;
+			if (span < 0) span = 0;
 			std::cout << "Span factor for lineout: " << span << std::endl;
 			i++;
 		}
