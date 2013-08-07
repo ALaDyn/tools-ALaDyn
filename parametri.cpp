@@ -1383,7 +1383,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 				{
 					std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
 					std::cin >> posizione_taglio;
-					posizioni_taglio_griglia_x.push_back(posizione_taglio);
+					posizioni_taglio_griglia_y.push_back(posizione_taglio);
 				}
 			}
 			if (p_b[OUT_CUTZ] && !do_not_ask_missing)
@@ -1396,7 +1396,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 				{
 					std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
 					std::cin >> posizione_taglio;
-					posizioni_taglio_griglia_x.push_back(posizione_taglio);
+					posizioni_taglio_griglia_z.push_back(posizione_taglio);
 				}
 			}
 			p[OUT_GRID2D] = 0;
