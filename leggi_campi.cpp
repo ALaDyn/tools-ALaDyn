@@ -410,7 +410,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		}
 		else
 		{
-			taglio = 0.0;
+			taglio = zminimo;
 			int i = 0;
 			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_z.size(); j++)
 			{
@@ -454,7 +454,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		}
 		else
 		{
-			taglio = 0.0;
+			taglio = yminimo;
 			int i = 0;
 			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_y.size(); j++)
 			{
@@ -498,7 +498,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		}
 		else
 		{
-			taglio = 0.0;
+			taglio = xminimo;
 			int i = 0;
 			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_x.size(); j++)
 			{
