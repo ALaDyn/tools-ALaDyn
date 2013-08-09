@@ -52,9 +52,9 @@ void swap_endian_i(int* in_i,int n)
 }
 
 
-void swap_endian_f(float* in_f, int n)
+void swap_endian_f(float* in_f, size_t n)
 {
-	int i;
+	size_t i;
 	union {int imio; float fmio; char arr[4];}x;
 	char buff;
 	for(i=0;i<n;i++)

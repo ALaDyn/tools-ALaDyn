@@ -1,6 +1,5 @@
 #ifndef __LEGGI_CAMPI_C
 #define __LEGGI_CAMPI_C
-
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
@@ -67,7 +66,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		nomefile_bin << std::string(argv[1]) << ".bin";
 		file_in=fopen(nomefile_bin.str().c_str(), "rb");
-
+printf("CAZZO CAZZO tanta MERDA 2\n");
+	  fflush(stdout);
+	
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(&N_param,sizeof(int),1,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
@@ -129,6 +130,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	}
 	else
 	{
+	  nomefile_bin << std::string(argv[1]) << ".bin";
+	
 		npe_y=parametri->intpar[0];     //numero processori lungo y
 		npe_z=parametri->intpar[1];     //numero processori lungo z
 		npe=npe_y*npe_z;     //numero processori
@@ -220,8 +223,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 
 	printf("=========INIZIO LETTURE==========\n");
-	long pippo=nx1*ny1*nz1;
-	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,pippo);
+	size_t pippo=nx1*((size_t)ny1)*nz1;
+	printf("nx1*ny1*nz1: %i %i %i = %.10e\n",nx1,ny1,nz1,(double)pippo);
 	fflush(stdout);
 
 	/* Quanto segue non sarebbe necessario se vecchie e nuove variabili fossero unificate*/
@@ -245,31 +248,40 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	field = new float[npunti_x*npunti_y*npunti_z];
 	// field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
 	x_lineout=new double[npunti_x];
-
-
+		
 	if (!parametri->nuovi_dati_su_griglia)
 	{
+	  	nomefile_bin.str("");
+		nomefile_bin << std::string(argv[1]) << ".bin";
 		file_in=fopen(nomefile_bin.str().c_str(), "rb");
+		if(file_in==NULL)
+		  printf("tanta ma proprio tanta MERDA!!!\n");
+		fflush(stdout);
 
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(&N_param,sizeof(int),1,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+	
 		if(out_swap) swap_endian_i(&N_param,1);
 		int_param = new int[N_param];
 		real_param = new float[N_param];
+	
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
-
+		
+		printf("tanta MERDA in\n");
+		fflush(stdout);
+		
 		for(int ipz = 0; ipz < ncpu_z; ipz++)
 		{
-			segnoy=0;
+		  segnoy=0;
 			for(int ipy=0; ipy < ncpu_y; ipy++)
 			{
-				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			  fread_size = std::fread(&buff,sizeof(int),1,file_in);
 				fread_size = std::fread(npoint_loc,sizeof(int),3,file_in);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
@@ -295,7 +307,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 				for(size_t k=0; k<nzloc; k++)
 					for(size_t j=0; j<nyloc; j++)
 						for(size_t i=0; i<nxloc; i++)
-							field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+							field[i+(j+segnoy)*npunti_x+(k+segnoz)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
 				segnoy += nyloc;
 			} 
 			segnoz += nzloc;
@@ -314,31 +326,31 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			x_coordinates=new float[npunti_x];
 			y_coordinates=new float[npunti_y];
 			z_coordinates=new float[npunti_z];
-			fread_size = std::fread(x_coordinates,sizeof(float),nx1,file_in);
+			fread_size = std::fread(x_coordinates,sizeof(float),npunti_x,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			fread_size = std::fread(y_coordinates,sizeof(float),ny1,file_in);
+			fread_size = std::fread(y_coordinates,sizeof(float),npunti_y,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			fread_size = std::fread(z_coordinates,sizeof(float),nz1,file_in);
+			fread_size = std::fread(z_coordinates,sizeof(float),npunti_z,file_in);
 			fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
 			if(out_swap)
 			{
-				swap_endian_f(x_coordinates,nx1);
-				swap_endian_f(y_coordinates,ny1);
-				swap_endian_f(z_coordinates,nz1);
+				swap_endian_f(x_coordinates,npunti_x);
+				swap_endian_f(y_coordinates,npunti_y);
+				swap_endian_f(z_coordinates,npunti_z);
 			}
 
-			parametri->xcoord.resize(nx1,0);
-			parametri->ycoord.resize(ny1,0);
-			parametri->zcoord.resize(nz1,0);
+			parametri->xcoord.resize(npunti_x,0);
+			parametri->ycoord.resize(npunti_y,0);
+			parametri->zcoord.resize(npunti_z,0);
 
-			for (int i = 0; i < nx1; i++)
+			for (int i = 0; i < npunti_x; i++)
 				parametri->xcoord[i] = x_coordinates[i];
-			for (int i = 0; i < ny1; i++)
+			for (int i = 0; i < npunti_y; i++)
 				parametri->ycoord[i] = y_coordinates[i];
-			for (int i = 0; i < nz1; i++)
+			for (int i = 0; i < npunti_z; i++)
 				parametri->zcoord[i] = z_coordinates[i];
 		}
 
@@ -349,10 +361,12 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (!parametri->multifile)
 		{
-			file_in=fopen(nomefile_bin.str().c_str(), "rb");
-			int header_size = 3;
-			int * header = new int[header_size];
-			for(int ipz = 0; ipz < ncpu_z; ipz++)
+		  nomefile_bin.str("");
+		  nomefile_bin << std::string(argv[1]) << ".bin";
+		  file_in=fopen(nomefile_bin.str().c_str(), "rb");
+		  int header_size = 3;
+		  int * header = new int[header_size];
+		  for(int ipz = 0; ipz < ncpu_z; ipz++)
 			{
 				segnoy=0;
 				for(int ipy=0; ipy < ncpu_y; ipy++)
@@ -378,7 +392,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 					for(size_t k=0; k<nzloc; k++)
 						for(size_t j=0; j<nyloc; j++)
 							for(size_t i=0; i<nxloc; i++)
-								field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+								field[i+(j+segnoy)*npunti_x+(k+segnoz)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
 					segnoy += nyloc;
 				}
 				segnoz += nzloc;
@@ -426,7 +440,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 					for(size_t k=0; k<nzloc; k++)
 						for(size_t j=0; j<nyloc; j++)
 							for(size_t i=0; i<nxloc; i++)
-								field[i+(j+segnoy)*nx1+(k+indice_multifile)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+								field[i+(j+segnoy)*npunti_x+(k+indice_multifile)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
 					segnoy += nyloc;
 				}
 				indice_multifile++;
@@ -446,15 +460,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-		fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
+		fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_x, npunti_y, 1); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-		for(int j = 0; j < ny1; j++)
+		for(int j = 0; j < npunti_y; j++)
 		{
-			for(int i = 0; i < nx1; i++)
+			for(int i = 0; i < npunti_x; i++)
 			{
 				xx=parametri->xcoord[i];//xmin+dx*i;
 				yy=parametri->ycoord[j];//ymin+dy*j;
-				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1]);
+				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*npunti_x]);
 			}
 		}
 		fclose(clean_fields);
@@ -469,9 +483,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the lineout file 1D (not vtk)\n");
 
-		for(int i = 0; i < nx1; i++) x_lineout[i]=0;
+		for(int i = 0; i < npunti_x; i++) x_lineout[i]=0;
 
-		for(int j = 0; j < ny1; j++)
+		for(int j = 0; j < npunti_y; j++)
 		{
 			if(parametri->ycoord[j]>=0)
 			{
@@ -484,13 +498,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		for(int j = myj-span; j < (myj+span+1); j++)
 		{
 			fprintf(clean_fields,"%.4g\t",parametri->ycoord[j]);
-			for(int i = 0; i < nx1; i++)
+			for(int i = 0; i < npunti_x; i++)
 			{
-				x_lineout[i]+=field[i+j*nx1]/(2*span+1.0);
+				x_lineout[i]+=field[i+j*npunti_x]/(2*span+1.0);
 			}
 		}
 		fprintf(clean_fields,"\n");
-		for(int i = 0; i < nx1; i++)
+		for(int i = 0; i < npunti_x; i++)
 		{
 			xx=parametri->xcoord[i];//xmin+dx*i;
 			fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
@@ -506,9 +520,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		clean_fields=fopen(nomefile_campi, "w");
 		printf("\nWriting the lineout file 1D (not vtk)\n");
 
-		for(int i = 0; i < nx1; i++)
+		for(int i = 0; i < npunti_x; i++)
 			x_lineout[i]=0;
-		for(int j = 0; j < ny1; j++)
+		for(int j = 0; j < npunti_y; j++)
 		{
 			if(parametri->ycoord[j]>=0)
 			{
@@ -523,14 +537,14 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 			for(size_t j = myj-span; j < (myj+span+1); j++)
 			{
-				for(size_t i = 0; i < nx1; i++)
+				for(size_t i = 0; i < npunti_x; i++)
 				{
-					x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*span+1.0)*(2*span+1.0));
+					x_lineout[i]+=field[i+j*npunti_x+k*npunti_x*npunti_y]/((2*span+1.0)*(2*span+1.0));
 				}
 			}
 		}
 		fprintf(clean_fields,"\n");
-		for(int i = 0; i < nx1; i++)
+		for(int i = 0; i < npunti_x; i++)
 		{
 			xx=parametri->xcoord[i];//xmin+dx*i;
 			fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
@@ -543,9 +557,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (parametri->posizioni_taglio_griglia_z.size() == 0)
 		{
-			taglio = parametri->zcoord[nz1/2];
+			taglio = parametri->zcoord[npunti_z/2];
 			cutz.push_back(taglio);
-			gridIndex_cutz.push_back(nz1/2);
+			gridIndex_cutz.push_back(npunti_z/2);
 		}
 		else
 		{
@@ -567,16 +581,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 			fprintf(clean_fields,"# 2D cut at z=%g\n", cutz[n]); 
-			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
+			fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_x, npunti_y, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
 			size_t k = gridIndex_cutz[n];
-			for(size_t j = 0; j < ny1; j++)
+			for(size_t j = 0; j < npunti_y; j++)
 			{
-				for(size_t i = 0; i < nx1; i++)
+				for(size_t i = 0; i < npunti_x; i++)
 				{
 					xx=parametri->xcoord[i];//xx=xmin+dx*i;
 					yy=parametri->ycoord[j];//yy=ymin+dy*j;
-					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*npunti_x+k*npunti_x*npunti_y]);
 				}
 			}
 			fclose(clean_fields);
@@ -587,9 +601,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (parametri->posizioni_taglio_griglia_y.size() == 0)
 		{
-			taglio = parametri->ycoord[ny1/2];
+			taglio = parametri->ycoord[npunti_y/2];
 			cuty.push_back(taglio);
-			gridIndex_cuty.push_back(ny1/2);
+			gridIndex_cuty.push_back(npunti_y/2);
 		}
 		else
 		{
@@ -611,16 +625,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 			fprintf(clean_fields,"# 2D cut at y=%g\n", cuty[n]); 
-			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, nz1, 1); 
+			fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_x, npunti_z, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, zmin, xmax, zmax);
 			size_t j = gridIndex_cuty[n];
-			for(size_t k = 0; k < nz1; k++)
+			for(size_t k = 0; k < npunti_z; k++)
 			{
-				for(size_t i = 0; i < nx1; i++)
+				for(size_t i = 0; i < npunti_x; i++)
 				{
 					xx=parametri->xcoord[i];//xx=xmin+dx*i;
 					yy=parametri->ycoord[k];//yy=ymin+dy*j;
-					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*npunti_x+k*npunti_x*npunti_y]);
 				}
 			}
 			fclose(clean_fields);
@@ -631,9 +645,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (parametri->posizioni_taglio_griglia_x.size() == 0)
 		{
-			taglio = parametri->xcoord[nx1/2];
+			taglio = parametri->xcoord[npunti_x/2];
 			cutx.push_back(taglio);
-			gridIndex_cutx.push_back(nx1/2);
+			gridIndex_cutx.push_back(npunti_x/2);
 		}
 		else
 		{
@@ -655,16 +669,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 			fprintf(clean_fields,"# 2D cut at x=%g\n", cutx[n]); 
-			fprintf(clean_fields,"# %i\n#%i\n#%i\n",ny1, nz1, 1); 
+			fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_y, npunti_z, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",ymin, zmin, ymax, zmax);
 			size_t i = gridIndex_cutx[n];
-			for(size_t k = 0; k < nz1; k++)
+			for(size_t k = 0; k < npunti_z; k++)
 			{
-				for(size_t j = 0; j < ny1; j++)
+				for(size_t j = 0; j < npunti_y; j++)
 				{
 					xx=parametri->ycoord[j];//xx=xmin+dx*i;
 					yy=parametri->zcoord[k];//yy=ymin+dy*j;
-					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
+					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*npunti_x+k*npunti_x*npunti_y]);
 				}
 			}
 			fclose(clean_fields);
@@ -681,19 +695,19 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		y_coordinates=new float[npunti_y];
 		z_coordinates=new float[npunti_z];
 
-		for (int i = 0; i < nx1; i++)
+		for (int i = 0; i < npunti_x; i++)
 			x_coordinates[i] = parametri->xcoord[i];
-		for (int i = 0; i < ny1; i++)
+		for (int i = 0; i < npunti_y; i++)
 			y_coordinates[i] = parametri->ycoord[i];
-		for (int i = 0; i < nz1; i++)
+		for (int i = 0; i < npunti_z; i++)
 			z_coordinates[i] = parametri->zcoord[i];
 
 		if(parametri->endian_machine == 0)
 		{
-			swap_endian_f(field,nx1*ny1*nz1);
-			swap_endian_f(x_coordinates,nx1);
-			swap_endian_f(y_coordinates,ny1);
-			swap_endian_f(z_coordinates,nz1);
+			swap_endian_f(field,npunti_x*npunti_y*npunti_z);
+			swap_endian_f(x_coordinates,npunti_x);
+			swap_endian_f(y_coordinates,npunti_y);
+			swap_endian_f(z_coordinates,npunti_z);
 		}
 
 		//////// DATASET STRUCTURED_POINTS VERSION    ////////
@@ -706,15 +720,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"BINARY\n");
 		//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
 		fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
-		fprintf(clean_fields,"POINTS %i float\n",nx1*((size_t)ny1)*nz1);
+		fprintf(clean_fields,"POINTS %i float\n",npunti_x*((size_t)npunti_y)*npunti_z);
 		float rr[3];
-		for(size_t k=0;k<nz1;k++)
+		for(size_t k=0;k<npunti_z;k++)
 		{
 			rr[2]=z_coordinates[k];
-			for(size_t j=0;j<ny1;j++)
+			for(size_t j=0;j<npunti_y;j++)
 			{
 				rr[1]=y_coordinates[j];
-				for(size_t i=0;i<nx1;i++)
+				for(size_t i=0;i<npunti_x;i++)
 				{
 					rr[0]=x_coordinates[i];
 					fwrite((void*)rr,sizeof(float),3,clean_fields);
@@ -722,10 +736,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			}
 		}
 
-		fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+		fprintf(clean_fields,"POINT_DATA %i\n",npunti_x*npunti_y*npunti_z);
 		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
-		fwrite((void*)field,sizeof(float),nx1*((size_t)ny1)*nz1,clean_fields);
+		fwrite((void*)field,sizeof(float),npunti_x*((size_t)npunti_y)*npunti_z,clean_fields);
 		fclose(clean_fields);
 
 
@@ -738,20 +752,20 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"BINARY\n");
 		//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
 		fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
-		fprintf(clean_fields,"DIMENSIONS %i %i %i\n",nx1, ny1, nz1);
+		fprintf(clean_fields,"DIMENSIONS %i %i %i\n",npunti_x, npunti_y, npunti_z);
 		//fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin, ymin, zmin);
 		//fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
-		fprintf(clean_fields,"X_COORDINATES %i float\n",nx1);
-		fwrite((void*)x_coordinates,sizeof(float),nx1,clean_fields);
-		fprintf(clean_fields,"Y_COORDINATES %i float\n",ny1);
-		fwrite((void*)y_coordinates,sizeof(float),ny1,clean_fields);
-		fprintf(clean_fields,"Z_COORDINATES %i float\n",nz1);
-		fwrite((void*)z_coordinates,sizeof(float),nz1,clean_fields);
+		fprintf(clean_fields,"X_COORDINATES %i float\n",npunti_x);
+		fwrite((void*)x_coordinates,sizeof(float),npunti_x,clean_fields);
+		fprintf(clean_fields,"Y_COORDINATES %i float\n",npunti_y);
+		fwrite((void*)y_coordinates,sizeof(float),npunti_y,clean_fields);
+		fprintf(clean_fields,"Z_COORDINATES %i float\n",npunti_z);
+		fwrite((void*)z_coordinates,sizeof(float),npunti_z,clean_fields);
 
-		fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
+		fprintf(clean_fields,"POINT_DATA %i\n",npunti_x*npunti_y*npunti_z);
 		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
-		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+		fwrite((void*)field,sizeof(float),npunti_x*npunti_y*npunti_z,clean_fields);
 		fclose(clean_fields);
 		*/
 		fclose(file_in);

@@ -7,7 +7,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  0
-#define BUGFIX_RELEASE 1
+#define BUGFIX_RELEASE 2
 
 #include <iostream>
 #include <vector>
@@ -285,6 +285,6 @@ int leggi_particelle(int , const char ** , Parametri *);
 int is_big_endian(void);
 void swap_endian_s(short* ,int );
 void swap_endian_i(int* ,int );
-void swap_endian_f(float* , int );
+void swap_endian_f(float* , size_t );
 
 #endif
