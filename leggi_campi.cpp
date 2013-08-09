@@ -17,9 +17,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	const int out_lineoutx = parametri->p[OUT_LINEOUT_X];
 	const int out_2d = parametri->p[OUT_GRID2D];
 
-	int npunti_x = parametri->npunti_x_ricampionati;
-	int npunti_y = parametri->npunti_y_ricampionati;
-	int npunti_z = parametri->npunti_z_ricampionati;
+	size_t npunti_x = parametri->npunti_x_ricampionati;
+	size_t npunti_y = parametri->npunti_y_ricampionati;
+	size_t npunti_z = parametri->npunti_z_ricampionati;
 	int npunti_x_per_cpu = parametri->npx_per_cpu;
 	int npunti_y_per_cpu = parametri->npy_per_cpu;
 	int npunti_z_per_cpu = parametri->npz_per_cpu;
@@ -220,7 +220,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 
 	printf("=========INIZIO LETTURE==========\n");
-	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,nx1*ny1*nz1);
+	long pippo=nx1*ny1*nz1;
+	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,pippo);
 	fflush(stdout);
 
 	/* Quanto segue non sarebbe necessario se vecchie e nuove variabili fossero unificate*/
@@ -291,9 +292,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 				if(out_swap) swap_endian_f(buffer,loc_size);
 
-				for(int k=0; k<nzloc; k++)
-					for(int j=0; j<nyloc; j++)
-						for(int i=0; i<nxloc; i++)
+				for(size_t k=0; k<nzloc; k++)
+					for(size_t j=0; j<nyloc; j++)
+						for(size_t i=0; i<nxloc; i++)
 							field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
 				segnoy += nyloc;
 			} 
@@ -374,9 +375,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 					if(out_swap) swap_endian_f(buffer,loc_size);
 
-					for(int k=0; k<nzloc; k++)
-						for(int j=0; j<nyloc; j++)
-							for(int i=0; i<nxloc; i++)
+					for(size_t k=0; k<nzloc; k++)
+						for(size_t j=0; j<nyloc; j++)
+							for(size_t i=0; i<nxloc; i++)
 								field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
 					segnoy += nyloc;
 				}
@@ -422,9 +423,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 					if(out_swap) swap_endian_f(buffer,loc_size);
 
-					for(int k=0; k<nzloc; k++)
-						for(int j=0; j<nyloc; j++)
-							for(int i=0; i<nxloc; i++)
+					for(size_t k=0; k<nzloc; k++)
+						for(size_t j=0; j<nyloc; j++)
+							for(size_t i=0; i<nxloc; i++)
 								field[i+(j+segnoy)*nx1+(k+indice_multifile)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
 					segnoy += nyloc;
 				}
@@ -516,13 +517,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			}
 		}
 		fprintf(clean_fields,"#");
-		for(int k = myj-span; k < (myj+span+1); k++)
+		for(size_t k = myj-span; k < (myj+span+1); k++)
 		{
 			fprintf(clean_fields,"%.4g\t",parametri->zcoord[k]);
 
-			for(int j = myj-span; j < (myj+span+1); j++)
+			for(size_t j = myj-span; j < (myj+span+1); j++)
 			{
-				for(int i = 0; i < nx1; i++)
+				for(size_t i = 0; i < nx1; i++)
 				{
 					x_lineout[i]+=field[i+j*nx1+k*nx1*ny1]/((2*span+1.0)*(2*span+1.0));
 				}
@@ -568,10 +569,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			fprintf(clean_fields,"# 2D cut at z=%g\n", cutz[n]); 
 			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, ny1, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
-			int k = gridIndex_cutz[n];
-			for(int j = 0; j < ny1; j++)
+			size_t k = gridIndex_cutz[n];
+			for(size_t j = 0; j < ny1; j++)
 			{
-				for(int i = 0; i < nx1; i++)
+				for(size_t i = 0; i < nx1; i++)
 				{
 					xx=parametri->xcoord[i];//xx=xmin+dx*i;
 					yy=parametri->ycoord[j];//yy=ymin+dy*j;
@@ -612,10 +613,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			fprintf(clean_fields,"# 2D cut at y=%g\n", cuty[n]); 
 			fprintf(clean_fields,"# %i\n#%i\n#%i\n",nx1, nz1, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, zmin, xmax, zmax);
-			int j = gridIndex_cuty[n];
-			for(int k = 0; k < nz1; k++)
+			size_t j = gridIndex_cuty[n];
+			for(size_t k = 0; k < nz1; k++)
 			{
-				for(int i = 0; i < nx1; i++)
+				for(size_t i = 0; i < nx1; i++)
 				{
 					xx=parametri->xcoord[i];//xx=xmin+dx*i;
 					yy=parametri->ycoord[k];//yy=ymin+dy*j;
@@ -656,10 +657,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			fprintf(clean_fields,"# 2D cut at x=%g\n", cutx[n]); 
 			fprintf(clean_fields,"# %i\n#%i\n#%i\n",ny1, nz1, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",ymin, zmin, ymax, zmax);
-			int i = gridIndex_cutx[n];
-			for(int k = 0; k < nz1; k++)
+			size_t i = gridIndex_cutx[n];
+			for(size_t k = 0; k < nz1; k++)
 			{
-				for(int j = 0; j < ny1; j++)
+				for(size_t j = 0; j < ny1; j++)
 				{
 					xx=parametri->ycoord[j];//xx=xmin+dx*i;
 					yy=parametri->zcoord[k];//yy=ymin+dy*j;
@@ -705,15 +706,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"BINARY\n");
 		//fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
 		fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
-		fprintf(clean_fields,"POINTS %i float\n",nx1*ny1*nz1);
+		fprintf(clean_fields,"POINTS %i float\n",nx1*((size_t)ny1)*nz1);
 		float rr[3];
-		for(int k=0;k<nz1;k++)
+		for(size_t k=0;k<nz1;k++)
 		{
 			rr[2]=z_coordinates[k];
-			for(int j=0;j<ny1;j++)
+			for(size_t j=0;j<ny1;j++)
 			{
 				rr[1]=y_coordinates[j];
-				for(int i=0;i<nx1;i++)
+				for(size_t i=0;i<nx1;i++)
 				{
 					rr[0]=x_coordinates[i];
 					fwrite((void*)rr,sizeof(float),3,clean_fields);
@@ -724,7 +725,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"POINT_DATA %i\n",nx1*ny1*nz1);
 		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
-		fwrite((void*)field,sizeof(float),nx1*ny1*nz1,clean_fields);
+		fwrite((void*)field,sizeof(float),nx1*((size_t)ny1)*nz1,clean_fields);
 		fclose(clean_fields);
 
 
