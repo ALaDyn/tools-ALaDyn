@@ -346,50 +346,94 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	}
 	else
 	{
-		int header_size = 3;
-		int * header = new int[header_size];
-		while(1)
+		if (!parametri->multifile)
 		{
-			nomefile_bin.str("");
-			nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
-
-			if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb"))== NULL)
+			file_in=fopen(nomefile_bin.str().c_str(), "rb");
+			int header_size = 3;
+			int * header = new int[header_size];
+			for(int ipz = 0; ipz < ncpu_z; ipz++)
 			{
-				printf("Sono finiti i files! \n");
-				break;
+				segnoy=0;
+				for(int ipy=0; ipy < ncpu_y; ipy++)
+				{
+					fread_size = std::fread(header,sizeof(int),header_size,file_in);
+					if(out_swap) swap_endian_i(header,header_size);
+
+					loc_size=header[0]*header[1]*header[2];
+
+					nxloc=header[0];
+					nyloc=header[1];
+					nzloc=header[2];
+
+					printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
+					fflush(stdout);
+
+					buffer = new float[loc_size];
+					//	buffer=(float*)malloc(loc_size*sizeof(float));
+					fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
+
+					if(out_swap) swap_endian_f(buffer,loc_size);
+
+					for(int k=0; k<nzloc; k++)
+						for(int j=0; j<nyloc; j++)
+							for(int i=0; i<nxloc; i++)
+								field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+					segnoy += nyloc;
+				}
+				segnoz += nzloc;
 			}
 
-			for(int ipy=0; ipy < ncpu_y; ipy++)
-			{
-				fread_size = std::fread(header,sizeof(int),header_size,file_in);
-				if(out_swap) swap_endian_i(header,header_size);
-
-				loc_size=header[0]*header[1]*header[2];
-
-				nxloc=header[0];
-				nyloc=header[1];
-				nzloc=header[2];
-
-				printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
-				fflush(stdout);
-
-				buffer = new float[loc_size];
-				//	buffer=(float*)malloc(loc_size*sizeof(float));
-				fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
-
-				if(out_swap) swap_endian_f(buffer,loc_size);
-
-				for(int k=0; k<nzloc; k++)
-					for(int j=0; j<nyloc; j++)
-						for(int i=0; i<nxloc; i++)
-							field[i+(j+segnoy)*nx1+(k+indice_multifile)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
-				segnoy += nyloc;
-			}
-			indice_multifile++;
+			printf("=========FINE LETTURE==========\n");
+			fflush(stdout);
 		}
+		else
+		{
+			int header_size = 3;
+			int * header = new int[header_size];
+			while(1)
+			{
+				nomefile_bin.str("");
+				nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
 
-		printf("=========FINE LETTURE==========\n");
-		fflush(stdout);
+				if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb"))== NULL)
+				{
+					printf("Sono finiti i files! \n");
+					break;
+				}
+
+				segnoy=0;
+				for(int ipy=0; ipy < ncpu_y; ipy++)
+				{
+					fread_size = std::fread(header,sizeof(int),header_size,file_in);
+					if(out_swap) swap_endian_i(header,header_size);
+
+					loc_size=header[0]*header[1]*header[2];
+
+					nxloc=header[0];
+					nyloc=header[1];
+					nzloc=header[2];
+
+					printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
+					fflush(stdout);
+
+					buffer = new float[loc_size];
+					//	buffer=(float*)malloc(loc_size*sizeof(float));
+					fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
+
+					if(out_swap) swap_endian_f(buffer,loc_size);
+
+					for(int k=0; k<nzloc; k++)
+						for(int j=0; j<nyloc; j++)
+							for(int i=0; i<nxloc; i++)
+								field[i+(j+segnoy)*nx1+(k+indice_multifile)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+					segnoy += nyloc;
+				}
+				indice_multifile++;
+			}
+
+			printf("=========FINE LETTURE==========\n");
+			fflush(stdout);
+		}
 	}
 
 

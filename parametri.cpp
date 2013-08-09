@@ -152,7 +152,7 @@ void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 	npunti_z_ricampionati = intpar[6];
 	npz_per_cpu = intpar[7];
 	ndv = intpar[17];
-	discriminante_versione_file = intpar[18];
+	discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->nuovi_dati_su_griglia che e' un semplice bool e di piu' difficile lettura
 	endianness = intpar[19];
 
 	std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
