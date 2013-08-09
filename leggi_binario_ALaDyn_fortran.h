@@ -5,9 +5,9 @@
 #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
-#define MAJOR_RELEASE  4
-#define MINOR_RELEASE  4
-#define BUGFIX_RELEASE 3
+#define MAJOR_RELEASE  5
+#define MINOR_RELEASE  0
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -87,6 +87,7 @@
 #define NUMERO_MASSIMO	1.0e30
 #define MAX_LENGTH_FILENAME 200
 #define MAX_NUMBER_OF_CPUS	32768
+#define NUMERO_PARAMETRI_FILE_DAT 20
 
 #define NPARAMETRI			16
 #define WEIGHT				0
@@ -159,6 +160,8 @@ struct Parametri
 	int ncpu_x, ncpu_y, ncpu_z, ncpu;
 	int ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
 	int endianness;
+	bool nuovi_dati_su_griglia;
+	bool multifile;
 	float massa_particella_MeV;
 	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_thetaT, nbin_gamma;
 	int endian_file, endian_machine;
@@ -169,6 +172,8 @@ struct Parametri
 	float minimi[SEI_DIMENSIONI+ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI+ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E
 	float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax;
 	std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
+	std::vector<float> xcoord, ycoord, zcoord, realpar;
+	std::vector<int> intpar;
 	bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, Emin_b, Emax_b, 
 		gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b, nbin_z_b, 
 		nbin_px_b, nbin_py_b, nbin_pz_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
@@ -200,8 +205,7 @@ struct Parametri
 	int dimmi_nbin(int);
 	void parse_command_line(int , const char ** );
 	void leggi_interattivo();
-	//	void leggi_da_shell(int, const char *[]);
-	void leggi_endian_e_ncol(std::ifstream & );
+	void leggi_file_dat(std::ifstream & );
 	void chiedi_endian_file();
 	void chiedi_numero_colonne();
 	void chiedi_2Do3D();

@@ -10,11 +10,15 @@ non puo' nemmeno calcolare le le dimensioni dei bin!
 Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri :: Parametri()
 {
+	intpar.resize(NUMERO_PARAMETRI_FILE_DAT,0);
+	realpar.resize(NUMERO_PARAMETRI_FILE_DAT,0.0);
 	subsample = 1;
 	span = 5;
 	ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
 	ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
 	endianness = 0;
+	nuovi_dati_su_griglia = false;
+	multifile = false;
 	massa_particella_MeV = 0.;
 	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
 	tnow = 0.0;
@@ -126,64 +130,42 @@ float Parametri :: dimmi_dim(int colonna)
 }
 
 
-void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
+void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 {
 	std::string riga_persa;
-	int trascura_int;
-	int trascura_float;
 	int fattore_ricampionamento;
-
+	int discriminante_versione_file;
+	float coord;
 	std::getline(file_dat,riga_persa);	// per leggere la riga Integer parameters
 
+	for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++) file_dat >> intpar[i];
 	ncpu_x = 1;
-	file_dat >> ncpu_y;					// 1° parametro
-	file_dat >> ncpu_z;					// 2° parametro
+	ncpu_y = intpar[0];
+	ncpu_z = intpar[1];
 	ncpu = ncpu_x * ncpu_y * ncpu_z;
-	file_dat >> npunti_x;				// 3° parametro
-	file_dat >> npunti_x_ricampionati;	// 4° parametro
+	npunti_x = intpar[2];
+	npunti_x_ricampionati = intpar[3];
 	fattore_ricampionamento = npunti_x / npunti_x_ricampionati;
 	npx_per_cpu = npunti_x_ricampionati;
-	file_dat >> npunti_y_ricampionati;	// 5° parametro
-	file_dat >> npy_per_cpu;			// 6° parametro
-	file_dat >> npunti_z_ricampionati;	// 7° parametro
-	file_dat >> npz_per_cpu;			// 8° parametro
-	file_dat >> trascura_int;			// 9° parametro
-	file_dat >> trascura_int;			// 10° parametro
-	file_dat >> trascura_int;			// 11° parametro
-	file_dat >> trascura_int;			// 12° parametro
-	file_dat >> trascura_int;			// 13° parametro
-	file_dat >> trascura_int;			// 14° parametro
-	file_dat >> trascura_int;			// 15° parametro
-	file_dat >> trascura_int;			// 16° parametro
-	file_dat >> trascura_int;			// 17° parametro
-	file_dat >> ndv;					// 18° parametro
-	file_dat >> trascura_int;			// 19° parametro
-	file_dat >> endianness;				// 20° parametro
+	npunti_y_ricampionati = intpar[4];
+	npy_per_cpu = intpar[5];
+	npunti_z_ricampionati = intpar[6];
+	npz_per_cpu = intpar[7];
+	ndv = intpar[17];
+	discriminante_versione_file = intpar[18];
+	endianness = intpar[19];
 
 	std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
 	std::getline(file_dat,riga_persa);	// per leggere la riga Real parameters
 
-	file_dat >> tnow;					// 1° parametro
-	file_dat >> xmin;					// 2° parametro
-	file_dat >> xmax;					// 3° parametro
-	file_dat >> ymin;					// 4° parametro
-	file_dat >> ymax;					// 5° parametro
-	file_dat >> zmin;					// 6° parametro
-	file_dat >> zmax;					// 7° parametro
-	file_dat >> trascura_float;			// 8° parametro
-	file_dat >> trascura_float;			// 9° parametro
-	file_dat >> trascura_float;			// 10° parametro
-	file_dat >> trascura_float;			// 11° parametro
-	file_dat >> trascura_float;			// 12° parametro
-	file_dat >> trascura_float;			// 13° parametro
-	file_dat >> trascura_float;			// 14° parametro
-	file_dat >> trascura_float;			// 15° parametro
-	file_dat >> trascura_float;			// 16° parametro
-	file_dat >> trascura_float;			// 17° parametro
-	file_dat >> trascura_float;			// 18° parametro
-	file_dat >> trascura_float;			// 19° parametro
-	file_dat >> trascura_float;			// 20° parametro
-
+	for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++) file_dat >> realpar[i];
+	tnow = realpar[0];
+	xmin = realpar[1];
+	xmax = realpar[2];
+	ymin = realpar[3];
+	ymax = realpar[4];
+	zmin = realpar[5];
+	zmax = realpar[6];
 
 	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
@@ -198,10 +180,60 @@ void Parametri :: leggi_endian_e_ncol(std::ifstream& file_dat)
 	else
 	{
 		if (npunti_z_ricampionati == 1) zmin = 0.0, zmax = 1.0;
+		if (discriminante_versione_file == -1) nuovi_dati_su_griglia = true;
 		p[WEIGHT] = 0;
 		p[NCOLONNE] = npunti_z_ricampionati;
 		p_b[NCOLONNE] = false;
 		p_b[WEIGHT] = false;
+
+		if (nuovi_dati_su_griglia)
+		{
+			std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei float
+			//	std::getline(file_dat,riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
+
+
+			for (int i = 0; i < npunti_x_ricampionati; i++)
+			{
+				file_dat >> coord;
+				xcoord.push_back(coord);
+			}
+			for (int i = 0; i < npunti_y_ricampionati; i++)
+			{
+				file_dat >> coord;
+				ycoord.push_back(coord);
+			}
+			for (int i = 0; i < npunti_z_ricampionati; i++)
+			{
+				file_dat >> coord;
+				zcoord.push_back(coord);
+			}
+		}
+		else			// mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
+		{
+			float dx, dy, dz;
+			if (npunti_x_ricampionati > 1) dx = (xmax - xmin) / (npunti_x_ricampionati-1);
+			else dx = (xmax - xmin);
+			if (npunti_y_ricampionati > 1) dy = (ymax - ymin) / (npunti_y_ricampionati-1);
+			else dy = (ymax - ymin);
+			if (npunti_z_ricampionati > 1) dz = (zmax - zmin) / (npunti_z_ricampionati-1);
+			else dz = (zmax - zmin);
+
+			for (int i = 0; i < npunti_x_ricampionati; i++)
+			{
+				coord = xmin + dx*i;
+				xcoord.push_back(coord);
+			}
+			for (int i = 0; i < npunti_y_ricampionati; i++)
+			{
+				coord = ymin + dy*i;
+				ycoord.push_back(coord);
+			}
+			for (int i = 0; i < npunti_z_ricampionati; i++)
+			{
+				coord = zmin + dz*i;
+				zcoord.push_back(coord);
+			}
+		}
 	}
 	endian_file = (endianness-1);
 }

@@ -15,7 +15,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	trascura = new char[MAX_LENGTH_FILENAME];
 	std::FILE *file_in;
 	int indice_multifile=0;
-	bool flag_multifile = false;
 	int contatori[] = {0,0,0};
 	float zero = 0.0f;
 	long long particelle_accumulate = 0;
@@ -25,24 +24,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	float array_supporto7[7];
 	float array_supporto5[5];
 
-	if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb")) == NULL )
-	{
-		nomefile_bin.str("");
-		nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
-		if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb")) == NULL )
-		{
-			printf ( "file non-existent!\n" );
-		}
-		else
-		{
-			flag_multifile = true;
-			printf ( "multi files exist!\n" );
-		}
-	}
-	else
-	{
-		printf ( "file exists!\n" );
-	}
+	if (!parametri->multifile) file_in=fopen(nomefile_bin.str().c_str(), "rb");
+
 	std::FILE *binary_vtk;
 	std::FILE *binary_clean;
 	std::FILE *ascii_propaga;
@@ -50,15 +33,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	std::FILE *ascii_csv;
 	std::FILE *parameters;
 	std::ofstream Estremi_out;
-	std::ifstream file_dat;
-	bool dat_not_found = true;
 	int conta_processori=0;
-	if (!(parametri->old_fortran_bin)) 
-	{
-		file_dat.open(nomefile_dat.str().c_str());
-		if (file_dat.fail()) printf ( "file .dat non-existent!\n" );
-		else dat_not_found = false;
-	}
 
 	const int out_swap = parametri->p[SWAP];
 	const int out_vtk = parametri->p[OUT_VTK];
@@ -94,7 +69,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	char nomefile_binnato[MAX_LENGTH_FILENAME];
 
 	size_t fread_size = 0;
-	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot,np_loc,ny_loc,ndv,i_end;
+	int npe,nx,nz,ibx,iby,ibz,model,dmodel,nsp,ndimen,lpord,deord,nptot,np_loc,ny_loc,ndv;
 	ndv = parametri->p[NCOLONNE];
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	int tipo = 0;
@@ -160,52 +135,44 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		charge=real_param[17];			// carica particella su carica elettrone
 		mass=real_param[18];			// massa particelle su massa elettrone
 	}
-
-	if (!(parametri->old_fortran_bin) && !dat_not_found)
+	else
 	{
-		std::getline(file_dat,riga_persa);
-		file_dat >> npe;
-		file_dat >> nx;
-		file_dat >> ny_loc;
-		file_dat >> nz;
-		file_dat >> ibx;
-		file_dat >> iby;
-		file_dat >> ibz;
-		file_dat >> model;
-		file_dat >> dmodel;
-		file_dat >> nsp;
-		file_dat >> ndimen;
-		file_dat >> np_loc;
-		file_dat >> lpord;
-		file_dat >> deord;
-		file_dat >> trascura;
-		file_dat >> pID;
-		file_dat >> nptot;
-		file_dat >> ndv;
-		file_dat >> i_end;
-		file_dat >> trascura;
-		std::getline(file_dat,riga_persa); // nb: servono due getline per eliminare la riga di testo nel .dat e non capisco il perche'...
-		std::getline(file_dat,riga_persa);
-		file_dat >> tnow;
-		file_dat >> xmin;
-		file_dat >> xmax;
-		file_dat >> ymin;
-		file_dat >> ymax;
-		file_dat >> zmin;
-		file_dat >> zmax;
-		file_dat >> w0x;
-		file_dat >> w0y;
-		file_dat >> nrat;
-		file_dat >> a0;
-		file_dat >> lam0;
-		file_dat >> E0;
-		file_dat >> ompe;
-		file_dat >> np_over_nm;
-		file_dat >> xt_in;
-		file_dat >> xt_end;
-		file_dat >> charge;
-		file_dat >> mass;
-		file_dat >> trascura;
+		npe=parametri->intpar[0];				//numero processori
+		nx=parametri->intpar[1];
+		ny_loc=parametri->intpar[2];
+		nz=parametri->intpar[3];
+		ibx=parametri->intpar[4];
+		iby=parametri->intpar[5];
+		ibz=parametri->intpar[6];
+		model=parametri->intpar[7];				//modello di laser utilizzato
+		dmodel=parametri->intpar[8];			//modello di condizioni iniziali
+		nsp=parametri->intpar[9];				//numero di speci
+		ndimen=parametri->intpar[10];			//numero di componenti dello spazio dei momenti
+		np_loc=parametri->intpar[11];
+		lpord=parametri->intpar[12];			//ordine dello schema leapfrog
+		deord=parametri->intpar[13];			//ordine derivate
+		pID=parametri->intpar[15];				// tipo delle particelle
+		nptot=parametri->intpar[16];			// numero di particelle da leggere nella specie
+		ndv=parametri->intpar[17];				// numero di particelle da leggere nella specie
+		tnow=parametri->realpar[0];				// tempo dell'output
+		xmin=parametri->realpar[1];				// estremi della griglia
+		xmax=parametri->realpar[2];				// estremi della griglia
+		ymin=parametri->realpar[3];				// estremi della griglia
+		ymax=parametri->realpar[4];				// estremi della griglia
+		zmin=parametri->realpar[5];				// estremi della griglia
+		zmax=parametri->realpar[6];				// estremi della griglia
+		w0x=parametri->realpar[7];				// waist del laser in x
+		w0y=parametri->realpar[8];				// waist del laser in y
+		nrat=parametri->realpar[9];				// n over n critical
+		a0=parametri->realpar[10];				// a0 laser
+		lam0=parametri->realpar[11];			// lambda
+		E0=parametri->realpar[12];				// conversione da campi numerici a TV/m
+		ompe=parametri->realpar[13];			// costante accoppiamento correnti campi
+		np_over_nm=parametri->realpar[14];		// numerical2physical particles 14 
+		xt_in=parametri->realpar[15];			// inizio plasma
+		xt_end=parametri->realpar[16];
+		charge=parametri->realpar[17];			// carica particella su carica elettrone
+		mass=parametri->realpar[18];			// massa particelle su massa elettrone
 	}
 
 
@@ -450,7 +417,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	while(1)
 	{
-		if(!flag_multifile)
+		if(!parametri->multifile)
 		{
 			if (conta_processori >= stop_at_cpu_number) break;
 			if (parametri->old_fortran_bin)
@@ -479,8 +446,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		}
 		else  //we do have multifiles i.e. Prpout00_000.bin
 		{
-			//set filename to be read
-			fclose(file_in);
 			nomefile_bin.str("");
 			nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
 			if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb"))== NULL)
@@ -513,7 +478,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			for (int h = 0; h < num_of_passes; h++)
 			{
 				if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %i of %i\n",h+1, num_of_passes);
-				if(!flag_multifile)
+				if(!parametri->multifile)
 				{
 					particelle = new float[npart_loc*ndv];
 					//	particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
@@ -1061,8 +1026,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		fclose(ascii_csv);
 	}
 
-	if (!(dat_not_found)) file_dat.close();
-	if (!flag_multifile) fclose(file_in);
+	if (!parametri->multifile) fclose(file_in);
 
 	return 0;
 }

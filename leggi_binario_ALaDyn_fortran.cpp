@@ -48,7 +48,6 @@ int main ()
 
 	/* Controllo file binario */
 	file_bin.open(nomefile_bin.str().c_str(),std::ios::binary|std::ios::in);
-	bool no_bin_file = false;
 	if ( file_bin.fail() )
 	{
 		nomefile_bin.str("");
@@ -57,15 +56,14 @@ int main ()
 		if ( file_bin.fail() )
 		{
 			std::cout << "Input file non trovato" << std::endl;
-			no_bin_file= true;
 			return -3;
 		}
+		else parametri.multifile = true;
 	}
-	if(!no_bin_file)
-	{
-		std::cout << "Input file is " << argv[1] << ".bin" << std::endl;
-		parametri.check_filename(argv[1]);
-	}
+	else parametri.multifile = false;
+	if(parametri.multifile) std::cout << "Input files are " << argv[1] << "_???.bin" << std::endl;
+	else std::cout << "Input file is " << argv[1] << ".bin" << std::endl;
+	parametri.check_filename(argv[1]);
 	file_bin.close();
 
 	/* Controllo file ascii */
@@ -95,7 +93,7 @@ int main ()
 	{
 		std::cout << "Found " << argv[1] << ".dat, using new routines" << std::endl;
 		parametri.old_fortran_bin = false;
-		parametri.leggi_endian_e_ncol(file_dat);
+		parametri.leggi_file_dat(file_dat);
 	}
 	file_dat.close();
 

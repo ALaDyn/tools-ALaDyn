@@ -7,7 +7,6 @@
 int leggi_campi(int argc, const char** argv, Parametri * parametri)
 {
 	std::ostringstream nomefile_bin;
-	nomefile_bin << std::string(argv[1]) << ".bin";
 
 	const int out_swap = parametri->p[SWAP];
 	const int out_parameters = parametri->p[OUT_PARAMS];
@@ -38,6 +37,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	std::vector<float> cutx, cuty, cutz;
 	std::vector<int> gridIndex_cutx, gridIndex_cuty, gridIndex_cutz;
 
+	int indice_multifile=0;
 
 	int N_param = 0, np_loc, npoint_loc[3] = {0,0,0}, loc_size = 0;
 	int segnoy = 0, segnoz = 0, buff = 0;
@@ -52,7 +52,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	int *int_param;
 	float *real_param;
 	float *field,*buffer;
-	float *x_coordinates, *y_coordinates, *z_coordinates;
 	double *x_lineout;
 	char nomefile_parametri[MAX_LENGTH_FILENAME];
 	char nomefile_campi[MAX_LENGTH_FILENAME];
@@ -61,69 +60,114 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	std::FILE *parameters;
 	std::FILE *clean_fields;
 
-	file_in=fopen(nomefile_bin.str().c_str(), "rb");
-
 	size_t fread_size = 0;
 
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(&N_param,sizeof(int),1,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
-	if(out_swap) swap_endian_i(&N_param,1);
+	if (parametri->old_fortran_bin)
+	{
+		nomefile_bin << std::string(argv[1]) << ".bin";
+		file_in=fopen(nomefile_bin.str().c_str(), "rb");
 
-	printf("numero parametri=%i\n",N_param);
-	int_param = new int[N_param];
-	real_param = new float[N_param];
-	//	int_param=(int*)malloc(N_param*sizeof(int));
-	//	real_param=(float*)malloc(N_param*sizeof(float));
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
-	fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&N_param,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
-	if (out_swap) swap_endian_i(int_param,N_param);
-	if (out_swap) swap_endian_f(real_param,N_param);
+		if(out_swap) swap_endian_i(&N_param,1);
 
-	npe_y=int_param[0];     //numero processori lungo y
-	npe_z=int_param[1];     //numero processori lungo z
-	npe=npe_y*npe_z;     //numero processori
-	nx=int_param[2];
-	nx1=int_param[3];
-	ny1=int_param[4];
-	nyloc=int_param[5];
-	nz1=int_param[6];
-	nzloc=int_param[7];
-	ibx=int_param[8];
-	iby=int_param[9];
-	ibz=int_param[10];
-	model=int_param[11];  //modello di laser utilizzato
-	dmodel=int_param[12]; //modello di condizioni iniziali
-	nsp=int_param[13];    //numero di speci
-	np_loc=int_param[14];  //numero di componenti dello spazio dei momenti
-	lpord=int_param[15]; //ordine dello schema leapfrog
-	deord=int_param[16]; //ordine derivate
-	fvar=int_param[17]; 
-	tnow=real_param[0];  //tempo dell'output
-	xmin=real_param[1];  //estremi della griglia
-	xmax=real_param[2];  //estremi della griglia
-	ymin=real_param[3];  //estremi della griglia
-	ymax=real_param[4];  //estremi della griglia
-	zmin=real_param[5];  //estremi della griglia
-	zmax=real_param[6];  //estremi della griglia
-	w0x=real_param[7];      //waist del laser in x
-	w0y=real_param[8];      //waist del laser in y
-	nrat=real_param[9];     //n orver n critical
-	a0=real_param[10];      // a0 laser
-	lam0=real_param[11];    // lambda
-	E0=real_param[12];      //conversione da campi numerici a TV/m
-	B0=E0+(float)(33.3);
-	ompe=real_param[13];    //costante accoppiamento correnti campi
-	xt_in=real_param[14];   //inizio plasma
-	xt_end=real_param[15];
-	charge=real_param[16];  //carica particella su carica elettrone
-	mass=real_param[17];    //massa particelle su massa elettrone
+		int_param = new int[N_param];
+		real_param = new float[N_param];
+		//	int_param=(int*)malloc(N_param*sizeof(int));
+		//	real_param=(float*)malloc(N_param*sizeof(float));
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+		if (out_swap) swap_endian_i(int_param,N_param);
+		if (out_swap) swap_endian_f(real_param,N_param);
+
+		npe_y=int_param[0];     //numero processori lungo y
+		npe_z=int_param[1];     //numero processori lungo z
+		npe=npe_y*npe_z;     //numero processori
+		nx=int_param[2];
+		nx1=int_param[3];
+		ny1=int_param[4];
+		nyloc=int_param[5];
+		nz1=int_param[6];
+		nzloc=int_param[7];
+		ibx=int_param[8];
+		iby=int_param[9];
+		ibz=int_param[10];
+		model=int_param[11];  //modello di laser utilizzato
+		dmodel=int_param[12]; //modello di condizioni iniziali
+		nsp=int_param[13];    //numero di speci
+		np_loc=int_param[14];  //numero di componenti dello spazio dei momenti
+		lpord=int_param[15]; //ordine dello schema leapfrog
+		deord=int_param[16]; //ordine derivate
+		fvar=int_param[17]; 
+		tnow=real_param[0];  //tempo dell'output
+		xmin=real_param[1];  //estremi della griglia
+		xmax=real_param[2];  //estremi della griglia
+		ymin=real_param[3];  //estremi della griglia
+		ymax=real_param[4];  //estremi della griglia
+		zmin=real_param[5];  //estremi della griglia
+		zmax=real_param[6];  //estremi della griglia
+		w0x=real_param[7];      //waist del laser in x
+		w0y=real_param[8];      //waist del laser in y
+		nrat=real_param[9];     //n orver n critical
+		a0=real_param[10];      // a0 laser
+		lam0=real_param[11];    // lambda
+		E0=real_param[12];      //conversione da campi numerici a TV/m
+		B0=E0+(float)(33.3);
+		ompe=real_param[13];    //costante accoppiamento correnti campi
+		xt_in=real_param[14];   //inizio plasma
+		xt_end=real_param[15];
+		charge=real_param[16];  //carica particella su carica elettrone
+		mass=real_param[17];    //massa particelle su massa elettrone
+	}
+	else
+	{
+		npe_y=parametri->intpar[0];     //numero processori lungo y
+		npe_z=parametri->intpar[1];     //numero processori lungo z
+		npe=npe_y*npe_z;     //numero processori
+		nx=parametri->intpar[2];
+		nx1=parametri->intpar[3];
+		ny1=parametri->intpar[4];
+		nyloc=parametri->intpar[5];
+		nz1=parametri->intpar[6];
+		nzloc=parametri->intpar[7];
+		ibx=parametri->intpar[8];
+		iby=parametri->intpar[9];
+		ibz=parametri->intpar[10];
+		model=parametri->intpar[11];  //modello di laser utilizzato
+		dmodel=parametri->intpar[12]; //modello di condizioni iniziali
+		nsp=parametri->intpar[13];    //numero di speci
+		np_loc=parametri->intpar[14];  //numero di componenti dello spazio dei momenti
+		lpord=parametri->intpar[15]; //ordine dello schema leapfrog
+		deord=parametri->intpar[16]; //ordine derivate
+		fvar=parametri->intpar[17]; 
+		tnow=parametri->realpar[0];  //tempo dell'output
+		xmin=parametri->realpar[1];  //estremi della griglia
+		xmax=parametri->realpar[2];  //estremi della griglia
+		ymin=parametri->realpar[3];  //estremi della griglia
+		ymax=parametri->realpar[4];  //estremi della griglia
+		zmin=parametri->realpar[5];  //estremi della griglia
+		zmax=parametri->realpar[6];  //estremi della griglia
+		w0x=parametri->realpar[7];      //waist del laser in x
+		w0y=parametri->realpar[8];      //waist del laser in y
+		nrat=parametri->realpar[9];     //n orver n critical
+		a0=parametri->realpar[10];      // a0 laser
+		lam0=parametri->realpar[11];    // lambda
+		E0=parametri->realpar[12];      //conversione da campi numerici a TV/m
+		B0=E0+(float)(33.3);
+		ompe=parametri->realpar[13];    //costante accoppiamento correnti campi
+		xt_in=parametri->realpar[14];   //inizio plasma
+		xt_end=parametri->realpar[15];
+		charge=parametri->realpar[16];  //carica particella su carica elettrone
+		mass=parametri->realpar[17];    //massa particelle su massa elettrone
+	}
 
 	if (out_parameters)
 	{
@@ -179,123 +223,174 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	printf("nx1*ny1*nz1: %i %i %i = %i\n",nx1,ny1,nz1,nx1*ny1*nz1);
 	fflush(stdout);
 
-
-	if (parametri->old_fortran_bin)
-	{
-		npunti_x = nx1;
-		npunti_y = ny1;
-		npunti_z = nz1;
-		ncpu_x = 1;
-		ncpu_y = npe_y;
-		ncpu_z = npe_z;
-		npunti_x_per_cpu = nx1;
-		npunti_y_per_cpu = nyloc;
-		npunti_z_per_cpu = nzloc;
-		xminimo = xmin;
-		xmaximo = xmax;
-		yminimo = ymin;
-		ymaximo = ymax;
-		zminimo = zmin;
-		zmaximo = zmax;
-	}
+	/* Quanto segue non sarebbe necessario se vecchie e nuove variabili fossero unificate*/
+	npunti_x = nx1;
+	npunti_y = ny1;
+	npunti_z = nz1;
+	ncpu_x = 1;
+	ncpu_y = npe_y;
+	ncpu_z = npe_z;
+	npunti_x_per_cpu = nx1;
+	npunti_y_per_cpu = nyloc;
+	npunti_z_per_cpu = nzloc;
+	xminimo = xmin;
+	xmaximo = xmax;
+	yminimo = ymin;
+	ymaximo = ymax;
+	zminimo = zmin;
+	zmaximo = zmax;
 
 
 	field = new float[npunti_x*npunti_y*npunti_z];
 	// field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
-
-
-
-	for(int ipz = 0; ipz < ncpu_z; ipz++)
-	{
-		segnoy=0;
-		for(int ipy=0; ipy < ncpu_y; ipy++)
-		{
-			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			fread_size = std::fread(npoint_loc,sizeof(int),3,file_in);
-			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-
-			if(out_swap) swap_endian_i(npoint_loc,3);
-
-			loc_size=npoint_loc[0]*npoint_loc[1]*npoint_loc[2];
-
-			nxloc=npoint_loc[0];	// ma non dovrebbero essere gia' noti? possono variare da cpu a cpu? non credo...
-			nyloc=npoint_loc[1];	// comunque a questo punto lascio i "vecchi" nxloc, nyloc ed nzloc, in attesa di rimuoverli in futuro con le versioni aggiornate
-			nzloc=npoint_loc[2];	// che leggono dal binario se necessario oppure dal dat allegato per i nuovi
-
-			printf("processore ipz=%i/%i  ipy=%i/%i     segnoz=%i     segnoy=%i\r",ipz,npe_z, ipy,npe_y,segnoz,segnoy );
-			fflush(stdout);
-
-			buffer = new float[loc_size];
-			//	buffer=(float*)malloc(loc_size*sizeof(float));
-			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-			fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
-			fread_size = std::fread(&buff,sizeof(int),1,file_in);
-
-			if(out_swap) swap_endian_f(buffer,loc_size);
-
-			for(int k=0; k<nzloc; k++)
-				for(int j=0; j<nyloc; j++)
-					for(int i=0; i<nxloc; i++)
-						field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
-			segnoy += nyloc;
-		} 
-		segnoz += nzloc;
-	}
-
-
-
-	dx=(xmax-xmin)/(npunti_x-1);
-	dy=(ymax-ymin)/(npunti_y-1);
-	if(npunti_z == 1)
-		dz = (zmax-zmin);
-	else
-		dz = (zmax-zmin) / (npunti_z-1);
-
-	x_coordinates=new float[npunti_x];
-	y_coordinates=new float[npunti_y];
-	z_coordinates=new float[npunti_z];
 	x_lineout=new double[npunti_x];
 
 
-
-	// leggiamo ora le coordinate dei punti di griglia, presenti solo nelle nuove versioni che possono prevedere griglia stretchata
-	// se non ci sono, le posizioni vengono create, sotto, nell'"else", come struttura regolare a partire dagli indici di griglia e dai dx, dy, dz
-
-	fread_size = std::fread(&buff,sizeof(int),1,file_in);	// facciamo il test sul buffer Fortran della prima coordinata, cosi' se c'e' non dobbiamo nemmeno tornare indietro
-	// in futuro, con un output pulito, andra' modificata, facendo il test di lettura della prima coordinata ed eventualmente
-	// tornando indietro se c'e' per poi entrare correttamente nella lettura seguente
-
-	if(!std::feof(file_in))
+	if (!parametri->nuovi_dati_su_griglia)
 	{
-		fread_size = std::fread(x_coordinates,sizeof(float),nx1,file_in);
+		file_in=fopen(nomefile_bin.str().c_str(), "rb");
+
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(&N_param,sizeof(int),1,file_in);
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		if(out_swap) swap_endian_i(&N_param,1);
+		int_param = new int[N_param];
+		real_param = new float[N_param];
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);
+		fread_size = std::fread(int_param,sizeof(int),N_param,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
-		fread_size = std::fread(y_coordinates,sizeof(float),ny1,file_in);
-		fread_size = std::fread(&buff,sizeof(int),1,file_in);
-		fread_size = std::fread(&buff,sizeof(int),1,file_in);
-		fread_size = std::fread(z_coordinates,sizeof(float),nz1,file_in);
+		fread_size = std::fread(real_param,sizeof(float),N_param,file_in);
 		fread_size = std::fread(&buff,sizeof(int),1,file_in);
 
-		if(out_swap){
-			swap_endian_f(x_coordinates,nx1);
-			swap_endian_f(y_coordinates,ny1);
-			swap_endian_f(z_coordinates,nz1);
+		for(int ipz = 0; ipz < ncpu_z; ipz++)
+		{
+			segnoy=0;
+			for(int ipy=0; ipy < ncpu_y; ipy++)
+			{
+				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+				fread_size = std::fread(npoint_loc,sizeof(int),3,file_in);
+				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+				if(out_swap) swap_endian_i(npoint_loc,3);
+
+				loc_size=npoint_loc[0]*npoint_loc[1]*npoint_loc[2];
+
+				nxloc=npoint_loc[0];	// ma non dovrebbero essere gia' noti? possono variare da cpu a cpu? non credo...
+				nyloc=npoint_loc[1];	// comunque a questo punto lascio i "vecchi" nxloc, nyloc ed nzloc, in attesa di rimuoverli in futuro con le versioni aggiornate
+				nzloc=npoint_loc[2];	// che leggono dal binario se necessario oppure dal dat allegato per i nuovi
+
+				printf("processore ipz=%i/%i  ipy=%i/%i     segnoz=%i     segnoy=%i\r",ipz,npe_z, ipy,npe_y,segnoz,segnoy );
+				fflush(stdout);
+
+				buffer = new float[loc_size];
+				//	buffer=(float*)malloc(loc_size*sizeof(float));
+				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+				fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
+				fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+				if(out_swap) swap_endian_f(buffer,loc_size);
+
+				for(int k=0; k<nzloc; k++)
+					for(int j=0; j<nyloc; j++)
+						for(int i=0; i<nxloc; i++)
+							field[i+(j+segnoy)*nx1+(k+segnoz)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+				segnoy += nyloc;
+			} 
+			segnoz += nzloc;
 		}
 
+		// leggiamo ora le coordinate dei punti di griglia, presenti solo nelle versioni che possono prevedere griglia stretchata e che ancora non la scrivevano nel .dat
+		// se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei parametri
+
+		fread_size = std::fread(&buff,sizeof(int),1,file_in);	// facciamo il test sul buffer Fortran della prima coordinata, cosi' se c'e' non dobbiamo nemmeno tornare indietro
+		// in futuro, con un output pulito, andra' modificata, facendo il test di lettura della prima coordinata ed eventualmente
+		// tornando indietro se c'e' per poi entrare correttamente nella lettura seguente
+
+		if(!std::feof(file_in))
+		{
+			float *x_coordinates, *y_coordinates, *z_coordinates;
+			x_coordinates=new float[npunti_x];
+			y_coordinates=new float[npunti_y];
+			z_coordinates=new float[npunti_z];
+			fread_size = std::fread(x_coordinates,sizeof(float),nx1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(y_coordinates,sizeof(float),ny1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+			fread_size = std::fread(z_coordinates,sizeof(float),nz1,file_in);
+			fread_size = std::fread(&buff,sizeof(int),1,file_in);
+
+			if(out_swap)
+			{
+				swap_endian_f(x_coordinates,nx1);
+				swap_endian_f(y_coordinates,ny1);
+				swap_endian_f(z_coordinates,nz1);
+			}
+
+			parametri->xcoord.resize(nx1,0);
+			parametri->ycoord.resize(ny1,0);
+			parametri->zcoord.resize(nz1,0);
+
+			for (int i = 0; i < nx1; i++)
+				parametri->xcoord[i] = x_coordinates[i];
+			for (int i = 0; i < ny1; i++)
+				parametri->ycoord[i] = y_coordinates[i];
+			for (int i = 0; i < nz1; i++)
+				parametri->zcoord[i] = z_coordinates[i];
+		}
+
+		printf("=========FINE LETTURE==========\n");
+		fflush(stdout);
 	}
 	else
 	{
-		for(int i = 0; i < nx1; i++)
-			x_coordinates[i] = xmin + dx*i;
-		for(int i = 0; i < ny1; i++)
-			y_coordinates[i] = ymin + dy*i;
-		for(int i = 0; i < nz1; i++)
-			z_coordinates[i] = zmin + dz*i;
+		int header_size = 3;
+		int * header = new int[header_size];
+		while(1)
+		{
+			nomefile_bin.str("");
+			nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile <<".bin";
+
+			if ( (file_in=fopen(nomefile_bin.str().c_str(), "rb"))== NULL)
+			{
+				printf("Sono finiti i files! \n");
+				break;
+			}
+
+			for(int ipy=0; ipy < ncpu_y; ipy++)
+			{
+				fread_size = std::fread(header,sizeof(int),header_size,file_in);
+				if(out_swap) swap_endian_i(header,header_size);
+
+				loc_size=header[0]*header[1]*header[2];
+
+				nxloc=header[0];
+				nyloc=header[1];
+				nzloc=header[2];
+
+				printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
+				fflush(stdout);
+
+				buffer = new float[loc_size];
+				//	buffer=(float*)malloc(loc_size*sizeof(float));
+				fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
+
+				if(out_swap) swap_endian_f(buffer,loc_size);
+
+				for(int k=0; k<nzloc; k++)
+					for(int j=0; j<nyloc; j++)
+						for(int i=0; i<nxloc; i++)
+							field[i+(j+segnoy)*nx1+(k+indice_multifile)*nx1*ny1]=buffer[i+j*nxloc+k*nxloc*nyloc];
+				segnoy += nyloc;
+			}
+			indice_multifile++;
+		}
+
+		printf("=========FINE LETTURE==========\n");
+		fflush(stdout);
 	}
-
-	printf("=========FINE LETTURE==========\n");
-	fflush(stdout);
-
 
 
 	if(npunti_z == 1 && out_2d)
@@ -312,14 +407,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		{
 			for(int i = 0; i < nx1; i++)
 			{
-				xx=x_coordinates[i];//xmin+dx*i;
-				yy=y_coordinates[j];//ymin+dy*j;
+				xx=parametri->xcoord[i];//xmin+dx*i;
+				yy=parametri->ycoord[j];//ymin+dy*j;
 				fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1]);
 			}
 		}
 		fclose(clean_fields);
 	}
-
 
 	//avg of the 10 points aorund the focal axis
 	if(npunti_z == 1 && out_lineoutx)
@@ -334,7 +428,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 		for(int j = 0; j < ny1; j++)
 		{
-			if(y_coordinates[j]>=0)
+			if(parametri->ycoord[j]>=0)
 			{
 				myj=j;
 				break;
@@ -344,7 +438,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"#");
 		for(int j = myj-span; j < (myj+span+1); j++)
 		{
-			fprintf(clean_fields,"%.4g\t",y_coordinates[j]);
+			fprintf(clean_fields,"%.4g\t",parametri->ycoord[j]);
 			for(int i = 0; i < nx1; i++)
 			{
 				x_lineout[i]+=field[i+j*nx1]/(2*span+1.0);
@@ -353,7 +447,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"\n");
 		for(int i = 0; i < nx1; i++)
 		{
-			xx=x_coordinates[i];//xmin+dx*i;
+			xx=parametri->xcoord[i];//xmin+dx*i;
 			fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
 		}
 		fclose(clean_fields);
@@ -371,7 +465,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			x_lineout[i]=0;
 		for(int j = 0; j < ny1; j++)
 		{
-			if(y_coordinates[j]>=0)
+			if(parametri->ycoord[j]>=0)
 			{
 				myj=j;
 				break;
@@ -380,7 +474,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"#");
 		for(int k = myj-span; k < (myj+span+1); k++)
 		{
-			fprintf(clean_fields,"%.4g\t",z_coordinates[k]);
+			fprintf(clean_fields,"%.4g\t",parametri->zcoord[k]);
 
 			for(int j = myj-span; j < (myj+span+1); j++)
 			{
@@ -393,7 +487,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"\n");
 		for(int i = 0; i < nx1; i++)
 		{
-			xx=x_coordinates[i];//xmin+dx*i;
+			xx=parametri->xcoord[i];//xmin+dx*i;
 			fprintf(clean_fields,"%.4g %.4g\n",xx, x_lineout[i]);
 		}
 		fclose(clean_fields);
@@ -404,7 +498,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (parametri->posizioni_taglio_griglia_z.size() == 0)
 		{
-			taglio = z_coordinates[nz1/2];
+			taglio = parametri->zcoord[nz1/2];
 			cutz.push_back(taglio);
 			gridIndex_cutz.push_back(nz1/2);
 		}
@@ -414,7 +508,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			int i = 0;
 			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_z.size(); j++)
 			{
-				while (taglio < parametri->posizioni_taglio_griglia_z.at(j)) taglio = z_coordinates[i], i++;
+				while (taglio < parametri->posizioni_taglio_griglia_z.at(j)) taglio = parametri->zcoord[i], i++;
 				cutz.push_back(taglio);
 				gridIndex_cutz.push_back(i-1);
 				i = 0;
@@ -435,8 +529,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			{
 				for(int i = 0; i < nx1; i++)
 				{
-					xx=x_coordinates[i];//xx=xmin+dx*i;
-					yy=y_coordinates[j];//yy=ymin+dy*j;
+					xx=parametri->xcoord[i];//xx=xmin+dx*i;
+					yy=parametri->ycoord[j];//yy=ymin+dy*j;
 					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
 			}
@@ -448,7 +542,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (parametri->posizioni_taglio_griglia_y.size() == 0)
 		{
-			taglio = y_coordinates[ny1/2];
+			taglio = parametri->ycoord[ny1/2];
 			cuty.push_back(taglio);
 			gridIndex_cuty.push_back(ny1/2);
 		}
@@ -458,7 +552,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			int i = 0;
 			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_y.size(); j++)
 			{
-				while (taglio < parametri->posizioni_taglio_griglia_y.at(j)) taglio = y_coordinates[i], i++;
+				while (taglio < parametri->posizioni_taglio_griglia_y.at(j)) taglio = parametri->ycoord[i], i++;
 				cuty.push_back(taglio);
 				gridIndex_cuty.push_back(i-1);
 				i = 0;
@@ -479,8 +573,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			{
 				for(int i = 0; i < nx1; i++)
 				{
-					xx=x_coordinates[i];//xx=xmin+dx*i;
-					yy=z_coordinates[k];//yy=ymin+dy*j;
+					xx=parametri->xcoord[i];//xx=xmin+dx*i;
+					yy=parametri->ycoord[k];//yy=ymin+dy*j;
 					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
 			}
@@ -492,7 +586,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	{
 		if (parametri->posizioni_taglio_griglia_x.size() == 0)
 		{
-			taglio = x_coordinates[nx1/2];
+			taglio = parametri->xcoord[nx1/2];
 			cutx.push_back(taglio);
 			gridIndex_cutx.push_back(nx1/2);
 		}
@@ -502,7 +596,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			int i = 0;
 			for (size_t j = 0; j < parametri->posizioni_taglio_griglia_x.size(); j++)
 			{
-				while (taglio < parametri->posizioni_taglio_griglia_x.at(j)) taglio = x_coordinates[i], i++;
+				while (taglio < parametri->posizioni_taglio_griglia_x.at(j)) taglio = parametri->xcoord[i], i++;
 				cutx.push_back(taglio);
 				gridIndex_cutx.push_back(i-1);
 				i = 0;
@@ -523,8 +617,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			{
 				for(int j = 0; j < ny1; j++)
 				{
-					xx=y_coordinates[j];//xx=xmin+dx*i;
-					yy=z_coordinates[k];//yy=ymin+dy*j;
+					xx=parametri->ycoord[j];//xx=xmin+dx*i;
+					yy=parametri->zcoord[k];//yy=ymin+dy*j;
 					fprintf(clean_fields,"%.4g %.4g %.4g\n",xx, yy, field[i+j*nx1+k*nx1*ny1]);
 				}
 			}
@@ -536,6 +630,18 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 	if (out_vtk)
 	{
 		printf("%lu\nScrittura vtk\n\n",(unsigned long) fread_size);
+
+		float *x_coordinates, *y_coordinates, *z_coordinates;
+		x_coordinates=new float[npunti_x];
+		y_coordinates=new float[npunti_y];
+		z_coordinates=new float[npunti_z];
+
+		for (int i = 0; i < nx1; i++)
+			x_coordinates[i] = parametri->xcoord[i];
+		for (int i = 0; i < ny1; i++)
+			y_coordinates[i] = parametri->ycoord[i];
+		for (int i = 0; i < nz1; i++)
+			z_coordinates[i] = parametri->zcoord[i];
 
 		if(parametri->endian_machine == 0)
 		{
