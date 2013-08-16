@@ -6,8 +6,8 @@
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  5
-#define MINOR_RELEASE  0
-#define BUGFIX_RELEASE 2
+#define MINOR_RELEASE  1
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -84,12 +84,12 @@
 #define DA_ERG_A_MEV			6.241509744512e+5	// conversione Sinigardi
 #define FROM_VOLT_TO_STATVOLT	3.335640951982e-3	// 1 statvolt = 299.792458 volts.
 
-#define NUMERO_MASSIMO	1.0e30
-#define MAX_LENGTH_FILENAME 200
-#define MAX_NUMBER_OF_CPUS	32768
-#define NUMERO_PARAMETRI_FILE_DAT 20
+#define NUMERO_MASSIMO				1.0e30
+#define MAX_LENGTH_FILENAME			200
+#define MAX_NUMBER_OF_CPUS			32768
+#define NUMERO_PARAMETRI_FILE_DAT	20
 
-#define NPARAMETRI			16
+#define NPARAMETRI			17
 #define WEIGHT				0
 #define SWAP				1
 #define OUT_VTK				2
@@ -98,12 +98,10 @@
 #define DO_BINNING			5
 #define OUT_PARAMS			6
 #define OUT_CSV				7
-
 #define NCOLONNE			8	
 /*	per i dump degli spazi delle fasi qui memorizziamo il numero di colonne presenti nel file binario [dovrebbe coincidere con ndv] 
 (valori pari a 4 o 5 significano simulazioni 2D con o senza weight, valori tipo 6 o 7 invece sono per sim 3D con o senza weight)
 per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (ricampionati) lungo z (> 1 significa che la griglia e' 3D) */
-
 #define OUT_XYZE			9
 #define OUT_CUTX			10
 #define OUT_CUTY			11
@@ -111,6 +109,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define OUT_GRID2D			13
 #define OUT_CLEAN_BINARY	14
 #define OUT_LINEOUT_X		15
+#define OUT_VTK_NOSTRETCH	16
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E
@@ -162,6 +161,7 @@ struct Parametri
 	int endianness;
 	bool nuovi_dati_su_griglia;
 	bool multifile;
+	bool stretched_grid; 	//nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
 	float massa_particella_MeV;
 	int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_thetaT, nbin_gamma;
 	int endian_file, endian_machine;
@@ -286,5 +286,7 @@ int is_big_endian(void);
 void swap_endian_s(short* ,int );
 void swap_endian_i(int* ,int );
 void swap_endian_f(float* , size_t );
+void swap_endian_f(float* , unsigned int );
+void swap_endian_f(float* , int );
 
 #endif

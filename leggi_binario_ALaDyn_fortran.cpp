@@ -1,17 +1,16 @@
 
-
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-#ifndef ENABLE_DEBUG_WIN32
-int main (const int argc, const char *argv[])
-#else
+#ifdef ENABLE_DEBUG_WIN32
 int main ()
+#else
+int main (const int argc, const char *argv[])
 #endif
 {
 #ifdef ENABLE_DEBUG_WIN32
 	const int argc = 9;
-	const char *argv[] = {"./bin2ascii", "Prpout08", "-dontask", "-find_minmax", "-noswap", "-do_binning", "-plot_xpx", "-readparamsfromfile", "Prpout08.extremes"};
+	const char *argv[] = {"./bin2ascii", "Prpout08", "-dontask", "-find_minmax", "-noswap", "-do_binning", "-plot_xpx", "-readparamsfromfile"};
 #endif
 
 	Parametri parametri;
@@ -21,11 +20,11 @@ int main ()
 
 	if (argc == 1)
 	{
-		std::cout << "Si usa:\n-manuale: ./reader Nomefile (senza estensione!)" << std::endl;
-		std::cout << "-batch: ./reader Nomefile  --parameters (see source code for details, for now)" << std::endl;
-		std::cout <<"----------Argument list------------------- " << std::endl;
+		std::cout << "-interactive: ./reader filebasename (so do not put file extension!" << std::endl;
+		std::cout << "-batch:       ./reader filebasename -arguments" << std::endl;
 
-		std::cout << "-swap/-noswap (endianess swap) -force_new (force new format)" << std::endl;
+		std::cout <<"----------Argument list------------------- " << std::endl;
+		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
 		std::cout << "-xmin #xmin -xmax #xmax -[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
@@ -35,7 +34,7 @@ int main ()
 		std::cout << "-nbin #num" << std::endl;
 		std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E] #num" << std::endl;
 		std::cout << "-dontask" << std::endl;
-		std::cout << "Filters: \n +xmin #num +xmax #num  +[x,y,z,px,py,pz,theta,thetarad,gamma,e]min/max #num" << std::endl;
+		std::cout << "Filters: \n +xmin #num +xmax #num  +[x,y,z,px,py,pz,theta,thetaT,gamma,e]min/max #num" << std::endl;
 		std::cout <<"----------Argument list------------------- " << std::endl;
 		return -1;
 	}

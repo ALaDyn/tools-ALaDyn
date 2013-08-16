@@ -19,6 +19,7 @@ Parametri :: Parametri()
 	endianness = 0;
 	nuovi_dati_su_griglia = false;
 	multifile = false;
+	stretched_grid = true;
 	massa_particella_MeV = 0.;
 	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
 	tnow = 0.0;
@@ -1874,6 +1875,30 @@ bool Parametri :: check_parametri()
 			else
 			{
 				printf("Attenzione: non capisco se la griglia e' 2D o 3D\n");
+				if (old_fortran_bin) printf("Con i files privi di .dat e' necessario specificare -ncol su riga di comando in modalita' batch\n");
+				test = false;
+			}
+		}
+		if ( !p_b[OUT_VTK_NOSTRETCH] && p[OUT_VTK_NOSTRETCH] != 0 && p[OUT_VTK_NOSTRETCH] != 1  )
+		{
+			printf("Attenzione: output vtk nostretch mal definito\n");
+			test = false;
+		}
+		else
+		{
+			if (!p_b[OUT_VTK_NOSTRETCH] && (p[OUT_VTK_NOSTRETCH] == 0 || p[OUT_VTK_NOSTRETCH] == 1))
+			{
+				test = true;		// tutto ok, in questo caso il parametro va bene!
+			}
+			else if (p_b[OUT_VTK_NOSTRETCH] && do_not_ask_missing)
+			{
+				p[OUT_VTK_NOSTRETCH] = 0;
+				p_b[OUT_VTK_NOSTRETCH] = false;
+				test=true;
+			}
+			else
+			{
+				printf("Attenzione: output binario non definito\n");
 				test = false;
 			}
 		}
