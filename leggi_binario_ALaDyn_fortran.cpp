@@ -13,10 +13,11 @@ int main (const int argc, const char *argv[])
 
 	if (argc == 1)
 	{
-		std::cout << "-interactive: ./reader filebasename (so do not put file extension!" << std::endl;
+		std::cout << "-interactive: ./reader filebasename (so do not put file extension!)" << std::endl;
 		std::cout << "-batch:       ./reader filebasename -arguments" << std::endl;
 
 		std::cout <<"----------Argument list------------------- " << std::endl;
+		std::cout << "-params (write a .parameters file with params from .bin/.dat files)" << std::endl;
 		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;

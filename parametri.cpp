@@ -190,7 +190,7 @@ void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 		if (nuovi_dati_su_griglia)
 		{
 			std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei float
-			//	std::getline(file_dat,riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
+			std::getline(file_dat,riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
 
 
 			for (int i = 0; i < npunti_x_ricampionati; i++)
@@ -454,6 +454,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 				std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
 			}
 		}
+		else if (std::string(argv[i]) == "-params")
+		{
+			std::cout << "Forcing the output of the parameters from .dat/.bin files" << std::endl;
+			p[OUT_PARAMS] = 1;
+			p_b[OUT_PARAMS] = false;
+		}
 		else if (std::string(argv[i]) == "-swap")
 		{
 			std::cout << "Forcing a bit endianness swapping" << std::endl;
@@ -519,9 +525,15 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-dump_vtk")
 		{
-			std::cout << "You asked to have a VTK dump of the input file" << last_cpu << std::endl;
+			std::cout << "You asked to have a VTK dump of the input file" << std::endl;
 			p[OUT_VTK] = 1;
 			p_b[OUT_VTK] = false;
+		}
+		else if (std::string(argv[i]) == "-dump_vtk_nostretch")
+		{
+			std::cout << "You asked to have a VTK dump of the input file" << std::endl;
+			p[OUT_VTK_NOSTRETCH] = 1;
+			p_b[OUT_VTK_NOSTRETCH] = false;
 		}
 		else if (std::string(argv[i]) == "-dump_cutx")
 		{
@@ -1385,6 +1397,12 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
 			std::cin >> p[OUT_VTK];
 			p_b[OUT_VTK] = false;
+		}
+		if (p_b[OUT_VTK_NOSTRETCH] && !do_not_ask_missing)
+		{
+			std::cout << "Vuoi l'output binario VTK della parte non stretchata? 1 si', 0 no: ";
+			std::cin >> p[OUT_VTK_NOSTRETCH];
+			p_b[OUT_VTK_NOSTRETCH] = false;
 		}
 		if (p[NCOLONNE] > 1)
 		{

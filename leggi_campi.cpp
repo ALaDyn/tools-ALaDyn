@@ -882,24 +882,26 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fclose(parameters);
 
 		std::cout << std::endl;
+		std::cout << "Grid along x axis" << std::endl;
 		for (int i = 0; i < nx1; i++)
 		{
-			std::cout << "Grid along x axis" << std::endl;
-			std::cout << parametri->xcoord[i] << " " << std::endl;
+			std::cout << parametri->xcoord[i] << " ";
 		}
 
 		std::cout << std::endl;
+		std::cout << std::endl;
+		std::cout << "Grid along y axis" << std::endl;
 		for (int i = 0; i < ny1; i++)
 		{
-			std::cout << "Grid along y axis" << std::endl;
-			std::cout << parametri->ycoord[i] << " " << std::endl;
+			std::cout << parametri->ycoord[i] << " ";
 		}
 
 		std::cout << std::endl;
+		std::cout << std::endl;
+		std::cout << "Grid along z axis" << std::endl;
 		for (int i = 0; i < nz1; i++)
 		{
-			std::cout << "Grid along z axis" << std::endl;
-			std::cout << parametri->zcoord[i] << " " << std::endl;
+			std::cout << parametri->zcoord[i] << " ";
 		}
 
 	}
