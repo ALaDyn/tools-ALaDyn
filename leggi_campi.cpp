@@ -340,7 +340,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 					nzloc=header[2];
 
 #ifdef ENABLE_DEBUG
-					printf("file %i, processore ipy=%i/%i\n", indice_multifile, ipy, npe_y);
+					printf("file %i, processore ipy=%i/%i, reading %i elements\n", indice_multifile, ipy, npe_y, loc_size);
 #else
 					printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
 #endif
@@ -381,40 +381,44 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 				}
 				else std::cout << "Opened file #" << indice_multifile << " to read data!" << std::endl;
 
-				segnoy=0;
-				for(int ipy=0; ipy < ncpu_y; ipy++)
+				for(int ipz = 0; ipz < ncpu_z; ipz++)
 				{
-					fread_size = std::fread(header,sizeof(int),header_size,file_in);
-					if(out_swap) swap_endian_i(header,header_size);
+					segnoy=0;
+					for(int ipy=0; ipy < ncpu_y; ipy++)
+					{
+						fread_size = std::fread(header,sizeof(int),header_size,file_in);
+						if(out_swap) swap_endian_i(header,header_size);
 
-					loc_size=header[0]*header[1]*header[2];
+						loc_size=header[0]*header[1]*header[2];
 
-					nxloc=header[0];
-					nyloc=header[1];
-					nzloc=header[2];
+						nxloc=header[0];
+						nyloc=header[1];
+						nzloc=header[2];
 
 #ifdef ENABLE_DEBUG
-					printf("file %i, processore ipy=%i/%i\n", indice_multifile, ipy, npe_y);
+						printf("file %i, processore ipy=%i/%i, reading %i elements\n", indice_multifile, ipy, npe_y, loc_size);
 #else
-					printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
+						printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
 #endif
-					fflush(stdout);
+						fflush(stdout);
 
-					buffer = new float[loc_size];
-					fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
+						buffer = new float[loc_size];
+						fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
 
-					if(out_swap) swap_endian_f(buffer,loc_size);
+						if(out_swap) swap_endian_f(buffer,loc_size);
 
-					for(size_t k=0; k<nzloc; k++)
-						for(size_t j=0; j<nyloc; j++)
-							for(size_t i=0; i<nxloc; i++)
-								field[i+(j+segnoy)*npunti_x+(k+indice_multifile)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
-					segnoy += nyloc;
+						for(size_t k=0; k<nzloc; k++)
+							for(size_t j=0; j<nyloc; j++)
+								for(size_t i=0; i<nxloc; i++)
+									field[i+(j+segnoy)*npunti_x+(k+segnoz)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
+						segnoy += nyloc;
+					}
+					segnoz += nzloc;
+					delete[] buffer;
+					buffer = NULL;
+					indice_multifile++;
+					fclose(file_in);
 				}
-				delete[] buffer;
-				buffer = NULL;
-				indice_multifile++;
-				fclose(file_in);
 			}
 
 			printf("=========FINE LETTURE==========\n");
@@ -431,7 +435,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-		fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_x, npunti_y, 1); 
+		fprintf(clean_fields,"#%i\n#%i\n#%i\n",npunti_x, npunti_y, npunti_z); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
 		for(int j = 0; j < npunti_y; j++)
 		{
@@ -885,7 +889,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		std::cout << "Grid along x axis" << std::endl;
 		for (int i = 0; i < nx1; i++)
 		{
-			std::cout << parametri->xcoord[i] << " ";
+			fprintf(parameters,"%.4g  ",parametri->xcoord[i]);
 		}
 
 		std::cout << std::endl;
@@ -893,7 +897,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		std::cout << "Grid along y axis" << std::endl;
 		for (int i = 0; i < ny1; i++)
 		{
-			std::cout << parametri->ycoord[i] << " ";
+			fprintf(parameters,"%.4g  ",parametri->ycoord[i]);
 		}
 
 		std::cout << std::endl;
@@ -901,7 +905,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		std::cout << "Grid along z axis" << std::endl;
 		for (int i = 0; i < nz1; i++)
 		{
-			std::cout << parametri->zcoord[i] << " ";
+			fprintf(parameters,"%.4g  ",parametri->zcoord[i]);
 		}
 
 	}

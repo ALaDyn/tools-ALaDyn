@@ -20,7 +20,7 @@ int main (const int argc, const char *argv[])
 		std::cout << "-params (write a .parameters file with params from .bin/.dat files)" << std::endl;
 		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
-		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
+		std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
 		std::cout << "-xmin #xmin -xmax #xmax -[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
 		std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
 		std::cout << "-plot_xy -plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
