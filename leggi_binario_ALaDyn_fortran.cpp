@@ -2,16 +2,9 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-#ifdef ENABLE_DEBUG_WIN32
-int main ()
-#else
+
 int main (const int argc, const char *argv[])
-#endif
 {
-#ifdef ENABLE_DEBUG_WIN32
-	const int argc = 9;
-	const char *argv[] = {"./bin2ascii", "Prpout08", "-dontask", "-find_minmax", "-noswap", "-do_binning", "-plot_xpx", "-readparamsfromfile"};
-#endif
 
 	Parametri parametri;
 	bool testParametri = true;
@@ -171,10 +164,6 @@ int main (const int argc, const char *argv[])
 
 		leggi_particelle(argc, argv, &parametri);
 
-
-#ifdef ENABLE_DEBUG_WIN32
-	std::cin.get();
-#endif
 	return 0;
 }
 

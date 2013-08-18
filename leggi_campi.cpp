@@ -175,55 +175,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		mass=parametri->realpar[17];
 	}
 
-	if (out_parameters)
-	{
-		sprintf(nomefile_parametri,"%s.parameters",argv[1]);
-		parameters=fopen(nomefile_parametri, "w");
-		printf("\nWriting parameters to file\n");
-		fprintf(parameters,"interi\n");
-		fprintf(parameters,"npe_y=%i\n",npe_y);     //numero processori
-		fprintf(parameters,"npe_z=%i\n",npe_z);     //numero processori
-		fprintf(parameters,"npe=%i\n",npe);     //numero processori
-		fprintf(parameters,"nx=%i\n",nx);
-		fprintf(parameters,"nx1=%i\n",nx1);
-		fprintf(parameters,"ny1=%i\n",ny1);
-		fprintf(parameters,"nyloc=%i\n",nyloc);
-		fprintf(parameters,"nz1=%i\n",nz1);
-		fprintf(parameters,"nzloc=%i\n",nzloc);
-		fprintf(parameters,"ibx=%i\n",ibx);
-		fprintf(parameters,"iby=%i\n",iby);
-		fprintf(parameters,"ibz=%i\n",ibz);
-		fprintf(parameters,"model=%i\n",model);  //modello di laser utilizzato
-		fprintf(parameters,"dmodel=%i\n",dmodel); //modello di condizioni iniziali
-		fprintf(parameters,"nsp=%i\n",nsp);    //numero di speci
-		fprintf(parameters,"np_loc=%i\n",np_loc);  //numero di componenti dello spazio dei momenti
-		fprintf(parameters,"lpord=%i\n",lpord); //ordine dello schema leapfrog
-		fprintf(parameters,"deord=%i\n",deord); //ordine derivate
-		fprintf(parameters,"fvar=%i\n",fvar); 
-		fprintf(parameters,"========= fine interi\n");
-		fprintf(parameters,"\n floating\n");
-		fprintf(parameters,"tnow=%f\n",tnow);  //tempo dell'output
-		fprintf(parameters,"xmin=%f\n",xmin);  //estremi della griglia
-		fprintf(parameters,"xmax=%f\n",xmax);  //estremi della griglia
-		fprintf(parameters,"ymin=%f\n",ymin);  //estremi della griglia
-		fprintf(parameters,"ymax=%f\n",ymax);  //estremi della griglia
-		fprintf(parameters,"zmin=%f\n",zmin);  //estremi della griglia
-		fprintf(parameters,"zmax=%f\n",zmax);  //estremi della griglia
-		fprintf(parameters,"w0x=%f\n",w0x);      //waist del laser in x
-		fprintf(parameters,"w0y=%f\n",w0y);      //waist del laser in y
-		fprintf(parameters,"nrat=%f\n",nrat);     //n orver n critical
-		fprintf(parameters,"a0=%f\n",a0);      // a0 laser
-		fprintf(parameters,"lam0=%f\n",lam0);    // lambda
-		fprintf(parameters,"E0=%f\n",E0);      //conversione da campi numerici a TV/m
-		fprintf(parameters,"B0=%f\n",B0);
-		fprintf(parameters,"ompe=%f\n",ompe);    //costante accoppiamento correnti campi
-		fprintf(parameters,"xt_in=%f\n",xt_in);   //inizio plasma
-		fprintf(parameters,"xt_end=%f\n",xt_end);
-		fprintf(parameters,"charge=%f\n",charge);  //carica particella su carica elettrone
-		fprintf(parameters,"mass=%f\n",mass);    //massa particelle su massa elettrone
-		fclose(parameters);
-	}
-
 
 	printf("=========INIZIO LETTURE==========\n");
 	size_t prodotto=nx1*ny1*nz1;
@@ -292,7 +243,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 				nyloc=npoint_loc[1];	// comunque a questo punto lascio i "vecchi" nxloc, nyloc ed nzloc, in attesa di rimuoverli in futuro con le versioni aggiornate
 				nzloc=npoint_loc[2];	// che leggono dal binario se necessario oppure dal dat allegato per i nuovi
 
+#ifdef ENABLE_DEBUG
+				printf("processore ipz=%i/%i  ipy=%i/%i     segnoz=%i     segnoy=%i\n",ipz,npe_z, ipy,npe_y,segnoz,segnoy );
+#else
 				printf("processore ipz=%i/%i  ipy=%i/%i     segnoz=%i     segnoy=%i\r",ipz,npe_z, ipy,npe_y,segnoz,segnoy );
+#endif
 				fflush(stdout);
 
 				buffer = new float[loc_size];
@@ -384,7 +339,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 					nyloc=header[1];
 					nzloc=header[2];
 
+#ifdef ENABLE_DEBUG
+					printf("file %i, processore ipy=%i/%i\n", indice_multifile, ipy, npe_y);
+#else
 					printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
+#endif
 					fflush(stdout);
 
 					buffer = new float[loc_size];
@@ -434,7 +393,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 					nyloc=header[1];
 					nzloc=header[2];
 
+#ifdef ENABLE_DEBUG
+					printf("file %i, processore ipy=%i/%i\n", indice_multifile, ipy, npe_y);
+#else
 					printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, npe_y);
+#endif
 					fflush(stdout);
 
 					buffer = new float[loc_size];
@@ -868,6 +831,77 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		******************************************************************************/
 
 		fclose(clean_fields);
+	}
+
+	if (out_parameters)
+	{
+		sprintf(nomefile_parametri,"%s.parameters",argv[1]);
+		parameters=fopen(nomefile_parametri, "w");
+		printf("\nWriting parameters to file\n");
+		fprintf(parameters,"interi\n");
+		fprintf(parameters,"npe_y=%i\n",npe_y);
+		fprintf(parameters,"npe_z=%i\n",npe_z);
+		fprintf(parameters,"npe=%i\n",npe);
+		fprintf(parameters,"nx=%i\n",nx);
+		fprintf(parameters,"nx1=%i\n",nx1);
+		fprintf(parameters,"ny1=%i\n",ny1);
+		fprintf(parameters,"nyloc=%i\n",nyloc);
+		fprintf(parameters,"nz1=%i\n",nz1);
+		fprintf(parameters,"nzloc=%i\n",nzloc);
+		fprintf(parameters,"ibx=%i\n",ibx);
+		fprintf(parameters,"iby=%i\n",iby);
+		fprintf(parameters,"ibz=%i\n",ibz);
+		fprintf(parameters,"model=%i\n",model);
+		fprintf(parameters,"dmodel=%i\n",dmodel);
+		fprintf(parameters,"nsp=%i\n",nsp);
+		fprintf(parameters,"np_loc=%i\n",np_loc);
+		fprintf(parameters,"lpord=%i\n",lpord);
+		fprintf(parameters,"deord=%i\n",deord);
+		fprintf(parameters,"fvar=%i\n",fvar);
+		fprintf(parameters,"========= fine interi\n");
+		fprintf(parameters,"\n floating\n");
+		fprintf(parameters,"tnow=%f\n",tnow);
+		fprintf(parameters,"xmin=%f\n",xmin);
+		fprintf(parameters,"xmax=%f\n",xmax);
+		fprintf(parameters,"ymin=%f\n",ymin);
+		fprintf(parameters,"ymax=%f\n",ymax);
+		fprintf(parameters,"zmin=%f\n",zmin);
+		fprintf(parameters,"zmax=%f\n",zmax);
+		fprintf(parameters,"w0x=%f\n",w0x);
+		fprintf(parameters,"w0y=%f\n",w0y);
+		fprintf(parameters,"nrat=%f\n",nrat);
+		fprintf(parameters,"a0=%f\n",a0);
+		fprintf(parameters,"lam0=%f\n",lam0);
+		fprintf(parameters,"E0=%f\n",E0);
+		fprintf(parameters,"B0=%f\n",B0);
+		fprintf(parameters,"ompe=%f\n",ompe);
+		fprintf(parameters,"xt_in=%f\n",xt_in);
+		fprintf(parameters,"xt_end=%f\n",xt_end);
+		fprintf(parameters,"charge=%f\n",charge);
+		fprintf(parameters,"mass=%f\n",mass);
+		fclose(parameters);
+
+		std::cout << std::endl;
+		for (int i = 0; i < nx1; i++)
+		{
+			std::cout << "Grid along x axis" << std::endl;
+			std::cout << parametri->xcoord[i] << " " << std::endl;
+		}
+
+		std::cout << std::endl;
+		for (int i = 0; i < ny1; i++)
+		{
+			std::cout << "Grid along y axis" << std::endl;
+			std::cout << parametri->ycoord[i] << " " << std::endl;
+		}
+
+		std::cout << std::endl;
+		for (int i = 0; i < nz1; i++)
+		{
+			std::cout << "Grid along z axis" << std::endl;
+			std::cout << parametri->zcoord[i] << " " << std::endl;
+		}
+
 	}
 
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);

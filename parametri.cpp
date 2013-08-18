@@ -416,13 +416,8 @@ void Parametri :: check_filename(const char *nomefile)
 	}
 	else
 	{
-#ifndef ENABLE_DEBUG_WIN32
 		std::cout << "File non riconosciuto" << std::endl;
 		exit(-15);
-#else
-		file_densita_elettroni = true;
-		sprintf (support_label,"eden");
-#endif
 	}
 
 }

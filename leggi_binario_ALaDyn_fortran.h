@@ -2,12 +2,15 @@
 #define __LEGGI_ALADYN_FORTRAN
 
 
+#define ENABLE_DEBUG
+
+
 #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 0
+#define BUGFIX_RELEASE 1
 
 #include <iostream>
 #include <vector>
@@ -21,15 +24,13 @@
 #include <sstream>
 #include <cstring>
 #include <string>
-#include <limits> // for declaration of 'numeric_limits'
-#include <ios>    // for declaration of 'streamsize'
+#include <limits>
+#include <ios>
 #include <cstdarg>
 
 #if (defined CINECA)
 #include <inttypes.h>
 #include <stdint.h>
-//typedef unsigned long int uint32_t;
-//typedef unsigned __int32 uint32_t;
 #endif
 
 #if (!defined CINECA) && (defined _MSC_VER)
@@ -43,8 +44,6 @@
 #else
 #include <inttypes.h>
 #include <stdint.h>
-//typedef unsigned long int uint32_t;
-//typedef unsigned __int32 uint32_t;
 #endif
 #endif
 
@@ -58,10 +57,6 @@
 #define fseeko fseeko64
 #define ftello ftello64
 #endif
-
-
-// #define ENABLE_DEBUG
-// #define ENABLE_DEBUG_WIN32
 
 
 #define MAX(x,y) ((x)>(y)?(x):(y))
