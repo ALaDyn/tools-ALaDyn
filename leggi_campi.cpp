@@ -884,27 +884,25 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(parameters,"charge=%f\n",charge);
 		fprintf(parameters,"mass=%f\n",mass);
 
-		std::cout << std::endl;
-		std::cout << "Grid along x axis" << std::endl;
+		fprintf(parameters,"\n\nGrid along x axis\n");
 		for (int i = 0; i < nx1; i++)
 		{
 			fprintf(parameters,"%.4g  ",parametri->xcoord[i]);
+			if (i > 0 && i % 10 == 0) fprintf(parameters,"\n");
 		}
 
-		std::cout << std::endl;
-		std::cout << std::endl;
-		std::cout << "Grid along y axis" << std::endl;
+		fprintf(parameters,"\n\nGrid along y axis\n");
 		for (int i = 0; i < ny1; i++)
 		{
 			fprintf(parameters,"%.4g  ",parametri->ycoord[i]);
+			if (i > 0 && i % 10 == 0) fprintf(parameters,"\n");
 		}
 
-		std::cout << std::endl;
-		std::cout << std::endl;
-		std::cout << "Grid along z axis" << std::endl;
+		fprintf(parameters,"\n\nGrid along z axis\n");
 		for (int i = 0; i < nz1; i++)
 		{
 			fprintf(parameters,"%.4g  ",parametri->zcoord[i]);
+			if (i > 0 && i % 10 == 0) fprintf(parameters,"\n");
 		}
 
 		fclose(parameters);
