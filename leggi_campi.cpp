@@ -883,7 +883,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(parameters,"xt_end=%f\n",xt_end);
 		fprintf(parameters,"charge=%f\n",charge);
 		fprintf(parameters,"mass=%f\n",mass);
-		fclose(parameters);
 
 		std::cout << std::endl;
 		std::cout << "Grid along x axis" << std::endl;
@@ -908,6 +907,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			fprintf(parameters,"%.4g  ",parametri->zcoord[i]);
 		}
 
+		fclose(parameters);
 	}
 
 	printf("%lu\nFine\n\n",(unsigned long) fread_size);
