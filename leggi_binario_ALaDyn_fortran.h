@@ -10,7 +10,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 3
+#define BUGFIX_RELEASE 4
 
 #include <iostream>
 #include <vector>

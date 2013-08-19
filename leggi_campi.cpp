@@ -416,9 +416,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 					segnoz += nzloc;
 					delete[] buffer;
 					buffer = NULL;
-					indice_multifile++;
-					fclose(file_in);
 				}
+				indice_multifile++;
+				fclose(file_in);
 			}
 
 			printf("=========FINE LETTURE==========\n");
