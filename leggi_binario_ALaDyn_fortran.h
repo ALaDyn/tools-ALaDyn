@@ -189,6 +189,8 @@ struct Parametri
 	float dimmi_dimx();
 	float dimmi_dimy();
 	float dimmi_dimz();
+	float dimmi_dimty();
+	float dimmi_dimtz();
 	float dimmi_dimpx();
 	float dimmi_dimpy();
 	float dimmi_dimpz();

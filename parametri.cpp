@@ -71,6 +71,14 @@ float Parametri :: dimmi_dimz()
 {
 	return (zmax - zmin) / static_cast <float> (nbin_z);
 }
+float Parametri :: dimmi_dimty()
+{
+	return (tymax - tymin) / static_cast <float> (nbin_ty);
+}
+float Parametri :: dimmi_dimtz()
+{
+	return (tzmax - tzmin) / static_cast <float> (nbin_tz);
+}
 float Parametri :: dimmi_dimpx()
 {
 	return (pxmax - pxmin) / static_cast <float> (nbin_px);

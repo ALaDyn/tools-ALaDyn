@@ -210,6 +210,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		for (int j = 0; j < parametri->nbin_z+3; j++) yz[i][j] = 0.0;
 	}
 
+	float **rcf = new float* [parametri->nbin_ty+3];
+	for (int i = 0; i < parametri->nbin_ty+3; i++)
+	{
+		rcf[i] = new float [parametri->nbin_tz+3];
+		for (int j = 0; j < parametri->nbin_tz+3; j++) rcf[i][j] = 0.0;
+	}
+
 	float **xpx = new float* [parametri->nbin_x+3];
 	for (int i = 0; i < parametri->nbin_x+3; i++)
 	{
@@ -580,7 +587,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if (parametri->fai_plot_xy)			_Binnaggio(particelle,val[0],ndv,parametri,xy,"x","y");
 					if (parametri->fai_plot_xz)			_Binnaggio(particelle,val[0],ndv,parametri,xz,"x","z");
 					if (parametri->fai_plot_yz)			_Binnaggio(particelle,val[0],ndv,parametri,yz,"y","z");
-					if (parametri->fai_plot_rcf)		_Binnaggio(particelle,val[0],ndv,parametri,yz,"ty","tz");
+					if (parametri->fai_plot_rcf)		_Binnaggio(particelle,val[0],ndv,parametri,rcf,"ty","tz");
 					if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
 					if (parametri->fai_plot_xpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpy,"x","py");
 					if (parametri->fai_plot_xpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpz,"x","pz");
@@ -906,6 +913,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		{
 			sprintf(nomefile_binnato,"%s_yz.txt",argv[1]);
 			_Scrittura(parametri, yz,"y","z",std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_rcf)
+		{
+			sprintf(nomefile_binnato,"%s_rcf.txt",argv[1]);
+			_Scrittura(parametri, rcf,"ty","tz",std::string(nomefile_binnato));
 		}
 		if (parametri->fai_plot_xpx)
 		{

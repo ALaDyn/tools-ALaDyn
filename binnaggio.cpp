@@ -236,6 +236,20 @@ _Scrittura :: _Scrittura(Parametri * parametri, float ** data_binned, std::strin
 		xmax = (parametri->zmin);
 		nbinx = (parametri->nbin_z+3);
 	}
+	else if (x == "ty") 
+	{
+		dimx = (parametri->dimmi_dimty());
+		xmin = (parametri->tymin)-dimx;
+		xmax = (parametri->tymin);
+		nbinx = (parametri->nbin_ty+3);
+	}
+	else if (x == "tz") 
+	{
+		dimx = (parametri->dimmi_dimtz());
+		xmin = (parametri->tzmin)-dimx;
+		xmax = (parametri->tzmin);
+		nbinx = (parametri->nbin_tz+3);
+	}
 	else if (x == "px") 
 	{
 		dimx = (parametri->dimmi_dimpx());
@@ -308,6 +322,20 @@ _Scrittura :: _Scrittura(Parametri * parametri, float ** data_binned, std::strin
 		ymin = (parametri->zmin)-dimy;
 		ymax = (parametri->zmin);
 		nbiny = (parametri->nbin_z+3);
+	}
+	else if (y == "ty") 
+	{
+		dimy = (parametri->dimmi_dimty());
+		ymin = (parametri->tymin)-dimy;
+		ymax = (parametri->tymin);
+		nbiny = (parametri->nbin_ty+3);
+	}
+	else if (y == "tz") 
+	{
+		dimy = (parametri->dimmi_dimtz());
+		ymin = (parametri->tzmin)-dimy;
+		ymax = (parametri->tzmin);
+		nbiny = (parametri->nbin_tz+3);
 	}
 	else if (y == "px") 
 	{
