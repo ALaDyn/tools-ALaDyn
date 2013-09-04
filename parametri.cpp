@@ -21,18 +21,21 @@ Parametri :: Parametri()
 	multifile = false;
 	stretched_grid = true;
 	massa_particella_MeV = 0.;
-	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
+	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_ty = nbin_tz = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
 	tnow = 0.0;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
+	tymin = tzmin = -1;
+	tymax = tzmax =  1;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = true;
+	tymin_b = tymax_b = tzmin_b = tzmax_b = nbin_ty_b = nbin_tz_b = true;
 	nbin_b = true;
 	nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
 	fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
 	fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
-	fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = false;
+	fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = fai_plot_rcf = false;
 	overwrite_weight = false;
 	overwrite_weight_value = 1.0;
 	do_not_ask_missing = false;
@@ -736,6 +739,44 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
 			}
 		}
+		else if (std::string(argv[i]) == "-tymin")
+		{
+			tymin = (float) atof(argv[i+1]);
+			tymin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-tymax")
+		{
+			tymax = (float) atof(argv[i+1]);
+			tymax_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-tzmin")
+		{
+			if (p[NCOLONNE]>5)
+			{
+				tzmin = (float) atof(argv[i+1]);
+				tzmin_b = false;
+				i++;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+			}
+		}
+		else if (std::string(argv[i]) == "-tzmax")
+		{
+			if (p[NCOLONNE]>5)
+			{
+				tzmax = (float) atof(argv[i+1]);
+				tzmax_b = false;
+				i++;
+			}
+			else
+			{
+				std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+			}
+		}
 		else if (std::string(argv[i]) == "-pxmin")
 		{
 			pxmin = (float) atof(argv[i+1]);
@@ -854,6 +895,17 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			if (p[NCOLONNE]>5)
 			{
 				fai_plot_yz = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+			}
+		}
+		else if (std::string(argv[i]) == "-plot_rcf")
+		{
+			if (p[NCOLONNE]>5)
+			{
+				fai_plot_rcf = 1;
 			}
 			else
 			{
@@ -1013,6 +1065,20 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			nbin_b = false;
 			i++;
 		}
+		else if (std::string(argv[i]) == "-nbinty")
+		{
+			nbin_ty = atoi(argv[i+1]);
+			nbin_ty_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbintz")
+		{
+			nbin_tz = atoi(argv[i+1]);
+			nbin_tz_b = false;
+			nbin_b = false;
+			i++;
+		}
 		else if (std::string(argv[i]) == "-nbinpx")
 		{
 			nbin_px = atoi(argv[i+1]);
@@ -1114,6 +1180,26 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 				{
 					zmax = (float) std::atof(leggi.c_str());
 					zmax_b = false;
+				}
+				else if ((nomepar == "tymin" || nomepar == "TYMIN") && tymin_b)
+				{
+					tymin = (float) std::atof(leggi.c_str());
+					tymin_b = false;
+				}
+				else if ((nomepar == "tymax" || nomepar == "TYMAX") && tymax_b)
+				{
+					tymax = (float) std::atof(leggi.c_str());
+					tymax_b = false;
+				}
+				else if ((nomepar == "tzmin" || nomepar == "TZMIN") && tzmin_b)
+				{
+					tzmin = (float) std::atof(leggi.c_str());
+					tzmin_b = false;
+				}
+				else if ((nomepar == "tzmax" || nomepar == "TZMAX") && tzmax_b)
+				{
+					tzmax = (float) std::atof(leggi.c_str());
+					tzmax_b = false;
 				}
 				else if ((nomepar == "pxmin" || nomepar == "PXMIN") && pxmin_b)
 				{

@@ -17,6 +17,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (binx == "theta") binnare_su_x = 7;
 	else if (binx == "E") binnare_su_x = 8;
 	else if (binx == "thetaT") binnare_su_x = 9;
+	else if (binx == "ty") binnare_su_x = 10;
+	else if (binx == "tz") binnare_su_x = 11;
 	else printf("variabile x non riconosciuta\n");
 
 	if (biny == "x") binnare_su_y = 0;
@@ -29,10 +31,12 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (biny == "theta") binnare_su_y = 7;
 	else if (biny == "E") binnare_su_y = 8;
 	else if (biny == "thetaT") binnare_su_y = 9;
+	else if (biny == "ty") binnare_su_y = 10;
+	else if (biny == "tz") binnare_su_y = 11;
 	else printf("variabile y non riconosciuta\n");
 
 	//	float z;
-	float x, y, px, py, pz, gamma, theta, thetaT, E;
+	float x, y, px, py, pz, gamma, theta, thetaT, E, ty, tz;
 	float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
 	for (int i = 0; i < npart; i++)
 	{
@@ -67,7 +71,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
 			else if (binnare_su_y == 9) dato_da_binnare_y = thetaT;
-		}
+			}
 		else if (ndv == 6 || ndv == 7)
 		{
 			px=*(particelle+i*ndv+3);
@@ -77,16 +81,22 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);			//theta sgatto
 			thetaT=(float) atan(sqrt((py*py/(px*px)) + (pz*pz/(px*px))));	//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);				//energia
+			ty=py/(px*(1+1e-15));
+			ty=pz/(px*(1+1e-15));
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
 			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
+			else if (binnare_su_x == 10) dato_da_binnare_x = ty;
+			else if (binnare_su_x == 11) dato_da_binnare_x = tz;
 			if (binnare_su_y < 6) dato_da_binnare_y = *(particelle+i*ndv+binnare_su_y);
 			else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
 			else if (binnare_su_y == 9) dato_da_binnare_y = thetaT;
+			else if (binnare_su_y == 10) dato_da_binnare_y = ty;
+			else if (binnare_su_y == 11) dato_da_binnare_y = tz;
 		}
 
 
