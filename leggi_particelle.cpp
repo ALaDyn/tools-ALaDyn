@@ -580,7 +580,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if (parametri->fai_plot_xy)			_Binnaggio(particelle,val[0],ndv,parametri,xy,"x","y");
 					if (parametri->fai_plot_xz)			_Binnaggio(particelle,val[0],ndv,parametri,xz,"x","z");
 					if (parametri->fai_plot_yz)			_Binnaggio(particelle,val[0],ndv,parametri,yz,"y","z");
-					if (parametri->fai_plot_rcf)		_Binnaggio(particelle,val[0],ndv,parametri,yz,"y","z");
+					if (parametri->fai_plot_rcf)		_Binnaggio(particelle,val[0],ndv,parametri,yz,"ty","tz");
 					if (parametri->fai_plot_xpx)		_Binnaggio(particelle,val[0],ndv,parametri,xpx,"x","px");
 					if (parametri->fai_plot_xpy)		_Binnaggio(particelle,val[0],ndv,parametri,xpy,"x","py");
 					if (parametri->fai_plot_xpz)		_Binnaggio(particelle,val[0],ndv,parametri,xpz,"x","pz");
