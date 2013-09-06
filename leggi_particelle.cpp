@@ -53,7 +53,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int buff, pID;
 
 	float x,y,z,px,py,pz;
-	float gamma, theta, thetaT, E;
+	float gamma, theta, thetaT, E, ty, tz;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	float *estremi_min, *estremi_max;
 
@@ -348,6 +348,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		std::cout << "PYMAX = " << parametri->pymax << std::endl;
 		std::cout << "PZMIN = " << parametri->pzmin << std::endl;
 		std::cout << "PZMAX = " << parametri->pzmax << std::endl;
+		std::cout << "TYMIN = " << parametri->tymin << std::endl;
+		std::cout << "TYMAX = " << parametri->tymax << std::endl;
+		std::cout << "TZMIN = " << parametri->tzmin << std::endl;
+		std::cout << "TZMAX = " << parametri->tzmax << std::endl;
 		std::cout << "GAMMAMIN = " << parametri->gammamin << std::endl;
 		std::cout << "GAMMAMAX = " << parametri->gammamax << std::endl;
 		std::cout << "THETAMIN = " << parametri->thetamin << std::endl;
@@ -530,6 +534,16 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 							thetaT=(float) atan(sqrt( (py*py+pz*pz)/(px*px) ));
 							E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+							if (px > 0) 
+							{
+								ty = py/px;
+								tz = pz/px;
+							}
+							else
+							{
+								ty = 0.0;
+								tz = 0.0;
+							}
 							if (x < estremi_min[0]) estremi_min[0] = x;
 							if (x > estremi_max[0]) estremi_max[0] = x;
 							if (y < estremi_min[1]) estremi_min[1] = y;
@@ -550,6 +564,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (E > estremi_max[8]) estremi_max[8] = E;
 							if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
 							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
+							if (ty < estremi_min[10]) estremi_min[10] = ty;
+							if (ty > estremi_max[10]) estremi_max[10] = ty;
+							if (tz < estremi_min[11]) estremi_min[11] = tz;
+							if (tz > estremi_max[11]) estremi_max[11] = tz;
 						}
 						else if (ndv == 4 || ndv == 5)
 						{
@@ -561,6 +579,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							theta=(float)(atan2(py,px)*180./M_PI);				//theta
 							thetaT=(float) atan(sqrt((py*py)/(px*px)));
 							E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+							if (px > 0) ty = py/px;
+							else ty = 0.0;
 							if (x < estremi_min[0]) estremi_min[0] = x;
 							if (x > estremi_max[0]) estremi_max[0] = x;
 							if (y < estremi_min[1]) estremi_min[1] = y;
@@ -579,6 +599,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (E > estremi_max[8]) estremi_max[8] = E;
 							if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
 							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
+							if (ty < estremi_min[10]) estremi_min[10] = ty;
+							if (ty > estremi_max[10]) estremi_max[10] = ty;
 						}
 					}
 				}
@@ -893,6 +915,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		Estremi_out << "THETARADMAX = " << estremi_max[9] << std::endl;
 		Estremi_out << "EMIN = " << estremi_min[8] << std::endl;
 		Estremi_out << "EMAX = " << estremi_max[8] << std::endl;
+		Estremi_out << "TYMIN = " << estremi_min[10] << std::endl;
+		Estremi_out << "TYMAX = " << estremi_max[10] << std::endl;
+		Estremi_out << "TZMIN = " << estremi_min[11] << std::endl;
+		Estremi_out << "TZMAX = " << estremi_max[11] << std::endl;
 		Estremi_out.close();
 	}
 

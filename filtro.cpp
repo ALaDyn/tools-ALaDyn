@@ -71,10 +71,8 @@ soglie da utilizzare per la filtratura. Il quarto, se fornito, rappresenta i
 filtri da applicare; se non fornito viene costruito da "costruisci_filtro"
 assieme all'array da usare come terzo argomento.
 
-Il main (commentato) che conclude il file esemplifica un paio di esecuzioni
-tipiche.
-
 */
+
 
 #ifndef _WIN32
 #include <strings.h>
@@ -114,6 +112,11 @@ namespace cost
 	unsigned int thetamax =  __0X15;
 	unsigned int thetaTmin = __0X16;
 	unsigned int thetaTmax = __0X17;
+	unsigned int tymin =     __0X18;
+	unsigned int tymax =     __0X19;
+	unsigned int tzmin =     __0X20;
+	unsigned int tzmax =     __0X21;
+
 	unsigned int tutte[]=
 	{
 		xmin, ymin, zmin, 
@@ -122,7 +125,9 @@ namespace cost
 		pxmax, pymax, pzmax,
 		emin, emax,
 		thetamin, thetamax,
-		thetaTmin, thetaTmax
+		thetaTmin, thetaTmax,
+		tymin, tymax,
+		tzmin, tzmax
 	};
 	// varie ed eventuali
 }
@@ -130,7 +135,7 @@ namespace cost
 
 _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
 {
-	float * pntt_loc, p[] = {0, 0, 0}, E = 0., theta = 0., thetaT = 0.;
+	float * pntt_loc, p[] = {0, 0, 0}, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0.;
 	unsigned int corrente = 0, tests[32];
 	bool flag;
 	unsigned char tot_test = 0;
@@ -165,6 +170,12 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 
 			else if(tests[c] == __0X16 || tests[c] == __0X17)
 				thetaT=(float) atan(sqrt( (p[1]*p[1]/(p[0]*p[0])) + (p[2]*p[2]/(p[0]*p[0])) ));
+
+			else if(tests[c] == __0X18 || tests[c] == __0X19)
+				ty=p[1]/p[0];
+
+			else if(tests[c] == __0X20 || tests[c] == __0X21)
+				tz=p[2]/p[0];
 
 			switch(tests[c])
 			{
@@ -229,34 +240,44 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 				flag = flag && flag_filtri . piu_pzmax;
 				break;
 			case __0X12: // cost::emin
-				flag_filtri . meno_ener = E >= val[12];
-				flag = flag && flag_filtri . meno_ener;
+				flag_filtri . meno_Emin = E >= val[12];
+				flag = flag && flag_filtri . meno_Emin;
 				break;
 			case __0X13:  // cost::emax
-				flag_filtri . piu_ener = E <= val[13];
-				flag = flag && flag_filtri . piu_ener;
+				flag_filtri . piu_Emax = E <= val[13];
+				flag = flag && flag_filtri . piu_Emax;
 				break;
 			case __0X14: // cost::thetamin
-				flag_filtri . meno_theta = theta >= val[14];
-				flag = flag && flag_filtri . meno_theta;
+				flag_filtri . meno_thetamin = theta >= val[14];
+				flag = flag && flag_filtri . meno_thetamin;
 				break;
 			case __0X15: // cost::thetamax
-				flag_filtri . piu_theta = theta <= val[15];
-				flag = flag && flag_filtri . piu_theta;
+				flag_filtri . piu_thetamax = theta <= val[15];
+				flag = flag && flag_filtri . piu_thetamax;
 				break;
 			case __0X16: // cost::thetaTmin
-#ifdef ENABLE_DEBUG
-				if (!(n_dati[0] % 100)) std::cout << "thetaT=" << thetaT << ", val[16]=" << val[16] << std::endl;
-#endif
-				flag_filtri . meno_thetaT = thetaT >= val[16];
-				flag = flag && flag_filtri . meno_thetaT;
+				flag_filtri . meno_thetaTmin = thetaT >= val[16];
+				flag = flag && flag_filtri . meno_thetaTmin;
 				break;
 			case __0X17: // cost::thetaTmax
-#ifdef ENABLE_DEBUG
-				if (!(n_dati[0] % 100)) std::cout << "thetaT=" << thetaT << ", val[17]=" << val[17] << std::endl;
-#endif
-				flag_filtri . piu_thetaT = thetaT <= val[17];
-				flag = flag && flag_filtri . piu_thetaT;
+				flag_filtri . piu_thetaTmax = thetaT <= val[17];
+				flag = flag && flag_filtri . piu_thetaTmax;
+				break;
+			case __0X18: // cost::tymin
+				flag_filtri . meno_tymin = ty <= val[18];
+				flag = flag && flag_filtri . meno_tymin;
+				break;
+			case __0X19: // cost::tymax
+				flag_filtri . piu_tymax = ty <= val[19];
+				flag = flag && flag_filtri . piu_tymax;
+				break;
+			case __0X20: // cost::tzmin
+				flag_filtri . meno_tzmin = tz <= val[20];
+				flag = flag && flag_filtri . meno_tzmin;
+				break;
+			case __0X21: // cost::tzmax
+				flag_filtri . piu_tzmax = tz <= val[21];
+				flag = flag && flag_filtri . piu_tzmax;
 				break;
 			}
 
@@ -288,7 +309,11 @@ const char * _Filtro :: descr[] =
 	"+thetamin",
 	"+thetamax",
 	"+thetaTmin",
-	"+thetaTmax"
+	"+thetaTmax",
+	"+tymin",
+	"+tymax",
+	"+tzmin",
+	"+tzmax"
 	// varie ed eventuali
 };
 
@@ -335,6 +360,10 @@ float * _Filtro :: costruisci_filtro(int narg, const char **args)
 		miei_args[15],  miei_val[15],
 		miei_args[16],  miei_val[16],
 		miei_args[17],  miei_val[17],
+		miei_args[18],  miei_val[18],
+		miei_args[19],  miei_val[19],
+		miei_args[20],  miei_val[20],
+		miei_args[21],  miei_val[21],
 		miei_args[NUM_FILTRI]);
 }
 
@@ -375,48 +404,5 @@ void _Filtro :: individua_filtro(char *b, float v, float *& V)
 
 unsigned int _Filtro :: maschera_interna = 0;
 
-
-
-/*
-int main(int narg, char ** args)
-{using namespace std;
-
-float * dati = new float[56], // array dei dati
-val[] = {1,1,1,1,1,1,1,1,1,1,1,3,1,1}; // array ordinato delle soglie
-unsigned int N[] = {8, 7},  // struttura fine del puntatore "dati"
-m = cost :: xmin | cost :: pzmax; // filtri che si vogliono applicare
-
-
-// i dati da filtrare sono presi da un file: consistono in 8 righe di 7 dati ciascuna
-ifstream issa(args[1]);
-issa . read (reinterpret_cast<char*>(dati), 56*sizeof(float));
-issa . close();
-
-
-// scrittura dei dati letti (per verifica)
-for(int i=0; i < N[0]; ++i) {for(int j=0; j < N[1]; j++) cout << dati[N[1]*i+j] << ' '; cout << '\n';}
-
-//applicazione del _Filtro con fornitura di TUTTI gli argomenti
-//_Filtro(dati, N, val, m);
-
-
-// oppure applicazione del _Filtro con uso di costruisci_filtro (equivalente alla precedente)
-//_Filtro(dati, N, _Filtro :: costruisci_filtro("xmin", 1.0, "xmax", 5.0, (char *)NULL));
-
-
-// oppure applicazione del _Filtro con uso di costruisci_filtro (equivalente alla precedente,
-// perché l'ORDINE DEGLI ARGOMENTI è irrilevante)
-//_Filtro(dati, N, _Filtro :: costruisci_filtro("xmax", 5.0, "xmin", 1.0, (char *)NULL));
-
-
-// oppure applicazione ERRATA del filtro (contumelia, ma "no operation")
-//_Filtro(dati, N, _Filtro :: costruisci_filtro("MERDE", 1.0, "PUPU", 5.0, (char *)NULL));
-_Filtro(dati, N, _Filtro :: costruisci_filtro("EMIN", 300.f, "EMAX", 350.f, (char *)NULL));
-
-// all'uscita in "dati", a partire dall'inizio, sopravvivono N[0] particelle
-cout << "sopravvissute " << N[0] << " particelle\n";
-for(int i=0; i < N[0]; ++i) {for(int j=0; j < N[1]; j++) cout << dati[N[1]*i+j] << ' '; cout << '\n';}
-}
-*/
 
 # endif

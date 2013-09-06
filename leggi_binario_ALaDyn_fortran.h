@@ -9,8 +9,8 @@
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  5
-#define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 5
+#define MINOR_RELEASE  2
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -107,7 +107,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define OUT_VTK_NOSTRETCH	16
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
-#define ALTRI_PARAMETRI 4 // gamma, theta, thetaT, E
+#define ALTRI_PARAMETRI 6 // gamma, theta, thetaT, E, ty, tz
 
 // definizione numero filtri "abilitati"
 # ifndef NUM_FILTRI
@@ -132,11 +132,11 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 # define __0X15 0x8000
 # define __0X16 0x10000
 # define __0X17 0x20000
-// fine filtri in uso, i prossimi sono codici liberi
 # define __0X18 0x40000
 # define __0X19 0x80000
 # define __0X20 0x100000
 # define __0X21 0x200000
+// fine filtri in uso, i prossimi sono codici liberi
 # define __0X22 0x400000
 # define __0X23 0x800000
 # define __0X24 0x1000000
@@ -164,7 +164,7 @@ struct Parametri
 	int p[NPARAMETRI];
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
-	float minimi[SEI_DIMENSIONI+ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI+ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E
+	float minimi[SEI_DIMENSIONI+ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI+ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E, ty, tz
 	float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
 	std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
 	std::vector<float> xcoord, ycoord, zcoord, realpar;
@@ -208,7 +208,6 @@ struct Parametri
 	void chiedi_2Do3D();
 	bool check_parametri();
 	void check_filename(const char *);
-	bool incompleto();
 	void organizza_minimi_massimi();
 };
 
@@ -233,7 +232,8 @@ struct _Filtro
 	{
 		xmin, ymin, zmin, xmax, ymax, zmax,
 		pxmin, pymin, pzmin, pxmax, pymax, pzmax,
-		emin, emax, thetamin, thetamax, thetaTmin, thetaTmax
+		emin, emax, thetamin, thetamax, thetaTmin, thetaTmax,
+		tymin, tymax, tzmin, tzmax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
 	static float * costruisci_filtro(int, const char **);
@@ -254,20 +254,25 @@ struct _Filtro
 		unsigned piu_pxmax:1;
 		unsigned piu_pymax:1;
 		unsigned piu_pzmax:1;
-		unsigned meno_ener:1;
-		unsigned piu_ener:1;
-		unsigned meno_theta:1;
-		unsigned piu_theta:1;
-		unsigned meno_thetaT:1;
-		unsigned piu_thetaT:1;
+		unsigned meno_Emin:1;
+		unsigned piu_Emax:1;
+		unsigned meno_thetamin:1;
+		unsigned piu_thetamax:1;
+		unsigned meno_thetaTmin:1;
+		unsigned piu_thetaTmax:1;
+		unsigned meno_tymin:1;
+		unsigned meno_tzmin:1;
+		unsigned piu_tymax:1;
+		unsigned piu_tzmax:1;
 		_flag_filtri operator=(int o)
 		{
 			meno_xmin = meno_ymin = meno_zmin =
 				meno_pxmin = meno_pymin = meno_pzmin =
 				piu_xmax = piu_ymax = piu_zmax =
 				piu_pxmax = piu_pymax = piu_pzmax =
-				meno_ener = piu_ener = meno_theta = piu_theta =
-				meno_thetaT = piu_thetaT = 0;
+				meno_Emin = piu_Emax = meno_thetamin = piu_thetamax =
+				meno_thetaTmin = piu_thetaTmax = meno_tymin =
+				piu_tymax = meno_tzmin = piu_tzmax = 0;
 			return *this;
 		}
 		// varie ed eventuali

@@ -51,6 +51,9 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			thetaT=(float) atan(sqrt((py*py/(px*px))));			//theta turch                                                                        
 			//			thetaT=(float) atan(py/px);				//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+			if (px > 0.0) ty = py/px;
+			else ty = 0.0;
+			tz = 0.0;
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
 			else if (binnare_su_x == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
@@ -61,6 +64,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
 			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
+			else if (binnare_su_x == 10) dato_da_binnare_x = ty;
+			else if (binnare_su_x == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
 			if (binnare_su_y == 0) dato_da_binnare_y = x;
 			else if (binnare_su_y == 1) dato_da_binnare_y = y;
 			else if (binnare_su_y == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
@@ -71,7 +76,9 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_y == 7) dato_da_binnare_y = theta;
 			else if (binnare_su_y == 8) dato_da_binnare_y = E;
 			else if (binnare_su_y == 9) dato_da_binnare_y = thetaT;
-			}
+			else if (binnare_su_y == 10) dato_da_binnare_y = ty;
+			else if (binnare_su_y == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
+		}
 		else if (ndv == 6 || ndv == 7)
 		{
 			px=*(particelle+i*ndv+3);
@@ -81,8 +88,16 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);			//theta sgatto
 			thetaT=(float) atan(sqrt((py*py/(px*px)) + (pz*pz/(px*px))));	//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);				//energia
-			ty=py/(px*(1+1e-15));
-			tz=pz/(px*(1+1e-15));
+			if (px > 0.0)
+			{
+				ty = py/px;
+				tz = pz/px;
+			}
+			else
+			{
+				ty = 0.0;
+				tz = 0.0;
+			}
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
@@ -144,10 +159,12 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	else if (binx == "theta") binnare_su_x = 7;
 	else if (binx == "E") binnare_su_x = 8;
 	else if (binx == "thetaT") binnare_su_x = 9;
+	else if (binx == "ty") binnare_su_x = 10;
+	else if (binx == "tz") binnare_su_x = 11;
 	else printf("variabile x non riconosciuta\n");
 
 	//	float z;
-	float x, y, px, py, pz, gamma, theta, thetaT, E;
+	float x, y, px, py, pz, gamma, theta, thetaT, E, ty, tz;
 	float dato_da_binnare_x = 0.;
 	//printf("AIUTO binnare_su_x=%i     min=%g    max=%g   dim=%g\n",binnare_su_x, parametri->minimi[binnare_su_x], parametri->massimi[binnare_su_x], parametri->dimmi_dim(binnare_su_x));
 	fflush(stdout);
@@ -163,6 +180,9 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			theta=(float)(atan2(py,px)*180./M_PI);				//theta
 			thetaT=(float) atan(py/px);							//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
+			if (px > 0.0) ty = py/px;
+			else ty = 0.0;
+			tz = 0.0;
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
 			else if (binnare_su_x == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
@@ -173,6 +193,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
 			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
+			else if (binnare_su_x == 10) dato_da_binnare_x = ty;
+			else if (binnare_su_x == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
 		}
 		else if (ndv == 6 || ndv == 7)
 		{
@@ -183,11 +205,23 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			theta=(float)(atan2(sqrt(py*py+pz*pz),px)*180./M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 			thetaT=(float) atan(py/px);							//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);		//energia
+			if (px > 0.0)
+			{
+				ty = py/px;
+				tz = pz/px;
+			}
+			else
+			{
+				ty = 0.0;
+				tz = 0.0;
+			}
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
 			else if (binnare_su_x == 7) dato_da_binnare_x = theta;
 			else if (binnare_su_x == 8) dato_da_binnare_x = E;
 			else if (binnare_su_x == 9) dato_da_binnare_x = thetaT;
+			else if (binnare_su_x == 10) dato_da_binnare_x = ty;
+			else if (binnare_su_x == 11) dato_da_binnare_x = tz;
 		}
 
 		if (dato_da_binnare_x < parametri->minimi[binnare_su_x])
@@ -486,6 +520,20 @@ _Scrittura :: _Scrittura(Parametri * parametri, float * data_binned, std::string
 		xmin = (parametri->thetaTmin)-dimx;
 		xmax = (parametri->thetaTmin);
 		nbinx = (parametri->nbin_thetaT+3);
+	}
+	else if (x == "ty") 
+	{
+		dimx = (parametri->dimmi_dimty());
+		xmin = (parametri->tymin)-dimx;
+		xmax = (parametri->tymin);
+		nbinx = (parametri->nbin_ty+3);
+	}
+	else if (x == "tz") 
+	{
+		dimx = (parametri->dimmi_dimtz());
+		xmin = (parametri->tzmin)-dimx;
+		xmax = (parametri->tzmin);
+		nbinx = (parametri->nbin_tz+3);
 	}
 	else printf("variabile x non riconosciuta\n");
 

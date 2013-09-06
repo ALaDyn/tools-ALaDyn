@@ -25,8 +25,8 @@ Parametri :: Parametri()
 	tnow = 0.0;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
-	tymin = tzmin = -1;
-	tymax = tzmax =  1;
+	tymin = tzmin = -1.0;
+	tymax = tzmax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = true;
 	tymin_b = tymax_b = tzmin_b = tzmax_b = nbin_ty_b = nbin_tz_b = true;
@@ -121,6 +121,8 @@ int Parametri :: dimmi_nbin(int colonna)
 	else if (colonna == 7)	return nbin_theta;
 	else if (colonna == 8)	return nbin_E;
 	else if (colonna == 9)	return nbin_thetaT;
+	else if (colonna == 10)	return nbin_ty;
+	else if (colonna == 11)	return nbin_tz;
 	else return 120;
 }
 
@@ -138,6 +140,8 @@ float Parametri :: dimmi_dim(int colonna)
 	else if (colonna == 7)	return dimmi_dimtheta();
 	else if (colonna == 8)	return dimmi_dimE();
 	else if (colonna == 9)	return dimmi_dimthetaT();
+	else if (colonna == 10)	return dimmi_dimty();
+	else if (colonna == 11)	return dimmi_dimtz();
 	else return 1.0;
 }
 
@@ -917,7 +921,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			}
 			else
 			{
-				std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+				std::cout << "Unable to do a plot with tz using a 2D file" << std::endl;
 			}
 		}
 		else if (std::string(argv[i]) == "-plot_xpx")
@@ -1046,8 +1050,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			if (nbin_px_b) nbin_px = nbin;
 			if (nbin_py_b) nbin_py = nbin;
 			if (nbin_pz_b) nbin_pz = nbin;
+			if (nbin_ty_b) nbin_ty = nbin;
+			if (nbin_tz_b) nbin_tz = nbin;
 			if (nbin_gamma_b) nbin_gamma = nbin;
 			if (nbin_theta_b) nbin_theta = nbin;
+			if (nbin_theta_b) nbin_thetaT = nbin;
 			if (nbin_E_b) nbin_E = nbin;
 			nbin_b = false;
 			i++;
@@ -1304,7 +1311,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			std::cout << "Quanti bin per asse vuoi usare? (consiglio: 120): ";
 			std::cin >> nbin;
-			nbin_x = nbin_px = nbin_y = nbin_z = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin;
+			nbin_x = nbin_y = nbin_z = nbin_px = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = nbin;
 		}
 
 		if (p[DO_BINNING] == 1 && !do_not_ask_missing)
@@ -1317,6 +1324,8 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cin >> fai_plot_EthetaT;
 			std::cout << "Vuoi fare lo spettro in energia? 0 per no, 1 per si': ";
 			std::cin >> fai_plot_Espec;
+			std::cout << "Vuoi fare il plot rfc? 0 per no, 1 per si': ";
+			std::cin >> fai_plot_rcf;
 			if (fai_plot_xpx)
 			{
 				if (xmin_b)
@@ -1354,6 +1363,27 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 					std::cout << "nbin_px = ";
 					std::cin >> nbin_px;
 					nbin_px_b = false;
+				}
+			}
+			if (fai_plot_Etheta || fai_plot_Espec || fai_plot_EthetaT)
+			{
+				if (Emin_b)
+				{
+					std::cout << "Emin = ";
+					std::cin >> Emin;
+					Emin_b = false;
+				}
+				if (Emax_b)
+				{
+					std::cout << "Emax = ";
+					std::cin >> Emax;
+					Emax_b = false;
+				}
+				if (nbin_E_b)
+				{
+					std::cout << "nbin_E = ";
+					std::cin >> nbin_E;
+					nbin_E_b = false;
 				}
 			}
 			if (fai_plot_Etheta)
@@ -1398,25 +1428,43 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 					nbin_thetaT_b = false;
 				}
 			}
-			if (fai_plot_Etheta || fai_plot_Espec || fai_plot_EthetaT)
+			if (fai_plot_rcf)
 			{
-				if (Emin_b)
+				if (tymin_b)
 				{
-					std::cout << "Emin = ";
-					std::cin >> Emin;
-					Emin_b = false;
+					std::cout << "tymin = ";
+					std::cin >> tymin;
+					tymin_b = false;
 				}
-				if (Emax_b)
+				if (tymax_b)
 				{
-					std::cout << "Emax = ";
-					std::cin >> Emax;
-					Emax_b = false;
+					std::cout << "tymax = ";
+					std::cin >> tymax;
+					tymax_b = false;
 				}
-				if (nbin_E_b)
+				if (nbin_ty_b)
 				{
-					std::cout << "nbin_E = ";
-					std::cin >> nbin_E;
-					nbin_E_b = false;
+					std::cout << "nbin_ty = ";
+					std::cin >> nbin_ty;
+					nbin_ty_b = false;
+				}
+				if (tzmin_b)
+				{
+					std::cout << "tzmin = ";
+					std::cin >> tzmin;
+					tzmin_b = false;
+				}
+				if (tzmax_b)
+				{
+					std::cout << "tzmax = ";
+					std::cin >> tzmax;
+					tzmax_b = false;
+				}
+				if (nbin_tz_b)
+				{
+					std::cout << "nbin_tz = ";
+					std::cin >> nbin_tz;
+					nbin_tz_b = false;
 				}
 			}
 		}
@@ -1446,6 +1494,10 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		std::cout << "THETARADMAX = " << thetaTmax << std::endl;
 		std::cout << "EMIN = " << Emin << std::endl;
 		std::cout << "EMAX = " << Emax << std::endl;
+		std::cout << "TYMIN = " << tymin << std::endl;
+		std::cout << "TYMAX = " << tymax << std::endl;
+		std::cout << "TZMIN = " << tzmin << std::endl;
+		std::cout << "TZMAX = " << tzmax << std::endl;
 #endif
 		if (p_b[OUT_VTK] && !do_not_ask_missing)
 		{
@@ -1866,6 +1918,31 @@ bool Parametri :: check_parametri()
 			printf("Attenzione: pzmin > pzmax\n");
 			test = false;
 		}
+		if (Emin > Emax)
+		{
+			printf("Attenzione: Emin > Emax\n");
+			test = false;
+		}
+		if (thetamin > thetamax)
+		{
+			printf("Attenzione: thetamin > thetamax\n");
+			test = false;
+		}
+		if (thetaTmin > thetaTmax)
+		{
+			printf("Attenzione: thetaTmin > thetaTmax\n");
+			test = false;
+		}
+		if (tymin > tymax)
+		{
+			printf("Attenzione: tymin > tymax\n");
+			test = false;
+		}
+		if (tzmin > tzmax)
+		{
+			printf("Attenzione: tzmin > tzmax\n");
+			test = false;
+		}
 		if ( nbin_x <= 0 )
 		{
 			printf("Attenzione: nbin_x < 0\n");
@@ -1894,6 +1971,31 @@ bool Parametri :: check_parametri()
 		if (nbin_pz <= 0)
 		{
 			printf("Attenzione: nbin_pz < 0\n");
+			test = false;
+		}
+		if (nbin_E <= 0)
+		{
+			printf("Attenzione: nbin_E < 0\n");
+			test = false;
+		}
+		if (nbin_theta <= 0)
+		{
+			printf("Attenzione: nbin_theta < 0\n");
+			test = false;
+		}
+		if (nbin_thetaT <= 0)
+		{
+			printf("Attenzione: nbin_thetaT < 0\n");
+			test = false;
+		}
+		if (nbin_ty <= 0)
+		{
+			printf("Attenzione: nbin_ty < 0\n");
+			test = false;
+		}
+		if (nbin_tz <= 0)
+		{
+			printf("Attenzione: nbin_tz < 0\n");
 			test = false;
 		}
 	}
@@ -2103,12 +2205,6 @@ bool Parametri :: check_parametri()
 		}
 	}
 
-	/*******************************************************
-	**** MOLTO PERICOLOSO QUANTO SEGUE *********************
-	**** commentato perche' non piu' necessario ************
-	*******************************************************/
-	//if (do_not_ask_missing) test=true;
-
 
 	return test;
 }
@@ -2116,27 +2212,31 @@ bool Parametri :: check_parametri()
 
 void Parametri :: organizza_minimi_massimi()
 {
-	minimi[0] = xmin;
-	minimi[1] = ymin;
-	minimi[2] = zmin;
-	minimi[3] = pxmin;
-	minimi[4] = pymin;
-	minimi[5] = pzmin;
-	minimi[6] = gammamin;
-	minimi[7] = thetamin;
-	minimi[8] = Emin;
-	minimi[9] = thetaTmin;
+	minimi[0]  = xmin;
+	minimi[1]  = ymin;
+	minimi[2]  = zmin;
+	minimi[3]  = pxmin;
+	minimi[4]  = pymin;
+	minimi[5]  = pzmin;
+	minimi[6]  = gammamin;
+	minimi[7]  = thetamin;
+	minimi[8]  = Emin;
+	minimi[9]  = thetaTmin;
+	minimi[10] = tymin;
+	minimi[11] = tzmin;
 
-	massimi[0] = xmax;
-	massimi[1] = ymax;
-	massimi[2] = zmax;
-	massimi[3] = pxmax;
-	massimi[4] = pymax;
-	massimi[5] = pzmax;
-	massimi[6] = gammamax;
-	massimi[7] = thetamax;
-	massimi[8] = Emax;
-	massimi[9] = thetaTmax;
+	massimi[0]  = xmax;
+	massimi[1]  = ymax;
+	massimi[2]  = zmax;
+	massimi[3]  = pxmax;
+	massimi[4]  = pymax;
+	massimi[5]  = pzmax;
+	massimi[6]  = gammamax;
+	massimi[7]  = thetamax;
+	massimi[8]  = Emax;
+	massimi[9]  = thetaTmax;
+	massimi[10] = tymax;
+	massimi[11] = tzmax;
 
 #ifdef ENABLE_DEBUG
 	std::cout << "---- organizza_minimi_massimi() -----" << std::endl;
@@ -2145,18 +2245,6 @@ void Parametri :: organizza_minimi_massimi()
 #endif
 }
 
-
-
-bool Parametri :: incompleto()
-{
-	bool test=true;
-	//	if (!xmin_b && !xmax_b && !pxmin_b && !pxmax_b && !ymin_b && !ymax_b && !pymin_b && !pymax_b && !zmin_b && !zmax_b && !pzmin_b && !pzmax_b && 
-	//		!Emin_b && !Emax_b && !nbin_x_b && !nbin_y_b && !nbin_z_b && !nbin_px_b && !nbin_py_b && !nbin_pz_b && !nbin_E_b)  test = false;
-	//	if (!gammamin_b && !gammamax_b && !thetamin_b && !thetamax_b && !nbin_theta_b && !nbin_gamma_b && !test) test = false;
-
-	test=false;
-	return test;
-}
 
 
 #endif

@@ -21,14 +21,14 @@ int main (const int argc, const char *argv[])
 		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
 		std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
-		std::cout << "-xmin #xmin -xmax #xmax -[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
-		std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E]min #number" << std::endl;
-		std::cout << "-plot_xy -plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
-		std::cout << "-plot_etheta -plot_ethetaT -plot_espec -plot_thetaspec -plot_thetaTspec" << std::endl;
+		std::cout << "-do_binning [REQUIRED TO ENABLE BINNING FOR PLOTTING]" << std::endl;
+		std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #number" << std::endl;
+		std::cout << "-plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
+		std::cout << "-plot_etheta -plot_ethetaT -plot_rfc -plot_espec -plot_thetaspec -plot_thetaTspec" << std::endl;
 		std::cout << "-nbin #num" << std::endl;
-		std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E] #num" << std::endl;
-		std::cout << "-dontask" << std::endl;
-		std::cout << "Filters: \n +xmin #num +xmax #num  +[x,y,z,px,py,pz,theta,thetaT,gamma,e]min/max #num" << std::endl;
+		std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz] #num" << std::endl;
+		std::cout << "-dontask [TRIES TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
+		std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #num" << std::endl;
 		std::cout <<"----------Argument list------------------- " << std::endl;
 		return -1;
 	}
