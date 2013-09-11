@@ -52,7 +52,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			//			thetaT=(float) atan(py/px);				//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 			if (px > 0.0) ty = py/px;
-			else ty = 0.0;
+			else ty = 1e15;
 			tz = 0.0;
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
@@ -95,8 +95,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			}
 			else
 			{
-				ty = 0.0;
-				tz = 0.0;
+				ty = 1e15;
+				tz = 1e15;
 			}
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
