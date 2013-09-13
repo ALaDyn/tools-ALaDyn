@@ -240,42 +240,52 @@ _Filtro ::  _Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], f
 				flag = flag && flag_filtri . piu_pzmax;
 				break;
 			case __0X12: // cost::emin
+				nomi = emin;
 				flag_filtri . meno_Emin = E >= val[12];
 				flag = flag && flag_filtri . meno_Emin;
 				break;
 			case __0X13:  // cost::emax
+				nomi = emax;
 				flag_filtri . piu_Emax = E <= val[13];
 				flag = flag && flag_filtri . piu_Emax;
 				break;
 			case __0X14: // cost::thetamin
+				nomi = thetamin;
 				flag_filtri . meno_thetamin = theta >= val[14];
 				flag = flag && flag_filtri . meno_thetamin;
 				break;
 			case __0X15: // cost::thetamax
+				nomi = thetamax;
 				flag_filtri . piu_thetamax = theta <= val[15];
 				flag = flag && flag_filtri . piu_thetamax;
 				break;
 			case __0X16: // cost::thetaTmin
+				nomi = thetaTmin;
 				flag_filtri . meno_thetaTmin = thetaT >= val[16];
 				flag = flag && flag_filtri . meno_thetaTmin;
 				break;
 			case __0X17: // cost::thetaTmax
+				nomi = thetaTmax;
 				flag_filtri . piu_thetaTmax = thetaT <= val[17];
 				flag = flag && flag_filtri . piu_thetaTmax;
 				break;
 			case __0X18: // cost::tymin
+				nomi = tymin;
 				flag_filtri . meno_tymin = ty <= val[18];
 				flag = flag && flag_filtri . meno_tymin;
 				break;
 			case __0X19: // cost::tymax
+				nomi = tymax;
 				flag_filtri . piu_tymax = ty <= val[19];
 				flag = flag && flag_filtri . piu_tymax;
 				break;
 			case __0X20: // cost::tzmin
+				nomi = tzmin;
 				flag_filtri . meno_tzmin = tz <= val[20];
 				flag = flag && flag_filtri . meno_tzmin;
 				break;
 			case __0X21: // cost::tzmax
+				nomi = tzmax;
 				flag_filtri . piu_tzmax = tz <= val[21];
 				flag = flag && flag_filtri . piu_tzmax;
 				break;

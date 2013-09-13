@@ -2,7 +2,7 @@
 #define __LEGGI_ALADYN_FORTRAN
 
 
-#define ENABLE_DEBUG
+// #define ENABLE_DEBUG
 
 
 #define _CRT_SECURE_NO_WARNINGS		// VS does not bother anymore with sprintf and strtok
@@ -10,7 +10,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 0
+#define BUGFIX_RELEASE 1
 
 #include <iostream>
 #include <vector>
@@ -25,6 +25,7 @@
 #include <cstring>
 #include <string>
 #include <limits>
+#include <cfloat>
 #include <ios>
 #include <cstdarg>
 

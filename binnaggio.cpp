@@ -52,7 +52,7 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			//			thetaT=(float) atan(py/px);				//theta turch
 			E=(float)(gamma*parametri->massa_particella_MeV);	//energia
 			if (px > 0.0) ty = py/px;
-			else ty = 1e15;
+			else ty = FLT_MAX;
 			tz = 0.0;
 			if (binnare_su_x == 0) dato_da_binnare_x = x;
 			else if (binnare_su_x == 1) dato_da_binnare_x = y;
@@ -95,8 +95,8 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 			}
 			else
 			{
-				ty = 1e15;
-				tz = 1e15;
+				ty = FLT_MAX;
+				tz = FLT_MAX;
 			}
 			if (binnare_su_x < 6) dato_da_binnare_x = *(particelle+i*ndv+binnare_su_x);
 			else if (binnare_su_x == 6) dato_da_binnare_x = gamma;
@@ -166,7 +166,6 @@ _Binnaggio :: _Binnaggio(float * particelle, int npart, int ndv, Parametri * par
 	//	float z;
 	float x, y, px, py, pz, gamma, theta, thetaT, E, ty, tz;
 	float dato_da_binnare_x = 0.;
-	//printf("AIUTO binnare_su_x=%i     min=%g    max=%g   dim=%g\n",binnare_su_x, parametri->minimi[binnare_su_x], parametri->massimi[binnare_su_x], parametri->dimmi_dim(binnare_su_x));
 	fflush(stdout);
 	for (int i = 0; i < npart; i++)
 	{

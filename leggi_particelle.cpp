@@ -451,7 +451,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			dimensione_array_particelle = npart_loc;
 			val[0] = (unsigned int)npart_loc;
 			val[1] = (unsigned int)ndv;
+#ifdef ENABLE_DEBUG
 			printf("proc number \t %i \t npart=%i \n",conta_processori,npart_loc);
+#else
+			printf("proc number \t %i \t npart=%i \r",conta_processori,npart_loc);
+#endif
+			printf("\n");
 			fflush(stdout);
 			num_of_passes = 1;
 		}
@@ -510,7 +515,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					//	particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
 					//	printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
 					val[0] = (unsigned int)dimensione_array_particelle;
+#ifdef ENABLE_DEBUG
 					printf("npart_loc = %i\t\t ndv=%i\n",val[0], ndv);
+#else
+					printf("npart_loc = %i\t\t ndv=%i\r",val[0], ndv);
+#endif
+					printf("\n");
 					fflush(stdout);
 					fread_size = std::fread(particelle,sizeof(float),val[0]*ndv,file_in);
 					if (out_swap) swap_endian_f(particelle,val[0]*ndv);

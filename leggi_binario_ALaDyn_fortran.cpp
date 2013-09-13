@@ -21,6 +21,7 @@ int main (const int argc, const char *argv[])
 		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
 		std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
+		std::cout << "-dump_propaga -dump_csv -dump_clean -dump_xyzE -parameters -find_minxmax" << std::endl;
 		std::cout << "-do_binning [REQUIRED TO ENABLE BINNING FOR PLOTTING]" << std::endl;
 		std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #number" << std::endl;
 		std::cout << "-plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
@@ -65,20 +66,21 @@ int main (const int argc, const char *argv[])
 	{
 		parametri.old_fortran_bin = true;
 		std::cout << "Unable to find " << argv[1] << ".dat, using old routines" << std::endl;
-		parametri.chiedi_endian_file();
 
-		if (parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) 
+		if (parametri.p_b[SWAP]) parametri.chiedi_endian_file();
+
+		if ((parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) && parametri.p_b[NCOLONNE])
 
 			parametri.chiedi_numero_colonne();
 
 
 
-		if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
+		if ((parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
 			|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
 			|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
 			|| parametri.file_densita_HI || parametri.file_densita_LI
 			|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni 
-			|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI)
+			|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI) && parametri.p_b[NCOLONNE])
 
 			parametri.chiedi_2Do3D();
 	}
