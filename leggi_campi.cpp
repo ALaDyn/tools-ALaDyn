@@ -752,16 +752,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 		for (int k = inizio_punti_non_stretchati_z; k < fine_punti_non_stretchati_z; k++)
 		{
+			c = k - inizio_punti_non_stretchati_z;
 			for (int j = inizio_punti_non_stretchati_y; j < fine_punti_non_stretchati_y; j++)
 			{
+				b = j - inizio_punti_non_stretchati_y;
 				for (int i = inizio_punti_non_stretchati_x; i < fine_punti_non_stretchati_x; i++)
 				{
+					a = i - inizio_punti_non_stretchati_x;
 					field_non_stretchato[a+b*npunti_non_stretchati_x+c*npunti_non_stretchati_x*npunti_non_stretchati_y] = field[i+j*npunti_x+k*npunti_x*npunti_y];
-					a++;
 				}
-				b++;
 			}
-			c++;
 		}
 
 		if(parametri->endian_machine == 0) swap_endian_f(field_non_stretchato,npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z);
