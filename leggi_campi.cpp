@@ -725,15 +725,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		size_t npunti_non_stretchati_x, npunti_non_stretchati_y, npunti_non_stretchati_z;
 		if (parametri->stretched_grid)
 		{
-			npunti_non_stretchati_x = (size_t) (npunti_x*5.0/6.0);
-			npunti_non_stretchati_y = (size_t) (npunti_y*5.0/6.0);
-			npunti_non_stretchati_z = (size_t) (npunti_z*5.0/6.0);
 			inizio_punti_non_stretchati_x = (int) (npunti_x/6.0);
 			inizio_punti_non_stretchati_y = (int) (npunti_y/6.0);
 			inizio_punti_non_stretchati_z = (int) (npunti_z/6.0);
 			fine_punti_non_stretchati_x = (int) (npunti_x*5.0/6.0);
 			fine_punti_non_stretchati_y = (int) (npunti_y*5.0/6.0);
 			fine_punti_non_stretchati_z = (int) (npunti_z*5.0/6.0);
+			npunti_non_stretchati_x = (size_t) (fine_punti_non_stretchati_x - inizio_punti_non_stretchati_x);
+			npunti_non_stretchati_y = (size_t) (fine_punti_non_stretchati_y - inizio_punti_non_stretchati_y);
+			npunti_non_stretchati_z = (size_t) (fine_punti_non_stretchati_z - inizio_punti_non_stretchati_z);
+			
 		}
 		else
 		{
@@ -746,7 +747,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			inizio_punti_non_stretchati_x = inizio_punti_non_stretchati_y = inizio_punti_non_stretchati_z = 0;
 		}
 
-		float * field_non_stretchato = new float[npunti_non_stretchati_x*npunti_non_stretchati_x*npunti_non_stretchati_x];
+		float * field_non_stretchato = new float[npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z];
 		int a = 0, b = 0, c = 0;
 
 		for (int k = inizio_punti_non_stretchati_z; k < fine_punti_non_stretchati_z; k++)
@@ -776,6 +777,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		float zmin_non_stretchato = parametri->zcoord[inizio_punti_non_stretchati_z];
 		//		float zmax_non_stretchato = parametri->zcoord[fine_punti_non_stretchati_z];
 
+		dx=parametri->xcoord[npunti_x/2]-parametri->xcoord[npunti_x/2-1];
+		dy=parametri->ycoord[npunti_y/2]-parametri->ycoord[npunti_y/2-1];
+		dz=parametri->zcoord[npunti_z/2]-parametri->zcoord[npunti_z/2-1];
 		sprintf(nomefile_campi,"%s_nostretch.vtk",argv[1]);
 		clean_fields=fopen(nomefile_campi, "wb");
 		printf("\nWriting the fields file\n");
