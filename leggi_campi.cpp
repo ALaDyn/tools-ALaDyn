@@ -725,10 +725,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		size_t npunti_non_stretchati_x, npunti_non_stretchati_y, npunti_non_stretchati_z;
 		if (parametri->stretched_grid)
 		{
-			inizio_punti_non_stretchati_x = (int) (npunti_x/6.0);
+			inizio_punti_non_stretchati_x = 0;//(int) (npunti_x/6.0);
 			inizio_punti_non_stretchati_y = (int) (npunti_y/6.0);
 			inizio_punti_non_stretchati_z = (int) (npunti_z/6.0);
-			fine_punti_non_stretchati_x = (int) (npunti_x*5.0/6.0);
+			fine_punti_non_stretchati_x = (int) (npunti_x);
 			fine_punti_non_stretchati_y = (int) (npunti_y*5.0/6.0);
 			fine_punti_non_stretchati_z = (int) (npunti_z*5.0/6.0);
 			npunti_non_stretchati_x = (size_t) (fine_punti_non_stretchati_x - inizio_punti_non_stretchati_x);
