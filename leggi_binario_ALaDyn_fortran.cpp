@@ -21,6 +21,7 @@ int main (const int argc, const char *argv[])
 		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
 		std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
+		std::cout << "(use -no_stretch_x if the grid is not stretched along x axis)" << std::endl;
 		std::cout << "-dump_propaga -dump_csv -dump_clean -dump_xyzE -parameters -find_minxmax" << std::endl;
 		std::cout << "-do_binning [REQUIRED TO ENABLE BINNING FOR PLOTTING]" << std::endl;
 		std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #number" << std::endl;

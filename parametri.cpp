@@ -20,6 +20,7 @@ Parametri :: Parametri()
 	nuovi_dati_su_griglia = false;
 	multifile = false;
 	stretched_grid = true;
+	stretched_along_x = 1;
 	massa_particella_MeV = 0.;
 	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_ty = nbin_tz = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
 	tnow = 0.0;
@@ -546,9 +547,15 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-dump_vtk_nostretch")
 		{
-			std::cout << "You asked to have a VTK dump of the input file" << std::endl;
+			std::cout << "You asked to have a VTK dump of the non-stretched grid.\n";
+			std::cout << "If not explicitly said, the grid will be considered stretched in ALL directions" << std::endl;
 			p[OUT_VTK_NOSTRETCH] = 1;
 			p_b[OUT_VTK_NOSTRETCH] = false;
+		}
+		else if (std::string(argv[i]) == "-no_stretch_x")
+		{
+			std::cout << "Assuming the grid is NOT stretched along x axis.\n";
+			stretched_along_x = 0;
 		}
 		else if (std::string(argv[i]) == "-dump_cutx")
 		{
@@ -1549,6 +1556,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			std::cout << "Vuoi l'output binario VTK della parte non stretchata? 1 si', 0 no: ";
 			std::cin >> p[OUT_VTK_NOSTRETCH];
 			p_b[OUT_VTK_NOSTRETCH] = false;
+		}
+		if (p[OUT_VTK_NOSTRETCH] && !do_not_ask_missing)
+		{
+			std::cout << "La griglia e' stretchata anche lungo l'asse x? 1 si', 0 no: ";
+			std::cin >> stretched_along_x;
 		}
 		if (p[NCOLONNE] > 1)
 		{

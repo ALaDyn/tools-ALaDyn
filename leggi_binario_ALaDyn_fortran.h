@@ -10,7 +10,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 1
+#define BUGFIX_RELEASE 2
 
 #include <iostream>
 #include <vector>
@@ -158,6 +158,7 @@ struct Parametri
 	bool nuovi_dati_su_griglia;
 	bool multifile;
 	bool stretched_grid; 	//nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
+	int stretched_along_x;
 	float massa_particella_MeV;
 	int nbin, nbin_x, nbin_y, nbin_z, nbin_ty, nbin_tz, nbin_px, nbin_py, nbin_pz, nbin_E, nbin_theta, nbin_thetaT, nbin_gamma;
 	int endian_file, endian_machine;
