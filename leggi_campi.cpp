@@ -432,7 +432,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		printf("\nWriting the fields file 2D (not vtk)\n");
 
 		//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-		fprintf(clean_fields,"#%i\n#%i\n#%i\n",npunti_x, npunti_y, npunti_z); 
+		fprintf(clean_fields,"#%lu\n#%lu\n#%lu\n",npunti_x, npunti_y, npunti_z); 
 		fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
 		for(int j = 0; j < npunti_y; j++)
 		{
@@ -553,7 +553,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 			fprintf(clean_fields,"# 2D cut at z=%g\n", cutz[n]); 
-			fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_x, npunti_y, 1); 
+			fprintf(clean_fields,"# %lu\n#%lu\n#%i\n",npunti_x, npunti_y, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, ymin, xmax, ymax);
 			size_t k = gridIndex_cutz[n];
 			for(size_t j = 0; j < npunti_y; j++)
@@ -597,7 +597,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 			fprintf(clean_fields,"# 2D cut at y=%g\n", cuty[n]); 
-			fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_x, npunti_z, 1); 
+			fprintf(clean_fields,"# %lu\n#%lu\n#%i\n",npunti_x, npunti_z, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",xmin, zmin, xmax, zmax);
 			size_t j = gridIndex_cuty[n];
 			for(size_t k = 0; k < npunti_z; k++)
@@ -641,7 +641,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			printf("\nWriting the fields file 2D (not vtk)\n");
 			//output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
 			fprintf(clean_fields,"# 2D cut at x=%g\n", cutx[n]); 
-			fprintf(clean_fields,"# %i\n#%i\n#%i\n",npunti_y, npunti_z, 1); 
+			fprintf(clean_fields,"# %lu\n#%lu\n#%i\n",npunti_y, npunti_z, 1); 
 			fprintf(clean_fields,"#%f %f\n#%f %f\n",ymin, zmin, ymax, zmax);
 			size_t i = gridIndex_cutx[n];
 			for(size_t k = 0; k < npunti_z; k++)
@@ -691,7 +691,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"titolo mio\n");
 		fprintf(clean_fields,"BINARY\n");
 		fprintf(clean_fields,"DATASET UNSTRUCTURED_GRID\n");
-		fprintf(clean_fields,"POINTS %i float\n",npunti_x*((size_t)npunti_y)*npunti_z);
+		fprintf(clean_fields,"POINTS %lu float\n",npunti_x*((size_t)npunti_y)*npunti_z);
 		float rr[3];
 		for(size_t k=0;k<npunti_z;k++)
 		{
@@ -707,7 +707,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 			}
 		}
 
-		fprintf(clean_fields,"POINT_DATA %i\n",npunti_x*npunti_y*npunti_z);
+		fprintf(clean_fields,"POINT_DATA %lu\n",npunti_x*npunti_y*npunti_z);
 		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
 		fwrite((void*)field,sizeof(float),npunti_x*((size_t)npunti_y)*npunti_z,clean_fields);
@@ -788,10 +788,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 		fprintf(clean_fields,"titolo mio\n");
 		fprintf(clean_fields,"BINARY\n");
 		fprintf(clean_fields,"DATASET STRUCTURED_POINTS\n");
-		fprintf(clean_fields,"DIMENSIONS %i %i %i\n",npunti_non_stretchati_x, npunti_non_stretchati_y, npunti_non_stretchati_z);
+		fprintf(clean_fields,"DIMENSIONS %lu %lu %lu\n",npunti_non_stretchati_x, npunti_non_stretchati_y, npunti_non_stretchati_z);
 		fprintf(clean_fields,"ORIGIN %f %f %f\n",xmin_non_stretchato, ymin_non_stretchato, zmin_non_stretchato);
 		fprintf(clean_fields,"SPACING %f %f %f\n",dx, dy, dz);
-		fprintf(clean_fields,"POINT_DATA %i\n",npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z);
+		fprintf(clean_fields,"POINT_DATA %lu\n",npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z);
 		fprintf(clean_fields,"SCALARS %s float 1\n",parametri->support_label);
 		fprintf(clean_fields,"LOOKUP_TABLE default\n");
 		fwrite((void*)field_non_stretchato,sizeof(float),npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z,clean_fields);
