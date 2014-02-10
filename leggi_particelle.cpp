@@ -18,6 +18,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int contatori[] = {0,0,0};
 	float zero = 0.0f;
 	long long particelle_accumulate = 0;
+	double peso_accumulato = 0.0;
 	int dim_file_in_bytes, num_of_floats_in_file, num_of_particles_in_file, num_of_passes, num_residual_particles;
 	int dimensione_array_particelle;
 	unsigned int val[2];
@@ -52,7 +53,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int N_param, *int_param, npart_loc;
 	int buff, pID;
 
-	float x,y,z,px,py,pz;
+	float x,y,z,px,py,pz,ptot;
 	float gamma, theta, thetaT, E, ty, tz;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	float *estremi_min, *estremi_max;
@@ -73,7 +74,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	ndv = parametri->p[NCOLONNE];
 	float tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0x,w0y,nrat,a0,lam0,E0,ompe,xt_in,xt_end,charge,mass, np_over_nm;
 	double emittance_x = 0.0, emittance_y = 0.0, emittance_z = 0.0;
-	double em_x2 = 0.0, em_x = 0.0, em_y2 = 0.0, em_y = 0.0, em_z2 = 0.0, em_z = 0.0;
+	double em_weight = 0.0, em_x2 = 0.0, em_x = 0.0, em_y2 = 0.0, em_y = 0.0, em_z2 = 0.0, em_z = 0.0;
 	double em_px2 = 0.0, em_px = 0.0, em_py2 = 0.0, em_py = 0.0, em_pz2 = 0.0, em_pz = 0.0, em_xpx = 0.0, em_ypy = 0.0, em_zpz = 0.0;
 	int tipo = 0;
 	if (argv[1][0] == 'E') tipo = 3;
@@ -543,6 +544,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							px = *(particelle + i*ndv + 3);
 							py = *(particelle + i*ndv + 4);
 							pz = *(particelle + i*ndv + 5);
+							ptot = sqrt(px*px + py*py + pz*pz);
+							px /= ptot;
+							py /= ptot;
+							pz /= ptot;
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+								em_weight = *(particelle + i*ndv + 6);
+							else
+								em_weight = parametri->overwrite_weight_value;
 						}
 						else if (ndv == 4 || ndv == 5)
 						{
@@ -552,23 +561,31 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							px = *(particelle + i*ndv + 2);
 							py = *(particelle + i*ndv + 3);
 							pz = 0.0;
+							ptot = sqrt(px*px + py*py);
+							px /= ptot;
+							py /= ptot;
+							if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+								em_weight = *(particelle + i*ndv + 4);
+							else
+								em_weight = parametri->overwrite_weight_value;
 						}
 
-						em_x += (double) x;
-						em_y += (double) y;
-						em_z += (double) z;
-						em_x2 += (double) (x*x);
-						em_y2 += (double) (y*y);
-						em_z2 += (double) (z*z);
-						em_px += (double) px;
-						em_py += (double) py;
-						em_pz += (double) pz;
-						em_px2 += (double) (px*px);
-						em_py2 += (double) (py*py);
-						em_pz2 += (double) (pz*pz);
-						em_xpx += (double) (x*px);
-						em_ypy += (double) (y*py);
-						em_zpz += (double) (z*pz);
+						em_x += (double)(x*em_weight);
+						em_y += (double)(y*em_weight);
+						em_z += (double)(z*em_weight);
+						em_x2 += (double)((x*x)*em_weight);
+						em_y2 += (double)((y*y)*em_weight);
+						em_z2 += (double)((z*z)*em_weight);
+						em_px += (double)(px*em_weight);
+						em_py += (double)(py*em_weight);
+						em_pz += (double)(pz*em_weight);
+						em_px2 += (double)((px*px)*em_weight);
+						em_py2 += (double)((py*py)*em_weight);
+						em_pz2 += (double)((pz*pz)*em_weight);
+						em_xpx += (double)((x*px)*em_weight);
+						em_ypy += (double)((y*py)*em_weight);
+						em_zpz += (double)((z*pz)*em_weight);
+						peso_accumulato += em_weight;
 					}
 				}
 
@@ -898,21 +915,21 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 	if (out_parameters)
 	{
-		em_x /= (double)particelle_accumulate;
-		em_y /= (double)particelle_accumulate;
-		em_z /= (double)particelle_accumulate;
-		em_px /= (double)particelle_accumulate;
-		em_py /= (double)particelle_accumulate;
-		em_pz /= (double)particelle_accumulate;
-		em_x2 /= (double)particelle_accumulate;
-		em_y2 /= (double)particelle_accumulate;
-		em_z2 /= (double)particelle_accumulate;
-		em_px2 /= (double)particelle_accumulate;
-		em_py2 /= (double)particelle_accumulate;
-		em_pz2 /= (double)particelle_accumulate;
-		em_xpx /= (double)particelle_accumulate;
-		em_ypy /= (double)particelle_accumulate;
-		em_zpz /= (double)particelle_accumulate;
+		em_x /= (double)peso_accumulato;
+		em_y /= (double)peso_accumulato;
+		em_z /= (double)peso_accumulato;
+		em_px /= (double)peso_accumulato;
+		em_py /= (double)peso_accumulato;
+		em_pz /= (double)peso_accumulato;
+		em_x2 /= (double)peso_accumulato;
+		em_y2 /= (double)peso_accumulato;
+		em_z2 /= (double)peso_accumulato;
+		em_px2 /= (double)peso_accumulato;
+		em_py2 /= (double)peso_accumulato;
+		em_pz2 /= (double)peso_accumulato;
+		em_xpx /= (double)peso_accumulato;
+		em_ypy /= (double)peso_accumulato;
+		em_zpz /= (double)peso_accumulato;
 
 		emittance_x = sqrt((em_x2 - em_x*em_x)*(em_px2 - em_px*em_px) - (em_xpx - em_x*em_px)*(em_xpx - em_x*em_px));
 		emittance_y = sqrt((em_y2 - em_y*em_y)*(em_py2 - em_py*em_py) - (em_ypy - em_y*em_py)*(em_ypy - em_y*em_py));
