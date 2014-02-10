@@ -251,7 +251,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 				fflush(stdout);
 
 				buffer = new float[loc_size];
-				//	buffer=(float*)malloc(loc_size*sizeof(float));
+				//buffer=(float*)malloc(loc_size*sizeof(float));
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
 				fread_size = std::fread(buffer,sizeof(float),loc_size,file_in);
 				fread_size = std::fread(&buff,sizeof(int),1,file_in);
@@ -263,10 +263,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 						for(size_t i=0; i<nxloc; i++)
 							field[i+(j+segnoy)*npunti_x+(k+segnoz)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
 				segnoy += nyloc;
+				delete[] buffer;
+				buffer = NULL;
 			} 
 			segnoz += nzloc;
-			delete[] buffer;
-			buffer = NULL;
+			
 		}
 
 		// leggiamo ora le coordinate dei punti di griglia, presenti solo nelle versioni che possono prevedere griglia stretchata e che ancora non la scrivevano nel .dat
@@ -356,10 +357,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 							for(size_t i=0; i<nxloc; i++)
 								field[i+(j+segnoy)*npunti_x+(k+segnoz)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
 					segnoy += nyloc;
+					delete[] buffer;
+					buffer = NULL;
 				}
 				segnoz += nzloc;
-				delete[] buffer;
-				buffer = NULL;
+				
 			}
 
 			printf("=========FINE LETTURE==========\n");
@@ -410,10 +412,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 							for(size_t i=0; i<nxloc; i++)
 								field[i+(j+segnoy)*npunti_x+(k+segnoz)*npunti_x*npunti_y]=buffer[i+j*nxloc+k*nxloc*nyloc];
 					segnoy += nyloc;
+					delete[] buffer;
+					buffer = NULL;
 				}
 				segnoz += nzloc;
-				delete[] buffer;
-				buffer = NULL;
+				
 				indice_multifile++;
 				fclose(file_in);
 			}
