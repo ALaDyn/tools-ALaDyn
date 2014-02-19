@@ -3,7 +3,7 @@
 
 
 
-int main (const int argc, const char *argv[])
+int main(const int argc, const char *argv[])
 {
 
 	Parametri parametri;
@@ -16,7 +16,7 @@ int main (const int argc, const char *argv[])
 		std::cout << "-interactive: ./reader filebasename (so do not put file extension!)" << std::endl;
 		std::cout << "-batch:       ./reader filebasename -arguments" << std::endl;
 
-		std::cout <<"----------Argument list------------------- " << std::endl;
+		std::cout << "----------Argument list------------------- " << std::endl;
 		std::cout << "-params (write a .parameters file with params from .bin/.dat files)" << std::endl;
 		std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
 		std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
@@ -31,7 +31,7 @@ int main (const int argc, const char *argv[])
 		std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz] #num" << std::endl;
 		std::cout << "-dontask [TRIES TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
 		std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #num" << std::endl;
-		std::cout <<"----------Argument list------------------- " << std::endl;
+		std::cout << "----------Argument list------------------- " << std::endl;
 		return -1;
 	}
 
@@ -42,13 +42,13 @@ int main (const int argc, const char *argv[])
 	std::ifstream file_dat, file_bin;
 
 	/* Controllo file binario */
-	file_bin.open(nomefile_bin.str().c_str(),std::ios::binary|std::ios::in);
-	if ( file_bin.fail() )
+	file_bin.open(nomefile_bin.str().c_str(), std::ios::binary | std::ios::in);
+	if (file_bin.fail())
 	{
 		nomefile_bin.str("");
 		nomefile_bin << std::string(argv[1]) << "_000.bin";
-		file_bin.open(nomefile_bin.str().c_str(),std::ios::binary|std::ios::in);
-		if ( file_bin.fail() )
+		file_bin.open(nomefile_bin.str().c_str(), std::ios::binary | std::ios::in);
+		if (file_bin.fail())
 		{
 			std::cout << "Input file non trovato" << std::endl;
 			return -3;
@@ -56,14 +56,14 @@ int main (const int argc, const char *argv[])
 		else parametri.multifile = true;
 	}
 	else parametri.multifile = false;
-	if(parametri.multifile) std::cout << "Input files are " << argv[1] << "_???.bin" << std::endl;
+	if (parametri.multifile) std::cout << "Input files are " << argv[1] << "_???.bin" << std::endl;
 	else std::cout << "Input file is " << argv[1] << ".bin" << std::endl;
 	parametri.check_filename(argv[1]);
 	file_bin.close();
 
 	/* Controllo file ascii */
 	file_dat.open(nomefile_dat.str().c_str());
-	if (file_dat.fail()) 
+	if (file_dat.fail())
 	{
 		parametri.old_fortran_bin = true;
 		std::cout << "Unable to find " << argv[1] << ".dat, using old routines" << std::endl;
@@ -76,11 +76,11 @@ int main (const int argc, const char *argv[])
 
 
 
-		if ((parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
-			|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
-			|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
+		if ((parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
+			|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
+			|| parametri.file_densita_elettroni || parametri.file_densita_protoni
 			|| parametri.file_densita_HI || parametri.file_densita_LI
-			|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni 
+			|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni
 			|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI) && parametri.p_b[NCOLONNE])
 
 			parametri.chiedi_2Do3D();
@@ -94,12 +94,12 @@ int main (const int argc, const char *argv[])
 	file_dat.close();
 
 
-	if (parametri.endian_file == parametri.endian_machine) 
+	if (parametri.endian_file == parametri.endian_machine)
 	{
 		parametri.p[SWAP] = 0;
 		parametri.p_b[SWAP] = false;
 	}
-	else 
+	else
 	{
 		parametri.p[SWAP] = 1;
 		parametri.p_b[SWAP] = false;
@@ -116,7 +116,7 @@ int main (const int argc, const char *argv[])
 
 	testParametri = parametri.check_parametri();
 
-	if ( testParametri == false )
+	if (testParametri == false)
 	{
 		std::cout << "Parametri non coerenti" << std::endl;
 		return -2;
@@ -153,18 +153,18 @@ int main (const int argc, const char *argv[])
 #endif
 
 
-	if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez 
-		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz 
-		|| parametri.file_densita_elettroni || parametri.file_densita_protoni 
-		|| parametri.file_densita_HI || parametri.file_densita_LI
-		|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni 
+	if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
+		|| parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
+		|| parametri.file_densita_elettroni || parametri.file_densita_protoni
+		|| parametri.file_densita_HI || parametri.file_densita_LI || parametri.file_densita_driver
+		|| parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni
 		|| parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI)
 
 		leggi_campi(argc, argv, &parametri);
 
 
-	else if (parametri.file_particelle_P || parametri.file_particelle_E 
-		|| parametri.file_particelle_HI || parametri.file_particelle_LI) 
+	else if (parametri.file_particelle_P || parametri.file_particelle_E
+		|| parametri.file_particelle_HI || parametri.file_particelle_LI)
 
 		leggi_particelle(argc, argv, &parametri);
 

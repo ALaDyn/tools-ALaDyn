@@ -5,13 +5,13 @@
 
 
 
-/* costruttore default - inizializza a zero per ora. Siccome tutto e' inizializzato a zero 
+/* costruttore default - inizializza a zero per ora. Siccome tutto e' inizializzato a zero
 non puo' nemmeno calcolare le le dimensioni dei bin!
 Verificare che non ci siano cose intelligenti da poter fare! */
-Parametri :: Parametri()
+Parametri::Parametri()
 {
-	intpar.resize(NUMERO_PARAMETRI_FILE_DAT,0);
-	realpar.resize(NUMERO_PARAMETRI_FILE_DAT,0.0);
+	intpar.resize(NUMERO_PARAMETRI_FILE_DAT, 0);
+	realpar.resize(NUMERO_PARAMETRI_FILE_DAT, 0.0);
 	subsample = 1;
 	span = 5;
 	ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
@@ -43,7 +43,7 @@ Parametri :: Parametri()
 
 	last_cpu = MAX_NUMBER_OF_CPUS;		// il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
 
-	for (int i = 0; i < NPARAMETRI; i++) 
+	for (int i = 0; i < NPARAMETRI; i++)
 	{
 		p_b[i] = true;
 		p[i] = -1;
@@ -54,63 +54,63 @@ Parametri :: Parametri()
 	endian_machine = is_big_endian();
 	file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = false;
 	file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
-	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = false;
+	file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = file_densita_driver = false;
 	file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false;
 }
 
 
 
-float Parametri :: dimmi_dimx()
+float Parametri::dimmi_dimx()
 {
 	return (xmax - xmin) / static_cast <float> (nbin_x);
 }
-float Parametri :: dimmi_dimy()
+float Parametri::dimmi_dimy()
 {
 	return (ymax - ymin) / static_cast <float> (nbin_y);
 }
-float Parametri :: dimmi_dimz()
+float Parametri::dimmi_dimz()
 {
 	return (zmax - zmin) / static_cast <float> (nbin_z);
 }
-float Parametri :: dimmi_dimty()
+float Parametri::dimmi_dimty()
 {
 	return (tymax - tymin) / static_cast <float> (nbin_ty);
 }
-float Parametri :: dimmi_dimtz()
+float Parametri::dimmi_dimtz()
 {
 	return (tzmax - tzmin) / static_cast <float> (nbin_tz);
 }
-float Parametri :: dimmi_dimpx()
+float Parametri::dimmi_dimpx()
 {
 	return (pxmax - pxmin) / static_cast <float> (nbin_px);
 }
-float Parametri :: dimmi_dimpy()
+float Parametri::dimmi_dimpy()
 {
 	return (pymax - pymin) / static_cast <float> (nbin_py);
 }
-float Parametri :: dimmi_dimpz()
+float Parametri::dimmi_dimpz()
 {
 	return (pzmax - pzmin) / static_cast <float> (nbin_pz);
 }
-float Parametri :: dimmi_dimgamma()
+float Parametri::dimmi_dimgamma()
 {
 	return (gammamax - gammamin) / static_cast <float> (nbin_gamma);
 }
-float Parametri :: dimmi_dimtheta()
+float Parametri::dimmi_dimtheta()
 {
 	return (thetamax - thetamin) / static_cast <float> (nbin_theta);
 }
-float Parametri :: dimmi_dimthetaT()
+float Parametri::dimmi_dimthetaT()
 {
 	return (thetaTmax - thetaTmin) / static_cast <float> (nbin_thetaT);
 }
-float Parametri :: dimmi_dimE()
+float Parametri::dimmi_dimE()
 {
 	return (Emax - Emin) / static_cast <float> (nbin_E);
 }
 
 
-int Parametri :: dimmi_nbin(int colonna)
+int Parametri::dimmi_nbin(int colonna)
 {
 	if (colonna == 0)		return nbin_x;
 	else if (colonna == 1)	return nbin_y;
@@ -129,7 +129,7 @@ int Parametri :: dimmi_nbin(int colonna)
 
 
 
-float Parametri :: dimmi_dim(int colonna)
+float Parametri::dimmi_dim(int colonna)
 {
 	if (colonna == 0)		return dimmi_dimx();
 	else if (colonna == 1)	return dimmi_dimy();
@@ -147,13 +147,13 @@ float Parametri :: dimmi_dim(int colonna)
 }
 
 
-void Parametri :: leggi_file_dat(std::ifstream& file_dat)
+void Parametri::leggi_file_dat(std::ifstream& file_dat)
 {
 	std::string riga_persa;
 	int fattore_ricampionamento;
 	int discriminante_versione_file;
 	float coord;
-	std::getline(file_dat,riga_persa);	// per leggere la riga Integer parameters
+	std::getline(file_dat, riga_persa);	// per leggere la riga Integer parameters
 
 	for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++) file_dat >> intpar[i];
 	ncpu_x = 1;
@@ -172,8 +172,8 @@ void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 	discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->nuovi_dati_su_griglia che e' un semplice bool e di piu' difficile lettura
 	endianness = intpar[19];
 
-	std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
-	std::getline(file_dat,riga_persa);	// per leggere la riga Real parameters
+	std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
+	std::getline(file_dat, riga_persa);	// per leggere la riga Real parameters
 
 	for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++) file_dat >> realpar[i];
 	tnow = realpar[0];
@@ -205,8 +205,8 @@ void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 
 		if (nuovi_dati_su_griglia)
 		{
-			std::getline(file_dat,riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei float
-			std::getline(file_dat,riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
+			std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei float
+			std::getline(file_dat, riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
 
 
 			for (int i = 0; i < npunti_x_ricampionati; i++)
@@ -228,11 +228,11 @@ void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 		else			// mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
 		{
 			float dx, dy, dz;
-			if (npunti_x_ricampionati > 1) dx = (xmax - xmin) / (npunti_x_ricampionati-1);
+			if (npunti_x_ricampionati > 1) dx = (xmax - xmin) / (npunti_x_ricampionati - 1);
 			else dx = (xmax - xmin);
-			if (npunti_y_ricampionati > 1) dy = (ymax - ymin) / (npunti_y_ricampionati-1);
+			if (npunti_y_ricampionati > 1) dy = (ymax - ymin) / (npunti_y_ricampionati - 1);
 			else dy = (ymax - ymin);
-			if (npunti_z_ricampionati > 1) dz = (zmax - zmin) / (npunti_z_ricampionati-1);
+			if (npunti_z_ricampionati > 1) dz = (zmax - zmin) / (npunti_z_ricampionati - 1);
 			else dz = (zmax - zmin);
 
 			for (int i = 0; i < npunti_x_ricampionati; i++)
@@ -252,16 +252,16 @@ void Parametri :: leggi_file_dat(std::ifstream& file_dat)
 			}
 		}
 	}
-	endian_file = (endianness-1);
+	endian_file = (endianness - 1);
 }
 
-void Parametri :: chiedi_numero_colonne()
+void Parametri::chiedi_numero_colonne()
 {
 	int ncolonne;
 	std::cout << "Il file contiene 4, 5, 6 o 7 colonne? ";
 	std::cin >> ncolonne;
-	if (ncolonne==6 || ncolonne==4) p[WEIGHT] = 0;
-	else if (ncolonne==7 || ncolonne==5) p[WEIGHT] = 1;
+	if (ncolonne == 6 || ncolonne == 4) p[WEIGHT] = 0;
+	else if (ncolonne == 7 || ncolonne == 5) p[WEIGHT] = 1;
 	else exit(-5);
 	p[NCOLONNE] = ncolonne;
 	p_b[NCOLONNE] = false;
@@ -269,13 +269,13 @@ void Parametri :: chiedi_numero_colonne()
 }
 
 
-void Parametri :: chiedi_2Do3D()
+void Parametri::chiedi_2Do3D()
 {
 	int dimensioni;
 	std::cout << "E' una griglia 3D (3) o 2D (2)? ";
 	std::cin >> dimensioni;
-	if (dimensioni==2) p[NCOLONNE] = 1;
-	else if (dimensioni==3) p[NCOLONNE] = 3;
+	if (dimensioni == 2) p[NCOLONNE] = 1;
+	else if (dimensioni == 3) p[NCOLONNE] = 3;
 	else
 	{
 		std::cout << "Choice not valid" << std::endl;
@@ -285,7 +285,7 @@ void Parametri :: chiedi_2Do3D()
 }
 
 
-void Parametri :: chiedi_endian_file()
+void Parametri::chiedi_endian_file()
 {
 	std::cout << "Il file e' little [x86] (0) o big [ppc] (1) endian? ";
 	std::cin >> endian_file;
@@ -293,7 +293,7 @@ void Parametri :: chiedi_endian_file()
 }
 
 
-void Parametri :: check_filename(const char *nomefile)
+void Parametri::check_filename(const char *nomefile)
 {
 	if (nomefile[0] == 'P')
 	{
@@ -301,19 +301,29 @@ void Parametri :: check_filename(const char *nomefile)
 		{
 			if (nomefile[2] == 'p')
 			{
-				massa_particella_MeV = (float) MP_MEV;
+				massa_particella_MeV = (float)MP_MEV;
 				file_particelle_P = true;
 			}
 			else if (nomefile[2] == 'e')
 			{
 				file_densita_energia_griglia_protoni = true;
-				sprintf (support_label,"pren");
+				sprintf(support_label, "pren");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'd')
 		{
 			file_densita_protoni = true;
-			sprintf (support_label,"pden");
+			sprintf(support_label, "pden");
+		}
+		else
+		{
+			std::cout << "File non riconosciuto" << std::endl;
+			exit(-15);
 		}
 	}
 	else if (nomefile[0] == 'H')
@@ -322,19 +332,29 @@ void Parametri :: check_filename(const char *nomefile)
 		{
 			if (nomefile[2] == 'p')
 			{
-				massa_particella_MeV = (float) MP_MEV;
+				massa_particella_MeV = (float)MP_MEV;
 				file_particelle_HI = true;
 			}
 			else if (nomefile[2] == 'd')
 			{
 				file_densita_HI = true;
-				sprintf (support_label,"hidn");
+				sprintf(support_label, "hidn");
 			}
 			else if (nomefile[2] == 'e')
 			{
 				file_densita_energia_griglia_HI = true;
-				sprintf (support_label,"hien");
+				sprintf(support_label, "hien");
 			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
+			}
+		}
+		else
+		{
+			std::cout << "File non riconosciuto" << std::endl;
+			exit(-15);
 		}
 	}
 	else if (nomefile[0] == 'L')
@@ -343,19 +363,29 @@ void Parametri :: check_filename(const char *nomefile)
 		{
 			if (nomefile[2] == 'p')
 			{
-				massa_particella_MeV = (float) MP_MEV;
+				massa_particella_MeV = (float)MP_MEV;
 				file_particelle_LI = true;
 			}
 			else if (nomefile[2] == 'd')
 			{
 				file_densita_LI = true;
-				sprintf (support_label,"lidn");
+				sprintf(support_label, "lidn");
 			}
 			else if (nomefile[2] == 'e')
 			{
 				file_densita_energia_griglia_LI = true;
-				sprintf (support_label,"lien");
+				sprintf(support_label, "lien");
 			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
+			}
+		}
+		else
+		{
+			std::cout << "File non riconosciuto" << std::endl;
+			exit(-15);
 		}
 	}
 	else if (nomefile[0] == 'E')
@@ -364,13 +394,18 @@ void Parametri :: check_filename(const char *nomefile)
 		{
 			if (nomefile[2] == 'p')
 			{
-				massa_particella_MeV = (float) ME_MEV;
+				massa_particella_MeV = (float)ME_MEV;
 				file_particelle_E = true;
 			}
 			else if (nomefile[2] == 'e')
 			{
 				file_densita_energia_griglia_elettroni = true;
-				sprintf (support_label,"elen");
+				sprintf(support_label, "elen");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'x')
@@ -378,7 +413,12 @@ void Parametri :: check_filename(const char *nomefile)
 			if (nomefile[2] == 'f')
 			{
 				file_campi_Ex = true;
-				sprintf (support_label,"Ex");
+				sprintf(support_label, "Ex");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'y')
@@ -386,7 +426,12 @@ void Parametri :: check_filename(const char *nomefile)
 			if (nomefile[2] == 'f')
 			{
 				file_campi_Ey = true;
-				sprintf (support_label,"Ey");
+				sprintf(support_label, "Ey");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'z')
@@ -394,13 +439,23 @@ void Parametri :: check_filename(const char *nomefile)
 			if (nomefile[2] == 'f')
 			{
 				file_campi_Ez = true;
-				sprintf (support_label,"Ez");
+				sprintf(support_label, "Ez");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'd')
 		{
 			file_densita_elettroni = true;
-			sprintf (support_label,"eden");
+			sprintf(support_label, "eden");
+		}
+		else
+		{
+			std::cout << "File non riconosciuto" << std::endl;
+			exit(-15);
 		}
 	}
 	else if (nomefile[0] == 'B')
@@ -410,7 +465,12 @@ void Parametri :: check_filename(const char *nomefile)
 			if (nomefile[2] == 'f')
 			{
 				file_campi_Bx = true;
-				sprintf (support_label,"Bx");
+				sprintf(support_label, "Bx");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'y')
@@ -418,7 +478,12 @@ void Parametri :: check_filename(const char *nomefile)
 			if (nomefile[2] == 'f')
 			{
 				file_campi_By = true;
-				sprintf (support_label,"By");
+				sprintf(support_label, "By");
+			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
 			}
 		}
 		else if (nomefile[1] == 'z')
@@ -426,8 +491,23 @@ void Parametri :: check_filename(const char *nomefile)
 			if (nomefile[2] == 'f')
 			{
 				file_campi_Bz = true;
-				sprintf (support_label,"Bz");
+				sprintf(support_label, "Bz");
 			}
+			else
+			{
+				std::cout << "File non riconosciuto" << std::endl;
+				exit(-15);
+			}
+		}
+		else if (nomefile[1] == 'd')
+		{
+			file_densita_driver = true;
+			sprintf(support_label, "Bd");
+		}
+		else
+		{
+			std::cout << "File non riconosciuto" << std::endl;
+			exit(-15);
 		}
 	}
 	else
@@ -438,13 +518,13 @@ void Parametri :: check_filename(const char *nomefile)
 
 }
 
-void Parametri :: parse_command_line(int argc, const char ** argv)
+void Parametri::parse_command_line(int argc, const char ** argv)
 {
 	std::ifstream fileParametri;
 	std::string nomefile;
 	bool usa_file_parametri = false;
 	bool failed_opening_file;
-	for (int i = 2; i < argc; i++)	
+	for (int i = 2; i < argc; i++)
 		/************************************************************************
 		We will iterate over argv[] to get the parameters stored inside.
 		Note that we're starting on 1 because we don't need to know the
@@ -454,18 +534,18 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 	{
 		//	  std::cout << argv[i] << std::endl;
 
-		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile" )
+		if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile")
 		{
-			if (i < argc-1 && argv[i+1][0] != '-') 
+			if (i < argc - 1 && argv[i + 1][0] != '-')
 			{
-				nomefile = std::string(argv[i+1]);
+				nomefile = std::string(argv[i + 1]);
 				usa_file_parametri = true;
 				i++;
 				std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
 			}
 			else
 			{
-				nomefile = std::string(argv[1])+".extremes";
+				nomefile = std::string(argv[1]) + ".extremes";
 				usa_file_parametri = true;
 				std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
 			}
@@ -495,21 +575,21 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-stop")
 		{
-			last_cpu = atoi(argv[i+1]);
+			last_cpu = atoi(argv[i + 1]);
 			if (last_cpu < 1) last_cpu = 1;
 			std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-span")
 		{
-			span = atoi(argv[i+1]);
+			span = atoi(argv[i + 1]);
 			if (span < 0) span = 0;
 			std::cout << "Span factor for lineout: " << span << std::endl;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-subsample")
 		{
-			subsample = atoi(argv[i+1]);
+			subsample = atoi(argv[i + 1]);
 			if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 			{
 				if (subsample < 1)
@@ -530,7 +610,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-ncol")
 		{
-			int ncolumns = atoi(argv[i+1]);
+			int ncolumns = atoi(argv[i + 1]);
 			p[NCOLONNE] = ncolumns;
 			if (ncolumns == 6) p[WEIGHT] = 0;
 			else if (ncolumns == 7) p[WEIGHT] = 1;
@@ -559,11 +639,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-dump_cutx")
 		{
-			if (p[NCOLONNE]>1)
+			if (p[NCOLONNE] > 1)
 			{
-				if (argv[i+1][0] != '-')
+				if (argv[i + 1][0] != '-')
 				{
-					float posizione_taglio = (float) atof(argv[i+1]);
+					float posizione_taglio = (float)atof(argv[i + 1]);
 					posizioni_taglio_griglia_x.push_back(posizione_taglio);
 					std::cout << "You asked to cut the grid at x = " << posizione_taglio << std::endl;
 					i++;
@@ -578,7 +658,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			else
 			{
 				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
-				if (argv[i+1][0] != '-') i++;
+				if (argv[i + 1][0] != '-') i++;
 				p[OUT_CUTX] = 0;
 				p_b[OUT_CUTX] = false;
 			}
@@ -586,11 +666,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 
 		else if (std::string(argv[i]) == "-dump_cuty")
 		{
-			if (p[NCOLONNE]>1)
+			if (p[NCOLONNE] > 1)
 			{
-				if (argv[i+1][0] != '-')
+				if (argv[i + 1][0] != '-')
 				{
-					float posizione_taglio = (float) atof(argv[i+1]);
+					float posizione_taglio = (float)atof(argv[i + 1]);
 					posizioni_taglio_griglia_y.push_back(posizione_taglio);
 					std::cout << "You asked to cut the grid at y = " << posizione_taglio << std::endl;
 					i++;
@@ -605,7 +685,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			else
 			{
 				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
-				if (argv[i+1][0] != '-') i++;
+				if (argv[i + 1][0] != '-') i++;
 				p[OUT_CUTY] = 0;
 				p_b[OUT_CUTY] = false;
 			}
@@ -613,11 +693,11 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 
 		else if (std::string(argv[i]) == "-dump_cutz")
 		{
-			if (p[NCOLONNE]>1)
+			if (p[NCOLONNE] > 1)
 			{
-				if (argv[i+1][0] != '-')
+				if (argv[i + 1][0] != '-')
 				{
-					float posizione_taglio = (float) atof(argv[i+1]);
+					float posizione_taglio = (float)atof(argv[i + 1]);
 					posizioni_taglio_griglia_z.push_back(posizione_taglio);
 					std::cout << "You asked to cut the grid at z = " << posizione_taglio << std::endl;
 					i++;
@@ -632,7 +712,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 			else
 			{
 				std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
-				if (argv[i+1][0] != '-') i++;
+				if (argv[i + 1][0] != '-') i++;
 				p[OUT_CUTZ] = 0;
 				p_b[OUT_CUTZ] = false;
 			}
@@ -704,39 +784,39 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-xmin")
 		{
-			xmin = (float) atof(argv[i+1]);
+			xmin = (float)atof(argv[i + 1]);
 			xmin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-xmax")
 		{
-			xmax = (float) atof(argv[i+1]);
+			xmax = (float)atof(argv[i + 1]);
 			xmax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-weight")
 		{
 			overwrite_weight = true;
-			overwrite_weight_value = (float) atof(argv[i+1]);
+			overwrite_weight_value = (float)atof(argv[i + 1]);
 			i++;
 		}
 		else if (std::string(argv[i]) == "-ymin")
 		{
-			ymin = (float) atof(argv[i+1]);
+			ymin = (float)atof(argv[i + 1]);
 			ymin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-ymax")
 		{
-			ymax = (float) atof(argv[i+1]);
+			ymax = (float)atof(argv[i + 1]);
 			ymax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-zmin")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
-				zmin = (float) atof(argv[i+1]);
+				zmin = (float)atof(argv[i + 1]);
 				zmin_b = false;
 				i++;
 			}
@@ -747,9 +827,9 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-zmax")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
-				zmax = (float) atof(argv[i+1]);
+				zmax = (float)atof(argv[i + 1]);
 				zmax_b = false;
 				i++;
 			}
@@ -760,21 +840,21 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-tymin")
 		{
-			tymin = (float) atof(argv[i+1]);
+			tymin = (float)atof(argv[i + 1]);
 			tymin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-tymax")
 		{
-			tymax = (float) atof(argv[i+1]);
+			tymax = (float)atof(argv[i + 1]);
 			tymax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-tzmin")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
-				tzmin = (float) atof(argv[i+1]);
+				tzmin = (float)atof(argv[i + 1]);
 				tzmin_b = false;
 				i++;
 			}
@@ -785,9 +865,9 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-tzmax")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
-				tzmax = (float) atof(argv[i+1]);
+				tzmax = (float)atof(argv[i + 1]);
 				tzmax_b = false;
 				i++;
 			}
@@ -798,33 +878,33 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-pxmin")
 		{
-			pxmin = (float) atof(argv[i+1]);
+			pxmin = (float)atof(argv[i + 1]);
 			pxmin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-pxmax")
 		{
-			pxmax = (float) atof(argv[i+1]);
+			pxmax = (float)atof(argv[i + 1]);
 			pxmax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-pymin")
 		{
-			pymin = (float) atof(argv[i+1]);
+			pymin = (float)atof(argv[i + 1]);
 			pymin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-pymax")
 		{
-			pymax = (float) atof(argv[i+1]);
+			pymax = (float)atof(argv[i + 1]);
 			pymax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-pzmin")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
-				pzmin = (float) atof(argv[i+1]);
+				pzmin = (float)atof(argv[i + 1]);
 				pzmin_b = false;
 				i++;
 			}
@@ -835,9 +915,9 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-pzmax")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
-				pzmax = (float) atof(argv[i+1]);
+				pzmax = (float)atof(argv[i + 1]);
 				pzmax_b = false;
 				i++;
 			}
@@ -848,49 +928,49 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-thetamin")
 		{
-			thetamin = (float) atof(argv[i+1]);
+			thetamin = (float)atof(argv[i + 1]);
 			thetamin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-thetamax")
 		{
-			thetamax = (float) atof(argv[i+1]);
+			thetamax = (float)atof(argv[i + 1]);
 			thetamax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-thetaTmin")
 		{
-			thetaTmin = (float) atof(argv[i+1]);
+			thetaTmin = (float)atof(argv[i + 1]);
 			thetaTmin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-thetaTmax")
 		{
-			thetaTmax = (float) atof(argv[i+1]);
+			thetaTmax = (float)atof(argv[i + 1]);
 			thetaTmax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-gammamin")
 		{
-			gammamin = (float) atof(argv[i+1]);
+			gammamin = (float)atof(argv[i + 1]);
 			gammamin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-gammamax")
 		{
-			gammamax = (float) atof(argv[i+1]);
+			gammamax = (float)atof(argv[i + 1]);
 			gammamax_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-Emin")
 		{
-			Emin = (float) atof(argv[i+1]);
+			Emin = (float)atof(argv[i + 1]);
 			Emin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-Emax")
 		{
-			Emax = (float) atof(argv[i+1]);
+			Emax = (float)atof(argv[i + 1]);
 			Emax_b = false;
 			i++;
 		}
@@ -900,7 +980,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_xz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_xz = 1;
 			}
@@ -911,7 +991,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_yz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_yz = 1;
 			}
@@ -922,7 +1002,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_rcf")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_rcf = 1;
 			}
@@ -941,7 +1021,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_xpz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_xpz = 1;
 			}
@@ -960,7 +1040,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_ypz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_ypz = 1;
 			}
@@ -971,7 +1051,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_zpx")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_zpx = 1;
 			}
@@ -982,7 +1062,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_zpy")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_zpy = 1;
 			}
@@ -993,7 +1073,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_zpz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_zpz = 1;
 			}
@@ -1008,7 +1088,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_pxpz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_pxpz = 1;
 			}
@@ -1019,7 +1099,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-plot_pypz")
 		{
-			if (p[NCOLONNE]>5)
+			if (p[NCOLONNE] > 5)
 			{
 				fai_plot_pypz = 1;
 			}
@@ -1050,7 +1130,7 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-nbin")
 		{
-			nbin = atoi(argv[i+1]);
+			nbin = atoi(argv[i + 1]);
 			if (nbin_x_b) nbin_x = nbin;
 			if (nbin_y_b) nbin_y = nbin;
 			if (nbin_z_b) nbin_z = nbin;
@@ -1068,84 +1148,84 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		}
 		else if (std::string(argv[i]) == "-nbinx")
 		{
-			nbin_x = atoi(argv[i+1]);
+			nbin_x = atoi(argv[i + 1]);
 			nbin_x_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbiny")
 		{
-			nbin_y = atoi(argv[i+1]);
+			nbin_y = atoi(argv[i + 1]);
 			nbin_y_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinz")
 		{
-			nbin_z = atoi(argv[i+1]);
+			nbin_z = atoi(argv[i + 1]);
 			nbin_z_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinty")
 		{
-			nbin_ty = atoi(argv[i+1]);
+			nbin_ty = atoi(argv[i + 1]);
 			nbin_ty_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbintz")
 		{
-			nbin_tz = atoi(argv[i+1]);
+			nbin_tz = atoi(argv[i + 1]);
 			nbin_tz_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinpx")
 		{
-			nbin_px = atoi(argv[i+1]);
+			nbin_px = atoi(argv[i + 1]);
 			nbin_px_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinpy")
 		{
-			nbin_py = atoi(argv[i+1]);
+			nbin_py = atoi(argv[i + 1]);
 			nbin_py_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinpz")
 		{
-			nbin_pz = atoi(argv[i+1]);
+			nbin_pz = atoi(argv[i + 1]);
 			nbin_pz_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbintheta")
 		{
-			nbin_theta = atoi(argv[i+1]);
+			nbin_theta = atoi(argv[i + 1]);
 			nbin_theta_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinthetaT")
 		{
-			nbin_thetaT = atoi(argv[i+1]);
+			nbin_thetaT = atoi(argv[i + 1]);
 			nbin_thetaT_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbingamma")
 		{
-			nbin_gamma = atoi(argv[i+1]);
+			nbin_gamma = atoi(argv[i + 1]);
 			nbin_gamma_b = false;
 			nbin_b = false;
 			i++;
 		}
 		else if (std::string(argv[i]) == "-nbinE")
 		{
-			nbin_E = atoi(argv[i+1]);
+			nbin_E = atoi(argv[i + 1]);
 			nbin_E_b = false;
 			nbin_b = false;
 			i++;
@@ -1165,132 +1245,132 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 		{
 			fileParametri.open(nomefile.c_str());
 			failed_opening_file = fileParametri.fail();
-			if (failed_opening_file) 
+			if (failed_opening_file)
 			{
 				std::cout << "Impossibile aprire il file " << nomefile << " contenente i parametri di binnaggio" << std::endl;
 				exit(50);
 			}
-			while(!fileParametri.eof())
+			while (!fileParametri.eof())
 			{
 				fileParametri >> nomepar >> evita >> leggi;
 				if ((nomepar == "xmin" || nomepar == "XMIN") && xmin_b)
 				{
-					xmin = (float) std::atof(leggi.c_str());
+					xmin = (float)std::atof(leggi.c_str());
 					xmin_b = false;
 				}
 				else if ((nomepar == "xmax" || nomepar == "XMAX") && xmax_b)
 				{
-					xmax = (float) std::atof(leggi.c_str());
+					xmax = (float)std::atof(leggi.c_str());
 					xmax_b = false;
 				}
 				else if ((nomepar == "ymin" || nomepar == "YMIN") && ymin_b)
 				{
-					ymin = (float) std::atof(leggi.c_str());
+					ymin = (float)std::atof(leggi.c_str());
 					ymin_b = false;
 				}
 				else if ((nomepar == "ymax" || nomepar == "YMAX") && ymax_b)
 				{
-					ymax = (float) std::atof(leggi.c_str());
+					ymax = (float)std::atof(leggi.c_str());
 					ymax_b = false;
 				}
 				else if ((nomepar == "zmin" || nomepar == "ZMIN") && zmin_b)
 				{
-					zmin = (float) std::atof(leggi.c_str());
+					zmin = (float)std::atof(leggi.c_str());
 					zmin_b = false;
 				}
 				else if ((nomepar == "zmax" || nomepar == "ZMAX") && zmax_b)
 				{
-					zmax = (float) std::atof(leggi.c_str());
+					zmax = (float)std::atof(leggi.c_str());
 					zmax_b = false;
 				}
 				else if ((nomepar == "tymin" || nomepar == "TYMIN") && tymin_b)
 				{
-					tymin = (float) std::atof(leggi.c_str());
+					tymin = (float)std::atof(leggi.c_str());
 					tymin_b = false;
 				}
 				else if ((nomepar == "tymax" || nomepar == "TYMAX") && tymax_b)
 				{
-					tymax = (float) std::atof(leggi.c_str());
+					tymax = (float)std::atof(leggi.c_str());
 					tymax_b = false;
 				}
 				else if ((nomepar == "tzmin" || nomepar == "TZMIN") && tzmin_b)
 				{
-					tzmin = (float) std::atof(leggi.c_str());
+					tzmin = (float)std::atof(leggi.c_str());
 					tzmin_b = false;
 				}
 				else if ((nomepar == "tzmax" || nomepar == "TZMAX") && tzmax_b)
 				{
-					tzmax = (float) std::atof(leggi.c_str());
+					tzmax = (float)std::atof(leggi.c_str());
 					tzmax_b = false;
 				}
 				else if ((nomepar == "pxmin" || nomepar == "PXMIN") && pxmin_b)
 				{
-					pxmin = (float) std::atof(leggi.c_str());
+					pxmin = (float)std::atof(leggi.c_str());
 					pxmin_b = false;
 				}
 				else if ((nomepar == "pxmax" || nomepar == "PXMAX") && pxmax_b)
 				{
-					pxmax = (float) std::atof(leggi.c_str());
+					pxmax = (float)std::atof(leggi.c_str());
 					pxmax_b = false;
 				}
 				else if ((nomepar == "pymin" || nomepar == "PYMIN") && pymin_b)
 				{
-					pymin = (float) std::atof(leggi.c_str());
+					pymin = (float)std::atof(leggi.c_str());
 					pymin_b = false;
 				}
 				else if ((nomepar == "pymax" || nomepar == "PYMAX") && pymax_b)
 				{
-					pymax = (float) std::atof(leggi.c_str());
+					pymax = (float)std::atof(leggi.c_str());
 					pymax_b = false;
 				}
 				else if ((nomepar == "pzmin" || nomepar == "PZMIN") && pzmin_b)
 				{
-					pzmin = (float) std::atof(leggi.c_str());
+					pzmin = (float)std::atof(leggi.c_str());
 					pzmin_b = false;
 				}
 				else if ((nomepar == "pzmax" || nomepar == "PZMAX") && pzmax_b)
 				{
-					pzmax = (float) std::atof(leggi.c_str());
+					pzmax = (float)std::atof(leggi.c_str());
 					pzmax_b = false;
 				}
 				else if ((nomepar == "gammamin" || nomepar == "GAMMAMIN") && gammamin_b)
 				{
-					gammamin = (float) std::atof(leggi.c_str());
+					gammamin = (float)std::atof(leggi.c_str());
 					gammamin_b = false;
 				}
 				else if ((nomepar == "gammamax" || nomepar == "GAMMAMAX") && gammamax_b)
 				{
-					gammamax = (float) std::atof(leggi.c_str());
+					gammamax = (float)std::atof(leggi.c_str());
 					gammamax_b = false;
 				}
 				else if ((nomepar == "thetamin" || nomepar == "THETAMIN") && thetamin_b)
 				{
-					thetamin = (float) std::atof(leggi.c_str());
+					thetamin = (float)std::atof(leggi.c_str());
 					thetamin_b = false;
 				}
 				else if ((nomepar == "thetamax" || nomepar == "THETAMAX") && thetamax_b)
 				{
-					thetamax = (float) std::atof(leggi.c_str());
+					thetamax = (float)std::atof(leggi.c_str());
 					thetamax_b = false;
 				}
 				else if ((nomepar == "thetaradmin" || nomepar == "THETARADMIN") && thetaTmin_b)
 				{
-					thetaTmin = (float) std::atof(leggi.c_str());
+					thetaTmin = (float)std::atof(leggi.c_str());
 					thetaTmin_b = false;
 				}
 				else if ((nomepar == "thetaradmax" || nomepar == "THETARADMAX") && thetaTmax_b)
 				{
-					thetaTmax = (float) std::atof(leggi.c_str());
+					thetaTmax = (float)std::atof(leggi.c_str());
 					thetaTmax_b = false;
 				}
 				else if ((nomepar == "emin" || nomepar == "EMIN") && Emin_b)
 				{
-					Emin = (float) std::atof(leggi.c_str());
+					Emin = (float)std::atof(leggi.c_str());
 					Emin_b = false;
 				}
 				else if ((nomepar == "emax" || nomepar == "EMAX") && Emax_b)
 				{
-					Emax = (float) std::atof(leggi.c_str());
+					Emax = (float)std::atof(leggi.c_str());
 					Emax_b = false;
 				}
 				/*
@@ -1639,10 +1719,10 @@ void Parametri :: parse_command_line(int argc, const char ** argv)
 
 
 
-bool Parametri :: check_parametri()
+bool Parametri::check_parametri()
 {
 	bool test = true;
-	if ( !p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1 )		// check swap o non-swap
+	if (!p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1)		// check swap o non-swap
 	{
 		printf("Attenzione: modalita` swap mal definita\n");
 		test = false;
@@ -1657,7 +1737,7 @@ bool Parametri :: check_parametri()
 		{
 			p[SWAP] = 0;
 			p_b[SWAP] = false;
-			test=true;
+			test = true;
 		}
 		else
 		{
@@ -1665,9 +1745,9 @@ bool Parametri :: check_parametri()
 			test = false;
 		}
 	}
-	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI) 
+	if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
 	{
-		if ( !p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1 )
+		if (!p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1)
 		{
 			printf("Attenzione: modalita` weight mal definita\n");
 			test = false;
@@ -1682,7 +1762,7 @@ bool Parametri :: check_parametri()
 			{
 				p[WEIGHT] = 1;
 				p_b[WEIGHT] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1690,7 +1770,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_CSV] && p[OUT_CSV]  != 0 && p[OUT_CSV]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+		if (!p_b[OUT_CSV] && p[OUT_CSV] != 0 && p[OUT_CSV] != 1)	// check leggi_particelle: out-ascii o non-out-ascii
 		{
 			printf("Attenzione: output csv mal definito\n");
 			test = false;
@@ -1705,7 +1785,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_CSV] = 0;
 				p_b[OUT_CSV] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1713,7 +1793,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_PROPAGA] && p[OUT_PROPAGA]  != 0 && p[OUT_PROPAGA]  != 1 )	// check leggi_particelle: out-ascii o non-out-ascii
+		if (!p_b[OUT_PROPAGA] && p[OUT_PROPAGA] != 0 && p[OUT_PROPAGA] != 1)	// check leggi_particelle: out-ascii o non-out-ascii
 		{
 			printf("Attenzione: output ppg mal definito\n");
 			test = false;
@@ -1728,7 +1808,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_PROPAGA] = 0;
 				p_b[OUT_PROPAGA] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1736,7 +1816,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_XYZE] && p[OUT_XYZE]  != 0 && p[OUT_XYZE]  != 1 )
+		if (!p_b[OUT_XYZE] && p[OUT_XYZE] != 0 && p[OUT_XYZE] != 1)
 		{
 			printf("Attenzione: output xyzE mal definito\n");
 			test = false;
@@ -1751,7 +1831,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_XYZE] = 0;
 				p_b[OUT_XYZE] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1759,7 +1839,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1  )
+		if (!p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1)
 		{
 			printf("Attenzione: output vtk mal definito\n");
 			test = false;
@@ -1774,7 +1854,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_VTK] = 0;
 				p_b[OUT_VTK] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1782,7 +1862,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_CLEAN_BINARY] && p[OUT_CLEAN_BINARY] != 0 && p[OUT_CLEAN_BINARY] != 1  )
+		if (!p_b[OUT_CLEAN_BINARY] && p[OUT_CLEAN_BINARY] != 0 && p[OUT_CLEAN_BINARY] != 1)
 		{
 			printf("Attenzione: output binario pulito mal definito\n");
 			test = false;
@@ -1797,7 +1877,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_CLEAN_BINARY] = 0;
 				p_b[OUT_CLEAN_BINARY] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1806,7 +1886,7 @@ bool Parametri :: check_parametri()
 			}
 		}
 
-		if ( !p_b[FIND_MINMAX] && p[FIND_MINMAX] != 0 && p[FIND_MINMAX] != 1  )
+		if (!p_b[FIND_MINMAX] && p[FIND_MINMAX] != 0 && p[FIND_MINMAX] != 1)
 		{
 			printf("Attenzione: ricerca minimi/massimi mal definita\n");
 			test = false;
@@ -1821,7 +1901,7 @@ bool Parametri :: check_parametri()
 			{
 				p[FIND_MINMAX] = 0;
 				p_b[FIND_MINMAX] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1829,7 +1909,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[DO_BINNING] && p[DO_BINNING] != 0 && p[DO_BINNING] != 1  )
+		if (!p_b[DO_BINNING] && p[DO_BINNING] != 0 && p[DO_BINNING] != 1)
 		{
 			printf("Attenzione: parametro binnaggio mal definito\n");
 			test = false;
@@ -1844,7 +1924,7 @@ bool Parametri :: check_parametri()
 			{
 				p[DO_BINNING] = 0;
 				p_b[DO_BINNING] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1852,7 +1932,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1  )
+		if (!p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1)
 		{
 			printf("Attenzione: output parametri mal definito\n");
 			test = false;
@@ -1867,7 +1947,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_PARAMS] = 0;
 				p_b[OUT_PARAMS] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1875,7 +1955,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7  )
+		if (!p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7)
 		{
 			printf("Attenzione: ncolonne mal definite\n");
 			test = false;
@@ -1890,7 +1970,7 @@ bool Parametri :: check_parametri()
 			{
 				p[NCOLONNE] = 7;
 				p_b[NCOLONNE] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -1900,17 +1980,17 @@ bool Parametri :: check_parametri()
 		}
 
 
-		if ( xmin > xmax )
+		if (xmin > xmax)
 		{
 			printf("Attenzione: xmin > xmax\n");
 			test = false;
 		}
-		if ( ymin > ymax ) 
+		if (ymin > ymax)
 		{
 			printf("Attenzione: ymin > ymax\n");
 			test = false;
 		}
-		if ( zmin > zmax )
+		if (zmin > zmax)
 		{
 			printf("Attenzione: zmin > zmax\n");
 			test = false;
@@ -1955,27 +2035,27 @@ bool Parametri :: check_parametri()
 			printf("Attenzione: tzmin > tzmax\n");
 			test = false;
 		}
-		if ( nbin_x <= 0 )
+		if (nbin_x <= 0)
 		{
 			printf("Attenzione: nbin_x < 0\n");
 			test = false;
 		}
-		if ( nbin_y <= 0 )
+		if (nbin_y <= 0)
 		{
 			printf("Attenzione: nbin_y < 0\n");
 			test = false;
 		}
-		if ( nbin_z <= 0 )
+		if (nbin_z <= 0)
 		{
 			printf("Attenzione: nbin_z < 0\n");
 			test = false;
 		}
-		if ( nbin_px <= 0 )
+		if (nbin_px <= 0)
 		{
 			printf("Attenzione: nbin_px < 0\n");
 			test = false;
 		}
-		if ( nbin_py <= 0 )
+		if (nbin_py <= 0)
 		{
 			printf("Attenzione: nbin_py < 0\n");
 			test = false;
@@ -2013,7 +2093,7 @@ bool Parametri :: check_parametri()
 	}
 	else
 	{
-		if ( !p_b[OUT_VTK_NOSTRETCH] && p[OUT_VTK_NOSTRETCH] != 0 && p[OUT_VTK_NOSTRETCH] != 1  )
+		if (!p_b[OUT_VTK_NOSTRETCH] && p[OUT_VTK_NOSTRETCH] != 0 && p[OUT_VTK_NOSTRETCH] != 1)
 		{
 			printf("Attenzione: output vtk nostretch mal definito\n");
 			test = false;
@@ -2028,7 +2108,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_VTK_NOSTRETCH] = 0;
 				p_b[OUT_VTK_NOSTRETCH] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2036,7 +2116,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1  )
+		if (!p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1)
 		{
 			printf("Attenzione: output binario mal definito\n");
 			test = false;
@@ -2051,7 +2131,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_VTK] = 0;
 				p_b[OUT_VTK] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2059,7 +2139,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1  )
+		if (!p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1)
 		{
 			printf("Attenzione: output parametri mal definito\n");
 			test = false;
@@ -2074,7 +2154,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_PARAMS] = 0;
 				p_b[OUT_PARAMS] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2082,7 +2162,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_LINEOUT_X] && p[OUT_LINEOUT_X] != 0 && p[OUT_LINEOUT_X] != 1  )
+		if (!p_b[OUT_LINEOUT_X] && p[OUT_LINEOUT_X] != 0 && p[OUT_LINEOUT_X] != 1)
 		{
 			printf("Attenzione: output lineout mal definito\n");
 			test = false;
@@ -2097,7 +2177,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_LINEOUT_X] = 0;
 				p_b[OUT_LINEOUT_X] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2105,14 +2185,14 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[NCOLONNE] && p[NCOLONNE] < 1 )
+		if (!p_b[NCOLONNE] && p[NCOLONNE] < 1)
 		{
 			printf("Attenzione: dimensioni griglia mal definite\n");
 			test = false;
 		}
 		else
 		{
-			if (!p_b[NCOLONNE] && p[NCOLONNE] >= 1 )
+			if (!p_b[NCOLONNE] && p[NCOLONNE] >= 1)
 			{
 				test = true;		// tutto ok, in questo caso il parametro va bene!
 			}
@@ -2123,7 +2203,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_CUTX] && p[OUT_CUTX] != 0 && p[OUT_CUTX] != 1  )
+		if (!p_b[OUT_CUTX] && p[OUT_CUTX] != 0 && p[OUT_CUTX] != 1)
 		{
 			printf("Attenzione: output slice mal definito\n");
 			test = false;
@@ -2138,7 +2218,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_CUTX] = 0;
 				p_b[OUT_CUTX] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2146,7 +2226,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_CUTY] && p[OUT_CUTY] != 0 && p[OUT_CUTY] != 1  )
+		if (!p_b[OUT_CUTY] && p[OUT_CUTY] != 0 && p[OUT_CUTY] != 1)
 		{
 			printf("Attenzione: output slice mal definito\n");
 			test = false;
@@ -2161,7 +2241,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_CUTY] = 0;
 				p_b[OUT_CUTY] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2169,7 +2249,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_CUTZ] && p[OUT_CUTZ] != 0 && p[OUT_CUTZ] != 1  )
+		if (!p_b[OUT_CUTZ] && p[OUT_CUTZ] != 0 && p[OUT_CUTZ] != 1)
 		{
 			printf("Attenzione: output slice mal definito\n");
 			test = false;
@@ -2184,7 +2264,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_CUTZ] = 0;
 				p_b[OUT_CUTZ] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2192,7 +2272,7 @@ bool Parametri :: check_parametri()
 				test = false;
 			}
 		}
-		if ( !p_b[OUT_GRID2D] && p[OUT_GRID2D] != 0 && p[OUT_GRID2D] != 1  )
+		if (!p_b[OUT_GRID2D] && p[OUT_GRID2D] != 0 && p[OUT_GRID2D] != 1)
 		{
 			printf("Attenzione: output griglia 2D mal definito\n");
 			test = false;
@@ -2207,7 +2287,7 @@ bool Parametri :: check_parametri()
 			{
 				p[OUT_GRID2D] = 0;
 				p_b[OUT_GRID2D] = false;
-				test=true;
+				test = true;
 			}
 			else
 			{
@@ -2222,38 +2302,38 @@ bool Parametri :: check_parametri()
 }
 
 
-void Parametri :: organizza_minimi_massimi()
+void Parametri::organizza_minimi_massimi()
 {
-	minimi[0]  = xmin;
-	minimi[1]  = ymin;
-	minimi[2]  = zmin;
-	minimi[3]  = pxmin;
-	minimi[4]  = pymin;
-	minimi[5]  = pzmin;
-	minimi[6]  = gammamin;
-	minimi[7]  = thetamin;
-	minimi[8]  = Emin;
-	minimi[9]  = thetaTmin;
+	minimi[0] = xmin;
+	minimi[1] = ymin;
+	minimi[2] = zmin;
+	minimi[3] = pxmin;
+	minimi[4] = pymin;
+	minimi[5] = pzmin;
+	minimi[6] = gammamin;
+	minimi[7] = thetamin;
+	minimi[8] = Emin;
+	minimi[9] = thetaTmin;
 	minimi[10] = tymin;
 	minimi[11] = tzmin;
 
-	massimi[0]  = xmax;
-	massimi[1]  = ymax;
-	massimi[2]  = zmax;
-	massimi[3]  = pxmax;
-	massimi[4]  = pymax;
-	massimi[5]  = pzmax;
-	massimi[6]  = gammamax;
-	massimi[7]  = thetamax;
-	massimi[8]  = Emax;
-	massimi[9]  = thetaTmax;
+	massimi[0] = xmax;
+	massimi[1] = ymax;
+	massimi[2] = zmax;
+	massimi[3] = pxmax;
+	massimi[4] = pymax;
+	massimi[5] = pzmax;
+	massimi[6] = gammamax;
+	massimi[7] = thetamax;
+	massimi[8] = Emax;
+	massimi[9] = thetaTmax;
 	massimi[10] = tymax;
 	massimi[11] = tzmax;
 
 #ifdef ENABLE_DEBUG
 	std::cout << "---- organizza_minimi_massimi() -----" << std::endl;
-	std::cout << "Hai scritto Emin = "<< Emin << "  Emax = "<< Emax << std::endl;
-	std::cout << "Hai scritto minimi[8] = "<< minimi[8] << "  massimi[8] = "<< massimi[8] << std::endl;
+	std::cout << "Hai scritto Emin = " << Emin << "  Emax = " << Emax << std::endl;
+	std::cout << "Hai scritto minimi[8] = " << minimi[8] << "  massimi[8] = " << massimi[8] << std::endl;
 #endif
 }
 
