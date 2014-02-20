@@ -21,17 +21,28 @@ from ALaDyn_read_binary import *
 ### --- ###
 
 
+#E-fields in GV/m
 
 # - #
 path      = '/Users/alberto/sims/ALaDyn_sims/00001' 
-file_name = 'Bdenout00.bin'
+file_name = 'Bdenout04.bin'
 matrix = read_ALaDyn_bin(path,file_name)
+file_name = 'Edenout04.bin'
+matrix2 = read_ALaDyn_bin(path,file_name)
+matrix = matrix2 # + matrix2
+
+
+# file_name = 'Ezbout00.bin'
+# matrix = read_ALaDyn_bin(path,file_name)
+
 
 xlist = linspace(0.,1.,256.) 
 ylist = linspace(0.,1.,128.) 
 X, Y = meshgrid (ylist, xlist)
 ax  = matplotlib.pyplot.subplot(111) #matplotlib.pyplot.subplot(111)
 pyplot.imshow(-matrix[:,:,64].T)
+pyplot.colorbar()
+#pyplot.plot(-matrix[:,64,64])
 show()
 
 
