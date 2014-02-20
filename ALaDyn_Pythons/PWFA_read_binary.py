@@ -57,8 +57,14 @@ print struct.unpack('i', f.read(4))
 
 #---***---#
 r = np.zeros((nx,ny,nz))
+print 'n',nx,ny,nz
 rr=[]
+print 'proc', npe_z,npe_y
+
+offsetz = 0
 for counter_z in range(0,npe_z):
+	offsety = 0;
+
 	for counter_y in range(0,npe_y):
 		print struct.unpack('i', f.read(4))
 		npx= struct.unpack('i', f.read(4))[0]
@@ -72,13 +78,15 @@ for counter_z in range(0,npe_z):
 		for k in range(0,npz):
 			for j in range(0,npy):
 				for i in range(0,npx):
-					r[i,j,k] = struct.unpack('f', f.read(4))[0]
-					rr.append(r[i,j,k])
+					r[i,j+offsety,k+offsetz] = struct.unpack('f', f.read(4))[0]
+					#rr.append(r[i,j,k])
 	# 				if np.abs(r[i,j,k]) > 0.0:
 	# 					print '***',r[i,j,k]
 		print struct.unpack('i', f.read(4))
+		offsety += npy
+	offsetz += npz;
 
-r=np.reshape(rr,(nx,ny,nz))
+#r=np.reshape(rr,(nx,ny,nz))
 print len(rr),r.shape
 
 
@@ -98,7 +106,10 @@ ylist = linspace(0.,1.,128.)
 X, Y = meshgrid (ylist, xlist)
 ax  = matplotlib.pyplot.subplot(111) #matplotlib.pyplot.subplot(111)
 print 'shape>>',X.shape, Y.shape,r.shape,r[:,:,64].shape
-CP1=pyplot.contour(Y,X,r[:,:,64])
+#CP1=pyplot.contour(Y,X,r[:,:,64])
+print r.shape,r.min(),r.max()
+pyplot.imshow(r[:,:,64].T)
+
 show()
 
 
