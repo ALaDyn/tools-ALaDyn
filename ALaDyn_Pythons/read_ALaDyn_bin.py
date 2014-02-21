@@ -1,6 +1,6 @@
 #!/usr/bin/python
 ######################################################################
-# Name:         dued_read_frm.py
+# Name:         read_ALaDyn_dat.py
 # Author:       
 # Date:			2014-02-18
 # Purpose:      reads dued binary frm output
@@ -21,13 +21,11 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 
 # - #
-def read_ALaDyn_bin(dir_path,file_name):
+def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 
 	# - #
 	path     = os.path.join(os.path.join(dir_path,file_name))
 	f        = open(path,'rb')
-
-
 
 	#- vector length -#
 	struct.unpack('i', f.read(4))
@@ -51,6 +49,7 @@ def read_ALaDyn_bin(dir_path,file_name):
 	for i in range(0,N_param):
 		struct.unpack('f', f.read(4))
 	struct.unpack('i', f.read(4))
+
 
 	#---***---#
 	r = np.zeros((nx,ny,nz))
@@ -77,22 +76,36 @@ def read_ALaDyn_bin(dir_path,file_name):
 			struct.unpack('i', f.read(4))
 			offsety += npy
 		offsetz += npz;
+		
+	if grid_no_grid == 'nogrid':
+		return r
+
+	#--- * --- * --- * --- * --- * ---#
+	#- reading grid -#
+	struct.unpack('i', f.read(4))
+	X=[]; [X.append(struct.unpack('f', f.read(4))[0]) for i in range(0,nx)]	
+	struct.unpack('i', f.read(4))
+
+	struct.unpack('i', f.read(4))
+	Y=[];  [Y.append(struct.unpack('f', f.read(4))[0]) for i in range(0,ny)]
+	struct.unpack('i', f.read(4))
+
+	struct.unpack('i', f.read(4))
+	Z=[];  [Z.append(struct.unpack('f', f.read(4))[0]) for i in range(0,nz)]
+	struct.unpack('i', f.read(4))
+
+# 	x=np.zeros((nx,ny,nz)); y=z=x;
+# 	for k in range(0,nz):
+# 		for j in range(0,ny):
+# 			for i in range(0,nx):
+# 				x[i,j,k] = X[i]
+# 				y[i,j,k] = Y[j]
+# 				z[i,j,k] = Z[k]
+	x=X; y=Y; z=Z;
+				
+	return (r,x,y,z)
 
 
-	return r
-
-# 	#np.savetxt('test.txt', r[:,:,64])
-# 
-# 	xlist = linspace(0.,1.,256.) 
-# 	ylist = linspace(0.,1.,128.) 
-# 	X, Y = meshgrid (ylist, xlist)
-# 	ax  = matplotlib.pyplot.subplot(111) #matplotlib.pyplot.subplot(111)
-# 	print 'shape>>',X.shape, Y.shape,r.shape,r[:,:,64].shape
-# 	#CP1=pyplot.contour(Y,X,r[:,:,64])
-# 	print r.shape,r.min(),r.max()
-# 	pyplot.imshow(-r[:,:,64].T)
-# 
-# 	show()
 
 
 

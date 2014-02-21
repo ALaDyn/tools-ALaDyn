@@ -17,34 +17,57 @@ from pylab import *
 import matplotlib as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 ### --- ###
-from ALaDyn_read_binary import *
+from read_ALaDyn_bin import *
+from ALaDyn_from_XYZ_to_surface import *
 ### --- ###
 
 
 #E-fields in GV/m
 
 # - #
-path      = '/Users/alberto/sims/ALaDyn_sims/00001' 
-file_name = 'Bdenout04.bin'
-matrix = read_ALaDyn_bin(path,file_name)
-file_name = 'Edenout04.bin'
-matrix2 = read_ALaDyn_bin(path,file_name)
-matrix = matrix2 # + matrix2
+path      = '/Users/alberto/sims/ALaDyn_sims/00001_test' 
+file_name = 'Bdenout00.bin'
+matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+# file_name = 'Edenout04.bin'
+# matrix2 = read_ALaDyn_bin(path,file_name)
+matrix = matrix #+ matrix2
 
 
-# file_name = 'Ezbout00.bin'
-# matrix = read_ALaDyn_bin(path,file_name)
 
 
-xlist = linspace(0.,1.,256.) 
-ylist = linspace(0.,1.,128.) 
-X, Y = meshgrid (ylist, xlist)
-ax  = matplotlib.pyplot.subplot(111) #matplotlib.pyplot.subplot(111)
-pyplot.imshow(-matrix[:,:,64].T)
-pyplot.colorbar()
-#pyplot.plot(-matrix[:,64,64])
+ax  = matplotlib.pyplot.subplot(111)
+# a=np.zeros((128,64)); b=a;
+# for i in range(0,128):
+# 	for j in range(0,64):
+# 		a(i,j) = 
+# 		b(i,j) = 
+a=np.linspace(0,1,256);
+b=np.linspace(0,1,128);
+print '>>>',len(x),len(y),matrix.shape
+ax.contourf(y,x,-matrix[:,:,64]) #, 15, linewidths = 0.5, colors = 'k')
+ax.equal()
 show()
 
+
+
+
+
+#ALaDyn_from_XYZ_to_surface(x[:,:,64],y[:,:,64],-matrix[:,:,64])
+#os.pause()
+
+
+
+# 
+# 
+# xlist = linspace(0.,1.,256.) 
+# ylist = linspace(0.,1.,128.) 
+# X, Y = meshgrid (ylist, xlist)
+ax  = matplotlib.pyplot.subplot(111) #matplotlib.pyplot.subplot(111)
+pyplot.imshow(-matrix[:,:,64].T)
+# pyplot.colorbar()
+# #pyplot.plot(-matrix[:,64,64])
+show()
+# 
 
 # 	#np.savetxt('test.txt', r[:,:,64])
 
