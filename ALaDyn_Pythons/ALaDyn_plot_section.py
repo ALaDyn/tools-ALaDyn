@@ -35,6 +35,5 @@ matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 fig = figure()
 ax  = fig.add_subplot(111, aspect='equal')
 ax.contourf(y,x,-matrix[:,:,64]) #, 15, linewidths = 0.5, colors = 'k')
-#ax.equal()
 show()
 
