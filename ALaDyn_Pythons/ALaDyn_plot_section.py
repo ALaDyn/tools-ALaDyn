@@ -27,15 +27,16 @@ from ALaDyn_from_XYZ_to_surface import *
 #E-fields in GV/m
 
 # - #
-path      = '/Users/alberto/sims/ALaDyn_sims/00002' 
-file_name = 'Bdenout15.bin'
+#path      = '/Users/alberto/sims/ALaDyn_sims/00002' 
+path       = os.getcwd()
+file_name = 'Bdenout09.bin'
 matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
-file_name = 'Edenout15.bin'
+file_name = 'Edenout09.bin'
 matrix2,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 matrix = matrix+matrix2
 
 fig = figure()
-ax  = fig.add_subplot(111) #, aspect='equal')
+ax  = fig.add_subplot(111, aspect='equal')
 ax.contourf(x,y,-matrix[:,:,64].T,100) #, 15, linewidths = 0.5, colors = 'k')
 show()
 
