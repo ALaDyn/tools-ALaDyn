@@ -9,6 +9,7 @@
 
 ### loading shell commands
 import os, os.path, glob, sys, shutil, time, datetime
+import numpy as np
 from pylab import *
 ###>>>
 # home_path = os.path.expanduser('~')
@@ -116,11 +117,12 @@ def plot_Efield_sections(path,frame):
 
 
 	#- norm(E) -#
-	norm_E=np.zeros(p)
-	for i in range(0,p[0]):
-		for j in range(0,p[1]):
-			for k in range(0,p[2]):
-				norm_E[i,j,k] = (Ex[i,j,k]**2+Ey[i,j,k]**2+Ez[i,j,k]**2)**(1./2.)
+	norm_E = np.power( np.power(Ex,2)+np.power(Ey,2)+np.power(Ez,2) , 0.5 )
+# 	norm_E=np.zeros(p)
+# 	for i in range(0,p[0]):
+# 		for j in range(0,p[1]):
+# 			for k in range(0,p[2]):
+# 				norm_E[i,j,k] = (Ex[i,j,k]**2+Ey[i,j,k]**2+Ez[i,j,k]**2)**(1./2.)
 
 	#- norm_E_XY -#
 	fig = figure()
