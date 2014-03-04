@@ -116,7 +116,7 @@ def plot_Efield_sections(path,frame):
 
 
 	#- norm(E) -#
-	np.zeros(p)
+	norm_E=np.zeros(p)
 	for i in range(0,p[0]):
 		for j in range(0,p[1]):
 			for k in range(0,p[2]):
