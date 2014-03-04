@@ -1,9 +1,9 @@
 #!/usr/bin/python
 ######################################################################
-# Name:         ALaDyn_plot_section.py
-# Author:       
+# Name:         ALaDyn_plot_utilities_Efield.py
+# Author:       A. Marocchino
 # Date:			2014-02-18
-# Purpose:      it nests into 'ALaDyn_read_binary' to plot sections
+# Purpose:      it is a module of: ALaDyn_plot_sections - plots densities
 # Source:       python
 #####################################################################
 

@@ -50,6 +50,7 @@ Qtilde			= bch * volume_N3 * kp**3	# reduced charge
 # - #
 
 #print 'Qtilde >>>',Qtilde
+print('lambda_p: %e [um] - omega_p: %e [Hz]' % (lp*1e4,wp) )
 print('Qtilde - normalized charge: %e' % (Qtilde) )
 
 

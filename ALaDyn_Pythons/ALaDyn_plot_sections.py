@@ -17,6 +17,7 @@ import os, os.path, glob, sys, shutil
 from read_ALaDyn_bin import *
 from ALaDyn_plot_utilities_1 import *
 from ALaDyn_plot_utilities_density import *
+from ALaDyn_plot_utilities_Efield import *
 ### --- ###
 
 
@@ -39,6 +40,7 @@ if __name__ == '__main__':
 		
 	for i in range(0,N):
 		plot_density_sections(path,i)
+		plot_Efield_sections(path,i)
 
 
 
