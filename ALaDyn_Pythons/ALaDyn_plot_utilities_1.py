@@ -27,6 +27,8 @@ def last_output(path):
 				print '>>>>>'
 				print os.path.basename(file)
 				print os.path.basename(file)[7:9]
+				ff= os.path.splitext(file)[0]
+				print ff[-3:-1]
 				print '*******************'
 				n_last_output = max( n_last_output, int(os.path.basename(file)[7:9]) )
 	return n_last_output
