@@ -45,7 +45,7 @@ if __name__ == '__main__':
 	print '-------------------'
 		
 	for i in range(0,N):
-		plot_density_sections(path,N)
+		plot_density_sections(path,i)
 
 
 
