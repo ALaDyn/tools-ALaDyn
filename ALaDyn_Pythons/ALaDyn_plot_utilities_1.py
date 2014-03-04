@@ -26,7 +26,7 @@ def last_output(path):
 			if os.path.splitext(file)[1] == '.bin':
 				print '>>>>>'
 				print os.path.basename(file)
-				print os.path.basename(file)[7:9]
+				print os.path.basename(file)[6:8]
 				print '*******************'
 				n_last_output = max( n_last_output, int(os.path.basename(file)[7:8]) )
 	return n_last_output
