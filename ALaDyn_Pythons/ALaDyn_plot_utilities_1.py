@@ -24,6 +24,7 @@ def last_output(path):
 	for root_dir, sub_dirs, files in os.walk(path):
 		for file in files:
 			if os.path.splitext(file)[1] == '.bin':
+				print os.path.basename(file)[7:9]
 				n_last_output = max( n_last_output, int(os.path.basename(file)[7:9]) )
 	return n_last_output
 
