@@ -8,13 +8,7 @@
 #####################################################################
 
 ### loading shell commands
-import os, os.path, glob, sys, shutil, time, datetime, scipy
-import struct
-from scipy import *
-import numpy as np
-from pylab import *
-import matplotlib as plt
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+import os, os.path, glob, sys, shutil, time, datetime
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))

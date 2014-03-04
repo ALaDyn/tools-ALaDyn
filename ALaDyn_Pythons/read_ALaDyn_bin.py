@@ -8,14 +8,14 @@
 #####################################################################
 
 ### loading shell commands
-import os, os.path, glob, sys, shutil, time, datetime, scipy, numpy, pylab, matplotlib
+import os, os.path, glob, sys, shutil, time
 import struct
-from scipy import *
+#from scipy import *
 import numpy as np
-from matplotlib import *
-from pylab import *
-import matplotlib as plt
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+# from matplotlib import *
+# from pylab import *
+# import matplotlib as plt
+# from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 ### --- ###
 
 
