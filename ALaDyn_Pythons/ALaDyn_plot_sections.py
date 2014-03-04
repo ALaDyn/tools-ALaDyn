@@ -40,9 +40,12 @@ if __name__ == '__main__':
 	generate_folder_output_structure(path)
 
 	N = last_output(path)
-	print 'N>',N
-	
-	plot_density_sections(path,N)
+	print '-------------------'
+	print 'N > ',N
+	print '-------------------'
+		
+	for i in range(0,N):
+		plot_density_sections(path,N)
 
 
 
