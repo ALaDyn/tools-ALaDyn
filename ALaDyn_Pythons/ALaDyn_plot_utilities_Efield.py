@@ -48,7 +48,7 @@ def plot_Efield_sections(path,frame):
 	Ey = Ey+Eyb
 	Ez = Ez+Ezb
 
-	p = matrix.shape
+	p = Ex.shape
 	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
 
 
