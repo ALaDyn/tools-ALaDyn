@@ -15,7 +15,6 @@ import os, os.path, glob, sys, shutil
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *
-from ALaDyn_from_XYZ_to_surface import *
 from ALaDyn_plot_utilities_1 import *
 from ALaDyn_plot_utilities_density import *
 ### --- ###
