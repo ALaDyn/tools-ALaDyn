@@ -118,6 +118,7 @@ def plot_Efield_sections(path,frame):
 
 	#- norm(E) -#
 	norm_E = np.power( np.power(Ex,2)+np.power(Ey,2)+np.power(Ez,2) , 0.5 )
+	print 'Dimensions - Ex',Ex.shape,'--- norm_E',norm_E.shape
 # 	norm_E=np.zeros(p)
 # 	for i in range(0,p[0]):
 # 		for j in range(0,p[1]):
