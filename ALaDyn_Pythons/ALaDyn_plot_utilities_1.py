@@ -8,7 +8,7 @@
 #####################################################################
 
 ### loading shell commands
-import os, os.path, glob, sys, shutil, time, datetime
+import os, os.path, glob, sys, shutil, time, datetime, re
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
@@ -20,17 +20,20 @@ import os, os.path, glob, sys, shutil, time, datetime
 
 #- get last output number
 def last_output(path):
-	n_last_output = -1.0
+	n_last_output = -1
 	for root_dir, sub_dirs, files in os.walk(path):
 		for file in files:
 			if os.path.splitext(file)[1] == '.bin':
-				print '>>>>>'
-				print os.path.basename(file)
-				print os.path.basename(file)[7:9]
-				ff= os.path.splitext(file)[0]
-				print ff[-3:-1]
-				print '*******************'
-				n_last_output = max( n_last_output, int(os.path.basename(file)[7:9]) )
+# 				print '>>>>>'
+# 				print os.path.basename(file)
+# 				print os.path.basename(file)[7:9]
+# 				ff= os.path.splitext(file)[0]
+				m = re.match(r'\D+(\d+)',os.path.basename(file))
+				n_last_output = max( n_last_output, int(m.group(1)) )
+# 				print 'mmmmmm',int(m.group(1))
+# 				print ff[-2:]
+# 				print '*******************'
+# 				n_last_output = max( n_last_output, int(os.path.basename(file)[7:9]) )
 	return n_last_output
 
 #- folder structure for outputs -#
