@@ -38,7 +38,7 @@ if __name__ == '__main__':
 	print 'N > ',N
 	print '-------------------'
 		
-	for i in range(0,N):
+	for i in range(0,N+1):
 		plot_density_sections(path,i)
 		plot_Efield_sections(path,i)
 
