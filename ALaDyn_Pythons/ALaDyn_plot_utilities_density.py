@@ -42,6 +42,7 @@ def plot_density_sections(path,frame):
 	ax  = fig.add_subplot(111, aspect='equal')
 	ax.contourf(x,y,-matrix[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
 	name_output = 'rho_Bunch_XY_'+s+'.png'
+	axis('tight')
 	#autoscale(axis='both', tight=True)
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
