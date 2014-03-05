@@ -116,7 +116,7 @@ def plot_Bfield_sections(path,frame):
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
 
 
-	#- norm(E) -#
+	#- norm(B) -#
 	norm_B = np.power( np.power(Bx,2)+np.power(By,2)+np.power(Bz,2) , 0.5 )
 
 
