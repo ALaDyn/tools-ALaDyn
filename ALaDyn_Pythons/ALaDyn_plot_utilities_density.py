@@ -43,7 +43,6 @@ def plot_density_sections(path,frame):
 	ax.contourf(x,y,-matrix[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
 	name_output = 'rho_Bunch_XY_'+s+'.png'
 	axis('tight')
-	#autoscale(axis='both', tight=True)
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
 	fig = figure()
@@ -65,6 +64,7 @@ def plot_density_sections(path,frame):
 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
 	ax.contourf(x,y,-matrix2[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
 	name_output = 'rho_Background_XY_'+s+'.png'
+	axis('tight')
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
 	fig = figure()
@@ -86,12 +86,14 @@ def plot_density_sections(path,frame):
 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
 	ax.contourf(x,y,-matrix[:,:,z2].T - matrix2[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
 	name_output = 'rho_tot_XY_'+s+'.png'
+	axis('tight')
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
 	ax.contourf(x,z,-matrix[:,y2,:].T - matrix2[:,y2,:].T,100)
 	name_output = 'rho_tot_XZ_'+s+'.png'
+	axis('tight')
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 
 # 	fig = figure()
