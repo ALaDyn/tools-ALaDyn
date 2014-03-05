@@ -24,16 +24,8 @@ def last_output(path):
 	for root_dir, sub_dirs, files in os.walk(path):
 		for file in files:
 			if os.path.splitext(file)[1] == '.bin':
-# 				print '>>>>>'
-# 				print os.path.basename(file)
-# 				print os.path.basename(file)[7:9]
-# 				ff= os.path.splitext(file)[0]
 				m = re.match(r'\D+(\d+)',os.path.basename(file))
 				n_last_output = max( n_last_output, int(m.group(1)) )
-# 				print 'mmmmmm',int(m.group(1))
-# 				print ff[-2:]
-# 				print '*******************'
-# 				n_last_output = max( n_last_output, int(os.path.basename(file)[7:9]) )
 	return n_last_output
 
 #- folder structure for outputs -#
