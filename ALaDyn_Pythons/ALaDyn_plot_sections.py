@@ -41,7 +41,7 @@ if __name__ == '__main__':
 		
 	for i in range(0,N+1):
 		plot_density_sections(path,i)
-		plot_Efield_sections(path,i)
+# 		plot_Efield_sections(path,i)
 # 		plot_Bfield_sections(path,i)
 
 
