@@ -10,6 +10,7 @@
 ### loading shell commands
 import os, os.path, glob, sys, shutil, time, datetime
 from pylab import *
+from matplotlib.axes import *
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
