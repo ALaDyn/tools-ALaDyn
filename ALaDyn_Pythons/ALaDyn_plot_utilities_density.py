@@ -9,8 +9,8 @@
 
 ### loading shell commands
 import os, os.path, glob, sys, shutil, time, datetime
+import numpy as np
 from pylab import *
-from matplotlib.axes import *
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
@@ -42,14 +42,16 @@ def plot_density_sections(path,frame):
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
 	ax.contourf(x,y,-matrix[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
-	autoscale(enable=True, axis='both', tight=True)
+	#autoscale(enable=True, axis='both', tight=True)
+	axis('tight')
 	name_output = 'rho_Bunch_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
 	ax.contourf(x,z,-matrix[:,y2,:].T,100)
-	autoscale(enable=True, axis='both', tight=True)
+	#autoscale(enable=True, axis='both', tight=True)
+	axis('tight')
 	name_output = 'rho_Bunch_XZ_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 
@@ -65,14 +67,16 @@ def plot_density_sections(path,frame):
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
 	ax.contourf(x,y,-matrix2[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
-	autoscale(enable=True, axis='both', tight=True)
+	#autoscale(enable=True, axis='both', tight=True)
+	axis('tight')
 	name_output = 'rho_Background_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
 	ax.contourf(x,z,-matrix2[:,y2,:].T,100)
-	autoscale(enable=True, axis='both', tight=True)
+	#autoscale(enable=True, axis='both', tight=True)
+	axis('tight')
 	name_output = 'rho_Background_XZ_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 
@@ -88,14 +92,16 @@ def plot_density_sections(path,frame):
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
 	ax.contourf(x,y,-matrix[:,:,z2].T - matrix2[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
-	autoscale(enable=True, axis='both', tight=True)
+	#autoscale(enable=True, axis='both', tight=True)
+	axis('tight')
 	name_output = 'rho_tot_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
 	ax.contourf(x,z,-matrix[:,y2,:].T - matrix2[:,y2,:].T,100)
-	autoscale(enable=True, axis='both', tight=True)
+	#autoscale(enable=True, axis='both', tight=True)
+	axis('tight')
 	name_output = 'rho_tot_XZ_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 
