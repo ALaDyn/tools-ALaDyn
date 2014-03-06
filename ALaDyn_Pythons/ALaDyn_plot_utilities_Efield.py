@@ -55,20 +55,23 @@ def plot_Efield_sections(path,frame):
 
 	#- Ex_XY -#
 	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-	ax.contourf(x,y,Ex[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
+	ax  = fig.add_subplot(111, aspect='equal')
+	ax.contourf(x,y,Ex[:,:,z2].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'Ex_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	#- Ey_XY -#
 	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-	ax.contourf(x,y,Ey[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
+	ax  = fig.add_subplot(111, aspect='equal')
+	ax.contourf(x,y,Ey[:,:,z2].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'Ey_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	#- Ez_XY -#
 	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-	ax.contourf(x,y,Ez[:,:,z2].T,100) #, 15, linewidths = 0.5, colors = 'k')
+	ax  = fig.add_subplot(111, aspect='equal')
+	ax.contourf(x,y,Ez[:,:,z2].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'Ez_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 
@@ -77,20 +80,23 @@ def plot_Efield_sections(path,frame):
 
 	#- Ex_XZ -#
 	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-	ax.contourf(x,z,Ex[:,y2,:].T,100) #, 15, linewidths = 0.5, colors = 'k')
+	ax  = fig.add_subplot(111, aspect='equal')
+	ax.contourf(x,z,Ex[:,y2,:].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'Ex_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	#- Ey_XZ -#
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,z,Ey[:,y2,:].T,100) #, 15, linewidths = 0.5, colors = 'k')
+	ax.contourf(x,z,Ey[:,y2,:].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'Ey_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	#- Ez_XZ -#
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,z,Ez[:,y2,:].T,100) #, 15, linewidths = 0.5, colors = 'k')
+	ax.contourf(x,z,Ez[:,y2,:].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'Ez_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 
@@ -98,20 +104,23 @@ def plot_Efield_sections(path,frame):
 
 # 	#- Ex_YZ -#
 # 	fig = figure()
-# 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-# 	ax.contourf(y,z,Ex[x2,:,:].T,100) #, 15, linewidths = 0.5, colors = 'k')
+# 	ax  = fig.add_subplot(111, aspect='equal')
+# 	ax.contourf(y,z,Ex[x2,:,:].T,100, linewidths = 0.00001)
+#	axis('tight')
 # 	name_output = 'Ex_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','E_field',name_output) )
 # 	#- Ey_YZ -#
 # 	fig = figure()
-# 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-# 	ax.contourf(y,z,Ey[x2,:,:].T,100) #, 15, linewidths = 0.5, colors = 'k')
+# 	ax  = fig.add_subplot(111, aspect='equal')
+# 	ax.contourf(y,z,Ey[x2,:,:].T,100, linewidths = 0.00001)
+#	axis('tight')
 # 	name_output = 'Ey_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','E_field',name_output) )
 # 	#- Ez_YZ -#
 # 	fig = figure()
-# 	ax  = fig.add_subplot(111, aspect='equal') #, aspect='equal')
-# 	ax.contourf(y,z,Ez[x2,:,:].T,100) #, 15, linewidths = 0.5, colors = 'k')
+# 	ax  = fig.add_subplot(111, aspect='equal')
+# 	ax.contourf(y,z,Ez[x2,:,:].T,100, linewidths = 0.00001)
+#	axis('tight')
 # 	name_output = 'Ez_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','E_field',name_output) )
 
@@ -123,19 +132,22 @@ def plot_Efield_sections(path,frame):
 	#- norm_E_XY -#
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,y,norm_E[:,:,z2].T,100)
+	ax.contourf(x,y,norm_E[:,:,z2].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'E_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	#- norm_E_XZ -#
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,z,norm_E[:,y2,:].T,100)
+	ax.contourf(x,z,norm_E[:,y2,:].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'E_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	#- norm_E_YZ -#
 	fig = figure()
 	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(y,z,norm_E[x2,:,:].T,100)
+	ax.contourf(y,z,norm_E[x2,:,:].T,100, linewidths = 0.00001)
+	axis('tight')
 	name_output = 'E_YZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 
