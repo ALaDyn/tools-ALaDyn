@@ -47,7 +47,7 @@ wp 				= ( 4.*np.pi* n0 *e_cgs**2 / me_cgs )**(1./2.)
 kp				= wp/c_cgs
 lp				= 2.*np.pi/kp
 Qtilde			= bch * volume_N3 * kp**3	# reduced charge
-total_Charge	= bch * volume_N3 * e / 1e-12 	#total charge in [pC]
+total_Charge	= (bch*n0) * volume_N3 * e / 1e-12 	#total charge in [pC]
 # - #
 
 #print 'Qtilde >>>',Qtilde
