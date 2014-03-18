@@ -10,8 +10,8 @@
 ### loading shell commands
 import os, os.path, glob, sys, shutil
 ###>>>
-# home_path = os.path.expanduser('~')
-# sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
+home_path = os.path.expanduser('~')
+sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *
