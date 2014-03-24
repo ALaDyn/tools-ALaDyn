@@ -139,7 +139,8 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 	#--------------------#
 	#- Plot Bdenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))
-	contourf(x,y,matrix[:,:,z2].T,100, locator=ticker.LogLocator(), norm=colors.LogNorm())
+#	contourf(x,y,matrix[:,:,z2].T,100, locator=ticker.LogLocator(), norm=colors.LogNorm())
+	contourf(x,y,matrix[:,:,z2].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
