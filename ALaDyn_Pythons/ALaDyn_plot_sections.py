@@ -27,7 +27,7 @@ from ALaDyn_plot_utilities_Bfield import *
 magnification_fig = 3.0
 
 rho_min = 0.01
-rho_max = 3.
+rho_max = 50.
 
 
 

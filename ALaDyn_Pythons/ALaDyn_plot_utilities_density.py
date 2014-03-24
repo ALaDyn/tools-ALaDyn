@@ -49,7 +49,7 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 	
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,magnification_fig)
 
-	levs = np.logspace(log10(rho_min),log10(rho_max),40)
+	levs = np.logspace(log10(rho_min),log10(rho_max),80)
 
 
 	#--------------------#
@@ -139,7 +139,6 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 	#--------------------#
 	#- Plot Bdenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))
-#	contourf(x,y,matrix[:,:,z2].T,100, locator=ticker.LogLocator(), norm=colors.LogNorm())
 	contourf(x,y,matrix[:,:,z2].T, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XY_log_'+s+'.png'
