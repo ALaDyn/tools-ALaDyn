@@ -23,6 +23,9 @@ from ALaDyn_plot_utilities_Bfield import *
 
 
 
+### --- ###
+magnification_fig = 3.0
+
 
 
 #--- *** ---#
@@ -37,13 +40,22 @@ if __name__ == '__main__':
 
 	N = last_output(path)
 	print '-------------------'
-	print 'N > ',N
+	print 'last output number > ',N
 	print '-------------------'
 		
-	for i in range(43,N+1):
-		plot_density_sections(path,i,3.0)
-# 		plot_Efield_sections(path,i)
-# 		plot_Bfield_sections(path,i)
+	for i in range(0,N+1):
+		print '-------------------'
+		if output_exists(path,'rho',i) == True:
+			print 'rho --- frame >>> ',i
+			plot_density_sections(path,i,magnification_fig)
+
+		if output_exists(path,'E',i) == True:
+			print 'E --- frame >>> ',i
+			plot_Efield_sections(path,i,magnification_fig)
+			
+		if output_exists(path,'B',i) == True:
+			print 'B --- frame >>> ',i		
+			plot_Bfield_sections(path,i,magnification_fig)
 
 
 

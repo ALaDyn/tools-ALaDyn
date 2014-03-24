@@ -61,11 +61,44 @@ def figure_dimension_inch(x,y,z,scale_factor):
 	return size_x, size_z
 
 
+#- check whether I do have all the outputs -#
+def output_exists(path,quantity,frame):
+	if quantity == 'rho':
+		if os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
+	
+	if quantity == 'E':
+		if os.path.isfile(os.path.join(path,'Exfout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Exbout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Eyfout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Eybout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Ezfout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Ezbout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
 
-
-
-
-
-
-
-
+	if quantity == 'B':
+		if os.path.isfile(os.path.join(path,'Bxfout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Bxbout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Byfout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Bybout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Bzfout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Bzbout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
