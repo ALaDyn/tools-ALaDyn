@@ -84,8 +84,6 @@ plot(x,-matrix[:,y2+2,z2+2].T - matrix2[:,y2+2,z2+2].T)
 show()
 
 # --- #
-f = open(full_file_name,'w+')
-f.close()
 Matrix = np.column_stack( (x,matrix[:,y2,z2].T) )
 np.savetxt( 'section.dat' ,Matrix,fmt='%15.14e')
 np.savetxt( 'section.dat' ,matrix[:,:,z2].T,fmt='%15.14e')

@@ -139,21 +139,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 	#--------------------#
 	#- Plot Bdenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))
-	contourf(x,y,matrix[:,:,z2].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+	contourf(x,y,matrix[:,:,z2].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,z,matrix[:,y2,:].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+	contourf(x,z,matrix[:,y2,:].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
-# 	contourf(y,z,matrix[x2,:,:].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+# 	contourf(y,z,matrix[x2,:,:].T,100, levs, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_Bunch_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
@@ -163,21 +163,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 
 	#- Plot Edenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,y,matrix2[:,:,z2].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+	contourf(x,y,matrix2[:,:,z2].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Background_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,z,matrix2[:,y2,:].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+	contourf(x,z,matrix2[:,y2,:].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Background_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
-# 	contourf(y,z,matrix2[x2,:,:].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+# 	contourf(y,z,matrix2[x2,:,:].T,100, levs, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_Background_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
@@ -187,21 +187,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 
 	#- Plot Bdenout+Edenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+	contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_tot_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,z,matrix[:,y2,:].T + matrix2[:,y2,:].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+	contourf(x,z,matrix[:,y2,:].T + matrix2[:,y2,:].T,100, levs, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_tot_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 # 	fig = figure(1, figsize=(sizeX, sizeX))	
-# 	contourf(y,z,matrix[x2,:,:].T + matrix2[x2,:,:].T,100, levs, norm=colors.LogNorm(), linewidths = 0.00001)
+# 	contourf(y,z,matrix[x2,:,:].T + matrix2[x2,:,:].T,100, levs, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_tot_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
