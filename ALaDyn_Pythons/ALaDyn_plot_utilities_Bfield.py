@@ -62,19 +62,21 @@ def plot_Bfield_sections(path,frame):
 	axis('tight')
 	name_output = 'Bx_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 	#- By_XY -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,y,By[:,:,z2].T,100, linewidths = 0.00001) 
 	axis('tight')
 	name_output = 'By_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 	#- Bz_XY -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,y,Bz[:,:,z2].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Bz_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
-
+	close(fig)
 
 
 
@@ -84,18 +86,21 @@ def plot_Bfield_sections(path,frame):
 	axis('tight')
 	name_output = 'Bx_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 	#- By_XZ -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,z,By[:,y2,:].T,100, linewidths = 0.00001) 
 	axis('tight')
 	name_output = 'By_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 	#- Bz_XZ -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,z,Bz[:,y2,:].T,100, linewidths = 0.00001) 
 	axis('tight')
 	name_output = 'Bz_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 
 
 
@@ -105,18 +110,21 @@ def plot_Bfield_sections(path,frame):
 #	axis('tight')
 # 	name_output = 'Bx_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
+#	close(fig)
 # 	#- By_YZ -#
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
 # 	contourf(y,z,By[x2,:,:].T,100, linewidths = 0.00001) 
 #	axis('tight')
 # 	name_output = 'By_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
+#	close(fig)
 # 	#- Bz_YZ -#
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
 # 	contourf(y,z,Bz[x2,:,:].T,100, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'Bz_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
+#	close(fig)
 
 
 	#- norm(B) -#
@@ -129,18 +137,21 @@ def plot_Bfield_sections(path,frame):
 	axis('tight')
 	name_output = 'B_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 	#- norm_E_XZ -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,z,norm_B[:,y2,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'B_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 	#- norm_E_YZ -#
 	fig = figure(1, figsize=(sizeZ, sizeZ))	
 	contourf(y,z,norm_B[x2,:,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'B_YZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
+	close(fig)
 
 
 

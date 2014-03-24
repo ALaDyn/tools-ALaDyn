@@ -25,9 +25,9 @@ from ALaDyn_plot_utilities_Bfield import *
 path = os.getcwd()
 
 #--- *** ---#
-file_name = 'Bdenout10.bin'
+file_name = 'Bdenout47.bin'
 matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
-file_name = 'Edenout10.bin'
+file_name = 'Edenout47.bin'
 matrix2,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 
 p = matrix.shape
@@ -67,8 +67,9 @@ show()
 
 f = open(full_file_name,'w+')
 f.close()
-Matrix = np.column_stack( (x,matrix[:,y2,z2].T) )
-np.savetxt( 'Ex_ALaDyn_comparison.dat' ,Matrix,fmt='%15.14e')
+Matrix = np.column_stack( (x,matrix[:,:,z2].T) )
+np.savetxt( 'section.dat' ,Matrix,fmt='%15.14e')
+np.savetxt( 'section.dat' ,matrix[:,:,z2].T,fmt='%15.14e')
 
 
 

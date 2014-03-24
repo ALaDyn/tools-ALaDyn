@@ -62,18 +62,21 @@ def plot_Efield_sections(path,frame):
 	axis('tight')
 	name_output = 'Ex_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 	#- Ey_XY -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,y,Ey[:,:,z2].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Ey_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 	#- Ez_XY -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,y,Ez[:,:,z2].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Ez_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 
 
 
@@ -84,18 +87,21 @@ def plot_Efield_sections(path,frame):
 	axis('tight')
 	name_output = 'Ex_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 	#- Ey_XZ -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,z,Ey[:,y2,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Ey_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 	#- Ez_XZ -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,z,Ez[:,y2,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Ez_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 
 
 
@@ -105,18 +111,21 @@ def plot_Efield_sections(path,frame):
 #	axis('tight')
 # 	name_output = 'Ex_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','E_field',name_output) )
+#	close(fig)
 # 	#- Ey_YZ -#
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
 # 	contourf(y,z,Ey[x2,:,:].T,100, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'Ey_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','E_field',name_output) )
+#	close(fig)
 # 	#- Ez_YZ -#
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
 # 	contourf(y,z,Ez[x2,:,:].T,100, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'Ez_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','E_field',name_output) )
+#	close(fig)
 
 
 	#- norm(E) -#
@@ -129,18 +138,21 @@ def plot_Efield_sections(path,frame):
 	axis('tight')
 	name_output = 'E_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 	#- norm_E_XZ -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
 	contourf(x,z,norm_E[:,y2,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'E_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 	#- norm_E_YZ -#
 	fig = figure(1, figsize=(sizeZ, sizeZ))	
 	contourf(y,z,norm_E[x2,:,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'E_YZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','E_field',name_output) )
+	close(fig)
 
 
 
