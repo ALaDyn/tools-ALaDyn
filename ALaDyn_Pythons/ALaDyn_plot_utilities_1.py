@@ -61,7 +61,7 @@ def figure_dimension_inch(x,y,z,scale_factor):
 	return size_x, size_z
 
 
-#- check whether I do have all the outputs -#
+#- check whether all the files are in place to be plotted -#
 def output_exists(path,quantity,frame):
 	if quantity == 'rho':
 		if os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True \

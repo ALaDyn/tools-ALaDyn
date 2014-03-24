@@ -26,6 +26,9 @@ from ALaDyn_plot_utilities_Bfield import *
 ### --- ###
 magnification_fig = 3.0
 
+rho_min = 0.3
+rho_max = 150.
+
 
 
 #--- *** ---#
@@ -47,7 +50,7 @@ if __name__ == '__main__':
 		print '-------------------'
 		if output_exists(path,'rho',i) == True:
 			print 'rho --- frame >>> ',i
-			plot_density_sections(path,i,magnification_fig)
+			plot_density_sections(path,i,rho_min,rho_max,magnification_fig)
 
 		if output_exists(path,'E',i) == True:
 			print 'E --- frame >>> ',i
