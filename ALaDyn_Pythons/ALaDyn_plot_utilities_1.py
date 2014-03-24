@@ -45,3 +45,27 @@ def	generate_folder_output_structure(path):
 	if not os.path.exists( directory_B ):
 		os.makedirs(directory_B)
 
+
+#- Image inches dimesions -#
+def figure_dimension_inch(x,y,z,scale_factor):
+	dx = max(x) - min(x)
+	dy = max(y) - min(y)
+	dz = max(z) - min(z)
+	
+	standard_size_x = 6.5
+	standard_size_z = 3.0
+	
+	size_x = scale_factor*standard_size_x
+	size_z = size_x * dz/dx + 1.5
+	
+	return size_x, size_z
+
+
+
+
+
+
+
+
+
+

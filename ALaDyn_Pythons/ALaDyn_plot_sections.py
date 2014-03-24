@@ -34,13 +34,14 @@ if __name__ == '__main__':
 	#-folder output structure
 	generate_folder_output_structure(path)
 
+
 	N = last_output(path)
 	print '-------------------'
 	print 'N > ',N
 	print '-------------------'
 		
 	for i in range(0,N+1):
-		plot_density_sections(path,i)
+		plot_density_sections(path,i,3.0)
 # 		plot_Efield_sections(path,i)
 # 		plot_Bfield_sections(path,i)
 

@@ -51,26 +51,26 @@ def plot_Bfield_sections(path,frame):
 
 	p = Bx.shape
 	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
+	
+	sizeX, sizeZ = figure_dimension_inch(x,y,z,scale_factor)
+
 
 
 	#- Bx_XY -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,y,Bx[:,:,z2].T,100, linewidths = 0.00001)
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,y,Bx[:,:,z2].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Bx_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 	#- By_XY -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,y,By[:,:,z2].T,100, linewidths = 0.00001) 
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,y,By[:,:,z2].T,100, linewidths = 0.00001) 
 	axis('tight')
 	name_output = 'By_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 	#- Bz_XY -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,y,Bz[:,:,z2].T,100, linewidths = 0.00001)
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,y,Bz[:,:,z2].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'Bz_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
@@ -79,47 +79,41 @@ def plot_Bfield_sections(path,frame):
 
 
 	#- Bx_XZ -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,z,Bx[:,y2,:].T,100, linewidths = 0.00001) 
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,z,Bx[:,y2,:].T,100, linewidths = 0.00001) 
 	axis('tight')
 	name_output = 'Bx_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 	#- By_XZ -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,z,By[:,y2,:].T,100, linewidths = 0.00001) 
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,z,By[:,y2,:].T,100, linewidths = 0.00001) 
 	axis('tight')
 	name_output = 'By_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 	#- Bz_XZ -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,z,Bz[:,y2,:].T,100, linewidths = 0.00001) 
 	axis('tight')
-	ax.contourf(x,z,Bz[:,y2,:].T,100, linewidths = 0.00001) 
 	name_output = 'Bz_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 
 
 
 # 	#- Bx_YZ -#
-# 	fig = figure()
-# 	ax  = fig.add_subplot(111, aspect='equal')
-# 	ax.contourf(y,z,Bx[x2,:,:].T,100, linewidths = 0.00001) 
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	contourf(y,z,Bx[x2,:,:].T,100, linewidths = 0.00001) 
 #	axis('tight')
 # 	name_output = 'Bx_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
 # 	#- By_YZ -#
-# 	fig = figure()
-# 	ax  = fig.add_subplot(111, aspect='equal')
-# 	ax.contourf(y,z,By[x2,:,:].T,100, linewidths = 0.00001) 
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	contourf(y,z,By[x2,:,:].T,100, linewidths = 0.00001) 
 #	axis('tight')
 # 	name_output = 'By_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
 # 	#- Bz_YZ -#
-# 	fig = figure()
-# 	ax  = fig.add_subplot(111, aspect='equal')
-# 	ax.contourf(y,z,Bz[x2,:,:].T,100, linewidths = 0.00001)
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	contourf(y,z,Bz[x2,:,:].T,100, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'Bz_YZ_'+s+'.png'
 # 	savefig( os.path.join(path,'plots','B_field',name_output) )
@@ -130,23 +124,20 @@ def plot_Bfield_sections(path,frame):
 
 
 	#- norm_E_XY -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,y,norm_B[:,:,z2].T,100, linewidths = 0.00001)
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,y,norm_B[:,:,z2].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'B_XY_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 	#- norm_E_XZ -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(x,z,norm_B[:,y2,:].T,100, linewidths = 0.00001)
+	fig = figure(1, figsize=(sizeX, sizeZ))	
+	contourf(x,z,norm_B[:,y2,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'B_XZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
 	#- norm_E_YZ -#
-	fig = figure()
-	ax  = fig.add_subplot(111, aspect='equal')
-	ax.contourf(y,z,norm_B[x2,:,:].T,100, linewidths = 0.00001)
+	fig = figure(1, figsize=(sizeZ, sizeZ))	
+	contourf(y,z,norm_B[x2,:,:].T,100, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'B_YZ_'+s+'.png'
 	savefig( os.path.join(path,'plots','B_field',name_output) )
