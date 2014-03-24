@@ -40,7 +40,7 @@ if __name__ == '__main__':
 	print 'N > ',N
 	print '-------------------'
 		
-	for i in range(22,N+1):
+	for i in range(0,N+1):
 		plot_density_sections(path,i,3.0)
 # 		plot_Efield_sections(path,i)
 # 		plot_Bfield_sections(path,i)
