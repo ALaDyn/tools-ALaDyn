@@ -23,11 +23,27 @@ from ALaDyn_plot_utilities_Bfield import *
 
 
 
-### --- ###
-magnification_fig = 3.0
+### --- ### shell inputs
+if(len(sys.argv)<2):
+	print "Input [1]: frame_begin"
+	print "Input [2]: frame_end"
+	print "Input [3]: magnification_fig"
+	print "Input [4]: rho_min"
+	print "Input [5]: rho_max"
 
-rho_min = 0.0001
-rho_max = 20.
+	if sys.argv[1] == -1:
+		frame_begin		  = 0
+		frame_end         = last_output(os.getcwd())
+		magnification_fig = 3.0
+		rho_min 		  = 0.0001
+		rho_max 		  = 20.
+	else:
+		frame_begin 		= int(sys.argv[1])
+		frame_end			= int(sys.argv[2])
+		magnification_fig 	= sys.argv[3]
+		rho_min 		  	= sys.argv[4]
+		rho_max 		  	= sys.argv[5]
+### --- ###
 
 
 
@@ -41,12 +57,12 @@ if __name__ == '__main__':
 	generate_folder_output_structure(path)
 
 
-	N = last_output(path)
-	print '-------------------'
-	print 'last output number > ',N
-	print '-------------------'
+# 	N = last_output(path)
+# 	print '-------------------'
+# 	print 'last output number > ',N
+# 	print '-------------------'
 		
-	for i in range(0,N+1):
+	for i in range(frame_begin,frame_end+1):
 		print '-------------------'
 		if output_exists(path,'rho',i) == True:
 			print 'rho --- frame >>> ',i

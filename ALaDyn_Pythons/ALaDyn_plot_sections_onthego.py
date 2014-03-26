@@ -27,14 +27,14 @@ path = os.getcwd()
 
 # --- #
 # FRAME NUMBER
-i = 4
+frame = 40
 
 
 # --- #
 magnification_fig = 3.0
 
-rho_min = -100
-rho_max = -0.3
+rho_min = 10
+rho_max = 0.001
 
 
 
@@ -61,8 +61,9 @@ size1, size2 = figure_dimension_inch(x,y,z,magnification_fig)
 
 
 # --- #
-fig = figure(1, figsize=(size1, size2))	
-#contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,100, linewidths = 0.0001)
+fig = figure(1, figsize=(size1, size2))
+levs = np.linspace(rho_min,rho_max,50)
+contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T, levs, linewidths = 0.0001)
 levs = np.logspace(log10(rho_min),log10(rho_max),50)
 contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T, levs, norm=colors.LogNorm(), linewidths = 0.0001)
 #axis('tight')
