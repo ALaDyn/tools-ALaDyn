@@ -31,8 +31,6 @@ if(len(sys.argv)<2):
 	print "Input [4]: rho_min"
 	print "Input [5]: rho_max"
 
-print int(sys.argv[1])
-
 if sys.argv[1] == -1:
 	frame_begin		  = 0
 	frame_end         = last_output(os.getcwd())
