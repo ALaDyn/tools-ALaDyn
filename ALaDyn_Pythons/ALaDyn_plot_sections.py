@@ -38,11 +38,11 @@ if sys.argv[1] == -1:
 	rho_min 		  = 0.0001
 	rho_max 		  = 20.
 else:
-	frame_begin 		= int(sys.argv[1])
-	frame_end			= int(sys.argv[2])
-	magnification_fig 	= float(sys.argv[3])
-	rho_min 		  	= sys.argv[4]
-	rho_max 		  	= sys.argv[5]
+	frame_begin 		= int(		sys.argv[1])	
+	frame_end			= int(		sys.argv[2])
+	magnification_fig 	= float(	sys.argv[3])
+	rho_min 		  	= float(	sys.argv[4])
+	rho_max 		  	= float(	sys.argv[5])
 ### --- ###
 
 
