@@ -40,7 +40,7 @@ if sys.argv[1] == -1:
 else:
 	frame_begin 		= int(sys.argv[1])
 	frame_end			= int(sys.argv[2])
-	magnification_fig 	= sys.argv[3]
+	magnification_fig 	= float(sys.argv[3])
 	rho_min 		  	= sys.argv[4]
 	rho_max 		  	= sys.argv[5]
 ### --- ###
