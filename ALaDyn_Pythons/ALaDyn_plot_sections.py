@@ -31,18 +31,20 @@ if(len(sys.argv)<2):
 	print "Input [4]: rho_min"
 	print "Input [5]: rho_max"
 
-	if sys.argv[1] == -1:
-		frame_begin		  = 0
-		frame_end         = last_output(os.getcwd())
-		magnification_fig = 3.0
-		rho_min 		  = 0.0001
-		rho_max 		  = 20.
-	else:
-		frame_begin 		= int(sys.argv[1])
-		frame_end			= int(sys.argv[2])
-		magnification_fig 	= sys.argv[3]
-		rho_min 		  	= sys.argv[4]
-		rho_max 		  	= sys.argv[5]
+print int(sys.argv[1])
+
+if sys.argv[1] == -1:
+	frame_begin		  = 0
+	frame_end         = last_output(os.getcwd())
+	magnification_fig = 3.0
+	rho_min 		  = 0.0001
+	rho_max 		  = 20.
+else:
+	frame_begin 		= int(sys.argv[1])
+	frame_end			= int(sys.argv[2])
+	magnification_fig 	= sys.argv[3]
+	rho_min 		  	= sys.argv[4]
+	rho_max 		  	= sys.argv[5]
 ### --- ###
 
 
