@@ -67,7 +67,7 @@ if __name__ == '__main__':
 # 	print 'last output number > ',N
 # 	print '-------------------'
 		
-	for i in range(frame_begin, max(frame_end,last_output(os.getcwd())) + 1 ):
+	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
 		print '-------------------'
 		if output_exists(path,'rho',i) == True:
 			print 'rho --- frame >>> ',i

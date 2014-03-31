@@ -44,8 +44,11 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 	matrix2[ (matrix2>rho_max) ] = rho_max
 
 	#---cut edges---#
-	matrix  = matrix[celltocut:-celltocut,celltocut:-celltocut,:]
-	matrix2 = matrix2[celltocut:-celltocut,celltocut:-celltocut,:]
+	if celltocut > 0:
+		matrix  = matrix[:,celltocut:-celltocut,celltocut:-celltocut]
+		matrix2 = matrix2[:,celltocut:-celltocut,celltocut:-celltocut]
+		y		= y[celltocut:-celltocut]
+		z		= z[celltocut:-celltocut]
 
 	p = matrix.shape
 	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
