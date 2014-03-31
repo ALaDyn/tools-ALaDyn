@@ -27,7 +27,7 @@ path = os.getcwd()
 
 # --- #
 # FRAME NUMBER
-frame = 40
+frame = 8
 
 
 # --- #
@@ -44,6 +44,26 @@ file_name = 'Bdenout'+('%2.2i'%frame)+'.bin'
 matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 file_name = 'Edenout'+('%2.2i'%frame)+'.bin'
 matrix2,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+
+#--- *** ---#
+file_name = 'Exbout'+('%2.2i'%frame)+'.bin'
+Ex_b,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+file_name = 'Eybout'+('%2.2i'%frame)+'.bin'
+Ey_b,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+file_name = 'Ezbout'+('%2.2i'%frame)+'.bin'
+Ez_b,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+file_name = 'Exfout'+('%2.2i'%frame)+'.bin'
+Ex_w,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+file_name = 'Eyfout'+('%2.2i'%frame)+'.bin'
+Ey_w,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+file_name = 'Ezfout'+('%2.2i'%frame)+'.bin'
+Ez_w,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+
+
+
 
 #- cut
 matrix = - matrix
@@ -73,15 +93,18 @@ show()
 
 # --- #
 fig = figure(1, figsize=(size1, size2))
-contourf(x,y,-matrix[:,:,z2].T,100, linewidths = 0.0001)
-clim(0.001,30.0)
+levs = np.linspace(-1.0,1.0,100)
+#contourf(x,y,-matrix[:,:,z2].T,100, linewidths = 0.0001)
+contourf(x,y,Ex_w[:,:,z2].T,levs, linewidths = 0.0001)
+#clim(0.001,30.0)
 show()
 
 # --- #
 fig = figure()
-plot(x,-matrix[:,y2,z2].T - matrix2[:,y2,z2].T)
-plot(x,-matrix[:,y2+1,z2+1].T - matrix2[:,y2+1,z2+1].T)
-plot(x,-matrix[:,y2+2,z2+2].T - matrix2[:,y2+2,z2+2].T)
+plot(x,Ez_w[:,y2,z2].T)
+#plot(x,-matrix[:,y2,z2].T - matrix2[:,y2,z2].T)
+#plot(x,-matrix[:,y2+1,z2+1].T - matrix2[:,y2+1,z2+1].T)
+#plot(x,-matrix[:,y2+2,z2+2].T - matrix2[:,y2+2,z2+2].T)
 show()
 
 # --- #

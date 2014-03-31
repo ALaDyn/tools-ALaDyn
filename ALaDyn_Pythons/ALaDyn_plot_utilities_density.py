@@ -26,7 +26,7 @@ from ALaDyn_plot_utilities_1 import *
 
 
 #- plot Sections
-def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
+def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnification_fig):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	
@@ -43,13 +43,16 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 	matrix2[ (matrix2<rho_min) ] = rho_min
 	matrix2[ (matrix2>rho_max) ] = rho_max
 
+	#---cut edges---#
+	matrix  = matrix[celltocut:-celltocut,celltocut:-celltocut,:]
+	matrix2 = matrix2[celltocut:-celltocut,celltocut:-celltocut,:]
 
 	p = matrix.shape
 	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
 	
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,magnification_fig)
 
-	levs = np.logspace(log10(rho_min),log10(rho_max),80)
+	levs_log = np.logspace(log10(rho_min),log10(rho_max),isolines)
 
 
 	#--------------------#
@@ -139,21 +142,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 	#--------------------#
 	#- Plot Bdenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))
-	contourf(x,y,matrix[:,:,z2].T, levs, norm=colors.LogNorm())
+	contourf(x,y,matrix[:,:,z2].T, levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,z,matrix[:,y2,:].T,levs, norm=colors.LogNorm())
+	contourf(x,z,matrix[:,y2,:].T,levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
-# 	contourf(y,z,matrix[x2,:,:].T, levs, norm=colors.LogNorm())
+# 	contourf(y,z,matrix[x2,:,:].T, levs_log, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_Bunch_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
@@ -163,21 +166,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 
 	#- Plot Edenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,y,matrix2[:,:,z2].T, levs, norm=colors.LogNorm())
+	contourf(x,y,matrix2[:,:,z2].T, levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Background_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,z,matrix2[:,y2,:].T, levs, norm=colors.LogNorm())
+	contourf(x,z,matrix2[:,y2,:].T, levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Background_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 # 	fig = figure(1, figsize=(sizeZ, sizeZ))	
-# 	contourf(y,z,matrix2[x2,:,:].T, levs, norm=colors.LogNorm())
+# 	contourf(y,z,matrix2[x2,:,:].T, levs_log, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_Background_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
@@ -187,21 +190,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,magnification_fig):
 
 	#- Plot Bdenout+Edenout -#
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,levs , norm=colors.LogNorm())
+	contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,levs_log , norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_tot_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 	fig = figure(1, figsize=(sizeX, sizeZ))	
-	contourf(x,z,matrix[:,y2,:].T + matrix2[:,y2,:].T,levs , norm=colors.LogNorm())
+	contourf(x,z,matrix[:,y2,:].T + matrix2[:,y2,:].T,levs_log , norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_tot_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
 # 	fig = figure(1, figsize=(sizeX, sizeX))	
-# 	contourf(y,z,matrix[x2,:,:].T + matrix2[x2,:,:].T, levs, norm=colors.LogNorm())
+# 	contourf(y,z,matrix[x2,:,:].T + matrix2[x2,:,:].T, levs_log, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_tot_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )

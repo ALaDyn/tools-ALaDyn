@@ -18,9 +18,9 @@ from pylab import *
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 #-- Inputs
-bch= 0.5
+bch= 1.4
 sx= 20 * 1e-4 #in [cm]
-sy= 10  * 1e-4 #in [cm] - sy == sz
+sy= 13  * 1e-4 #in [cm] - sy == sz
 n0 		= 0.01*1e18	 #[cm-3]
 #-QFLUID
 # n0		= 1.0e16 #[cm-3]
@@ -53,8 +53,8 @@ total_Charge	= (bch*n0) * volume_N3 * e / 1e-12 	#total charge in [pC]
 #print 'Qtilde >>>',Qtilde
 print('\n')
 print('lambda_p: %e [um] - omega_p: %e [Hz]' % (lp*1e4,wp) )
-print('total bunch Charge: %e [pC]' % (total_Charge) )
-print('Qtilde - normalized charge: %e' % (Qtilde) )
+print('total bunch Charge: %i [pC]' % (total_Charge) )
+print('Qtilde - normalized charge: %5.3e' % (Qtilde) )
 print('\n')
 
 
