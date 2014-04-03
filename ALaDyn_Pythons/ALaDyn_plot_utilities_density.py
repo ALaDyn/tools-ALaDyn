@@ -36,8 +36,10 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 	matrix2,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 	
 	#- cut & sign
-	matrix = - matrix
-	matrix2 = - matrix2
+	matrix = np.abs( matrix )
+	matrix2 = np.abs( matrix2 )
+	print 'rho-max >>', np.max([np.max(matrix),np.max(matrix2)])
+	print 'rho-min >>', np.min([np.min(matrix),np.min(matrix2)])
 # 	matrix[ (matrix<rho_min) ] = rho_min
 # 	matrix[ (matrix>rho_max) ] = rho_max
 # 	matrix2[ (matrix2<rho_min) ] = rho_min
