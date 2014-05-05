@@ -58,6 +58,8 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,magnification_fig)
 
 	levs_lin = np.linspace(      rho_min ,      rho_max ,isolines)
+# 	levs_lin = np.insert(levs_lin,0,np.min([np.min(matrix),np.min(matrix2)]))
+# 	levs_lin = np.insert(levs_lin,len(levs_lin),np.min([np.max(matrix),np.max(matrix2)]))
 	levs_log = np.logspace(log10(rho_min),log10(rho_max),isolines)
 
 
