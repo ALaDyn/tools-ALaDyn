@@ -26,7 +26,7 @@ from ALaDyn_plot_utilities_1 import *
 
 
 #- plot Sections
-def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnification_fig):
+def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnification_fig,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	
@@ -34,6 +34,15 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 	matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 	file_name = 'Edenout'+s+'.bin'
 	matrix2,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+
+	
+
+
+
+
+
+
 	
 	#- cut & sign
 	matrix = np.abs( matrix )
@@ -44,6 +53,14 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 # 	matrix[ (matrix>rho_max) ] = rho_max
 # 	matrix2[ (matrix2<rho_min) ] = rho_min
 # 	matrix2[ (matrix2>rho_max) ] = rho_max
+
+
+
+
+
+
+
+
 
 	#---cut edges---#
 	if celltocut > 0:
@@ -217,5 +234,29 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 # 	name_output = 'rho_tot_YZ_log_'+s+'.png'
 # 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 #	close(fig)
+
+
+
+    #----- Save density sections data -----#
+	if (savedata == 'True'):
+    	
+		print 'saving rho data'
+    	
+		rho_b = matrix
+		rho_w = matrix2
+
+		rho_b=np.abs( rho_b )
+		rho_w=np.abs( rho_w )
+
+		rho = rho_b+rho_w
+
+		p = rho.shape
+		x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
+
+	
+		np.savetxt( os.path.join(path,'data','rho',('rho_section_'+('%2.2i'%frame)+'.dat')),rho[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'data','rho',('rho_bunch_section_'+('%2.2i'%frame)+'.dat')),rho_b[:,:,z2].T,fmt='%15.14e')
+# 		np.savetxt( 'rho_section_'+('%2.2i'%frame)+'.dat' ,rho[:,:,z2].T,fmt='%15.14e')
+# 		np.savetxt( 'rho_b_section_'+('%2.2i'%frame)+'.dat' ,rho_b[:,:,z2].T,fmt='%15.14e')
 
 
