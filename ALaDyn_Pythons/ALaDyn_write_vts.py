@@ -17,10 +17,6 @@ sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Py
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *
-from ALaDyn_plot_utilities_1 import *
-from ALaDyn_plot_utilities_density import *
-from ALaDyn_plot_utilities_Efield import *
-from ALaDyn_plot_utilities_Bfield import *
 ### --- ###
 
 
