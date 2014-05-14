@@ -58,8 +58,25 @@ if __name__ == '__main__':
 
 	print '--- Generating VTS ---'
 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
-		print '--- frame >',i
+		print '--- COMPLETE vts: frame >',i
 		write_vts(path,i,X,Y,Z)
+		
+
+		#- in such a way it is much longer, but it is neater to write
+		#- plus: it has to be done only once
+		print '--- density only vts: frame >',i
+		write_density_vts(path,i,X,Y,Z)
+
+		print '--- E-field only vts: frame >',i
+		write_E_vts(path,i,X,Y,Z)
+
+		print '--- B-field only vts: frame >',i
+		write_B_vts(path,i,X,Y,Z)
+
+
+
+
+
 		
 # 
 # # 	frame = 0

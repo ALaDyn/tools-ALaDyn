@@ -142,9 +142,3 @@ def	generate_folder_vts(path):
 	directory = os.path.join(path,'VTS_files')
 	if not os.path.exists( directory ):
 		os.makedirs(directory)
-		
-			
-			
-			
-			
-			
