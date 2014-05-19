@@ -42,7 +42,7 @@ def matrix2vectorField( M1, M2, M3):
 
 
 #--- *** ---#
-def write_vts(path,frame,X,Y,Z):
+def write_vts(path,frame,X,Y,Z,cell_cut):
 # 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
 # 		write_VTS(path,i)
 
@@ -53,7 +53,16 @@ def write_vts(path,frame,X,Y,Z):
  	file_name 		= 'Edenout'+sf+'.bin'
  	rhobck, x,y,z	= read_ALaDyn_bin(path,file_name,'grid')
  	rhobck			= np.abs( rhobck )
+ 	
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	rhobunch = rhobunch[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+ 		rhobck   = rhobck[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Y		 = Y[cell_cut:-cell_cut]
+ 		Z        = Z[cell_cut:-cell_cut]
+ 	#-
  	size 			= rhobunch.shape
+ 	#- 
 
  	
 	#- writing vts header
@@ -121,6 +130,17 @@ def write_vts(path,frame,X,Y,Z):
 	Eyb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 	file_name = 'Ezbout'+sf+'.bin'
 	Ezb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	Ex  = Ex[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Ey  = Ey[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Ez  = Ez[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Exb = Exb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Eyb = Eyb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Ezb = Ezb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+ 	#- 
+
 	
 	#- E-field bunch
 	f.write('<DataArray type="Float32" Name="E_bunch" NumberOfComponents="3" format="binary"> \n')
@@ -155,6 +175,14 @@ def write_vts(path,frame,X,Y,Z):
 # 	Byb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 # 	file_name = 'Bzbout'+sf+'.bin'
 # 	Bzb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	Bx  = Bx[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	By  = By[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Bz  = Bz[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+ 	#- 
+
 	
 	#- B-field bunch
 # 	f.write('<DataArray type="Float32" Name="B_bunch" NumberOfComponents="3" format="binary"> \n')
@@ -277,7 +305,7 @@ def write_vts(path,frame,X,Y,Z):
 
 
 #--- *** ---# DENSITY VTS: bunch+capillary+total
-def write_density_vts(path,frame,X,Y,Z):
+def write_density_vts(path,frame,X,Y,Z,cell_cut):
 
  	sf='%2.2i'%frame 				#conversion to 2-character-long-string
  	file_name 		= 'Bdenout'+sf+'.bin'
@@ -286,7 +314,16 @@ def write_density_vts(path,frame,X,Y,Z):
  	file_name 		= 'Edenout'+sf+'.bin'
  	rhobck, x,y,z	= read_ALaDyn_bin(path,file_name,'grid')
  	rhobck			= np.abs( rhobck )
+ 	
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	rhobunch = rhobunch[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+ 		rhobck   = rhobck[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Y		 = Y[cell_cut:-cell_cut]
+ 		Z        = Z[cell_cut:-cell_cut]
+ 	#-
  	size 			= rhobunch.shape
+ 	#- 
 
  	
 	#- writing vts header
@@ -409,7 +446,7 @@ def write_density_vts(path,frame,X,Y,Z):
 
 
 #--- *** ---#
-def write_E_vts(path,frame,X,Y,Z):
+def write_E_vts(path,frame,X,Y,Z,cell_cut):
 # 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
 # 		write_VTS(path,i)
 
@@ -427,7 +464,20 @@ def write_E_vts(path,frame,X,Y,Z):
 	Eyb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 	file_name = 'Ezbout'+sf+'.bin'
 	Ezb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	Ex  = Ex[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Ey  = Ey[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Ez  = Ez[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Exb = Exb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Eyb = Eyb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Ezb = Ezb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Y		 = Y[cell_cut:-cell_cut]
+ 		Z        = Z[cell_cut:-cell_cut]
+ 	#-
  	size 			= Ex.shape
+ 	#- 
 
  	
 	#- writing vts header
@@ -484,7 +534,7 @@ def write_E_vts(path,frame,X,Y,Z):
 
 
 #--- *** ---#
-def write_B_vts(path,frame,X,Y,Z):
+def write_B_vts(path,frame,X,Y,Z,cell_cut):
 # 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
 # 		write_VTS(path,i)
 
@@ -496,6 +546,18 @@ def write_B_vts(path,frame,X,Y,Z):
 	file_name = 'Bzfout'+sf+'.bin'
 	Bz,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
  	size 			= Bx.shape
+
+
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	Bx  = Bx[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	By  = By[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Bz  = Bz[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
+	 	Y		 = Y[cell_cut:-cell_cut]
+ 		Z        = Z[cell_cut:-cell_cut]
+ 	#-
+ 	size 			= Ex.shape
+ 	#- 
 
  	
 	#- writing vts header
