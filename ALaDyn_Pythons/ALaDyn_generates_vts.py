@@ -59,8 +59,10 @@ if __name__ == '__main__':
 	print '--- Generating VTS ---'
 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
 # 		print '--- COMPLETE vts: frame >',i
-		write_vts(path,i,X,Y,Z,cell_cut)
+#		write_vts(path,i,X,Y,Z,cell_cut)
 		
+		print '--- write vts-section longitudinal: frame >',i
+		write_vts_section_longitudinal(path,i,X,Y,Z,cell_cut)		
 
 		#- in such a way it is much longer, but it is neater to write
 		#- plus: it has to be done only once

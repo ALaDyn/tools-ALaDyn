@@ -23,21 +23,33 @@ from read_ALaDyn_bin import *
 def matrix2vector( M ):
 	s = M.shape
 	v = []
-	for i in range(0,s[0]):
-		for j in range(0,s[1]):
-			for k in range(0,s[2]):
-				v.append(M[i,j,k])
+	if len(s) == 3:
+		for i in range(0,s[0]):
+			for j in range(0,s[1]):
+				for k in range(0,s[2]):
+					v.append(M[i,j,k])
+	if len(s) == 2:
+		for i in range(0,s[0]):
+			for j in range(0,s[1]):
+				v.append(M[i,j])	
 	return v
 
 def matrix2vectorField( M1, M2, M3):
 	s = M1.shape
 	v = []
-	for i in range(0,s[0]):
-		for j in range(0,s[1]):
-			for k in range(0,s[2]):
-				v.append(M1[i,j,k])
-				v.append(M2[i,j,k])
-				v.append(M3[i,j,k])
+	if len(s) == 3:
+		for i in range(0,s[0]):
+			for j in range(0,s[1]):
+				for k in range(0,s[2]):
+					v.append(M1[i,j,k])
+					v.append(M2[i,j,k])
+					v.append(M3[i,j,k])
+	if len(s) == 2:
+		for i in range(0,s[0]):
+			for j in range(0,s[1]):
+				v.append(M1[i,j])
+				v.append(M2[i,j])
+				v.append(M3[i,j])
 	return v
 
 
@@ -476,7 +488,7 @@ def write_E_vts(path,frame,X,Y,Z,cell_cut):
 	 	Y		 = Y[cell_cut:-cell_cut]
  		Z        = Z[cell_cut:-cell_cut]
  	#-
- 	size 			= Ex.shape
+ 	size = Ex.shape
  	#- 
 
  	
@@ -556,7 +568,7 @@ def write_B_vts(path,frame,X,Y,Z,cell_cut):
 	 	Y		 = Y[cell_cut:-cell_cut]
  		Z        = Z[cell_cut:-cell_cut]
  	#-
- 	size 			= Ex.shape
+ 	size = Bx.shape
  	#- 
 
  	
@@ -608,3 +620,199 @@ def write_B_vts(path,frame,X,Y,Z,cell_cut):
 	f.write('</StructuredGrid> \n')
 	f.write('</VTKFile>')
 
+
+
+
+
+
+
+
+
+
+#--- *** ---#
+def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut):
+
+ 	sf='%2.2i'%frame 				#conversion to 2-character-long-string
+ 	file_name 		= 'Bdenout'+sf+'.bin'
+ 	rhobunch, x,y,z	= read_ALaDyn_bin(path,file_name,'grid')
+ 	rhobunch		= np.abs( rhobunch )
+ 	file_name 		= 'Edenout'+sf+'.bin'
+ 	rhobck, x,y,z	= read_ALaDyn_bin(path,file_name,'grid')
+ 	rhobck			= np.abs( rhobck )
+
+	#-original size
+	sizeO = rhobunch.shape
+ 	
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	rhobunch = rhobunch[:, sizeO[1]/2, cell_cut:-cell_cut]
+ 		rhobck   = rhobck[:, sizeO[1]/2, cell_cut:-cell_cut]
+	 	Y		 = Y[ sizeO[1]/2 ]
+ 		Z        = Z[cell_cut:-cell_cut]
+	else:
+	 	rhobunch = rhobunch[:, sizeO[1]/2,:]
+ 		rhobck   = rhobck[:, sizeO[1]/2,:]
+	 	Y		 = Y[ sizeO[1]/2 ]
+ 		Z        = Z[:]
+ 	#-
+ 	size 		 = rhobunch.shape
+ 	#- 
+
+ 	
+	#- writing vts header
+	f = open(os.path.join(path,'VTS_files','ALaDyn_section_longitudinal_output_'+sf+'.vts'),'w+')
+	f.write('<?xml version="1.0"?>' + '\n')
+	f.write('<VTKFile type="StructuredGrid" version="0.1" byte_order="LittleEndian">' + '\n')
+	f.write('<StructuredGrid WholeExtent=" %d %d %d %d %d %d "> \n' % (0,0,0,size[1]-1,0,size[0]-1) )
+	f.write('<Piece Extent=" %d %d %d %d %d %d "> \n' % (0,0,0,size[1]-1,0,size[0]-1) )
+	#--- ---#
+
+
+	#- generating vector-MESH
+ 	mesh=[]
+ 	for i in range(0,size[0]):
+		for k in range(0,size[1]):
+			mesh.append( Y    )
+			mesh.append( Z[k] )
+			mesh.append( X[i] )
+	#- Writing MESH -#
+	f.write('<Points> \n')
+ 	f.write('<DataArray type="Float32" Name="Points" NumberOfComponents="3" format="binary"> \n')
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(  base64.b64encode(np.array(len(s),dtype=np.int32))  )
+ 	f.write(  s  )
+	f.write('</DataArray> \n')
+	f.write('</Points> \n')
+	#- -#
+
+	#- Point Data Begin-#
+ 	f.write('<PointData>\n')
+#	f.write('<CellData> \n')
+	#- -#
+
+	#- Writing BUNCH Density -#
+	f.write('<DataArray type="Float32" Name="rho_bunch" format="binary"> \n')
+	mesh = matrix2vector( rhobunch )
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+
+	#- Writing Tot-Density -#
+	f.write('<DataArray type="Float32" Name="rho" format="binary"> \n')
+	mesh = matrix2vector( rhobunch+rhobck )
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+		#-Deallocate memory
+	rhobunch = [0.]; rhobck = [0.]
+
+	#- Writing E-field -#
+			#- background -#
+ 	file_name = 'Exfout'+sf+'.bin'
+	Ex,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+	file_name = 'Eyfout'+sf+'.bin'
+	Ey,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+	file_name = 'Ezfout'+sf+'.bin'
+	Ez,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+			#- bunch(es) -#
+	file_name = 'Exbout'+sf+'.bin'
+	Exb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+	file_name = 'Eybout'+sf+'.bin'
+	Eyb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+	file_name = 'Ezbout'+sf+'.bin'
+	Ezb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	Ex  = Ex[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	Ey  = Ey[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	Ez  = Ez[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	Exb = Exb[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	Eyb = Eyb[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	Ezb = Ezb[:,sizeO[1]/2,cell_cut:-cell_cut]
+ 	else:
+	 	Ex  = Ex[:,sizeO[1]/2,:]
+	 	Ey  = Ey[:,sizeO[1]/2,:]
+	 	Ez  = Ez[:,sizeO[1]/2,:]
+	 	Exb = Exb[:,sizeO[1]/2,:]
+	 	Eyb = Eyb[:,sizeO[1]/2,:]
+	 	Ezb = Ezb[:,sizeO[1]/2,:]
+ 	#- 
+
+	
+	#- E-field bunch
+	f.write('<DataArray type="Float32" Name="E_bunch" NumberOfComponents="3" format="binary"> \n')
+	mesh = matrix2vectorField(Exb,Eyb,Ezb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+	#- E-field total
+	f.write('<DataArray type="Float32" Name="E" NumberOfComponents="3" format="binary"> \n')
+	mesh = matrix2vectorField(Ex+Exb,Ey+Eyb,Ez+Ezb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+		#-Deallocate memory
+	Ex=[0.];Ey=[0.];Ez=[0.];Exb=[0.];Eyb=[0.];Ezb=[0.];
+
+
+	#- Writing B-field -#
+			#- background -#
+ 	file_name = 'Bxfout'+sf+'.bin'
+	Bx,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+	file_name = 'Byfout'+sf+'.bin'
+	By,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+	file_name = 'Bzfout'+sf+'.bin'
+	Bz,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+# 			#- bunch(es) -#
+# 	file_name = 'Bxbout'+sf+'.bin'
+# 	Bxb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+# 	file_name = 'Bybout'+sf+'.bin'
+# 	Byb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+# 	file_name = 'Bzbout'+sf+'.bin'
+# 	Bzb,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
+
+ 	#- matrix shaving
+ 	if cell_cut > 0:
+	 	Bx  = Bx[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	By  = By[:,sizeO[1]/2,cell_cut:-cell_cut]
+	 	Bz  = Bz[:,sizeO[1]/2,cell_cut:-cell_cut]
+ 	else:
+	 	Bx  = Bx[:,sizeO[1]/2,:]
+	 	By  = By[:,sizeO[1]/2,:]
+	 	Bz  = Bz[:,sizeO[1]/2,:]
+ 	#- 
+
+	
+	#- B-field bunch
+# 	f.write('<DataArray type="Float32" Name="B_bunch" NumberOfComponents="3" format="binary"> \n')
+# 	mesh = matrix2vectorField(Bxb,Byb,Bzb)
+# 	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+#  	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+#  	f.write(s)
+# 	f.write('</DataArray> \n')
+	#- B-field total
+	f.write('<DataArray type="Float32" Name="B" NumberOfComponents="3" format="binary"> \n')
+	mesh = matrix2vectorField(Bx,By,Bz)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+		#-Deallocate memory
+	Bx=[0.];By=[0.];Bz=[0.];#Bxb=[0.];Byb=[0.];Bzb=[0.];
+
+
+
+	#- Point Data End-#
+ 	f.write('</PointData> \n')
+#	f.write('</CellData> \n')
+	#- -#
+
+
+	f.write('</Piece> \n')
+	f.write('</StructuredGrid> \n')
+	f.write('</VTKFile>')
