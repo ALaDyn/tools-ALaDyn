@@ -24,8 +24,8 @@ Parametri::Parametri()
 	massa_particella_MeV = 0.;
 	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_ty = nbin_tz = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
 	tnow = 0.0;
-	xmin = pxmin = ymin = pymin = zmin = pzmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
-	xmax = pxmax = ymax = pymax = zmax = pzmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
+	xmin = pxmin = ymin = pymin = zmin = pzmin = wmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
+	xmax = pxmax = ymax = pymax = zmax = pzmax = wmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
 	tymin = tzmin = -1.0;
 	tymax = tzmax = 1.0;
 	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
@@ -1585,6 +1585,8 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 		std::cout << "TYMAX = " << tymax << std::endl;
 		std::cout << "TZMIN = " << tzmin << std::endl;
 		std::cout << "TZMAX = " << tzmax << std::endl;
+		std::cout << "WMIN = " << wmin << std::endl;
+		std::cout << "WMAX = " << wmax << std::endl;
 #endif
 		if (p_b[OUT_VTK] && !do_not_ask_missing)
 		{
@@ -2316,6 +2318,7 @@ void Parametri::organizza_minimi_massimi()
 	minimi[9] = thetaTmin;
 	minimi[10] = tymin;
 	minimi[11] = tzmin;
+	minimi[12] = wmin;
 
 	massimi[0] = xmax;
 	massimi[1] = ymax;
@@ -2329,12 +2332,8 @@ void Parametri::organizza_minimi_massimi()
 	massimi[9] = thetaTmax;
 	massimi[10] = tymax;
 	massimi[11] = tzmax;
+	massimi[12] = wmax;
 
-#ifdef ENABLE_DEBUG
-	std::cout << "---- organizza_minimi_massimi() -----" << std::endl;
-	std::cout << "Hai scritto Emin = " << Emin << "  Emax = " << Emax << std::endl;
-	std::cout << "Hai scritto minimi[8] = " << minimi[8] << "  massimi[8] = " << massimi[8] << std::endl;
-#endif
 }
 
 

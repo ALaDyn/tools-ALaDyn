@@ -108,7 +108,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define OUT_VTK_NOSTRETCH	16
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
-#define ALTRI_PARAMETRI 6 // gamma, theta, thetaT, E, ty, tz
+#define ALTRI_PARAMETRI 7 // gamma, theta, thetaT, E, ty, tz, w
 
 // definizione numero filtri "abilitati"
 # ifndef NUM_FILTRI
@@ -167,7 +167,7 @@ struct Parametri
 	bool p_b[NPARAMETRI];
 	char support_label[MAX_LENGTH_FILENAME];
 	float minimi[SEI_DIMENSIONI + ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI + ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E, ty, tz
-	float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
+	float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, wmin, wmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
 	std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
 	std::vector<float> xcoord, ycoord, zcoord, realpar;
 	std::vector<int> intpar;

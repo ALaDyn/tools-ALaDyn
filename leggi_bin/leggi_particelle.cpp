@@ -53,7 +53,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int N_param, *int_param, npart_loc;
 	int buff, pID;
 
-	float x, y, z, px, py, pz, ptot;
+	float x, y, z, px, py, pz, w, ptot;
 	float gamma, theta, thetaT, E, ty, tz;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	float *estremi_min, *estremi_max;
@@ -601,6 +601,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							px = *(particelle + i*ndv + 3);
 							py = *(particelle + i*ndv + 4);
 							pz = *(particelle + i*ndv + 5);
+							if (ndv == 7) w = x = *(particelle + i*ndv + 6);
+							else w = 1.0;
 							gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma
 							theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 							thetaT = (float)atan(sqrt((py*py + pz*pz) / (px*px)));
@@ -639,6 +641,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (ty > estremi_max[10]) estremi_max[10] = ty;
 							if (tz < estremi_min[11]) estremi_min[11] = tz;
 							if (tz > estremi_max[11]) estremi_max[11] = tz;
+							if (w < estremi_min[12]) estremi_min[12] = w;
+							if (w > estremi_max[12]) estremi_max[12] = w;
 						}
 						else if (ndv == 4 || ndv == 5)
 						{
@@ -646,6 +650,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							y = *(particelle + i*ndv + 1);
 							px = *(particelle + i*ndv + 2);
 							py = *(particelle + i*ndv + 3);
+							if (ndv == 5) w = x = *(particelle + i*ndv + 4);
+							else w = 1.0;
 							gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
 							theta = (float)(atan2(py, px)*180. / M_PI);				//theta
 							thetaT = (float)atan(sqrt((py*py) / (px*px)));
@@ -672,6 +678,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
 							if (ty < estremi_min[10]) estremi_min[10] = ty;
 							if (ty > estremi_max[10]) estremi_max[10] = ty;
+							if (w < estremi_min[12]) estremi_min[12] = w;
+							if (w > estremi_max[12]) estremi_max[12] = w;
 						}
 					}
 				}
@@ -1014,6 +1022,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		Estremi_out << "TYMAX = " << estremi_max[10] << std::endl;
 		Estremi_out << "TZMIN = " << estremi_min[11] << std::endl;
 		Estremi_out << "TZMAX = " << estremi_max[11] << std::endl;
+		Estremi_out << "WMIN = " << estremi_min[12] << std::endl;
+		Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
 		Estremi_out.close();
 	}
 
