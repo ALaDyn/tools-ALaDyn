@@ -165,9 +165,9 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 			p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
 
 		if (parametri->p[NCOLONNE] == 5)
-			w = pntt_loc[5];
+			w = pntt_loc[4];
 		else if (parametri->p[NCOLONNE] == 7)
-			w = pntt_loc[7];
+			w = pntt_loc[6];
 		else
 			w = 1.0;
 
