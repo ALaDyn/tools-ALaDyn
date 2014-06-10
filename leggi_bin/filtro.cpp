@@ -284,7 +284,7 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 				break;
 			case __0X18: // cost::tymin
 				nomi = tymin;
-				flag_filtri.meno_tymin = ty <= val[18];
+				flag_filtri.meno_tymin = ty >= val[18];
 				flag = flag && flag_filtri.meno_tymin;
 				break;
 			case __0X19: // cost::tymax
@@ -294,7 +294,7 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 				break;
 			case __0X20: // cost::tzmin
 				nomi = tzmin;
-				flag_filtri.meno_tzmin = tz <= val[20];
+				flag_filtri.meno_tzmin = tz >= val[20];
 				flag = flag && flag_filtri.meno_tzmin;
 				break;
 			case __0X21: // cost::tzmax
@@ -304,7 +304,7 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 				break;
 			case __0X22: // cost::wmin
 				nomi = wmin;
-				flag_filtri.meno_wmin = w <= val[22];
+				flag_filtri.meno_wmin = w >= val[22];
 				flag = flag && flag_filtri.meno_wmin;
 				break;
 			case __0X23: // cost::wmax
