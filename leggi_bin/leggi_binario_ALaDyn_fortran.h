@@ -112,7 +112,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 
 // definizione numero filtri "abilitati"
 # ifndef NUM_FILTRI
-# define NUM_FILTRI 18
+# define NUM_FILTRI 24
 # endif
 
 # define __0X00 0x1
@@ -235,7 +235,7 @@ struct _Filtro
 		xmin, ymin, zmin, xmax, ymax, zmax,
 		pxmin, pymin, pzmin, pxmax, pymax, pzmax,
 		emin, emax, thetamin, thetamax, thetaTmin, thetaTmax,
-		tymin, tymax, tzmin, tzmax
+		tymin, tymax, tzmin, tzmax, wmin, wmax
 	} nomi;
 	static float * costruisci_filtro(const char *, ...);
 	static float * costruisci_filtro(int, const char **);
@@ -266,6 +266,8 @@ struct _Filtro
 		unsigned meno_tzmin : 1;
 		unsigned piu_tymax : 1;
 		unsigned piu_tzmax : 1;
+		unsigned meno_wmin : 1;
+		unsigned piu_wmax : 1;
 		_flag_filtri operator=(int o)
 		{
 			meno_xmin = meno_ymin = meno_zmin =
@@ -274,7 +276,8 @@ struct _Filtro
 				piu_pxmax = piu_pymax = piu_pzmax =
 				meno_Emin = piu_Emax = meno_thetamin = piu_thetamax =
 				meno_thetaTmin = piu_thetaTmax = meno_tymin =
-				piu_tymax = meno_tzmin = piu_tzmax = 0;
+				piu_tymax = meno_tzmin = piu_tzmax = 
+				meno_wmin = piu_wmax = 0;
 			return *this;
 		}
 		// varie ed eventuali

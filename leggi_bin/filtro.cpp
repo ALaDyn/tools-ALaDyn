@@ -116,6 +116,8 @@ namespace cost
 	unsigned int tymax = __0X19;
 	unsigned int tzmin = __0X20;
 	unsigned int tzmax = __0X21;
+	unsigned int wmin = __0X22;
+	unsigned int wmax = __0X23;
 
 	unsigned int tutte[] =
 	{
@@ -127,7 +129,8 @@ namespace cost
 		thetamin, thetamax,
 		thetaTmin, thetaTmax,
 		tymin, tymax,
-		tzmin, tzmax
+		tzmin, tzmax,
+		wmin, wmax
 	};
 	// varie ed eventuali
 }
@@ -135,7 +138,7 @@ namespace cost
 
 _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
 {
-	float * pntt_loc, p[] = { 0, 0, 0 }, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0.;
+	float * pntt_loc, p[] = { 0, 0, 0 }, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0., w = 0.;
 	unsigned int corrente = 0, tests[32];
 	bool flag;
 	unsigned char tot_test = 0;
@@ -155,8 +158,18 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 	{
 		pntt_loc = dati + i*n_dati[1];
 		flag = true;
-		if (parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
-		else if (parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
+		if (parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) 
+			p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
+
+		else if (parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) 
+			p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
+
+		if (parametri->p[NCOLONNE] == 5)
+			w = pntt_loc[5];
+		else if (parametri->p[NCOLONNE] == 7)
+			w = pntt_loc[7];
+		else
+			w = 1.0;
 
 		for (unsigned char c = 0; c < tot_test; ++c)
 		{
@@ -289,6 +302,16 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 				flag_filtri.piu_tzmax = tz <= val[21];
 				flag = flag && flag_filtri.piu_tzmax;
 				break;
+			case __0X22: // cost::wmin
+				nomi = wmin;
+				flag_filtri.meno_wmin = w <= val[22];
+				flag = flag && flag_filtri.meno_wmin;
+				break;
+			case __0X23: // cost::wmax
+				nomi = wmax;
+				flag_filtri.piu_wmax = w <= val[23];
+				flag = flag && flag_filtri.piu_wmax;
+				break;
 			}
 
 		}
@@ -323,7 +346,9 @@ const char * _Filtro::descr[] =
 	"+tymin",
 	"+tymax",
 	"+tzmin",
-	"+tzmax"
+	"+tzmax",
+	"+wmin",
+	"+wmax"
 	// varie ed eventuali
 };
 
@@ -376,6 +401,8 @@ float * _Filtro::costruisci_filtro(int narg, const char **args)
 		miei_args[19], miei_val[19],
 		miei_args[20], miei_val[20],
 		miei_args[21], miei_val[21],
+		miei_args[22], miei_val[22],
+		miei_args[23], miei_val[23],
 		miei_args[NUM_FILTRI]);
 }
 
