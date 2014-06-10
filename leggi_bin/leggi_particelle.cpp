@@ -601,7 +601,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							px = *(particelle + i*ndv + 3);
 							py = *(particelle + i*ndv + 4);
 							pz = *(particelle + i*ndv + 5);
-							if (ndv == 7) w = x = *(particelle + i*ndv + 6);
+							if (ndv == 7) w = *(particelle + i*ndv + 6);
 							else w = 1.0;
 							gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma
 							theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
@@ -650,7 +650,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							y = *(particelle + i*ndv + 1);
 							px = *(particelle + i*ndv + 2);
 							py = *(particelle + i*ndv + 3);
-							if (ndv == 5) w = x = *(particelle + i*ndv + 4);
+							if (ndv == 5) w = *(particelle + i*ndv + 4);
 							else w = 1.0;
 							gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
 							theta = (float)(atan2(py, px)*180. / M_PI);				//theta
