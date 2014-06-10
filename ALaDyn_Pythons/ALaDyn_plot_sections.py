@@ -19,6 +19,9 @@ from ALaDyn_plot_utilities_1 import *
 from ALaDyn_plot_utilities_density import *
 from ALaDyn_plot_utilities_Efield import *
 from ALaDyn_plot_utilities_Bfield import *
+from ALaDyn_plot_utilities_axes import *
+
+
 ### --- ###
 
 
@@ -32,6 +35,7 @@ if(len(sys.argv)<2):
 	print 'Input [5]: rho_max'
 	print 'Input [6]: iso-lines'
 	print 'Input [7]: cell to cut'
+	print 'Input [8]: Save data? (True/False)'
 
 if sys.argv[1] == -1:
 	frame_begin		  = 0
@@ -48,6 +52,7 @@ else:
 	rho_max 		  	= float(	sys.argv[5])
 	isolines			= int(		sys.argv[6])
 	celltocut			= int(		sys.argv[7])
+	savedata            = sys.argv[8]
 ### --- ###
 
 
@@ -59,9 +64,9 @@ if __name__ == '__main__':
 	path = os.getcwd()
 	
 	#-folder output structure
-	generate_folder_output_structure(path)
+	generate_folder_output_structure(path,savedata)
 
-
+	
 # 	N = last_output(path)
 # 	print '-------------------'
 # 	print 'last output number > ',N
@@ -69,17 +74,50 @@ if __name__ == '__main__':
 		
 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
 		print '-------------------'
+		
+		
 		if output_exists(path,'rho',i) == True:
 			print 'rho --- frame >>> ',i
-			plot_density_sections(path,i,rho_min,rho_max,isolines,celltocut,magnification_fig)
+			plot_density_sections(path,i,rho_min,rho_max,isolines,celltocut,magnification_fig,savedata)
 
 		if output_exists(path,'E',i) == True:
 			print 'E --- frame >>> ',i
-			plot_Efield_sections(path,i,magnification_fig)
+			plot_Efield_sections(path,i,magnification_fig,savedata)
+
 			
 		if output_exists(path,'B',i) == True:
 			print 'B --- frame >>> ',i		
-			plot_Bfield_sections(path,i,magnification_fig)
+			plot_Bfield_sections(path,i,magnification_fig,savedata)
+		
+		
+			
+		if output_exists(path,'Moving_window_axes',i) == True:
+			print 'Moving window axes --- frame >>> ',i
+			if savedata == 'True':
+ 				print 'Moving Window Coordinates data --- frame >>> ',i		
+ 				save_moving_window_coordinates(path,i)
+
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

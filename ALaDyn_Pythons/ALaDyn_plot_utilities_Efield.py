@@ -16,6 +16,7 @@ from pylab import *
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
 ###>>>
 from read_ALaDyn_bin import *
+from ALaDyn_plot_utilities_1 import *
 ### --- ###
 
 
@@ -24,7 +25,7 @@ from read_ALaDyn_bin import *
 
 
 #- plot Sections
-def plot_Efield_sections(path,frame):
+def plot_Efield_sections(path,frame,scale_factor,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	
@@ -53,6 +54,7 @@ def plot_Efield_sections(path,frame):
 	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
 	
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,scale_factor)
+
 
 
 
@@ -154,8 +156,17 @@ def plot_Efield_sections(path,frame):
 	savefig( os.path.join(path,'plots','E_field',name_output) )
 	close(fig)
 
-
-
+	
+	if (savedata == 'True'):
+		
+		print 'saving E field data'
+		
+		#--- saves E-sections ---#
+	
+		np.savetxt( os.path.join(path,'data','E_field',('Ex_z0_section_'+('%2.2i'%frame)+'.dat' )),Ex[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'data','E_field',('Ey_z0_section_'+('%2.2i'%frame)+'.dat' )),Ey[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'data','E_field',('Ez_z0_section_'+('%2.2i'%frame)+'.dat' )),Ez[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'data','E_field',('E_z0_section_'+('%2.2i'%frame)+'.dat'  )),norm_E[:,:,z2].T,fmt='%15.14e')
 
 
 

@@ -27,7 +27,7 @@ path = os.getcwd()
 
 # --- #
 # FRAME NUMBER
-frame = 8
+frame = 6
 
 
 # --- #

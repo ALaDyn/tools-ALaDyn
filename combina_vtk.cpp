@@ -100,3 +100,4 @@ int main (int argc, char *argv[])
 	for(int f=0;f<3;f++) fclose(inputfile[f]);
 }
 
+

@@ -29,7 +29,7 @@ def last_output(path):
 	return n_last_output
 
 #- folder structure for outputs -#
-def	generate_folder_output_structure(path):
+def	generate_folder_output_structure(path,savedata):
 	directory = os.path.join(path,'plots')
 	if not os.path.exists( directory ):
 		os.makedirs(directory)
@@ -44,6 +44,27 @@ def	generate_folder_output_structure(path):
 		os.makedirs(directory_E)
 	if not os.path.exists( directory_B ):
 		os.makedirs(directory_B)
+
+
+	if (savedata == 'True'):
+		directory = os.path.join(path,'data')
+		if not os.path.exists( directory ):
+			os.makedirs(directory)
+	
+		directory_rho = os.path.join(directory,'rho')
+		directory_E   = os.path.join(directory,'E_field')
+		directory_B   = os.path.join(directory,'B_field')
+		directory_moving_window = os.path.join(directory,'Moving_window_axes')
+		
+		if not os.path.exists( directory_rho ):
+			os.makedirs(directory_rho)
+		if not os.path.exists( directory_E ):
+			os.makedirs(directory_E)
+		if not os.path.exists( directory_B ):
+			os.makedirs(directory_B)
+		if not os.path.exists( directory_moving_window ):
+			os.makedirs( directory_moving_window )
+
 
 
 #- Image inches dimesions -#
@@ -102,3 +123,22 @@ def output_exists(path,quantity,frame):
 			return True
 		else:
 			return False
+			
+			
+	if quantity == 'Moving_window_axes':
+# 		print os.path.join(path,'data','Moving_window_axes',('moving_window_axes_'+('%2.2i'%frame)+'.dat')
+# 		window_data_file = os.path.join(path,'data','Moving_window_axes',('moving_window_axes_'+('%2.2i'%frame)+'.dat')
+# 		print window_data_file
+		# 
+		if os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
+	
+			
+			
+#- folder structure for VTS outputs -#
+def	generate_folder_vts(path):
+	directory = os.path.join(path,'VTS_files')
+	if not os.path.exists( directory ):
+		os.makedirs(directory)

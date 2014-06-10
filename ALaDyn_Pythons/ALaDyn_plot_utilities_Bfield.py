@@ -16,6 +16,7 @@ from pylab import *
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
 ###>>>
 from read_ALaDyn_bin import *
+from ALaDyn_plot_utilities_1 import *
 ### --- ###
 
 
@@ -24,7 +25,7 @@ from read_ALaDyn_bin import *
 
 
 #- plot Sections
-def plot_Bfield_sections(path,frame):
+def plot_Bfield_sections(path,frame,scale_factor,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	
@@ -154,6 +155,16 @@ def plot_Bfield_sections(path,frame):
 	close(fig)
 
 
+	if (savedata == 'True'):
+		
+		print 'saving E field data'
+		
+		#--- saves E-sections data---#
+
+		np.savetxt( os.path.join(path,'plots','B_field',('Bx_z0_section_'+('%2.2i'%frame)+'.dat')) ,Bx[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'plots','B_field',('By_z0_section_'+('%2.2i'%frame)+'.dat')) ,By[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'plots','B_field',('Bz_z0_section_'+('%2.2i'%frame)+'.dat')) ,Bz[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'plots','B_field',('B_z0_section_'+('%2.2i'%frame)+'.dat'))  ,norm_B[:,:,z2].T,fmt='%15.14e')
 
 
 
