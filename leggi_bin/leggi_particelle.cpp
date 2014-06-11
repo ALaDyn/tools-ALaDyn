@@ -688,6 +688,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
 							if (ty < estremi_min[10]) estremi_min[10] = ty;
 							if (ty > estremi_max[10]) estremi_max[10] = ty;
+							estremi_min[11] = -1., estremi_max[11] = 1.;
 							if (w < estremi_min[12]) estremi_min[12] = w;
 							if (w > estremi_max[12]) estremi_max[12] = w;
 						}
