@@ -22,21 +22,21 @@ Parametri::Parametri()
 	stretched_grid = true;
 	stretched_along_x = 1;
 	massa_particella_MeV = 0.;
-	nbin = nbin_x = nbin_px = nbin_y = nbin_z = nbin_ty = nbin_tz = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_gamma = 120;
+	nbin = nbin_x = nbin_px = nbin_y = nbin_py = nbin_z = nbin_pz = nbin_w = nbin_E = nbin_gamma = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = 120;
 	tnow = 0.0;
 	xmin = pxmin = ymin = pymin = zmin = pzmin = wmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
 	xmax = pxmax = ymax = pymax = zmax = pzmax = wmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
 	tymin = tzmin = -1.0;
 	tymax = tzmax = 1.0;
-	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = gammamin_b = gammamax_b = true;
+	ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = wmin_b = wmax_b = gammamin_b = gammamax_b = true;
 	xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = true;
 	tymin_b = tymax_b = tzmin_b = tzmax_b = nbin_ty_b = nbin_tz_b = true;
 	nbin_b = true;
 	nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
 	nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
-	fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
+	fai_plot_wspec = fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
 	fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
-	fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = fai_plot_rcf = false;
+	fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = fai_plot_xw = fai_plot_rcf = false;
 	overwrite_weight = false;
 	overwrite_weight_value = 1.0;
 	do_not_ask_missing = false;
@@ -92,6 +92,10 @@ float Parametri::dimmi_dimpz()
 {
 	return (pzmax - pzmin) / static_cast <float> (nbin_pz);
 }
+float Parametri::dimmi_dimw()
+{
+	return (wmax - wmin) / static_cast <float> (nbin_w);
+}
 float Parametri::dimmi_dimgamma()
 {
 	return (gammamax - gammamin) / static_cast <float> (nbin_gamma);
@@ -124,6 +128,7 @@ int Parametri::dimmi_nbin(int colonna)
 	else if (colonna == 9)	return nbin_thetaT;
 	else if (colonna == 10)	return nbin_ty;
 	else if (colonna == 11)	return nbin_tz;
+	else if (colonna == 12)	return nbin_w;
 	else return 120;
 }
 
@@ -143,6 +148,7 @@ float Parametri::dimmi_dim(int colonna)
 	else if (colonna == 9)	return dimmi_dimthetaT();
 	else if (colonna == 10)	return dimmi_dimty();
 	else if (colonna == 11)	return dimmi_dimtz();
+	else if (colonna == 12)	return dimmi_dimw();
 	else return 1.0;
 }
 
@@ -800,6 +806,18 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 			overwrite_weight_value = (float)atof(argv[i + 1]);
 			i++;
 		}
+		else if (std::string(argv[i]) == "-wmin")
+		{
+			wmin = (float)atof(argv[i + 1]);
+			wmin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-wmax")
+		{
+			wmax = (float)atof(argv[i + 1]);
+			wmax_b = false;
+			i++;
+		}
 		else if (std::string(argv[i]) == "-ymin")
 		{
 			ymin = (float)atof(argv[i + 1]);
@@ -978,6 +996,17 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 		{
 			fai_plot_xy = 1;
 		}
+		else if (std::string(argv[i]) == "-plot_xw")
+		{
+			if (p[WEIGHT])
+			{
+				fai_plot_xw = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with weight using a file without weight!" << std::endl;
+			}
+		}
 		else if (std::string(argv[i]) == "-plot_xz")
 		{
 			if (p[NCOLONNE] > 5)
@@ -1120,6 +1149,17 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 		{
 			fai_plot_Espec = 1;
 		}
+		else if (std::string(argv[i]) == "-plot_wspec")
+		{
+			if (p[WEIGHT])
+			{
+				fai_plot_wspec = 1;
+			}
+			else
+			{
+				std::cout << "Unable to do a plot with weight using a file without weight!" << std::endl;
+			}
+		}
 		else if (std::string(argv[i]) == "-plot_thetaspec")
 		{
 			fai_plot_thetaspec = 1;
@@ -1143,6 +1183,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 			if (nbin_theta_b) nbin_theta = nbin;
 			if (nbin_theta_b) nbin_thetaT = nbin;
 			if (nbin_E_b) nbin_E = nbin;
+			if (nbin_w_b) nbin_w = nbin;
 			nbin_b = false;
 			i++;
 		}
@@ -1227,6 +1268,13 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 		{
 			nbin_E = atoi(argv[i + 1]);
 			nbin_E_b = false;
+			nbin_b = false;
+			i++;
+		}
+		else if (std::string(argv[i]) == "-nbinw")
+		{
+			nbin_w = atoi(argv[i + 1]);
+			nbin_w_b = false;
 			nbin_b = false;
 			i++;
 		}
@@ -1372,6 +1420,16 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 				{
 					Emax = (float)std::atof(leggi.c_str());
 					Emax_b = false;
+				}
+				else if ((nomepar == "wmin" || nomepar == "WMIN") && wmin_b)
+				{
+					wmin = (float)std::atof(leggi.c_str());
+					wmin_b = false;
+				}
+				else if ((nomepar == "wmax" || nomepar == "WMAX") && wmax_b)
+				{
+					wmax = (float)std::atof(leggi.c_str());
+					wmax_b = false;
 				}
 				/*
 				else
@@ -2037,6 +2095,11 @@ bool Parametri::check_parametri()
 			printf("Attenzione: tzmin > tzmax\n");
 			test = false;
 		}
+		if (wmin > wmax)
+		{
+			printf("Attenzione: wmin > wmax\n");
+			test = false;
+		}
 		if (nbin_x <= 0)
 		{
 			printf("Attenzione: nbin_x < 0\n");
@@ -2090,6 +2153,11 @@ bool Parametri::check_parametri()
 		if (nbin_tz <= 0)
 		{
 			printf("Attenzione: nbin_tz < 0\n");
+			test = false;
+		}
+		if (nbin_w <= 0)
+		{
+			printf("Attenzione: nbin_w < 0\n");
 			test = false;
 		}
 	}

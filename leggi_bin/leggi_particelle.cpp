@@ -193,6 +193,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	fflush(stdout);
 
 
+	float **xw = new float*[parametri->nbin_x + 3];
+	for (int i = 0; i < parametri->nbin_x + 3; i++)
+	{
+		xw[i] = new float[parametri->nbin_w + 3];
+		for (int j = 0; j < parametri->nbin_w + 3; j++) xw[i][j] = 0.0;
+	}
+
 	float **xy = new float*[parametri->nbin_x + 3];
 	for (int i = 0; i < parametri->nbin_x + 3; i++)
 	{
@@ -318,6 +325,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		EthetaT[i] = new float[parametri->nbin_thetaT + 3];
 		for (int j = 0; j < parametri->nbin_thetaT + 3; j++) EthetaT[i][j] = 0.0;
 	}
+
+	float *wspec = new float[parametri->nbin_w + 3];
+	for (int i = 0; i < parametri->nbin_w + 3; i++) wspec[i] = 0.0;
 
 	float *Espec = new float[parametri->nbin_E + 3];
 	for (int i = 0; i < parametri->nbin_E + 3; i++) Espec[i] = 0.0;
@@ -701,9 +711,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if (parametri->fai_plot_pxpy)		_Binnaggio(particelle, val[0], ndv, parametri, pxpy, "px", "py");
 					if (parametri->fai_plot_pxpz)		_Binnaggio(particelle, val[0], ndv, parametri, pxpz, "px", "pz");
 					if (parametri->fai_plot_pypz)		_Binnaggio(particelle, val[0], ndv, parametri, pypz, "py", "pz");
+					if (parametri->fai_plot_xw)			_Binnaggio(particelle, val[0], ndv, parametri, xw, "x", "w");
 					if (parametri->fai_plot_Etheta)		_Binnaggio(particelle, val[0], ndv, parametri, Etheta, "E", "theta");
 					if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle, val[0], ndv, parametri, EthetaT, "E", "thetaT");
 					if (parametri->fai_plot_Espec)		_Binnaggio(particelle, val[0], ndv, parametri, Espec, "E");
+					if (parametri->fai_plot_wspec)		_Binnaggio(particelle, val[0], ndv, parametri, wspec, "w");
 					if (parametri->fai_plot_thetaspec)	_Binnaggio(particelle, val[0], ndv, parametri, thetaspec, "theta");
 					if (parametri->fai_plot_thetaTspec)	_Binnaggio(particelle, val[0], ndv, parametri, thetaTspec, "thetaT");
 				}
@@ -1110,6 +1122,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			sprintf(nomefile_binnato, "%s_pypz.txt", argv[1]);
 			_Scrittura(parametri, pypz, "py", "pz", std::string(nomefile_binnato));
 		}
+		if (parametri->fai_plot_xw)
+		{
+			sprintf(nomefile_binnato, "%s_xw.txt", argv[1]);
+			_Scrittura(parametri, xw, "x", "w", std::string(nomefile_binnato));
+		}
 		if (parametri->fai_plot_Etheta)
 		{
 			sprintf(nomefile_binnato, "%s_Etheta.txt", argv[1]);
@@ -1124,6 +1141,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		{
 			sprintf(nomefile_binnato, "%s_Espec.txt", argv[1]);
 			_Scrittura(parametri, Espec, "E", std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_wspec)
+		{
+			sprintf(nomefile_binnato, "%s_wspec.txt", argv[1]);
+			_Scrittura(parametri, wspec, "w", std::string(nomefile_binnato));
 		}
 		if (parametri->fai_plot_thetaspec)
 		{

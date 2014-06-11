@@ -158,18 +158,24 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
 	{
 		pntt_loc = dati + i*n_dati[1];
 		flag = true;
-		if (parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) 
+		if (parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7)
+		{
 			p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
+			if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+				w = pntt_loc[6];
+			else
+				w = parametri->overwrite_weight_value;
+		}
 
-		else if (parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) 
+		else if (parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5)
+		{
 			p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
+			if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+				w = pntt_loc[4];
+			else
+				w = parametri->overwrite_weight_value;
+		}
 
-		if (parametri->p[NCOLONNE] == 5)
-			w = pntt_loc[4];
-		else if (parametri->p[NCOLONNE] == 7)
-			w = pntt_loc[6];
-		else
-			w = 1.0;
 
 		for (unsigned char c = 0; c < tot_test; ++c)
 		{
