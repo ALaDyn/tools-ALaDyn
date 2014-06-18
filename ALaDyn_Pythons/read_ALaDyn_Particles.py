@@ -33,8 +33,8 @@ file_name = sys.argv[1]
 
 f  = open(file_name,'rb')
 
-X=[]
-Y=[]
+X=[]  
+Y=[] 
 Z=[]
 Px=[]
 Py=[]
@@ -62,13 +62,17 @@ while True:
 f.close()
 
 
+H, xedges, yedges = np.histogram2d(Y, Py, bins=(120, 120))
+
 Xhist,Xbins=np.histogram(X,100)
 print Xhist
 print Xbins
 
 #use interactive mode
 plt.ion()
-plt.hist(X)
+#plt.hist(X)
+#plt.plot(Y,Py,'.')i
+plt.imshow(H)
 plt.draw()
 
 
