@@ -18,26 +18,32 @@ import numpy as np
 # - #
 def read_particle_phasespace(file_name):
 	f  = open(file_name,'rb')
-	X=Y=Z=Px=Py=Pz=W=[] 
+	X=[]
+	Y=[]
+	Z=[]
+	Px=[]
+	Py=[]
+	Pz=[]
+	W=[] 
 
 	while True:
-    	try:
-        	Np=struct.unpack('i', f.read(4))
-	    except struct.error:
-    	    print "End of File"
-        	break
-	    vars=[]
-    	for i in range(0,Np[0]):
-	        vars=struct.unpack('fffffff', f.read(4*7))
-    	    X.append(vars[0])
-        	Y.append(vars[1])
-	        Z.append(vars[2])
-    	    Px.append(vars[3])
-        	Py.append(vars[4])
-	        Pz.append(vars[5])
-    	    W.append(vars[6])
-        	pass
-	    pass
+		try:
+			Np=struct.unpack('i', f.read(4))
+		except struct.error:
+			print "End of File"
+			break
+		vars=[]
+		for i in range(0,Np[0]):
+			vars=struct.unpack('fffffff', f.read(4*7))
+			X.append(vars[0])
+			Y.append(vars[1])
+			Z.append(vars[2])
+			Px.append(vars[3])
+			Py.append(vars[4])
+			Pz.append(vars[5])
+			W.append(vars[6])
+			pass
+		pass
 	f.close()
 
 	return X, Y, Z, Px, Py, Pz, W
