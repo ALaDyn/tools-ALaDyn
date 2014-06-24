@@ -53,7 +53,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	int N_param, *int_param, npart_loc;
 	int buff, pID;
 
-	float x, y, z, px, py, pz, ptot;
+	float x, y, z, px, py, pz, w, ptot;
 	float gamma, theta, thetaT, E, ty, tz;
 	float rx, ry, rz, ux, uy, uz, wgh;
 	float *estremi_min, *estremi_max;
@@ -193,6 +193,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 	fflush(stdout);
 
 
+	float **xw = new float*[parametri->nbin_x + 3];
+	for (int i = 0; i < parametri->nbin_x + 3; i++)
+	{
+		xw[i] = new float[parametri->nbin_w + 3];
+		for (int j = 0; j < parametri->nbin_w + 3; j++) xw[i][j] = 0.0;
+	}
+
 	float **xy = new float*[parametri->nbin_x + 3];
 	for (int i = 0; i < parametri->nbin_x + 3; i++)
 	{
@@ -318,6 +325,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		EthetaT[i] = new float[parametri->nbin_thetaT + 3];
 		for (int j = 0; j < parametri->nbin_thetaT + 3; j++) EthetaT[i][j] = 0.0;
 	}
+
+	float *wspec = new float[parametri->nbin_w + 3];
+	for (int i = 0; i < parametri->nbin_w + 3; i++) wspec[i] = 0.0;
 
 	float *Espec = new float[parametri->nbin_E + 3];
 	for (int i = 0; i < parametri->nbin_E + 3; i++) Espec[i] = 0.0;
@@ -601,6 +611,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							px = *(particelle + i*ndv + 3);
 							py = *(particelle + i*ndv + 4);
 							pz = *(particelle + i*ndv + 5);
+							if (ndv == 7) w = *(particelle + i*ndv + 6);
+							else w = 1.0;
 							gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma
 							theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
 							thetaT = (float)atan(sqrt((py*py + pz*pz) / (px*px)));
@@ -639,6 +651,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (ty > estremi_max[10]) estremi_max[10] = ty;
 							if (tz < estremi_min[11]) estremi_min[11] = tz;
 							if (tz > estremi_max[11]) estremi_max[11] = tz;
+							if (w < estremi_min[12]) estremi_min[12] = w;
+							if (w > estremi_max[12]) estremi_max[12] = w;
 						}
 						else if (ndv == 4 || ndv == 5)
 						{
@@ -646,6 +660,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							y = *(particelle + i*ndv + 1);
 							px = *(particelle + i*ndv + 2);
 							py = *(particelle + i*ndv + 3);
+							if (ndv == 5) w = *(particelle + i*ndv + 4);
+							else w = 1.0;
 							gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
 							theta = (float)(atan2(py, px)*180. / M_PI);				//theta
 							thetaT = (float)atan(sqrt((py*py) / (px*px)));
@@ -672,6 +688,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 							if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
 							if (ty < estremi_min[10]) estremi_min[10] = ty;
 							if (ty > estremi_max[10]) estremi_max[10] = ty;
+							estremi_min[11] = -1., estremi_max[11] = 1.;
+							if (w < estremi_min[12]) estremi_min[12] = w;
+							if (w > estremi_max[12]) estremi_max[12] = w;
 						}
 					}
 				}
@@ -693,9 +712,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 					if (parametri->fai_plot_pxpy)		_Binnaggio(particelle, val[0], ndv, parametri, pxpy, "px", "py");
 					if (parametri->fai_plot_pxpz)		_Binnaggio(particelle, val[0], ndv, parametri, pxpz, "px", "pz");
 					if (parametri->fai_plot_pypz)		_Binnaggio(particelle, val[0], ndv, parametri, pypz, "py", "pz");
+					if (parametri->fai_plot_xw)			_Binnaggio(particelle, val[0], ndv, parametri, xw, "x", "w");
 					if (parametri->fai_plot_Etheta)		_Binnaggio(particelle, val[0], ndv, parametri, Etheta, "E", "theta");
 					if (parametri->fai_plot_EthetaT)	_Binnaggio(particelle, val[0], ndv, parametri, EthetaT, "E", "thetaT");
 					if (parametri->fai_plot_Espec)		_Binnaggio(particelle, val[0], ndv, parametri, Espec, "E");
+					if (parametri->fai_plot_wspec)		_Binnaggio(particelle, val[0], ndv, parametri, wspec, "w");
 					if (parametri->fai_plot_thetaspec)	_Binnaggio(particelle, val[0], ndv, parametri, thetaspec, "theta");
 					if (parametri->fai_plot_thetaTspec)	_Binnaggio(particelle, val[0], ndv, parametri, thetaTspec, "thetaT");
 				}
@@ -1014,6 +1035,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		Estremi_out << "TYMAX = " << estremi_max[10] << std::endl;
 		Estremi_out << "TZMIN = " << estremi_min[11] << std::endl;
 		Estremi_out << "TZMAX = " << estremi_max[11] << std::endl;
+		Estremi_out << "WMIN = " << estremi_min[12] << std::endl;
+		Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
 		Estremi_out.close();
 	}
 
@@ -1100,6 +1123,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 			sprintf(nomefile_binnato, "%s_pypz.txt", argv[1]);
 			_Scrittura(parametri, pypz, "py", "pz", std::string(nomefile_binnato));
 		}
+		if (parametri->fai_plot_xw)
+		{
+			sprintf(nomefile_binnato, "%s_xw.txt", argv[1]);
+			_Scrittura(parametri, xw, "x", "w", std::string(nomefile_binnato));
+		}
 		if (parametri->fai_plot_Etheta)
 		{
 			sprintf(nomefile_binnato, "%s_Etheta.txt", argv[1]);
@@ -1114,6 +1142,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 		{
 			sprintf(nomefile_binnato, "%s_Espec.txt", argv[1]);
 			_Scrittura(parametri, Espec, "E", std::string(nomefile_binnato));
+		}
+		if (parametri->fai_plot_wspec)
+		{
+			sprintf(nomefile_binnato, "%s_wspec.txt", argv[1]);
+			_Scrittura(parametri, wspec, "w", std::string(nomefile_binnato));
 		}
 		if (parametri->fai_plot_thetaspec)
 		{
