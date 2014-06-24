@@ -500,6 +500,28 @@ def write_E_vts(path,frame,X,Y,Z,cell_cut):
 	f.write('<Piece Extent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
 	#--- ---#
 
+	#- writing Ex-vts header
+	fEx = open(os.path.join(path,'VTS_files','ALaDyn_Ex_'+sf+'.vts'),'w+')
+	fEx.write('<?xml version="1.0"?>' + '\n')
+	fEx.write('<VTKFile type="StructuredGrid" version="0.1" byte_order="LittleEndian">' + '\n')
+	fEx.write('<StructuredGrid WholeExtent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
+	fEx.write('<Piece Extent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
+	#- writing Ey-vts header
+	fEy = open(os.path.join(path,'VTS_files','ALaDyn_Ey_'+sf+'.vts'),'w+')
+	fEy.write('<?xml version="1.0"?>' + '\n')
+	fEy.write('<VTKFile type="StructuredGrid" version="0.1" byte_order="LittleEndian">' + '\n')
+	fEy.write('<StructuredGrid WholeExtent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
+	fEy.write('<Piece Extent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
+	#- writing Ex-vts header
+	fEz = open(os.path.join(path,'VTS_files','ALaDyn_Ez_'+sf+'.vts'),'w+')
+	fEz.write('<?xml version="1.0"?>' + '\n')
+	fEz.write('<VTKFile type="StructuredGrid" version="0.1" byte_order="LittleEndian">' + '\n')
+	fEz.write('<StructuredGrid WholeExtent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
+	fEz.write('<Piece Extent=" %d %d %d %d %d %d "> \n' % (0,size[1]-1,0,size[2]-1,0,size[0]-1) )
+	#--- ---#
+
+
+
 
 	#- generating vector-MESH
  	mesh=[]
@@ -519,8 +541,38 @@ def write_E_vts(path,frame,X,Y,Z,cell_cut):
 	f.write('</Points> \n')
 	#- -#
 
+	#- Writing ExMESH -#
+	fEx.write('<Points> \n')
+ 	fEx.write('<DataArray type="Float32" Name="Points" NumberOfComponents="3" format="binary"> \n')
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	fEx.write(  base64.b64encode(np.array(len(s),dtype=np.int32))  )
+ 	fEx.write(  s  )
+	fEx.write('</DataArray> \n')
+	fEx.write('</Points> \n')
+	#- Writing ExMESH -#
+	fEy.write('<Points> \n')
+ 	fEy.write('<DataArray type="Float32" Name="Points" NumberOfComponents="3" format="binary"> \n')
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	fEy.write(  base64.b64encode(np.array(len(s),dtype=np.int32))  )
+ 	fEy.write(  s  )
+	fEy.write('</DataArray> \n')
+	fEy.write('</Points> \n')
+	#- Writing ExMESH -#
+	fEz.write('<Points> \n')
+ 	fEz.write('<DataArray type="Float32" Name="Points" NumberOfComponents="3" format="binary"> \n')
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	fEz.write(  base64.b64encode(np.array(len(s),dtype=np.int32))  )
+ 	fEz.write(  s  )
+	fEz.write('</DataArray> \n')
+	fEz.write('</Points> \n')
+	#- -#
+
+
 	#- Point Data Begin-#
  	f.write('<PointData>\n')
+ 	fEx.write('<PointData>\n')
+ 	fEy.write('<PointData>\n')
+ 	fEz.write('<PointData>\n')
 	#- -#
 
 	#- Writing E-field -#
@@ -531,16 +583,54 @@ def write_E_vts(path,frame,X,Y,Z,cell_cut):
  	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
  	f.write(s)
 	f.write('</DataArray> \n')
+
+	#- Writing Ex-field -#
+	fEx.write('<DataArray type="Float32" Name="Ex" NumberOfComponents="1" format="binary"> \n')
+	mesh = matrix2vector(Ex+Exb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	fEx.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	fEx.write(s)
+	fEx.write('</DataArray> \n')
+	#- Writing Ex-field -#
+	fEy.write('<DataArray type="Float32" Name="Ey" NumberOfComponents="1" format="binary"> \n')
+	mesh = matrix2vector(Ey+Eyb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	fEy.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	fEy.write(s)
+	fEy.write('</DataArray> \n')
+	#- Writing Ex-field -#
+	fEz.write('<DataArray type="Float32" Name="Ez" NumberOfComponents="1" format="binary"> \n')
+	mesh = matrix2vector(Ez+Ezb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	fEz.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	fEz.write(s)
+	fEz.write('</DataArray> \n')
+
 		#-Deallocate memory
 	Ex=[0.];Ey=[0.];Ez=[0.];Exb=[0.];Eyb=[0.];Ezb=[0.];
 
 
 	#- Point Data End-#
  	f.write('</PointData> \n')
+ 	fEx.write('</PointData> \n')
+ 	fEy.write('</PointData> \n')
+ 	fEz.write('</PointData> \n')
 	#- -#
 	f.write('</Piece> \n')
 	f.write('</StructuredGrid> \n')
 	f.write('</VTKFile>')
+
+	fEx.write('</Piece> \n')
+	fEx.write('</StructuredGrid> \n')
+	fEx.write('</VTKFile>')
+
+	fEy.write('</Piece> \n')
+	fEy.write('</StructuredGrid> \n')
+	fEy.write('</VTKFile>')
+
+	fEz.write('</Piece> \n')
+	fEz.write('</StructuredGrid> \n')
+	fEz.write('</VTKFile>')
 
 
 
@@ -752,6 +842,27 @@ def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut):
 	#- E-field total
 	f.write('<DataArray type="Float32" Name="E" NumberOfComponents="3" format="binary"> \n')
 	mesh = matrix2vectorField(Ex+Exb,Ey+Eyb,Ez+Ezb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+	#- Ex-total
+	f.write('<DataArray type="Float32" Name="Ex" NumberOfComponents="1" format="binary"> \n')
+	mesh = matrix2vector(Ex+Exb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+	#- Ey-total
+	f.write('<DataArray type="Float32" Name="Ey" NumberOfComponents="1" format="binary"> \n')
+	mesh = matrix2vector(Ey+Eyb)
+	s = base64.b64encode(np.array(mesh,dtype=np.float32))
+ 	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
+ 	f.write(s)
+	f.write('</DataArray> \n')
+	#- Ez-total
+	f.write('<DataArray type="Float32" Name="Ez" NumberOfComponents="1" format="binary"> \n')
+	mesh = matrix2vector(Ez+Ezb)
 	s = base64.b64encode(np.array(mesh,dtype=np.float32))
  	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
  	f.write(s)
