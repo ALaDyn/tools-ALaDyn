@@ -49,6 +49,9 @@ if __name__ == '__main__':
 				#PSBunch2_21.bin
 				print file
 				X, Y, Z, Px, Py, Pz, W = read_particle_phasespace( os.path.join(root_dir,file) )
+				X=np.array(X);    Y=np.array(Y);   Z=np.array(Z)
+				Px=np.array(Px); Py=np.array(Py); Pz=np.array(Pz)
+				
 				H, xedges, pxedges = np.histogram2d(X, Px, bins=(nbins, nbins))
 				K, yedges, pyedges = np.histogram2d(Y, Py, bins=(nbins, nbins))
 				L, zedges, pzedges = np.histogram2d(Z, Pz, bins=(nbins, nbins))
@@ -64,19 +67,19 @@ if __name__ == '__main__':
 				ax3.contourf(0.5*(zedges[0:nbins]+zedges[1:nbins+1]), 0.5*(pzedges[0:nbins]+pzedges[1:nbins+1]), L.T,100,linewidths=.001)
 				#ax3.xlabel('z'); ax3.ylabel('Pz')			
 			
-				#ax4 = fig.add_subplot(2,3,4)
-				#ax4.scatter(X[np.arange(0,len(X),10)],Px[np.arange(0,len(Px),10)],s=.01)
+				ax4 = fig.add_subplot(2,3,4)
+				ax4.scatter(X[range(0,len(X),10)],Px[range(0,len(Px),10)],s=.1,edgecolors='None')
 				#ax4.xlabel('x'); ax4.ylabel('Px')
-				#ax5 = fig.add_subplot(2,3,5)
-				#ax5.scatter(Y[np.arange(0,len(Y),10)],Py[np.arange(0,len(Py),10)],s=.01)
+				ax5 = fig.add_subplot(2,3,5)
+				ax5.scatter(Y[range(0,len(Y),10)],Py[range(0,len(Py),10)],s=.1,edgecolors='None')
 				#ax5.xlabel('y'); ax5.ylabel('Py')
-				#ax6 = fig.add_subplot(2,3,6)
-				#ax6.scatter(Z[np.arange(0,len(Z),10)],Pz[np.arange(0,len(Pz),10)],s=.01)
+				ax6 = fig.add_subplot(2,3,6)
+				ax6.scatter(Z[range(0,len(Z),10)],Pz[range(0,len(Pz),10)],s=.1,edgecolors='None')
 				#ax6.xlabel('z'); ax6.ylabel('Pz')
 
 			
 				plt.axis('tight')
 				name_output =  'phasespace_bunch_' + str(file[7]) + '_' + str(file[9:11])+ '.png'
-				plt.savefig( os.path.join(path,'plots','phasespace',name_output) )
+				plt.savefig( os.path.join(path,'data','phasespace',name_output) )
 				plt.close(fig)
 
