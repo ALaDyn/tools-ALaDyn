@@ -40,25 +40,30 @@ Px=[]
 Py=[]
 Pz=[]
 W=[]
-
+counter=0
 while True:
     try:
         Np=struct.unpack('i', f.read(4))
+	print counter,Np[0]
+	counter+=1
     except struct.error:
         print "End of File"
         break
     vars=[]
-    for i in range(0,Np[0]):
-        vars=struct.unpack('fffffff', f.read(4*7))
-        X.append(vars[0])
-        Y.append(vars[1])
-        Z.append(vars[2])
-        Px.append(vars[3])
-        Py.append(vars[4])
-        Pz.append(vars[5])
-        W.append(vars[6])
-        pass
-    pass
+    try:
+        for i in range(0,Np[0]):
+            vars=struct.unpack('fffffff', f.read(4*7))
+            X.append(vars[0])
+            Y.append(vars[1])
+            Z.append(vars[2])
+            Px.append(vars[3])
+            Py.append(vars[4])
+            Pz.append(vars[5])
+            W.append(vars[6])
+    except:
+            pass    
+   #     pass
+    #pass
 f.close()
 
 
