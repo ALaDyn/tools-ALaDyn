@@ -12,12 +12,14 @@ then
 fi
 
 
-NCPU=12
-ENABLE_FINAL_DUMPS=1
+NCPU=64
+CREA_FILE_DUMP=1
 
 
 ##### nx, ny,nz
-## nb: il numero punti di griglia in y e z, se diversi da 1, deve essere divisibile per il numero di processori
+## nb:  il numero punti di griglia in y e z, se diversi da 1, deve essere divisibile per il numero di processori
+##      se la simulazione e' di PWFA, anche il numero di punti di griglia in x deve essere divisibile per il num
+##      di processori
 ## nb2: se si abilita lo stretching, il numero di punti in y e z deve anche essere divisibile per 6, dato che la
 ##      zona di stretching e' definita come 1/6 dei punti totali
 ## nb3: per ora e' meglio mettere in z un numero di punti uguale a quello in y, a meno che non si metta 1 per le simulazioni 2D
@@ -25,22 +27,22 @@ NUMERO_PUNTI_GRIGLIA_X=2640
 NUMERO_PUNTI_GRIGLIA_Y=2400
 ##NB: mettere il seguente numero ad 1 per fare simulazioni 2D
 NUMERO_PUNTI_GRIGLIA_Z=1
-##NB: a causa di un baco, mettere il seguente valore superiore a (NUMERO_PUNTI_GRIGLIA_Y - NUMERO_PUNTI_GRIGLIA_Y / NCPU)
+
 NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=2280
 
 
-##nb: ricordarsi di risolvere la skin depth con k0
-##### k0,yx_rat
+##nb: ricordarsi di risolvere la skin depth
 NUMERO_PUNTI_GRIGLIA_PER_MICRON="80.0"
 RAPPORTO_DIMENSIONE_GRIGLIA_TRASVERSA_GRIGLIA_LONGITUDINALE="2.0"
 
 ##### a questo punto sappiamo le dimensioni in micron della griglia 
-#####  Dimx = nx/k0    Dimy = ny*yx_rat/k0
+##### Dimx = nx/k0    Dimy = ny*yx_rat/k0
+##### Si potrebbero anche scrivere a video per l'utente
 
 ##### LPf,Der,str,iform
 ORDINE_INTEGRAZIONE_LEAPFROG=2
 TIPO_DERIVATA=3
-##NB: per il seguente dato, 0=niente, 1=stretching trasversale, 2=stretching anche lungo x, 3=PML
+##NB: per il seguente dato, 0=griglia standard, 1=stretching trasversale, 2=stretching anche lungo x, 3=PML
 TIPO_BOUNDARIES=1
 ##NB: per il seguente dato, 1=conservazione carica, 2=conservazione energia
 ALGORITMO_INTEGRAZIONE=2
@@ -73,7 +75,6 @@ NUMERO_IONIZZAZIONE_Z=9
 NUMERO_DI_NUCLEONI_A=27
 
 
-## Ricordarsi di risolvere la densita' in unita' di densita' critiche con il numero di particelle per cella
 #### np_xc
 NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=6
 NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=2
@@ -95,7 +96,7 @@ NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=2
 #### a questo punto e' meglio controllare che np_xc_el_l2*np_yc_el_l2 sia
 #### uguale a Z_i*np_xc_ion_l2*np_yc_ion_l2
 #### NON DOVREBBE ESSER NECESSARIO, MA PASQUALE INSISTE SU QUESTO PUNTO:
-#### E' PIU' TRANQUILLO SE TUTTE LE SPECIE HANNO LO STESSO PESO
+#### MEGLIO CHE TUTTE LE SPECIE ABBIANO LO STESSO PESO
 
 
 #### t0, xc, wx, wy, a0,lam0 ## tutti in micrometri
@@ -130,9 +131,9 @@ DENSITA_ELETTRONI_LAYER_POSTERIORE="9."
 
 #### nf, nd, npv, end_p
 ####
-TIPO_OUTPUT_CAMPI=3
-TIPO_OUTPUT_DENSITA_GRIGLIA=1
-TIPO_OUTPUT_SPAZIOFASI_PARTICELLE=2
+NUMERO_OUTPUT_CAMPI=3
+NUMERO_OUTPUT_DENSITA_GRIGLIA=1
+NUMERO_OUTPUT_SPAZIOFASI_PARTICELLE=2
 #### il flag seguente, se vale 1, impone un taglio nello spazio xyz secondo le dimensioni descritte dai
 #### parametri imposti nelle tre seguenti righe, al fine di ridurre le dimensioni dei file.
 FLAG_TAGLIO_OUTPUT_SPAZIOFASI_PARTICELLE=1
@@ -162,14 +163,15 @@ MW_SPEED="0.5"
 
 
 
-#### Non sono anticipati qui i parametri del bunch di elettroni per l'iniezione
-#### Saranno aggiunti in futuro
+####  per il seguente dato, 1=laser driven simulation
+####                        2=bunch driven simulation
+SYM_TYPE=1
 
 
+#### il seguente dato deve sempre essere <= 1.0
+COURANT_FRIEDRICHS_LEWY_PARAMETER="0.85"
 
-#### I seguenti valori non sono documentati (ibeam, cfl)
-BEAM_MODEL=1
-CFL="0.85"
+
 
 
 ########################################
@@ -221,22 +223,22 @@ a0=${PARAMETRO_ADIMENSIONALE_LASER_A0}
 lam0=${LUNGHEZZA_ONDA_LASER}
 Line08Comments=" t0, xc, wx, wy, a0,lam0         ! laser: xf=xc+t0 focus, wx=length,wy=waist"
 bch="0.0"
-xb="50"
-gam0="50."
-sx="30."
-sy="50."
-epsx="0."
-epsy="0."
-dg="0."
-Line09Comments=" bch,xb,gam0,sx,sy,epsx,epsy,dg        ! el bunch param "
-wch="0."
-xw="50."
-sxw="10."
-syw="10."
-epsxw="0."
-epsyw="0."
-dgw="0."
-Line10Comments=" wch,xw,sxw,syw,epsxw,epsyw,dgw        ! el bunch param "
+xb="0.0"
+gam0="0.0"
+sx="0.0"
+sy="0.0"
+epsx="0.0"
+epsy="0.0"
+dg="0.0"
+Line09Comments=" bch,xb,gam0,sx,sy,epsx,epsy,dg        ! dummy el bunch param "
+wch="0.0"
+xw="0.0"
+sxw="0.0"
+syw="0.0"
+epsxw="0.0"
+epsyw="0.0"
+dgw="0.0"
+Line10Comments=" wch,xw,sxw,syw,epsxw,epsyw,dgw        ! dummy el bunch param "
 lx1=${SPESSORE_LAYER_FRONTALE}
 lx2=${SPESSORE_RAMPA_LAYER_FRONTALE_LAYER_CENTRALE}
 lx3=${SPESSORE_LAYER_CENTRALE}
@@ -256,9 +258,9 @@ w_speed=${MW_SPEED}
 Line13Comments=" wnd_sh,w_in,w_end,w_speed !mov.wind.:points, init. time,final time,speed"
 nout=$4
 iene=$5
-nf=${TIPO_OUTPUT_CAMPI}
-nd=${TIPO_OUTPUT_DENSITA_GRIGLIA}
-npv=${TIPO_OUTPUT_SPAZIOFASI_PARTICELLE}
+nf=${NUMERO_OUTPUT_CAMPI}
+nd=${NUMERO_OUTPUT_DENSITA_GRIGLIA}
+npv=${NUMERO_OUTPUT_SPAZIOFASI_PARTICELLE}
 end_p=${FLAG_TAGLIO_OUTPUT_SPAZIOFASI_PARTICELLE}
 Line14Comments=" nout,iene,nf,nd,npv,end_p !out numb nf fields, nd den fields npv part"
 jmp=${JUMP_GRIGLIA}
@@ -269,11 +271,11 @@ xp1=${X1_TAGLIO_OUTPUT}
 ypmax=${SEMILATO_BASE_TAGLIO_OUTPUT}
 Line16Comments=" xp0, xp1, ypmax        !volume for out particles "
 tmax=$3
-cfl=${CFL}
+cfl=${COURANT_FRIEDRICHS_LEWY_PARAMETER}
 Line17Comments=" tmax, cfl               !"
 new=$1
 id_ew=$2
-dump=${ENABLE_FINAL_DUMPS}
+dump=${CREA_FILE_DUMP}
 pey=${NCPU}
 Line18Comments=" new,id_ew,dump,pey"
 
