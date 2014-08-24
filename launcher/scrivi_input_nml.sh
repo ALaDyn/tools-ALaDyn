@@ -23,16 +23,16 @@ CREA_FILE_DUMP=1
 ## nb2: se si abilita lo stretching, il numero di punti in y e z deve anche essere divisibile per 6, dato che la
 ##      zona di stretching e' definita come 1/6 dei punti totali
 ## nb3: per ora e' meglio mettere in z un numero di punti uguale a quello in y, a meno che non si metta 1 per le simulazioni 2D
-NUMERO_PUNTI_GRIGLIA_X=2640
-NUMERO_PUNTI_GRIGLIA_Y=2400
+NUMERO_PUNTI_GRIGLIA_X=7168
+NUMERO_PUNTI_GRIGLIA_Y=3584
 ##NB: mettere il seguente numero ad 1 per fare simulazioni 2D
 NUMERO_PUNTI_GRIGLIA_Z=1
 
-NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=2280
+NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=3500
 
 
 ##nb: ricordarsi di risolvere la skin depth
-NUMERO_PUNTI_GRIGLIA_PER_MICRON="80.0"
+NUMERO_PUNTI_GRIGLIA_PER_MICRON="100."
 RAPPORTO_DIMENSIONE_GRIGLIA_TRASVERSA_GRIGLIA_LONGITUDINALE="2.0"
 
 ##### a questo punto sappiamo le dimensioni in micron della griglia 
@@ -41,11 +41,11 @@ RAPPORTO_DIMENSIONE_GRIGLIA_TRASVERSA_GRIGLIA_LONGITUDINALE="2.0"
 
 ##### LPf,Der,str,iform
 ORDINE_INTEGRAZIONE_LEAPFROG=2
-TIPO_DERIVATA=3
+TIPO_DERIVATA=2
 ##NB: per il seguente dato, 0=griglia standard, 1=stretching trasversale, 2=stretching anche lungo x, 3=PML
-TIPO_BOUNDARIES=1
+TIPO_BOUNDARIES=2
 ##NB: per il seguente dato, 1=conservazione carica, 2=conservazione energia
-ALGORITMO_INTEGRAZIONE=2
+ALGORITMO_INTEGRAZIONE=1
 
 
 ##### mdl,dmdl,ibeam 
@@ -59,7 +59,7 @@ LASER_MODEL=1
 ##                            oppure di carbonio "light ions" (con BEAM_MODEL=0 e NUMERO_SPECIE=4) oppure infine dello stesso materiale
 ##                            del bulk della targhetta "heavy ions" (con BEAM_MODEL=1 e NUMERO_SPECIE=3);
 ##                            la targhetta centrale e' sempre fatta di "Heavy Ions" ed elettroni, e i contaminanti di solo idrogeno+elettroni
-PLASMA_MODEL=2
+PLASMA_MODEL=4
 
 
 #### nsp,nsb,Z_i,A_i 
@@ -67,7 +67,7 @@ PLASMA_MODEL=2
 ##                                                         se e' 2 invece genero entrambe le specie
 ##    se il plasma model e' 2, nsp deve essere uguale a 4
 ##    se il plasma model e' 4, riferirsi alla guida in PLASMA_MODEL
-NUMERO_SPECIE=4
+NUMERO_SPECIE=3
 ##NB: per la documentazione riguardante il seguente numero, riferirsi alla spiegazione di PLASMA_MODEL
 NUMERO_SPECIE_SECONDARIO=0
 ##NB: per i seguenti valori di solito si usa ionizzazione 9 e peso 27 (alluminio)
@@ -76,21 +76,21 @@ NUMERO_DI_NUCLEONI_A=27
 
 
 #### np_xc
-NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=6
-NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=2
-NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE=2
-NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE=2
-NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE=2
-NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE=2
+NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=12
+NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=4
+NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE=4
+NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE=4
+NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE=4
+NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE=4
 
 
 #### np_yc
-NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE=6
-NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE=2
-NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE=2
-NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE=2
-NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=2
-NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=2
+NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE=9
+NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE=3
+NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE=4
+NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE=4
+NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=4
+NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=4
 
 
 #### a questo punto e' meglio controllare che np_xc_el_l2*np_yc_el_l2 sia
@@ -100,23 +100,23 @@ NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=2
 
 
 #### t0, xc, wx, wy, a0,lam0 ## tutti in micrometri
-POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER="10.7"
-DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO="11."
-LUNGHEZZA_LASER_TOTALE="20.6"
-WAIST_LASER="3."
-PARAMETRO_ADIMENSIONALE_LASER_A0="5."
+POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER="12.1"
+DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO="12.0"
+LUNGHEZZA_LASER_TOTALE="24.0"
+WAIST_LASER="12.0"
+PARAMETRO_ADIMENSIONALE_LASER_A0="5.0"
 LUNGHEZZA_ONDA_LASER="0.8"
 
 
 
 #### lx(1:7)
-SPESSORE_LAYER_FRONTALE="0.0"
+SPESSORE_LAYER_FRONTALE="0.08"
 SPESSORE_RAMPA_LAYER_FRONTALE_LAYER_CENTRALE="0.0"
-SPESSORE_LAYER_CENTRALE="0.8"
+SPESSORE_LAYER_CENTRALE="0.6"
 SPESSORE_RAMPA_LAYER_CENTRALE_LAYER_POSTERIORE="0.0"
 SPESSORE_LAYER_POSTERIORE="0.08"
 ANGOLO_ROTAZIONE_LASER="0.0"
-OFFSET_FINE_LASER_INIZIO_TARGHETTA="0.1"
+OFFSET_FINE_LASER_INIZIO_TARGHETTA="0.01"
 
 
 #### a questo punto sappiamo la posizione della targhetta
@@ -124,22 +124,22 @@ OFFSET_FINE_LASER_INIZIO_TARGHETTA="0.1"
 
 
 #### n/nc, n1/nc,n2/nc (tutte le densita' sono quindi rapportate alla densita' critica)
-DENSITA_ELETTRONI_LAYER_FRONTALE="0.0"
-DENSITA_ELETTRONI_LAYER_CENTRALE="50."
-DENSITA_ELETTRONI_LAYER_POSTERIORE="9."
+DENSITA_ELETTRONI_LAYER_FRONTALE="10.0"
+DENSITA_ELETTRONI_LAYER_CENTRALE="100."
+DENSITA_ELETTRONI_LAYER_POSTERIORE="10.0"
 
 
 #### nf, nd, npv, end_p
 ####
 NUMERO_OUTPUT_CAMPI=3
 NUMERO_OUTPUT_DENSITA_GRIGLIA=1
-NUMERO_OUTPUT_SPAZIOFASI_PARTICELLE=2
+NUMERO_OUTPUT_SPAZIOFASI_PARTICELLE=4
 #### il flag seguente, se vale 1, impone un taglio nello spazio xyz secondo le dimensioni descritte dai
 #### parametri imposti nelle tre seguenti righe, al fine di ridurre le dimensioni dei file.
-FLAG_TAGLIO_OUTPUT_SPAZIOFASI_PARTICELLE=1
+FLAG_TAGLIO_OUTPUT_SPAZIOFASI_PARTICELLE=0
 #### X1-X0 seguenti definiscono quindi l'altezza del parallelepipedo (o rettangolo in 2D) di spazio da dumpare
-X0_TAGLIO_OUTPUT="24.0"
-X1_TAGLIO_OUTPUT="60.0"
+X0_TAGLIO_OUTPUT="0.0"
+X1_TAGLIO_OUTPUT="100.0"
 #### Il seguente valore invece definisce il semilato di base del parallelepipedo (o del rettangolo in 2D) dello spazio da dumpare
 SEMILATO_BASE_TAGLIO_OUTPUT="20.0"
 
@@ -155,11 +155,11 @@ JUMP_PARTICELLE=2
 #### numero time steps ogni quanti viene invocate la routine di moving window
 MW_CALL_EVERY_N_TIMESTEPS=20
 #### time step inizio movimento della window
-MW_START_TIME="10."
+MW_START_TIME="120."
 #### time step fine movimento della window
-MW_END_TIME="50."
+MW_END_TIME="120."
 #### velocità beta con cui si muove la window
-MW_SPEED="0.5"
+MW_SPEED="1.0"
 
 
 
@@ -194,7 +194,7 @@ iform=${ALGORITMO_INTEGRAZIONE}
 
 mdl=${LASER_MODEL}
 dmdl=${PLASMA_MODEL}
-ibeam=${BEAM_MODEL}
+ibeam=${SYM_TYPE}
 
 nsp=${NUMERO_SPECIE}
 nsb=${NUMERO_SPECIE_SECONDARIO}
@@ -269,79 +269,82 @@ pey=${NCPU}
  rm  ${INPUTFILE}
  touch ${INPUTFILE}
 
- printf '&GRID' >> ${INPUTFILE}
- printf 'nx = %s,\n' "$nx" >> ${INPUTFILE}
- printf 'ny = %s,\n' "$ny" >> ${INPUTFILE}
- printf 'nz = %s,\n' "$nz" >> ${INPUTFILE}
- printf 'ny_targ = %s,\n' "$nplasma" >> ${INPUTFILE}
- printf 'k0 = %s,\n' "$k0" >> ${INPUTFILE}
- printf 'yx_rat = %s,\n' "$yx_rat" >> ${INPUTFILE}
+ printf '&GRID\n' >> ${INPUTFILE}
+ printf ' nx = %s,\n' "$nx" >> ${INPUTFILE}
+ printf ' ny = %s,\n' "$ny" >> ${INPUTFILE}
+ printf ' nz = %s,\n' "$nz" >> ${INPUTFILE}
+ printf ' ny_targ = %s,\n' "$nplasma" >> ${INPUTFILE}
+ printf ' k0 = %s,\n' "$k0" >> ${INPUTFILE}
+ printf ' yx_rat = %s,\n' "$yx_rat" >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
 
- printf '&SIMULATION' >> ${INPUTFILE}
- printf 'LPf_ord = %s,\n' "$LPf" >> ${INPUTFILE}
- printf 'Der_ord = %s,\n' "$Der" >> ${INPUTFILE}
- printf 'Str_flag = %s,\n' "$str" >> ${INPUTFILE}
- printf 'iform = %s,\n' "$iform" >> ${INPUTFILE}
- printf 'model_id = %s,\n' "$mdl" >> ${INPUTFILE}
- printf 'dmodel_id = %s,\n' "$dmdl" >> ${INPUTFILE}
- printf 'ibeam = %s,\n' "$ibeam" >> ${INPUTFILE}
- printf 'nsp = %s,\n' "$nsp" >> ${INPUTFILE}
- printf 'nsb = %s,\n' "$nsb" >> ${INPUTFILE}
- printf 'Z_ion = %s,\n' "${Z_i}" >> ${INPUTFILE}
- printf 'A_ion = %s,\n' "${A_i}" >> ${INPUTFILE}
- printf 'np_per_xc(1) = %s,\n' "${np_xc_el_l2}" >> ${INPUTFILE}
- printf 'np_per_xc(2) = %s,\n' "${np_xc_ion_l2}" >> ${INPUTFILE}
- printf 'np_per_xc(3) = %s,\n' "${np_xc_el_l1}" >> ${INPUTFILE}
- printf 'np_per_xc(4) = %s,\n' "${np_xc_ion_l1}" >> ${INPUTFILE}
- printf 'np_per_xc(5) = %s,\n' "${np_xc_el_l3}" >> ${INPUTFILE}
- printf 'np_per_xc(6) = %s,\n' "${np_xc_ion_l3}" >> ${INPUTFILE}
- printf 'np_per_yc(1) = %s,\n' "${np_yc_el_l2}" >> ${INPUTFILE}
- printf 'np_per_yc(2) = %s,\n' "${np_yc_ion_l2}" >> ${INPUTFILE}
- printf 'np_per_yc(3) = %s,\n' "${np_yc_el_l1}" >> ${INPUTFILE}
- printf 'np_per_yc(4) = %s,\n' "${np_yc_ion_l1}" >> ${INPUTFILE}
- printf 'np_per_yc(5) = %s,\n' "${np_yc_el_l3}" >> ${INPUTFILE}
- printf 'np_per_yc(6) = %s,\n' "${np_yc_ion_l3}" >> ${INPUTFILE}
- printf 't0_lp = %s,\n' "$t0" >> ${INPUTFILE}
- printf 'xc_lp = %s,\n' "$xc" >> ${INPUTFILE}
- printf 'w0_x = %s,\n' "$wx" >> ${INPUTFILE}
- printf 'w0_y = %s,\n' "$wy" >> ${INPUTFILE}
- printf 'a0 = %s,\n' "$a0" >> ${INPUTFILE}
- printf 'lam0 = %s,\n' "$lam0" >> ${INPUTFILE}
- printf 'lpx(1) = %s,\n' "$lx1" >> ${INPUTFILE}
- printf 'lpx(2) = %s,\n' "$lx2" >> ${INPUTFILE}
- printf 'lpx(3) = %s,\n' "$lx3" >> ${INPUTFILE}
- printf 'lpx(4) = %s,\n' "$lx4" >> ${INPUTFILE}
- printf 'lpx(5) = %s,\n' "$lx5" >> ${INPUTFILE}
- printf 'lpx(6) = %s,\n' "$lx6" >> ${INPUTFILE}
- printf 'lpx(7) = %s,\n' "$lx7" >> ${INPUTFILE}
- printf 'n_over_nc = %s,\n' "${n_nc}" >> ${INPUTFILE}
- printf 'n1_over_n = %s,\n' "${n1_nc}" >> ${INPUTFILE}
- printf 'n2_over_n = %s,\n' "${n2_nc}" >> ${INPUTFILE}
- printf 'w_sh = %s,\n' "${wnd_sh}" >> ${INPUTFILE}
- printf 'wi_time = %s,\n' "${w_in}" >> ${INPUTFILE}
- printf 'wf_time = %s,\n' "${w_end}" >> ${INPUTFILE}
- printf 'w_speed = %s,\n' "${w_speed}" >> ${INPUTFILE}
+ printf '&SIMULATION\n' >> ${INPUTFILE}
+ printf ' LPf_ord = %s,\n' "$LPf" >> ${INPUTFILE}
+ printf ' Der_ord = %s,\n' "$Der" >> ${INPUTFILE}
+ printf ' Str_flag = %s,\n' "$str" >> ${INPUTFILE}
+ printf ' iform = %s,\n' "$iform" >> ${INPUTFILE}
+ printf ' model_id = %s,\n' "$mdl" >> ${INPUTFILE}
+ printf ' dmodel_id = %s,\n' "$dmdl" >> ${INPUTFILE}
+ printf ' ibeam = %s,\n' "$ibeam" >> ${INPUTFILE}
+ printf ' nsp = %s,\n' "$nsp" >> ${INPUTFILE}
+ printf ' nsb = %s,\n' "$nsb" >> ${INPUTFILE}
+ printf ' Z_ion = %s,\n' "${Z_i}" >> ${INPUTFILE}
+ printf ' A_ion = %s,\n' "${A_i}" >> ${INPUTFILE}
+ printf ' np_per_xc(1) = %s,\n' "${np_xc_el_l2}" >> ${INPUTFILE}
+ printf ' np_per_xc(2) = %s,\n' "${np_xc_ion_l2}" >> ${INPUTFILE}
+ printf ' np_per_xc(3) = %s,\n' "${np_xc_el_l1}" >> ${INPUTFILE}
+ printf ' np_per_xc(4) = %s,\n' "${np_xc_ion_l1}" >> ${INPUTFILE}
+ printf ' np_per_xc(5) = %s,\n' "${np_xc_el_l3}" >> ${INPUTFILE}
+ printf ' np_per_xc(6) = %s,\n' "${np_xc_ion_l3}" >> ${INPUTFILE}
+ printf ' np_per_yc(1) = %s,\n' "${np_yc_el_l2}" >> ${INPUTFILE}
+ printf ' np_per_yc(2) = %s,\n' "${np_yc_ion_l2}" >> ${INPUTFILE}
+ printf ' np_per_yc(3) = %s,\n' "${np_yc_el_l1}" >> ${INPUTFILE}
+ printf ' np_per_yc(4) = %s,\n' "${np_yc_ion_l1}" >> ${INPUTFILE}
+ printf ' np_per_yc(5) = %s,\n' "${np_yc_el_l3}" >> ${INPUTFILE}
+ printf ' np_per_yc(6) = %s,\n' "${np_yc_ion_l3}" >> ${INPUTFILE}
+ printf ' t0_lp = %s,\n' "$t0" >> ${INPUTFILE}
+ printf ' xc_lp = %s,\n' "$xc" >> ${INPUTFILE}
+ printf ' w0_x = %s,\n' "$wx" >> ${INPUTFILE}
+ printf ' w0_y = %s,\n' "$wy" >> ${INPUTFILE}
+ printf ' a0 = %s,\n' "$a0" >> ${INPUTFILE}
+ printf ' lam0 = %s,\n' "$lam0" >> ${INPUTFILE}
+ printf ' lpx(1) = %s,\n' "$lx1" >> ${INPUTFILE}
+ printf ' lpx(2) = %s,\n' "$lx2" >> ${INPUTFILE}
+ printf ' lpx(3) = %s,\n' "$lx3" >> ${INPUTFILE}
+ printf ' lpx(4) = %s,\n' "$lx4" >> ${INPUTFILE}
+ printf ' lpx(5) = %s,\n' "$lx5" >> ${INPUTFILE}
+ printf ' lpx(6) = %s,\n' "$lx6" >> ${INPUTFILE}
+ printf ' lpx(7) = %s,\n' "$lx7" >> ${INPUTFILE}
+ printf ' n_over_nc = %s,\n' "${n_nc}" >> ${INPUTFILE}
+ printf ' n1_over_n = %s,\n' "${n1_nc}" >> ${INPUTFILE}
+ printf ' n2_over_n = %s,\n' "${n2_nc}" >> ${INPUTFILE}
+ printf ' w_sh = %s,\n' "${wnd_sh}" >> ${INPUTFILE}
+ printf ' wi_time = %s,\n' "${w_in}" >> ${INPUTFILE}
+ printf ' wf_time = %s,\n' "${w_end}" >> ${INPUTFILE}
+ printf ' w_speed = %s,\n' "${w_speed}" >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
 
- printf '&OUTPUT' >> ${INPUTFILE}
- printf 'nouts = %s,\n' "$nout" >> ${INPUTFILE}
- printf 'iene = %s,\n' "$iene" >> ${INPUTFILE}
- printf 'nvout = %s,\n' "$nf" >> ${INPUTFILE}
- printf 'nden = %s,\n' "$nd" >> ${INPUTFILE}
- printf 'npout = %s,\n' "$npv" >> ${INPUTFILE}
- printf 'nbout = %s,\n' "${end_p}" >> ${INPUTFILE}
- printf 'jump = %s,\n' "$jmp" >> ${INPUTFILE}
- printf 'pjump = %s,\n' "$pjmp" >> ${INPUTFILE}
- printf 'xp0_out = %s,\n' "$xp0" >> ${INPUTFILE}
- printf 'xp1_out = %s,\n' "$xp1" >> ${INPUTFILE}
- printf 'yp_out = %s,\n' "$ypmax" >> ${INPUTFILE}
- printf 'tmax = %s,\n' "$tmax" >> ${INPUTFILE}
- printf 'cfl = %s,\n' "$cfl" >> ${INPUTFILE}
- printf 'new_sim = %s,\n' "$new" >> ${INPUTFILE}
- printf 'id_new = %s,\n' "${id_ew}" >> ${INPUTFILE}
- printf 'dump = %s,\n' "$dump" >> ${INPUTFILE}
- printf 'npe_yz = %s,\n' "$pey" >> ${INPUTFILE}
+ printf '&OUTPUT\n' >> ${INPUTFILE}
+ printf ' nouts = %s,\n' "$nout" >> ${INPUTFILE}
+ printf ' iene = %s,\n' "$iene" >> ${INPUTFILE}
+ printf ' nvout = %s,\n' "$nf" >> ${INPUTFILE}
+ printf ' nden = %s,\n' "$nd" >> ${INPUTFILE}
+ printf ' npout = %s,\n' "$npv" >> ${INPUTFILE}
+ printf ' nbout = %s,\n' "${end_p}" >> ${INPUTFILE}
+ printf ' jump = %s,\n' "$jmp" >> ${INPUTFILE}
+ printf ' pjump = %s,\n' "$pjmp" >> ${INPUTFILE}
+ printf ' xp0_out = %s,\n' "$xp0" >> ${INPUTFILE}
+ printf ' xp1_out = %s,\n' "$xp1" >> ${INPUTFILE}
+ printf ' yp_out = %s,\n' "$ypmax" >> ${INPUTFILE}
+ printf ' tmax = %s,\n' "$tmax" >> ${INPUTFILE}
+ printf ' cfl = %s,\n' "$cfl" >> ${INPUTFILE}
+ printf ' new_sim = %s,\n' "$new" >> ${INPUTFILE}
+ printf ' id_new = %s,\n' "${id_ew}" >> ${INPUTFILE}
+ printf ' dump = %s,\n' "$dump" >> ${INPUTFILE}
+ printf ' npe_yz = %s,\n' "$pey" >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
 
 
