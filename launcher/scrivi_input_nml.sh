@@ -269,86 +269,79 @@ pey=${NCPU}
  rm  ${INPUTFILE}
  touch ${INPUTFILE}
 
- printf '%s\n' "$nx" >> ${INPUTFILE}
- printf '%s\n' "$ny" >> ${INPUTFILE}
- printf '%s\n' "$nz" >> ${INPUTFILE}
- printf '%s\n' "$nplasma" >> ${INPUTFILE}
+ printf '&GRID' >> ${INPUTFILE}
+ printf 'nx = %s,\n' "$nx" >> ${INPUTFILE}
+ printf 'ny = %s,\n' "$ny" >> ${INPUTFILE}
+ printf 'nz = %s,\n' "$nz" >> ${INPUTFILE}
+ printf 'ny_targ = %s,\n' "$nplasma" >> ${INPUTFILE}
+ printf 'k0 = %s,\n' "$k0" >> ${INPUTFILE}
+ printf 'yx_rat = %s,\n' "$yx_rat" >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
 
- printf '%s\n' "$k0" >> ${INPUTFILE}
- printf '%s\n' "$yx_rat" >> ${INPUTFILE}
+ printf '&SIMULATION' >> ${INPUTFILE}
+ printf 'LPf_ord = %s,\n' "$LPf" >> ${INPUTFILE}
+ printf 'Der_ord = %s,\n' "$Der" >> ${INPUTFILE}
+ printf 'Str_flag = %s,\n' "$str" >> ${INPUTFILE}
+ printf 'iform = %s,\n' "$iform" >> ${INPUTFILE}
+ printf 'model_id = %s,\n' "$mdl" >> ${INPUTFILE}
+ printf 'dmodel_id = %s,\n' "$dmdl" >> ${INPUTFILE}
+ printf 'ibeam = %s,\n' "$ibeam" >> ${INPUTFILE}
+ printf 'nsp = %s,\n' "$nsp" >> ${INPUTFILE}
+ printf 'nsb = %s,\n' "$nsb" >> ${INPUTFILE}
+ printf 'Z_ion = %s,\n' "${Z_i}" >> ${INPUTFILE}
+ printf 'A_ion = %s,\n' "${A_i}" >> ${INPUTFILE}
+ printf 'np_per_xc(1) = %s,\n' "${np_xc_el_l2}" >> ${INPUTFILE}
+ printf 'np_per_xc(2) = %s,\n' "${np_xc_ion_l2}" >> ${INPUTFILE}
+ printf 'np_per_xc(3) = %s,\n' "${np_xc_el_l1}" >> ${INPUTFILE}
+ printf 'np_per_xc(4) = %s,\n' "${np_xc_ion_l1}" >> ${INPUTFILE}
+ printf 'np_per_xc(5) = %s,\n' "${np_xc_el_l3}" >> ${INPUTFILE}
+ printf 'np_per_xc(6) = %s,\n' "${np_xc_ion_l3}" >> ${INPUTFILE}
+ printf 'np_per_yc(1) = %s,\n' "${np_yc_el_l2}" >> ${INPUTFILE}
+ printf 'np_per_yc(2) = %s,\n' "${np_yc_ion_l2}" >> ${INPUTFILE}
+ printf 'np_per_yc(3) = %s,\n' "${np_yc_el_l1}" >> ${INPUTFILE}
+ printf 'np_per_yc(4) = %s,\n' "${np_yc_ion_l1}" >> ${INPUTFILE}
+ printf 'np_per_yc(5) = %s,\n' "${np_yc_el_l3}" >> ${INPUTFILE}
+ printf 'np_per_yc(6) = %s,\n' "${np_yc_ion_l3}" >> ${INPUTFILE}
+ printf 't0_lp = %s,\n' "$t0" >> ${INPUTFILE}
+ printf 'xc_lp = %s,\n' "$xc" >> ${INPUTFILE}
+ printf 'w0_x = %s,\n' "$wx" >> ${INPUTFILE}
+ printf 'w0_y = %s,\n' "$wy" >> ${INPUTFILE}
+ printf 'a0 = %s,\n' "$a0" >> ${INPUTFILE}
+ printf 'lam0 = %s,\n' "$lam0" >> ${INPUTFILE}
+ printf 'lpx(1) = %s,\n' "$lx1" >> ${INPUTFILE}
+ printf 'lpx(2) = %s,\n' "$lx2" >> ${INPUTFILE}
+ printf 'lpx(3) = %s,\n' "$lx3" >> ${INPUTFILE}
+ printf 'lpx(4) = %s,\n' "$lx4" >> ${INPUTFILE}
+ printf 'lpx(5) = %s,\n' "$lx5" >> ${INPUTFILE}
+ printf 'lpx(6) = %s,\n' "$lx6" >> ${INPUTFILE}
+ printf 'lpx(7) = %s,\n' "$lx7" >> ${INPUTFILE}
+ printf 'n_over_nc = %s,\n' "${n_nc}" >> ${INPUTFILE}
+ printf 'n1_over_n = %s,\n' "${n1_nc}" >> ${INPUTFILE}
+ printf 'n2_over_n = %s,\n' "${n2_nc}" >> ${INPUTFILE}
+ printf 'w_sh = %s,\n' "${wnd_sh}" >> ${INPUTFILE}
+ printf 'wi_time = %s,\n' "${w_in}" >> ${INPUTFILE}
+ printf 'wf_time = %s,\n' "${w_end}" >> ${INPUTFILE}
+ printf 'w_speed = %s,\n' "${w_speed}" >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
 
- printf '%s\n' "$LPf" >> ${INPUTFILE}
- printf '%s\n' "$Der" >> ${INPUTFILE}
- printf '%s\n' "$str" >> ${INPUTFILE}
- printf '%s\n' "$iform" >> ${INPUTFILE}
-
- printf '%s\n' "$mdl" >> ${INPUTFILE}
- printf '%s\n' "$dmdl" >> ${INPUTFILE}
- printf '%s\n' "$ibeam" >> ${INPUTFILE}
-
- printf '%s\n' "$nsp" >> ${INPUTFILE}
- printf '%s\n' "$nsb" >> ${INPUTFILE}
- printf '%s\n' "${Z_i}" >> ${INPUTFILE}
- printf '%s\n' "${A_i}" >> ${INPUTFILE}
-
- printf '%s\n' "${np_xc_el_l2}" >> ${INPUTFILE}
- printf '%s\n' "${np_xc_ion_l2}" >> ${INPUTFILE}
- printf '%s\n' "${np_xc_el_l1}" >> ${INPUTFILE}
- printf '%s\n' "${np_xc_ion_l1}" >> ${INPUTFILE}
- printf '%s\n' "${np_xc_el_l3}" >> ${INPUTFILE}
- printf '%s\n' "${np_xc_ion_l3}" >> ${INPUTFILE}
-
- printf '%s\n' "${np_yc_el_l2}" >> ${INPUTFILE}
- printf '%s\n' "${np_yc_ion_l2}" >> ${INPUTFILE}
- printf '%s\n' "${np_yc_el_l1}" >> ${INPUTFILE}
- printf '%s\n' "${np_yc_ion_l1}" >> ${INPUTFILE}
- printf '%s\n' "${np_yc_el_l3}" >> ${INPUTFILE}
- printf '%s\n' "${np_yc_ion_l3}" >> ${INPUTFILE}
-
- printf '%s\n' "$t0" >> ${INPUTFILE}
- printf '%s\n' "$xc" >> ${INPUTFILE}
- printf '%s\n' "$wx" >> ${INPUTFILE}
- printf '%s\n' "$wy" >> ${INPUTFILE}
- printf '%s\n' "$a0" >> ${INPUTFILE}
- printf '%s\n' "$lam0" >> ${INPUTFILE}
-
- printf '%s\n' "$lx1" >> ${INPUTFILE}
- printf '%s\n' "$lx2" >> ${INPUTFILE}
- printf '%s\n' "$lx3" >> ${INPUTFILE}
- printf '%s\n' "$lx4" >> ${INPUTFILE}
- printf '%s\n' "$lx5" >> ${INPUTFILE}
- printf '%s\n' "$lx6" >> ${INPUTFILE}
- printf '%s\n' "$lx7" >> ${INPUTFILE}
-
- printf '%s\n' "${n_nc}" >> ${INPUTFILE}
- printf '%s\n' "${n1_nc}" >> ${INPUTFILE}
- printf '%s\n' "${n2_nc}" >> ${INPUTFILE}
-
- printf '%s\n' "${wnd_sh}" >> ${INPUTFILE}
- printf '%s\n' "${w_in}" >> ${INPUTFILE}
- printf '%s\n' "${w_end}" >> ${INPUTFILE}
- printf '%s\n' "${w_speed}" >> ${INPUTFILE}
-
- printf '%s\n' "$nout" >> ${INPUTFILE}
- printf '%s\n' "$iene" >> ${INPUTFILE}
- printf '%s\n' "$nf" >> ${INPUTFILE}
- printf '%s\n' "$nd" >> ${INPUTFILE}
- printf '%s\n' "$npv" >> ${INPUTFILE}
- printf '%s\n' "${end_p}" >> ${INPUTFILE}
-
- printf '%s\n' "$jmp" >> ${INPUTFILE}
- printf '%s\n' "$pjmp" >> ${INPUTFILE}
-
- printf '%s\n' "$xp0" >> ${INPUTFILE}
- printf '%s\n' "$xp1" >> ${INPUTFILE}
- printf '%s\n' "$ypmax" >> ${INPUTFILE}
-
- printf '%s\n' "$tmax" >> ${INPUTFILE}
- printf '%s\n' "$cfl" >> ${INPUTFILE}
-
- printf '%s\n' "$new" >> ${INPUTFILE}
- printf '%s\n' "${id_ew}" >> ${INPUTFILE}
- printf '%s\n' "$dump" >> ${INPUTFILE}
- printf '%s\n' "$pey" >> ${INPUTFILE}
+ printf '&OUTPUT' >> ${INPUTFILE}
+ printf 'nouts = %s,\n' "$nout" >> ${INPUTFILE}
+ printf 'iene = %s,\n' "$iene" >> ${INPUTFILE}
+ printf 'nvout = %s,\n' "$nf" >> ${INPUTFILE}
+ printf 'nden = %s,\n' "$nd" >> ${INPUTFILE}
+ printf 'npout = %s,\n' "$npv" >> ${INPUTFILE}
+ printf 'nbout = %s,\n' "${end_p}" >> ${INPUTFILE}
+ printf 'jump = %s,\n' "$jmp" >> ${INPUTFILE}
+ printf 'pjump = %s,\n' "$pjmp" >> ${INPUTFILE}
+ printf 'xp0_out = %s,\n' "$xp0" >> ${INPUTFILE}
+ printf 'xp1_out = %s,\n' "$xp1" >> ${INPUTFILE}
+ printf 'yp_out = %s,\n' "$ypmax" >> ${INPUTFILE}
+ printf 'tmax = %s,\n' "$tmax" >> ${INPUTFILE}
+ printf 'cfl = %s,\n' "$cfl" >> ${INPUTFILE}
+ printf 'new_sim = %s,\n' "$new" >> ${INPUTFILE}
+ printf 'id_new = %s,\n' "${id_ew}" >> ${INPUTFILE}
+ printf 'dump = %s,\n' "$dump" >> ${INPUTFILE}
+ printf 'npe_yz = %s,\n' "$pey" >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
 
 
