@@ -25,7 +25,7 @@ from ALaDyn_plot_utilities_1 import *
 
 
 #- plot Sections
-def plot_Bfield_sections(path,frame,scale_factor,savedata):
+def plot_Bfield_sections(path,frame,scale_factor,sliceposition_x,sliceposition_y,sliceposition_z,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	

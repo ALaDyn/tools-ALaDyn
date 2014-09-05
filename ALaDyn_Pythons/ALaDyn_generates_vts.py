@@ -29,15 +29,19 @@ if(len(sys.argv)<2):
 	print 'Input [1]: frame_begin'
 	print 'Input [2]: frame_end'
 	print 'Input [3]: yz-shaving'
+	print 'Input [4]: sliceposition_y'
+	exit(0)
 
 if sys.argv[1] == -1:
 	frame_begin		  = 0
 	frame_end         = last_output(os.getcwd())
 	cell_cut		  = 0
+	sliceposition_y	  = 0
 else:
 	frame_begin 		= int(		sys.argv[1])	
 	frame_end			= int(		sys.argv[2])
 	cell_cut		 	= int(		sys.argv[3])
+	sliceposition_y		= int(		sys.argv[4])
 ### --- ###
 
 
@@ -62,7 +66,7 @@ if __name__ == '__main__':
 #		write_vts(path,i,X,Y,Z,cell_cut)
 		
 		print '--- write vts-section longitudinal: frame >',i
-		write_vts_section_longitudinal(path,i,X,Y,Z,cell_cut)		
+		write_vts_section_longitudinal(path,i,X,Y,Z,cell_cut,sliceposition_y)		
 
 		#- in such a way it is much longer, but it is neater to write
 		#- plus: it has to be done only once
