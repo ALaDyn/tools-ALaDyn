@@ -49,6 +49,7 @@ if sys.argv[1] == -1:
 	rho_min 		  = 0.0001
 	rho_max 		  = 20.
 	isolines		  = 30
+	celltocut		  = 0
 	sliceposition_x	  = 0
 	sliceposition_y	  = 0
 	sliceposition_z	  = 0

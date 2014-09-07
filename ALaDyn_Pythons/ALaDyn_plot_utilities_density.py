@@ -251,7 +251,7 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 		rho = rho_b+rho_w
 
 		p = rho.shape
-		x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
+		x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
 
 	
 		np.savetxt( os.path.join(path,'data','rho',('rho_section_'+('%2.2i'%frame)+'.dat')),rho[:,:,z2].T,fmt='%15.14e')
