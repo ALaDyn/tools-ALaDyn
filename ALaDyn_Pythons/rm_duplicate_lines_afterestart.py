@@ -26,7 +26,7 @@ path = os.getcwd()
 
 # - #
 #read standard output
-std_output = np.genfromtxt( os.path.join(path, 'bunch_1.dat') , unpack=True);
+std_output = np.genfromtxt( os.path.join(path, 'bunch_integrated_quantity_1.dat') , unpack=True);
 
 # - # find duplicates lines -- find jumps
 s = std_output.shape
