@@ -720,7 +720,7 @@ def write_B_vts(path,frame,X,Y,Z,cell_cut):
 
 
 #--- *** ---#
-def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut):
+def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut,sliceposition_y):
 
  	sf='%2.2i'%frame 				#conversion to 2-character-long-string
  	file_name 		= 'Bdenout'+sf+'.bin'
@@ -735,14 +735,14 @@ def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut):
  	
  	#- matrix shaving
  	if cell_cut > 0:
-	 	rhobunch = rhobunch[:, sizeO[1]/2, cell_cut:-cell_cut]
- 		rhobck   = rhobck[:, sizeO[1]/2, cell_cut:-cell_cut]
-	 	Y		 = Y[ sizeO[1]/2 ]
+	 	rhobunch = rhobunch[:, sizeO[1]/2+sliceposition_y, cell_cut:-cell_cut]
+ 		rhobck   = rhobck[:, sizeO[1]/2+sliceposition_y, cell_cut:-cell_cut]
+	 	Y		 = Y[ sizeO[1]/2+sliceposition_y ]
  		Z        = Z[cell_cut:-cell_cut]
 	else:
-	 	rhobunch = rhobunch[:, sizeO[1]/2,:]
- 		rhobck   = rhobck[:, sizeO[1]/2,:]
-	 	Y		 = Y[ sizeO[1]/2 ]
+	 	rhobunch = rhobunch[:, sizeO[1]/2+sliceposition_y,:]
+ 		rhobck   = rhobck[:, sizeO[1]/2+sliceposition_y,:]
+	 	Y		 = Y[ sizeO[1]/2+sliceposition_y ]
  		Z        = Z[:]
  	#-
  	size 		 = rhobunch.shape

@@ -25,7 +25,7 @@ from ALaDyn_plot_utilities_1 import *
 
 
 #- plot Sections
-def plot_Efield_sections(path,frame,scale_factor,savedata):
+def plot_Efield_sections(path,frame,scale_factor,sliceposition_x,sliceposition_y,sliceposition_z,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	
@@ -51,7 +51,7 @@ def plot_Efield_sections(path,frame,scale_factor,savedata):
 	Ez = Ez+Ezb
 
 	p = Ex.shape
-	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
+	x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
 	
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,scale_factor)
 

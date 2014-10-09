@@ -28,14 +28,19 @@ from ALaDyn_plot_utilities_axes import *
 
 ### --- ### shell inputs
 if(len(sys.argv)<2):
-	print 'Input [1]: frame_begin'
-	print 'Input [2]: frame_end'
-	print 'Input [3]: magnification_fig'
-	print 'Input [4]: rho_min'
-	print 'Input [5]: rho_max'
-	print 'Input [6]: iso-lines'
-	print 'Input [7]: cell to cut'
-	print 'Input [8]: Save data? (True/False)'
+	print 'Input  [1]: frame_begin'
+	print 'Input  [2]: frame_end'
+	print 'Input  [3]: magnification_fig'
+	print 'Input  [4]: rho_min'
+	print 'Input  [5]: rho_max'
+	print 'Input  [6]: iso-lines'
+	print 'Input  [7]: cell to cut'
+	print 'Input  [8]: slice position x'
+	print 'Input  [9]: slice position y'
+	print 'Input [10]: slice position z'
+	print 'Input [11]: Save data? (True/False)'
+	
+	exit(0)
 
 if sys.argv[1] == -1:
 	frame_begin		  = 0
@@ -44,6 +49,11 @@ if sys.argv[1] == -1:
 	rho_min 		  = 0.0001
 	rho_max 		  = 20.
 	isolines		  = 30
+	celltocut		  = 0
+	sliceposition_x	  = 0
+	sliceposition_y	  = 0
+	sliceposition_z	  = 0
+	savedata          = True 
 else:
 	frame_begin 		= int(		sys.argv[1])	
 	frame_end			= int(		sys.argv[2])
@@ -52,7 +62,10 @@ else:
 	rho_max 		  	= float(	sys.argv[5])
 	isolines			= int(		sys.argv[6])
 	celltocut			= int(		sys.argv[7])
-	savedata            = sys.argv[8]
+	sliceposition_x		= int(		sys.argv[8])
+	sliceposition_y		= int(		sys.argv[9])
+	sliceposition_z		= int(		sys.argv[10])
+	savedata            = sys.argv[11]
 ### --- ###
 
 
@@ -78,16 +91,16 @@ if __name__ == '__main__':
 		
 		if output_exists(path,'rho',i) == True:
 			print 'rho --- frame >>> ',i
-			plot_density_sections(path,i,rho_min,rho_max,isolines,celltocut,magnification_fig,savedata)
+			plot_density_sections(path,i,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata)
 
 		if output_exists(path,'E',i) == True:
 			print 'E --- frame >>> ',i
-			plot_Efield_sections(path,i,magnification_fig,savedata)
+			plot_Efield_sections(path,i,magnification_fig,sliceposition_x,sliceposition_y,sliceposition_z,savedata)
 
 			
 		if output_exists(path,'B',i) == True:
 			print 'B --- frame >>> ',i		
-			plot_Bfield_sections(path,i,magnification_fig,savedata)
+			plot_Bfield_sections(path,i,magnification_fig,sliceposition_x,sliceposition_y,sliceposition_z,savedata)
 		
 		
 			

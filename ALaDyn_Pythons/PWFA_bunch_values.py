@@ -18,9 +18,9 @@ from pylab import *
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 #-- Inputs
-bch= 4.0
-sx= 30 * 1e-4 #in [cm]
-sy= 6  * 1e-4 #in [cm] - sy == sz
+bch= 5.0
+sx= 10 * 1e-4 #in [cm]
+sy= 3  * 1e-4 #in [cm] - sy == sz
 n0 		= 0.01*1e18	 #[cm-3]
 #-QFLUID
 # n0		= 1.0e16 #[cm-3]

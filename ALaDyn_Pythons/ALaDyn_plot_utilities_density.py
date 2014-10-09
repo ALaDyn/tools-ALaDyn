@@ -26,7 +26,7 @@ from ALaDyn_plot_utilities_1 import *
 
 
 #- plot Sections
-def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnification_fig,savedata):
+def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
 	
@@ -70,7 +70,7 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 		z		= z[celltocut:-celltocut]
 
 	p = matrix.shape
-	x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
+	x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
 	
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,magnification_fig)
 
@@ -251,7 +251,7 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,magnific
 		rho = rho_b+rho_w
 
 		p = rho.shape
-		x2=p[0]/2; y2=p[1]/2; z2=p[2]/2;
+		x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
 
 	
 		np.savetxt( os.path.join(path,'data','rho',('rho_section_'+('%2.2i'%frame)+'.dat')),rho[:,:,z2].T,fmt='%15.14e')
