@@ -56,7 +56,7 @@ print k_input
 if k_input is '1':
 	file_to_clean = raw_input('what file do you want to clean? \t')
 	to_clean      = np.genfromtxt( os.path.join(path, file_to_clean) , unpack=True)
-	cleaned       = to_clean[:,to_save]
+	cleaned       = to_clean[:,to_save].transpose()
 	print cleaned.shape
 	np.savetxt( os.path.join(path, os.path.splitext(file_to_clean)[0]+'_cleaned'+os.path.splitext(file_to_clean)[1] ), cleaned )
 	
