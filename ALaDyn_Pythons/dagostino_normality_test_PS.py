@@ -53,7 +53,10 @@ if __name__ == '__main__':
 				nX = X.shape[0]; nY = Y.shape[0]; nZ = Z.shape[0]
 				nPx = Px.shape[0]; nPy = Py.shape[0]; nPz = Pz.shape[0]
 				
-				
+				#- Shapito test
+				f=np.random.randint(nX,size=(4999,))
+				KX,pX = shapiro(X[f])
+				print KX,pX
 # 				KX,pX = shapiro(X)
 # 				KX,pX=mstats.normaltest(X)
 				#t = mstats.chisquare(2).ppf( 0.95 )
