@@ -30,7 +30,7 @@ def read_particle_phasespace(file_name):
 		try:
 			Np=struct.unpack('i', f.read(4))
 		except struct.error:
-			print "End of File"
+			#print "End of File"
 			break
 		vars=[]
 		try:

@@ -14,7 +14,8 @@ import numpy as np
 import pylab as pyl
 import matplotlib.pyplot as plt
 import scipy as sci
-from scipy.stats import mstats
+#from scipy.stats import mstats
+import scipy.stats as mstats
 from scipy.stats import shapiro
 ###>>>
 home_path = os.path.expanduser('~')
@@ -53,14 +54,30 @@ if __name__ == '__main__':
 				nX = X.shape[0]; nY = Y.shape[0]; nZ = Z.shape[0]
 				nPx = Px.shape[0]; nPy = Py.shape[0]; nPz = Pz.shape[0]
 				
-				#- Shapito test
-				f=np.random.randint(nX,size=(4999,))
-				KX,pX = shapiro(X[f])
-				print KX,pX
+				#- Shapito test: iterative
+# 				KX_tot=[]; KY_tot=[]; KY_tot=[]; pX_tot=[]; pY_tot=[]; pZ_tot=[]; KPx_tot=[]; KPy_tot=[]; KPz_tot=[]; pPx_tot=[]; pPy_tot=[]; pPz_tot=[];
+# 				for i in range(0,100):
+# 					f=np.random.randint(nX,size=(4999,))
+# 					KX,pX = shapiro(X[f])
+# 					KY,pY = shapiro(Y[f])
+# 					KZ,pZ = shapiro(Z[f])
+# 					KPx,pPx = shapiro(Px[f])
+# 					KPy,pPy = shapiro(Py[f])
+# 					KPz,pPz = shapiro(Pz[f])
+# 					
+# 					KX_tot.append(KX); KY_tot.append(KY); KY_tot.append(KZ)
+# 					pX_tot.append(pX); pY_tot.append(pY); pZ_tot.append(pZ)
+# 					
+# 					KPx_tot.append(KPx); KPy_tot.append(KPx); KPz_tot.append(KPz)
+# 					pPx_tot.append(pPx); pPy_tot.append(pPy); pPz_tot.append(pPz)
+
+#				print KX,pX
 # 				KX,pX = shapiro(X)
-# 				KX,pX=mstats.normaltest(X)
-				#t = mstats.chisquare(2).ppf( 0.95 )
-				#print SX,SY,SZ,SPx,SPy,SPz
+
+				#- normal test - full sample
+ 				KX,pX=mstats.normaltest(X); KY,pY=mstats.normaltest(Y); KZ,pZ=mstats.normaltest(Z)
+ 				KPx,pPx=mstats.normaltest(Px); KPy,pPy=mstats.normaltest(Py); KPz,pPz=mstats.normaltest(Pz)
+				print int(file[7]), pX, pY, pZ, pPx, pPy, pPz
 	
 	
 # 	#-hunting and printing
