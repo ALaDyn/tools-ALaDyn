@@ -79,7 +79,7 @@ if __name__ == '__main__':
 					KPx,pPx=mstats.normaltest(Px); 	KPy,pPy=mstats.normaltest(Py); 	KPz,pPz=mstats.normaltest(Pz)
 
 				#- screen output
-				print '[',int(file[9:11]),',', pX,',' pY,',' pZ,',' pPx,',' pPy,',' pPz,'],'
+				print '[',int(file[9:11]),',', pX,',', pY,',', pZ,',', pPx,',', pPy,',', pPz,'],'
 # 				test[i][:] = [int(file[7]), pX, pY, pZ, pPx, pPy, pPz]; i+=1
 	
 	#-printing
