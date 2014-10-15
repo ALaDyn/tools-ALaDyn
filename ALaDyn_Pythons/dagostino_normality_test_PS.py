@@ -30,11 +30,19 @@ from Particle_reader_utilities import *
 ### --- ### shell inputs
 if(len(sys.argv)<2):
 	print 'Usage:'
-	print 'bunch number'
+	print '			bunch number'
+	print '			stat test: shapiro / dagostino'
 	exit(0)
 #---
 nbunch = int(sys.argv[1])
+test_kind = str( sys.argv[2] )
 
+#---
+test=np.zeros((7,50))
+i=0
+pX_shapiro=[]; pY_shapiro=[]; pZ_shapiro=[];
+pPx_shapiro=[]; pPy_shapiro=[]; pPz_shapiro=[];
+#---
 
 #--- *** ---#
 if __name__ == '__main__':
@@ -55,36 +63,24 @@ if __name__ == '__main__':
 				nPx = Px.shape[0]; nPy = Py.shape[0]; nPz = Pz.shape[0]
 				
 				#- Shapito test: iterative
-# 				KX_tot=[]; KY_tot=[]; KY_tot=[]; pX_tot=[]; pY_tot=[]; pZ_tot=[]; KPx_tot=[]; KPy_tot=[]; KPz_tot=[]; pPx_tot=[]; pPy_tot=[]; pPz_tot=[];
-# 				for i in range(0,100):
-# 					f=np.random.randint(nX,size=(4999,))
-# 					KX,pX = shapiro(X[f])
-# 					KY,pY = shapiro(Y[f])
-# 					KZ,pZ = shapiro(Z[f])
-# 					KPx,pPx = shapiro(Px[f])
-# 					KPy,pPy = shapiro(Py[f])
-# 					KPz,pPz = shapiro(Pz[f])
-# 					
-# 					KX_tot.append(KX); KY_tot.append(KY); KY_tot.append(KZ)
-# 					pX_tot.append(pX); pY_tot.append(pY); pZ_tot.append(pZ)
-# 					
-# 					KPx_tot.append(KPx); KPy_tot.append(KPx); KPz_tot.append(KPz)
-# 					pPx_tot.append(pPx); pPy_tot.append(pPy); pPz_tot.append(pPz)
+				if test_kind == 'shapiro':
+	 				for i in range(0,500):	
+	 					f=np.random.randint(nX,size=(4999,))
+						KX,pX = shapiro(X[f]); 			KY,pY = shapiro(Y[f]); 			KZ,pZ = shapiro(Z[f])
+						KPx,pPx=mstats.shapiro(Px[f]); 	KPy,pPy=mstats.shapiro(Py[f]); 	KPz,pPz=mstats.shapiro(Pz[f])
+						pX_shapiro.append(pX); 		pY_shapiro.append(pY);		pZ_shapiro.append(pZ);
+						pPx_shapiro.append(pPx);	pPy_shapiro.append(pPy);	pPz_shapiro.append(pPz);
+					pX=np.mean(pX_shapiro); 	pY=np.mean(pY_shapiro); 	pZ=np.mean(pZ_shapiro);
+					pPx=np.mean(pPx_shapiro); 	pPy=np.mean(pPy_shapiro); 	pPz=np.mean(pPz_shapiro);
 
-#				print KX,pX
-# 				KX,pX = shapiro(X)
+				#- normal test - full sample - d'Agostino test
+				if test_kind == 'dagostino':
+					KX,pX=mstats.normaltest(X); 	KY,pY=mstats.normaltest(Y); 	KZ,pZ=mstats.normaltest(Z)
+					KPx,pPx=mstats.normaltest(Px); 	KPy,pPy=mstats.normaltest(Py); 	KPz,pPz=mstats.normaltest(Pz)
 
-				#- normal test - full sample
- 				KX,pX=mstats.normaltest(X); KY,pY=mstats.normaltest(Y); KZ,pZ=mstats.normaltest(Z)
- 				KPx,pPx=mstats.normaltest(Px); KPy,pPy=mstats.normaltest(Py); KPz,pPz=mstats.normaltest(Pz)
-				print int(file[7]), pX, pY, pZ, pPx, pPy, pPz
+				#- screen output
+				print int(file[9:11]), pX, pY, pZ, pPx, pPy, pPz
+# 				test[i][:] = [int(file[7]), pX, pY, pZ, pPx, pPy, pPz]; i+=1
 	
-	
-# 	#-hunting and printing
-# 
-# 			
-# 				plt.axis('tight')
-# 				name_output =  'phasespace_bunch_' + str(file[7]) + '_' + str(file[9:11])+ '.png'
-# 				plt.savefig( os.path.join(path,'data','phasespace',name_output) )
-# 				plt.close(fig)
-# 
+	#-printing
+# 	np.savetxt( os.path.join(path, 'dagostino_normality_test.txt' ), test[0:i-1,:] )
