@@ -43,19 +43,69 @@ using namespace std;
 
 
 
-int main(int args, char* argv[])
+int main(int argc, char* argv[])
 {
-  if (args < 2)
+  if (argc < 3)
   {
-    cerr << "Specificare su linea comando il file di input!" << endl;
+    cerr << "Please write input file on command line and also working mode!" << endl;
+    cerr << "-scan to write on the output, on a single line and without the newline at the end, just the mean energy and the total number of particles (fitting parameters)" << endl;
+    cerr << "-func to write on the output the fitting functions" << endl;
+    cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curves" << endl;
+    cerr << "\nIn all cases, this program works best using output redirection" << endl;
     exit(1);
+  }
+
+  bool scan = false, func = false, gnuplot = false;
+  int inputfile_position = 0;
+
+  for (int i = 1; i < argc; i++)
+    /************************************************************************
+    We will iterate over argv[] to get the parameters stored inside.
+    Note that we're starting on 1 because we don't need to know the
+    path of the program, which is stored in argv[0], and the input file,
+    which is supposed to be given as the first argument and so is in argv[1]
+    ************************************************************************/
+  {
+    if (std::string(argv[i]) == "-scan")
+    {
+      scan = true;
+    }
+    else if (std::string(argv[i]) == "-gnuplot")
+    {
+      gnuplot = true;
+    }
+    else if (std::string(argv[i]) == "-func")
+    {
+      func = true;
+    }
+    else
+    {
+      inputfile_position = i;
+    }
+
+
+  }
+
+  if (inputfile_position < 1)
+  {
+    cerr << "Unable to find an input file on the command line" << endl;
+    cerr << "Scan[0:disabled, 1:enabled] --> " << scan << endl;
+    cerr << "Gnuplot[0:disabled, 1:enabled] --> " << gnuplot << endl;
+    cerr << "Func[0:disabled, 1:enabled] --> " << func << endl;
+    exit(2);
   }
 
   string riga;
   vector<string> righe;
 
   ifstream infile;
-  infile.open(argv[1], ifstream::in);
+  infile.open(argv[inputfile_position], ifstream::in);
+  if (!infile.is_open())
+  {
+    cerr << "Unable to open input file " << argv[inputfile_position] << "!" << endl;
+    exit(3);
+  }
+
 
   char * riga_letta;
   riga_letta = new char[LUNGHEZZA_MAX_RIGA];
@@ -127,53 +177,71 @@ int main(int args, char* argv[])
   fit_a2 = (sum_x2z*sum_zlogz - sum_xz*sum_xzlogz) / (sum_z*sum_x2z - sum_xz*sum_xz);
   fit_b2 = (sum_z*sum_xzlogz - sum_xz*sum_zlogz) / (sum_z*sum_x2z - sum_xz*sum_xz);
 
-  cout << "Fit for full spectrum: y=" << exp(fit_a1) << "e^(" << fit_b1 << "x)" << endl;
-  cout << "Fit for selected spectrum: y=" << exp(fit_a2) << "e^(" << fit_b2 << "x)" << endl;
-
-
-
-  FILE*  outfile;
-  outfile = fopen("plot.plt", "w");
-
   double aveE1 = -1. / fit_b1;
   double aveE2 = -1. / fit_b2;
   int N0_1 = (int)(exp(fit_a1) * aveE1);
   int N0_2 = (int)(exp(fit_a2) * aveE2);
-  int weight = 2;
-  int subsample_factor = 48230;
-  int Xres = 1280;
-  int Yres = 720;
-  //  int Emin = 0;
-  //  int Emax = 60;
-  char image_type[] = "png";
+  int weight = 2; // fix, read it from the first line of the infile
+  int subsample_factor = 48230; // fix, read it from the first line of the infile
 
-  fprintf(outfile, "#!/gnuplot\n");
-  fprintf(outfile, "FILE_IN='%s'\n", argv[1]);
-  fprintf(outfile, "FILE_OUT='%s.%s'\n", argv[1], image_type);
-  fprintf(outfile, "set terminal %s truecolor enhanced size %i,%i\n", image_type, Xres, Yres);
-  fprintf(outfile, "set output FILE_OUT\n");
-  fprintf(outfile, "AVERAGE_E1 = %2.1f\n", aveE1);
-  fprintf(outfile, "AVERAGE_E2 = %2.1f\n", aveE2);
-  fprintf(outfile, "WEIGHT = %i\n", weight);
-  fprintf(outfile, "SUBSAMPLE = %i\n", subsample_factor);
-  fprintf(outfile, "N0_1 = %i*WEIGHT*SUBSAMPLE\n", N0_1);
-  fprintf(outfile, "N0_2 = %i*WEIGHT*SUBSAMPLE\n", N0_2);
-  fprintf(outfile, "f(x) = (N0_1 / AVERAGE_E1)*exp(-x / AVERAGE_E1)\n");
-  fprintf(outfile, "g(x) = (N0_2 / AVERAGE_E2)*exp(-x / AVERAGE_E2)\n");
-  fprintf(outfile, "set xlabel 'E (MeV)' \n");
-  fprintf(outfile, "set ylabel 'dN/dE (MeV^{-1})'\n");
-  fprintf(outfile, "set format y '10^{%%L}'\n");
-  //  fprintf(outfile, "set xrange[%i:%i]\n", Emin, Emax);
-  fprintf(outfile, "set logscale y\n");
-  fprintf(outfile, "plot FILE_IN u 1:($2*%i*%i) w histeps lt 1 lc rgb 'blue' lw 3 t 'full spectrum',\\", weight, subsample_factor);
-  fprintf(outfile, "\n");
-  fprintf(outfile, "FILE_IN u 1:($3*%i*%i) w histeps lt 1 lc rgb 'red' lw 3 t 'selected spectrum',\\", weight, subsample_factor);
-  fprintf(outfile, "\n");
-  fprintf(outfile, "f(x) w lines lt 1 lc rgb 'purple' lw 3 t 'exponential fit E_01 = %1.1f MeV',\\", aveE1);
-  fprintf(outfile, "\n");
-  fprintf(outfile, "g(x) w lines lt 1 lc rgb 'dark-green' lw 3 t 'exponential fit E_02 = %1.1f MeV'", aveE2);
 
-  fprintf(outfile, "\n");
+
+
+  if (func)
+  {
+    cout << "Fit for full spectrum: y=" << exp(fit_a1) << "e^(" << fit_b1 << "x)" << endl;
+    cout << "Fit for selected spectrum: y=" << exp(fit_a2) << "e^(" << fit_b2 << "x)" << endl;
+  }
+
+
+  if (gnuplot)
+  {
+    FILE*  outfile;
+    outfile = fopen("plot.plt", "w");
+
+    int Xres = 1280; // fix, make it possible to define on command line
+    int Yres = 720; // fix, make it possible to define on command line
+    //  int Emin = 0; // fix, read it from the infile
+    //  int Emax = 60; // fix, read it from the infile
+    char image_type[] = "png";
+
+    fprintf(outfile, "#!/gnuplot\n");
+    fprintf(outfile, "FILE_IN='%s'\n", argv[1]);
+    fprintf(outfile, "FILE_OUT='%s.%s'\n", argv[1], image_type);
+    fprintf(outfile, "set terminal %s truecolor enhanced size %i,%i\n", image_type, Xres, Yres);
+    fprintf(outfile, "set output FILE_OUT\n");
+    fprintf(outfile, "AVERAGE_E1 = %3.2f\n", aveE1);
+    fprintf(outfile, "AVERAGE_E2 = %3.2f\n", aveE2);
+    fprintf(outfile, "WEIGHT = %i\n", weight);
+    fprintf(outfile, "SUBSAMPLE = %i\n", subsample_factor);
+    fprintf(outfile, "N0_1 = %i*WEIGHT*SUBSAMPLE\n", N0_1);
+    fprintf(outfile, "N0_2 = %i*WEIGHT*SUBSAMPLE\n", N0_2);
+    fprintf(outfile, "f(x) = (N0_1 / AVERAGE_E1)*exp(-x / AVERAGE_E1)\n");
+    fprintf(outfile, "g(x) = (N0_2 / AVERAGE_E2)*exp(-x / AVERAGE_E2)\n");
+    fprintf(outfile, "set xlabel 'E (MeV)' \n");
+    fprintf(outfile, "set ylabel 'dN/dE (MeV^{-1})'\n");
+    fprintf(outfile, "set format y '10^{%%L}'\n");
+    //  fprintf(outfile, "set xrange[%i:%i]\n", Emin, Emax);
+    fprintf(outfile, "set logscale y\n");
+    fprintf(outfile, "plot FILE_IN u 1:($2*%i*%i) w histeps lt 1 lc rgb 'blue' lw 3 t 'full spectrum',\\", weight, subsample_factor);
+    fprintf(outfile, "\n");
+    fprintf(outfile, "FILE_IN u 1:($3*%i*%i) w histeps lt 1 lc rgb 'red' lw 3 t 'selected spectrum',\\", weight, subsample_factor);
+    fprintf(outfile, "\n");
+    fprintf(outfile, "f(x) w lines lt 1 lc rgb 'purple' lw 3 t 'exponential fit E_01 = %1.1f MeV',\\", aveE1);
+    fprintf(outfile, "\n");
+    fprintf(outfile, "g(x) w lines lt 1 lc rgb 'dark-green' lw 3 t 'exponential fit E_02 = %1.1f MeV'", aveE2);
+
+    fprintf(outfile, "\n");
+    fclose(outfile);
+  }
+
+
+  if (scan)
+  {
+    printf(" \t %3.2f \t %i \t %3.2f \t %i \t ", aveE1, N0_1, aveE2, N0_2);
+  }
+
+
 
   return 0;
 
