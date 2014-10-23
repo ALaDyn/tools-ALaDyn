@@ -62,8 +62,7 @@ int main(int argc, char* argv[])
     /************************************************************************
     We will iterate over argv[] to get the parameters stored inside.
     Note that we're starting on 1 because we don't need to know the
-    path of the program, which is stored in argv[0], and the input file,
-    which is supposed to be given as the first argument and so is in argv[1]
+    path of the program, which is stored in argv[0]
     ************************************************************************/
   {
     if (std::string(argv[i]) == "-scan")
