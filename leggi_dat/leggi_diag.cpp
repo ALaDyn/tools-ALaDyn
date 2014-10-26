@@ -14,7 +14,7 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
 	int tipofile = -1;		// 1 = diag, 2 = spec
 	int mod_id, dmodel_id, LP_ord, der_ord;
@@ -28,21 +28,33 @@ int main()
 	int Nx, Ny, Nz, n_cell, Nsp, Nsb;
 	int iter, nst, sp_step, nvar, npvar;
 
-	string commenti[10];
-	char * nomefile;
-	nomefile = new char[LUNGHEZZA_MAX_NOMEFILE];
-	ostringstream nomefile_in, nomefile_out;
-	printf("dai file (no extension): ");
-	scanf("%s",nomefile);
-	if (nomefile[0] == 'd') tipofile = 1;
-	else if (nomefile[0] == 's') tipofile = 2;
-	else printf("File non riconosciuto\n");
-	nomefile_in << string(nomefile) << ".dat";
+  ifstream infile;
+  char * nomefile;
+  nomefile = new char[LUNGHEZZA_MAX_NOMEFILE];
+  ostringstream nomefile_out;
+  string commenti[10];
 
-	ifstream infile;
-	infile.open(nomefile_in.str().c_str(),ifstream::in);
+  if (argc == 1)
+  {
+    char * nomefile;
+    nomefile = new char[LUNGHEZZA_MAX_NOMEFILE];
+    ostringstream nomefile_in;
+    printf("dai file (no extension): ");
+    scanf("%s", nomefile);
+    nomefile_in << string(nomefile) << ".dat";
+    infile.open(nomefile_in.str().c_str(), ifstream::in);
+  }
+  else
+  {
+    infile.open(argv[1], ifstream::in);
+    nomefile = argv[1];
+  }
 
-	infile >> commenti[0];
+  if (nomefile[0] == 'd') tipofile = 1;
+  else if (nomefile[0] == 's') tipofile = 2;
+  else printf("File non riconosciuto\n");
+  
+  infile >> commenti[0];
 	if (commenti[0].c_str()[0] == 'n')
 	{
 		getline(infile,commenti[0]);
@@ -271,3 +283,4 @@ int main()
 	infile.close();
 
 }
+
