@@ -36,9 +36,9 @@ string cartella (double j,double k,double l)
 int main ()
 {
 
-		//
-		//	Choose max values and step values for the increments
-	  //
+	//
+	//	Choose max values and step values for the increments
+	//
 
     double max_j=2.5;
     double max_k=2.5;
@@ -56,8 +56,8 @@ int main ()
         myfile << "\n";
 
         //
-				//	Add j,k,l to the parameters you want to vary
-				//
+	//	Add j,k,l to the parameters you want to vary
+	//
 
         myfile << "&GRID \n";
 
