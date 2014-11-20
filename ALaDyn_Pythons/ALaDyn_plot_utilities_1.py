@@ -87,7 +87,7 @@ def output_exists(path,quantity,frame):
 	if quantity == 'rho':
 		if os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True \
 		and \
-		os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True:
+		os.path.isfile(os.path.join(path,'Edenout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:
 			return False
@@ -111,15 +111,15 @@ def output_exists(path,quantity,frame):
 	if quantity == 'B':
 		if os.path.isfile(os.path.join(path,'Bxfout'+('%2.2i'%frame)+'.bin')) == True \
 		and \
-		os.path.isfile(os.path.join(path,'Bxbout'+('%2.2i'%frame)+'.bin')) == True \
-		and \
 		os.path.isfile(os.path.join(path,'Byfout'+('%2.2i'%frame)+'.bin')) == True \
 		and \
-		os.path.isfile(os.path.join(path,'Bybout'+('%2.2i'%frame)+'.bin')) == True \
-		and \
-		os.path.isfile(os.path.join(path,'Bzfout'+('%2.2i'%frame)+'.bin')) == True \
-		and \
-		os.path.isfile(os.path.join(path,'Bzbout'+('%2.2i'%frame)+'.bin')) == True:
+		os.path.isfile(os.path.join(path,'Bzfout'+('%2.2i'%frame)+'.bin')) == True:
+#		and \
+#		os.path.isfile(os.path.join(path,'Bxbout'+('%2.2i'%frame)+'.bin')) == True \
+#		and \
+#		os.path.isfile(os.path.join(path,'Bybout'+('%2.2i'%frame)+'.bin')) == True \
+#		and \
+#		os.path.isfile(os.path.join(path,'Bzbout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:
 			return False

@@ -64,7 +64,7 @@ if __name__ == '__main__':
 				
 				#- Shapito test: iterative
 				if test_kind == 'shapiro':
-	 				for i in range(0,500):	
+	 				for i in range(0,1500):	
 	 					f=np.random.randint(nX,size=(4999,))
 						KX,pX = shapiro(X[f]); 			KY,pY = shapiro(Y[f]); 			KZ,pZ = shapiro(Z[f])
 						KPx,pPx=mstats.shapiro(Px[f]); 	KPy,pPy=mstats.shapiro(Py[f]); 	KPz,pPz=mstats.shapiro(Pz[f])
