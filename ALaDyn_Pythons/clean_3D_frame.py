@@ -11,6 +11,11 @@
 import os, os.path, sys, shutil, time, string
 ### --- ###
 
+if len(sys.argv)!=2:
+    print "Usage path+clean_3D_frame.py frame_number"
+    exit(0)
+    pass
+frame = int(sys.argv[1])
 
 #Path
 path = os.getcwd()
@@ -31,25 +36,14 @@ for root_dir, sub_dirs, files in os.walk(path):
 	for file in files:
 		for left in frame_name:
 			for end in extensions:
-				if file == [left,'10',end]:
-					print file
+				if file == [left+'%2.2i'%frame+end][0]:
+					print 'deleting:\t',file
+					#print root_dir,file
+					os.remove(os.path.join(root_dir,file))
 	
 	
 	
 	
 		
-# 	nml_exists = 0
-# 	for file in files:
-# 		if file in nml_file:
-# 			nml_exists += 1
-# 		if file not in nml_file and os.path.splitext(file)[1] not in Exc_list:
-# 			os.remove(os.path.join(root_dir,file))
-# 			
-# 	if nml_exists > 0 and os.path.exists(os.path.join(root_dir,'out')) == True:
-#  		shutil.rmtree(os.path.join(root_dir,'out'))
-# 	if nml_exists > 0 and os.path.exists(os.path.join(root_dir,'dump')) == True:
-#  		shutil.rmtree(os.path.join(root_dir,'dump'))
-# 	
-# 		
 	
 				
