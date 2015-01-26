@@ -17,17 +17,31 @@ from pylab import *
 #from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
-#-- Inputs
-bch= 6.4
-sx= 20 * 1e-4 #in [cm]
-sy= 6  * 1e-4 #in [cm] - sy == sz
-n0 		= 0.01*1e18	 #[cm-3]
-#-QFLUID
-# n0		= 1.0e16 #[cm-3]
-# sx 		= 50 * 1e-4
-# sy      = 20 * 1e-4
-# bch		= 0.05e-9 / (n0*1.6e-19* (2.*np.pi)**(3./2.) * (sx*sy*sy) )
-# - #
+
+### --- ### shell inputs
+if(len(sys.argv)<2):
+	print 'Input  [1]: bch (n_bunch/n_0)'
+	print 'Input  [2]: sx    [cm]'
+	print 'Input  [3]: sy,sz [cm]'
+	print 'Input  [4]: n_0   [cm^-3]'
+	exit(0)
+
+try:
+	switch=int(sys.argv[1])
+except:
+	switch=float(sys.argv[1])
+
+if switch == -1:
+	bch= 2.6
+	sx= 50 * 1e-4 #in [cm]
+	sy= 6 * 1e-4 #in [cm] - sy == sz
+	n0 		= 0.01*1e18	 #[cm-3]
+else:
+	bch	= float(	sys.argv[1])
+	sx	= float(	sys.argv[2])
+	sy	= float(	sys.argv[3])
+	n0 	= float(	sys.argv[4])
+### --- ###
 
 
 # - Phys. Constants - #
