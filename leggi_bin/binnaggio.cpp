@@ -6,6 +6,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
 {
   int binnare_su_x = 0, binnare_su_y = 0;
   int whichbin_x = 0, whichbin_y = 0;
+  double_as_two_float acc;
 
   if (binx == "x") binnare_su_x = 0;
   else if (binx == "y") binnare_su_x = 1;
@@ -48,8 +49,13 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       y = *(particelle + i*ndv + 1);
       px = *(particelle + i*ndv + 2);
       py = *(particelle + i*ndv + 3);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
         w = *(particelle + i*ndv + 4);
+      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+      {
+        acc.d = *(particelle + i*ndv + 4);
+        w = acc.f[0];
+      }
       else
         w = parametri->overwrite_weight_value;
       gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma-1
@@ -92,14 +98,19 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
       pz = *(particelle + i*ndv + 5);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
         w = *(particelle + i*ndv + 6);
+      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+      {
+        acc.d = *(particelle + i*ndv + 6);
+        w = acc.f[0];
+      }
       else
         w = parametri->overwrite_weight_value;
-      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);					//gamma-1
-      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);			//theta sgatto
+      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);					    //gamma-1
+      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);			  //theta sgatto
       thetaT = (float)atan(sqrt((py*py / (px*px)) + (pz*pz / (px*px))));	//theta turch
-      E = (float)(gamma*parametri->massa_particella_MeV);				//energia
+      E = (float)(gamma*parametri->massa_particella_MeV);				          //energia
       if (px > 0.0)
       {
         ty = py / px;
@@ -162,6 +173,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
 {
   int binnare_su_x = 0;
   int whichbin_x = 0;
+  double_as_two_float acc;
 
   if (binx == "x") binnare_su_x = 0;
   else if (binx == "y") binnare_su_x = 1;
@@ -190,8 +202,13 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       y = *(particelle + i*ndv + 1);
       px = *(particelle + i*ndv + 2);
       py = *(particelle + i*ndv + 3);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
         w = *(particelle + i*ndv + 4);
+      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+      {
+        acc.d = *(particelle + i*ndv + 4);
+        w = acc.f[0];
+      }
       else
         w = parametri->overwrite_weight_value;
       gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
@@ -220,8 +237,13 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
       pz = *(particelle + i*ndv + 5);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
         w = *(particelle + i*ndv + 6);
+      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+      {
+        acc.d = *(particelle + i*ndv + 6);
+        w = acc.f[0];
+      }
       else
         w = parametri->overwrite_weight_value;
       gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma

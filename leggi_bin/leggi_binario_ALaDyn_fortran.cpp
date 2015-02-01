@@ -65,30 +65,33 @@ int main(const int argc, const char *argv[])
   file_dat.open(nomefile_dat.str().c_str());
   if (file_dat.fail())
   {
-    parametri.old_fortran_bin = true;
-    std::cout << "Unable to find " << argv[1] << ".dat, using old routines" << std::endl;
+    parametri.aladyn_version = 1;
+    std::cout << "Unable to find " << argv[1] << ".dat, using routines for aladyn v1" << std::endl;
 
-    if (parametri.p_b[SWAP]) parametri.chiedi_endian_file();
+    if (parametri.p_b[SWAP])
+      
+      parametri.chiedi_endian_file();
 
-    if ((parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI) && parametri.p_b[NCOLONNE])
+    
+    if ((parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI || parametri.file_particelle_generic_ion)
+      && parametri.p_b[NCOLONNE])
 
       parametri.chiedi_numero_colonne();
 
-
-
+    
     if ((parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
       || parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
       || parametri.file_densita_elettroni || parametri.file_densita_protoni
-      || parametri.file_densita_HI || parametri.file_densita_LI
+      || parametri.file_densita_HI || parametri.file_densita_LI || parametri.file_densita_generic_ion
       || parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni
-      || parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI) && parametri.p_b[NCOLONNE])
+      || parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI || parametri.file_densita_energia_griglia_generic_ion)
+      && parametri.p_b[NCOLONNE])
 
       parametri.chiedi_2Do3D();
   }
   else
   {
     std::cout << "Found " << argv[1] << ".dat, using new routines" << std::endl;
-    parametri.old_fortran_bin = false;
     parametri.leggi_file_dat(file_dat);
   }
   file_dat.close();
@@ -156,15 +159,16 @@ int main(const int argc, const char *argv[])
   if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
     || parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
     || parametri.file_densita_elettroni || parametri.file_densita_protoni
-    || parametri.file_densita_HI || parametri.file_densita_LI || parametri.file_densita_driver
+    || parametri.file_densita_HI || parametri.file_densita_LI || parametri.file_densita_generic_ion || parametri.file_densita_driver
     || parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni
-    || parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI)
+    || parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI || parametri.file_densita_energia_griglia_generic_ion)
 
     leggi_campi(argc, argv, &parametri);
 
 
   else if (parametri.file_particelle_P || parametri.file_particelle_E
-    || parametri.file_particelle_HI || parametri.file_particelle_LI)
+    || parametri.file_particelle_HI || parametri.file_particelle_LI
+    || parametri.file_particelle_generic_ion)
 
     leggi_particelle(argc, argv, &parametri);
 

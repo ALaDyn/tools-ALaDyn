@@ -65,7 +65,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   size_t fread_size = 0;
 
 
-  if (parametri->old_fortran_bin)
+  if (parametri->aladyn_version == 1)
   {
     nomefile_bin << basefilename << ".bin";
     file_in = fopen(nomefile_bin.str().c_str(), "rb");
@@ -204,7 +204,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   // field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
   x_lineout = new double[npunti_x];
 
-  if (!parametri->nuovi_dati_su_griglia)
+  if (!parametri->aladyn_version > 1)
   {
     nomefile_bin.str("");
     nomefile_bin << basefilename << ".bin";

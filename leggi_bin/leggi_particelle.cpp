@@ -5,6 +5,30 @@
 
 #define MAX_NUM_OF_PARTICLES_PER_SHOT 10000000			// in realta' il numero massimo che viene caricato in memoria e' il doppio di questo -1
 
+
+class Particella_v1 {
+  double x, y, z;
+  double px, py, pz;
+};
+class Particella_v2 {
+  double x, y, z;
+  double px, py, pz;
+  double weight;
+};
+class Particella_v3 {
+  double x, y, z;
+  double px, py, pz;
+  float weight;
+  int charge;
+};
+union Particella_vX {
+  Particella_v1 particella_v1;
+  Particella_v2 particella_v2;
+  Particella_v3 particella_v3;
+};
+
+
+
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
   std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
@@ -24,6 +48,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   unsigned int val[2];
   float array_supporto7[7];
   float array_supporto5[5];
+  double_as_two_float acc;
 
   if (!parametri->multifile) file_in = fopen(nomefile_bin.str().c_str(), "rb");
 
@@ -81,7 +106,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   else if (argv[1][0] == 'P') tipo = 1;
   else printf("Tipo non riconosciuto!\n");
 
-  if (parametri->old_fortran_bin)
+  if (parametri->aladyn_version == 1)
   {
     fread_size = std::fread((void*)&buff, sizeof(int), 1, file_in);
     fread_size = std::fread((void*)&N_param, sizeof(int), 1, file_in);
@@ -445,7 +470,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     if (!parametri->multifile)
     {
       if (conta_processori >= stop_at_cpu_number) break;
-      if (parametri->old_fortran_bin)
+      if (parametri->aladyn_version == 1)
       {
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
@@ -513,7 +538,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           particelle = new float[npart_loc*ndv];
           //	particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
           //	printf("Reading file %s.bin \n",argv[1]);
-          if (parametri->old_fortran_bin)
+          if (parametri->aladyn_version == 1)
           {
             fread_size = std::fread(buffshort, sizeof(short), 2, file_in);
             fread_size = std::fread(particelle, sizeof(float), npart_loc*ndv, file_in);
@@ -558,8 +583,15 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               px /= ptot;
               py /= ptot;
               pz /= ptot;
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+              {
+                acc.d = *(particelle + i*ndv + 6);
+                em_weight = (double)acc.f[0];
+              }
+              else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+              {
                 em_weight = *(particelle + i*ndv + 6);
+              }
               else
                 em_weight = parametri->overwrite_weight_value;
             }
@@ -574,7 +606,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               ptot = sqrt(px*px + py*py);
               px /= ptot;
               py /= ptot;
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+              {
+                acc.d = *(particelle + i*ndv + 4);
+                em_weight = (double)acc.f[0];
+              }
+              else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
                 em_weight = *(particelle + i*ndv + 4);
               else
                 em_weight = parametri->overwrite_weight_value;
@@ -611,8 +648,17 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               px = *(particelle + i*ndv + 3);
               py = *(particelle + i*ndv + 4);
               pz = *(particelle + i*ndv + 5);
-              if (ndv == 7) w = *(particelle + i*ndv + 6);
-              else w = 1.0;
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+              {
+                acc.d = *(particelle + i*ndv + 6);
+                w = (double)acc.f[0];
+              }
+              else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+              {
+                w = *(particelle + i*ndv + 6);
+              }
+              else
+                w = parametri->overwrite_weight_value;
               gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma
               theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
               thetaT = (float)atan(sqrt((py*py + pz*pz) / (px*px)));
@@ -660,8 +706,15 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               y = *(particelle + i*ndv + 1);
               px = *(particelle + i*ndv + 2);
               py = *(particelle + i*ndv + 3);
-              if (ndv == 5) w = *(particelle + i*ndv + 4);
-              else w = 1.0;
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+              {
+                acc.d = *(particelle + i*ndv + 4);
+                w = (double)acc.f[0];
+              }
+              else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+                w = *(particelle + i*ndv + 4);
+              else
+                w = parametri->overwrite_weight_value;
               gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
               theta = (float)(atan2(py, px)*180. / M_PI);				//theta
               thetaT = (float)atan(sqrt((py*py) / (px*px)));
@@ -733,15 +786,20 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               ux = particelle[i*ndv + 4];
               uy = particelle[i*ndv + 5];
               uz = particelle[i*ndv + 3];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
               {
-                wgh = particelle[i*ndv + 6];
+                acc.d = *(particelle + i*ndv + 6);
+                wgh = (double)acc.f[0];
+                if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", rx, ry, rz, ux, uy, uz, tipo, wgh, i + 1);
+              }
+              else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+              {
+                wgh = *(particelle + i*ndv + 6);
                 if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", rx, ry, rz, ux, uy, uz, tipo, wgh, i + 1);
               }
               else
-              {
                 if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", rx, ry, rz, ux, uy, uz, tipo, parametri->overwrite_weight_value, i + 1);
-              }
+
             }
           }
           else if (ndv == 4 || ndv == 5)
@@ -752,9 +810,15 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               rz = particelle[i*ndv + 0] * ((float)1.e-4);
               ux = particelle[i*ndv + 3];
               uz = particelle[i*ndv + 2];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
               {
-                wgh = particelle[i*ndv + 4];
+                acc.d = *(particelle + i*ndv + 4);
+                wgh = (double)acc.f[0];
+                if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", rx, rz, ux, uz, tipo, wgh, i + 1);
+              }
+              else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+              {
+                wgh = *(particelle + i*ndv + 4);
                 if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", rx, rz, ux, uz, tipo, wgh, i + 1);
               }
               else

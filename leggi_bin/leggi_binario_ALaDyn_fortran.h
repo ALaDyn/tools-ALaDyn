@@ -155,7 +155,7 @@ struct Parametri
   int ncpu_x, ncpu_y, ncpu_z, ncpu;
   int ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   int endianness;
-  bool nuovi_dati_su_griglia;
+  int aladyn_version;
   bool multifile;
   bool stretched_grid; 	//nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
   int stretched_along_x;
@@ -174,7 +174,6 @@ struct Parametri
   bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, wmin_b, wmax_b, Emin_b, Emax_b,
     tymin_b, tymax_b, tzmin_b, tzmax_b, gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b,
     nbin_z_b, nbin_ty_b, nbin_tz_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_w_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
-  bool old_fortran_bin;
   bool overwrite_weight;
   bool do_not_ask_missing;
   float overwrite_weight_value;
@@ -184,10 +183,10 @@ struct Parametri
   int fai_plot_xw, fai_plot_rcf;
   int subsample;
   int span;
-  bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI;
+  bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI, file_particelle_generic_ion;
   bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
-  bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI, file_densita_driver;
-  bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI;
+  bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI, file_densita_generic_ion, file_densita_driver;
+  bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI, file_densita_energia_griglia_generic_ion;
   Parametri();
   float dimmi_dimx();
   float dimmi_dimy();
@@ -213,6 +212,12 @@ struct Parametri
   bool check_parametri();
   void check_filename(const char *);
   void organizza_minimi_massimi();
+};
+
+
+union double_as_two_float {
+  double d;
+  float f[2]; //f[0] = peso, f[1] = carica
 };
 
 

@@ -17,7 +17,7 @@ Parametri::Parametri()
   ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
   ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
   endianness = 0;
-  nuovi_dati_su_griglia = false;
+  aladyn_version = 1;
   multifile = false;
   stretched_grid = true;
   stretched_along_x = 1;
@@ -49,13 +49,12 @@ Parametri::Parametri()
     p[i] = -1;
   }
 
-  old_fortran_bin = false;
   endian_file = 0;
   endian_machine = is_big_endian();
-  file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = false;
+  file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = file_particelle_generic_ion = false;
   file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
-  file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = file_densita_driver = false;
-  file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = false;
+  file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = file_densita_generic_ion = file_densita_driver = false;
+  file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = file_densita_energia_griglia_generic_ion = false;
 }
 
 
@@ -175,7 +174,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   npunti_z_ricampionati = intpar[6];
   npz_per_cpu = intpar[7];
   ndv = intpar[17];
-  discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->nuovi_dati_su_griglia che e' un semplice bool e di piu' difficile lettura
+  discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->aladyn_version secondo la logica che i numeri negativi identificano le versioni di aladyn nuove, -1 --> aladyn_v2, -2 --> aladyn_v3, ...
   endianness = intpar[19];
 
   std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
@@ -190,26 +189,39 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   zmin = realpar[5];
   zmax = realpar[6];
 
-  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
+  if (discriminante_versione_file == -1) aladyn_version = 2;
+  if (discriminante_versione_file == -2) aladyn_version = 3;
+
+  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
   {
-    if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
-    else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
-    else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
-    if (ndv == 4 || ndv == 5) zmin = 0.0, zmax = 1.0;
-    p[NCOLONNE] = ndv;
-    p_b[NCOLONNE] = false;
-    p_b[WEIGHT] = false;
+    if (aladyn_version < 3)
+    {
+      if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
+      else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
+      else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
+      if (ndv == 4 || ndv == 5) zmin = 0.0, zmax = 1.0;
+      p[NCOLONNE] = ndv;
+      p_b[NCOLONNE] = false;
+      p_b[WEIGHT] = false;
+    }
+    else
+    {
+      p[WEIGHT] = 1;
+      p_b[WEIGHT] = false;
+      if (ndv < 6) zmin = 0.0, zmax = 1.0;
+      p[NCOLONNE] = ndv;
+      p_b[NCOLONNE] = false;
+    }
   }
   else
   {
     if (npunti_z_ricampionati == 1) zmin = 0.0, zmax = 1.0;
-    if (discriminante_versione_file == -1) nuovi_dati_su_griglia = true;
     p[WEIGHT] = 0;
     p[NCOLONNE] = npunti_z_ricampionati;
     p_b[NCOLONNE] = false;
     p_b[WEIGHT] = false;
 
-    if (nuovi_dati_su_griglia)
+    if (aladyn_version > 1)
     {
       std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei float
       std::getline(file_dat, riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
@@ -264,14 +276,31 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 void Parametri::chiedi_numero_colonne()
 {
   int ncolonne;
-  std::cout << "Il file contiene 4, 5, 6 o 7 colonne? ";
-  std::cin >> ncolonne;
-  if (ncolonne == 6 || ncolonne == 4) p[WEIGHT] = 0;
-  else if (ncolonne == 7 || ncolonne == 5) p[WEIGHT] = 1;
-  else exit(-5);
-  p[NCOLONNE] = ncolonne;
-  p_b[NCOLONNE] = false;
-  p_b[WEIGHT] = false;
+  std::cout << "Quale versione di ALaDyn e` stata usata per generare il file? (1|2|3): ";
+  std::cin >> aladyn_version;
+  if (aladyn_version < 3)
+  {
+    std::cout << "Il file contiene 4, 5, 6 o 7 colonne? ";
+    std::cin >> ncolonne;
+    if (ncolonne == 6 || ncolonne == 4) p[WEIGHT] = 0;
+    else if (ncolonne == 7 || ncolonne == 5) p[WEIGHT] = 1;
+    else exit(-5);
+    p[NCOLONNE] = ncolonne;
+    p_b[NCOLONNE] = false;
+    p_b[WEIGHT] = false;
+  }
+  else
+  {
+    std::cout << "Il file e` di una sim 2D o 3D (scrivi solo il numero)? ";
+    std::cin >> ncolonne;
+    if (ncolonne == 2) p[NCOLONNE] = 6;
+    else if (ncolonne == 3) p[NCOLONNE] = 8;
+    else exit(-5);
+    p_b[NCOLONNE] = false;
+    p[WEIGHT] = 1;
+    p_b[WEIGHT] = false;
+  }
+
 }
 
 
@@ -338,7 +367,7 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV;
+        massa_particella_MeV = (float)MP_MEV; // fix wrong!
         file_particelle_HI = true;
       }
       else if (nomefile[2] == 'd')
@@ -350,6 +379,52 @@ void Parametri::check_filename(const char *nomefile)
       {
         file_densita_energia_griglia_HI = true;
         sprintf(support_label, "hien");
+      }
+      else
+      {
+        std::cout << "File non riconosciuto" << std::endl;
+        exit(-15);
+      }
+    }
+    else if (nomefile[1] == '1')
+    {
+      if (nomefile[2] == 'p')
+      {
+        massa_particella_MeV = (float)MP_MEV; // fix wrong!
+        file_particelle_generic_ion = true;
+      }
+      else if (nomefile[2] == 'd')
+      {
+        file_densita_generic_ion = true;
+        sprintf(support_label, "h1dn");
+      }
+      else if (nomefile[2] == 'e')
+      {
+        file_densita_energia_griglia_generic_ion = true;
+        sprintf(support_label, "h1en");
+      }
+      else
+      {
+        std::cout << "File non riconosciuto" << std::endl;
+        exit(-15);
+      }
+    }
+    else if (nomefile[1] == '2')
+    {
+      if (nomefile[2] == 'p')
+      {
+        massa_particella_MeV = (float)MP_MEV; // fix wrong!
+        file_particelle_generic_ion = true;
+      }
+      else if (nomefile[2] == 'd')
+      {
+        file_densita_generic_ion = true;
+        sprintf(support_label, "h2dn");
+      }
+      else if (nomefile[2] == 'e')
+      {
+        file_densita_energia_griglia_generic_ion = true;
+        sprintf(support_label, "h2en");
       }
       else
       {
@@ -369,7 +444,7 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV;
+        massa_particella_MeV = (float)MP_MEV; // fix wrong!
         file_particelle_LI = true;
       }
       else if (nomefile[2] == 'd')
@@ -574,10 +649,15 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       p[SWAP] = 0;
       p_b[SWAP] = false;
     }
-    else if (std::string(argv[i]) == "-force_new")
+    else if (std::string(argv[i]) == "-force_v2")
     {
-      std::cout << "Forced using new files routine even without .dat file" << std::endl;
-      old_fortran_bin = false;
+      std::cout << "Forced using routines for aladyn v2" << std::endl;
+      aladyn_version = 2;
+    }
+    else if (std::string(argv[i]) == "-force_v3")
+    {
+      std::cout << "Forced using routines for aladyn v3" << std::endl;
+      aladyn_version = 3;
     }
     else if (std::string(argv[i]) == "-stop")
     {
@@ -2269,7 +2349,7 @@ bool Parametri::check_parametri()
       else
       {
         printf("Attenzione: non capisco se la griglia e' 2D o 3D\n");
-        if (old_fortran_bin) printf("Con i files privi di .dat e' necessario specificare -ncol su riga di comando in modalita' batch\n");
+        if (aladyn_version < 2) printf("Con i files privi di .dat e' necessario specificare -ncol su riga di comando in modalita' batch\n");
         test = false;
       }
     }

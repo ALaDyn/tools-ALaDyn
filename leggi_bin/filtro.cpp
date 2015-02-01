@@ -142,6 +142,8 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
   unsigned int corrente = 0, tests[32];
   bool flag;
   unsigned char tot_test = 0;
+  double_as_two_float acc;
+
   flag_filtri = 0;
   if (!maschera) maschera = maschera_interna;
   if (!maschera)
@@ -161,8 +163,13 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
     if (parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7)
     {
       p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
         w = pntt_loc[6];
+      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+      {
+        acc.d = pntt_loc[6];
+        w = (double)acc.f[0];
+      }
       else
         w = parametri->overwrite_weight_value;
     }
@@ -170,8 +177,13 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
     else if (parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5)
     {
       p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
         w = pntt_loc[4];
+      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
+      {
+        acc.d = pntt_loc[4];
+        w = (double)acc.f[0];
+      }
       else
         w = parametri->overwrite_weight_value;
     }
