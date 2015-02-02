@@ -15,7 +15,7 @@
 int main(int argc, char *argv[])
 {
   std::ifstream inputFile;
-  inputFile.open(argv[1], std::ifstream::in);
+  inputFile.open(argv[1], std::fstream::in);
   bool stackFound = false;
   bool stackJustFound = false;
   bool frameJustFound = false;
@@ -103,9 +103,13 @@ int main(int argc, char *argv[])
     {
       std::ofstream outputFile;
       std::string outputFileName = std::string(argv[1]) + ".txt";
-      outputFile.open(outputFileName, std::ofstream::out);
+      outputFile.open(outputFileName.c_str(), std::fstream::out);
 
+#if defined (USE_CPP11)
       for (auto i : octalLinks) outputFile << i << std::endl;
+#else
+      for (size_t i = 0; i < octalLinks.size(); i++) outputFile << octalLinks[i] << std::endl;
+#endif
       outputFile.close();
     }
     inputFile.close();
