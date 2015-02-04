@@ -37,7 +37,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   std::string riga_persa;
   char* trascura;
   trascura = new char[MAX_LENGTH_FILENAME];
-  std::FILE *file_in = nullptr;
+  std::FILE *file_in = NULL;
   int indice_multifile = 0;
   int contatori[] = { 0, 0, 0 };
   float zero = 0.0f;
@@ -545,7 +545,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
             fread_size = std::fread(&buff, sizeof(int), 1, file_in);
           }
           else fread_size = std::fread(particelle, sizeof(float), npart_loc*ndv, file_in);
-          if (out_swap) swap_endian_f(particelle, npart_loc*ndv);
+          if (out_swap) swap_endian_f(particelle, (size_t)npart_loc*ndv);
         }
         else
         {
@@ -936,7 +936,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
         {
           if (parametri->endian_machine == 0)
           {
-            swap_endian_f(particelle, val[0] * ndv);
+            swap_endian_f(particelle, (size_t)val[0] * ndv);
           }
           switch (ndv)
           {
