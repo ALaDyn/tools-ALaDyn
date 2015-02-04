@@ -562,7 +562,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           printf("\n");
           fflush(stdout);
           fread_size = std::fread(particelle, sizeof(float), val[0] * ndv, file_in);
-          if (out_swap) swap_endian_f((size_t)particelle, val[0] * ndv);
+          if (out_swap) swap_endian_f(particelle, (size_t)val[0] * ndv);
         }
 
         _Filtro(parametri, particelle, val, _Filtro::costruisci_filtro(argc, argv));
