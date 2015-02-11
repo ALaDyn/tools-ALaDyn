@@ -24,13 +24,13 @@ int main(const int argc, const char *argv[])
     std::cout << "(use -no_stretch_x if the grid is not stretched along x axis)" << std::endl;
     std::cout << "-dump_propaga -dump_csv -dump_clean -dump_xyzE -parameters -find_minxmax" << std::endl;
     std::cout << "-do_binning [REQUIRED TO ENABLE BINNING FOR PLOTTING]" << std::endl;
-    std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #number" << std::endl;
+    std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #number" << std::endl;
     std::cout << "-plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
-    std::cout << "-plot_etheta -plot_ethetaT -plot_rfc -plot_espec -plot_thetaspec -plot_thetaTspec" << std::endl;
+    std::cout << "-plot_etheta -plot_ethetaT -plot_rfc -plot_espec -plot_thetaspec -plot_thetaTspec -plot_chspec" << std::endl;
     std::cout << "-nbin #num" << std::endl;
-    std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz] #num" << std::endl;
-    std::cout << "-dontask [TRIES TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
-    std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz]min/max #num" << std::endl;
+    std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch] #num" << std::endl;
+    std::cout << "-dontask [TRY TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
+    std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #num" << std::endl;
     std::cout << "----------Argument list------------------- " << std::endl;
     return -1;
   }
@@ -144,14 +144,25 @@ int main(const int argc, const char *argv[])
   printf("Tipo file: file_campi_Bx? %i\n", parametri.file_campi_Bx);
   printf("Tipo file: file_campi_By? %i\n", parametri.file_campi_By);
   printf("Tipo file: file_campi_Bz? %i\n", parametri.file_campi_Bz);
+
   printf("Tipo file: file_eden? %i\n", parametri.file_densita_elettroni);
   printf("Tipo file: file_pden? %i\n", parametri.file_densita_protoni);
   printf("Tipo file: file_hiden? %i\n", parametri.file_densita_HI);
   printf("Tipo file: file_liden? %i\n", parametri.file_densita_LI);
+  printf("Tipo file: file_genionden? %i\n", parametri.file_densita_generic_ion);
+  printf("Tipo file: file_driverden? %i\n", parametri.file_densita_driver);
+
   printf("Tipo file: file_Prpout? %i\n", parametri.file_particelle_P);
   printf("Tipo file: file_Elpout? %i\n", parametri.file_particelle_E);
   printf("Tipo file: file_Hipout? %i\n", parametri.file_particelle_HI);
   printf("Tipo file: file_Lipout? %i\n", parametri.file_particelle_LI);
+  printf("Tipo file: file_genericIon? %i\n", parametri.file_particelle_generic_ion);
+
+  printf("Tipo file: file_denen_el? %i\n", parametri.file_densita_energia_griglia_elettroni);
+  printf("Tipo file: file_denen_pr? %i\n", parametri.file_densita_energia_griglia_protoni);
+  printf("Tipo file: file_denen_Hi? %i\n", parametri.file_densita_energia_griglia_HI);
+  printf("Tipo file: file_denen_Li? %i\n", parametri.file_densita_energia_griglia_LI);
+  printf("Tipo file: file_denen_genericIon? %i\n", parametri.file_densita_energia_griglia_generic_ion);
   fflush(stdout);
 #endif
 

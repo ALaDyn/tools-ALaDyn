@@ -6,7 +6,6 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
 {
   int binnare_su_x = 0, binnare_su_y = 0;
   int whichbin_x = 0, whichbin_y = 0;
-  double_as_two_float acc;
 
   if (binx == "x") binnare_su_x = 0;
   else if (binx == "y") binnare_su_x = 1;
@@ -21,6 +20,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   else if (binx == "ty") binnare_su_x = 10;
   else if (binx == "tz") binnare_su_x = 11;
   else if (binx == "w") binnare_su_x = 12;
+  else if (binx == "ch") binnare_su_x = 13;
   else printf("variabile x non riconosciuta\n");
 
   if (biny == "x") binnare_su_y = 0;
@@ -36,28 +36,28 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   else if (biny == "ty") binnare_su_y = 10;
   else if (biny == "tz") binnare_su_y = 11;
   else if (biny == "w") binnare_su_y = 12;
+  else if (biny == "ch") binnare_su_y = 13;
   else printf("variabile y non riconosciuta\n");
 
 
-  float x, y, px, py, pz, w, gamma, theta, thetaT, E, ty, tz;
+  float x, y, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
   for (int i = 0; i < npart; i++)
   {
-    if (ndv == 4 || ndv == 5)
+    if ( ((ndv == 4 || ndv == 5) && parametri->aladyn_version < 3) || (ndv == 6 && parametri->aladyn_version == 3) )
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
       px = *(particelle + i*ndv + 2);
       py = *(particelle + i*ndv + 3);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = *(particelle + i*ndv + 4);
-      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
-      {
-        acc.d = *(particelle + i*ndv + 4);
-        w = acc.f[0];
-      }
       else
         w = parametri->overwrite_weight_value;
+      if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+        ch = *(particelle + i*ndv + 5);
+      else
+        ch = parametri->overwrite_charge_value;
       gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma-1
       theta = (float)(atan2(py, px)*180. / M_PI);				//theta sgatto
       thetaT = (float)atan(sqrt((py*py / (px*px))));			//theta turch                                                                        
@@ -79,6 +79,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_x == 10) dato_da_binnare_x = ty;
       else if (binnare_su_x == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
       else if (binnare_su_x == 12) dato_da_binnare_x = w;
+      else if (binnare_su_x == 13) dato_da_binnare_x = ch;
       if (binnare_su_y == 0) dato_da_binnare_y = x;
       else if (binnare_su_y == 1) dato_da_binnare_y = y;
       else if (binnare_su_y == 2) std::cout << "Unable to bin on z in 2D" << std::endl;
@@ -92,21 +93,21 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_y == 10) dato_da_binnare_y = ty;
       else if (binnare_su_y == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
       else if (binnare_su_y == 12) dato_da_binnare_y = w;
+      else if (binnare_su_y == 13) dato_da_binnare_y = ch;
     }
-    else if (ndv == 6 || ndv == 7)
+    else if (((ndv == 6 || ndv == 7) && parametri->aladyn_version < 3) || (ndv == 8 && parametri->aladyn_version == 3))
     {
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
       pz = *(particelle + i*ndv + 5);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = *(particelle + i*ndv + 6);
-      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
-      {
-        acc.d = *(particelle + i*ndv + 6);
-        w = acc.f[0];
-      }
       else
         w = parametri->overwrite_weight_value;
+      if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+        ch = *(particelle + i*ndv + 7);
+      else
+        ch = parametri->overwrite_charge_value;
       gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);					    //gamma-1
       theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);			  //theta sgatto
       thetaT = (float)atan(sqrt((py*py / (px*px)) + (pz*pz / (px*px))));	//theta turch
@@ -129,6 +130,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_x == 10) dato_da_binnare_x = ty;
       else if (binnare_su_x == 11) dato_da_binnare_x = tz;
       else if (binnare_su_x == 12) dato_da_binnare_x = w;
+      else if (binnare_su_x == 13) dato_da_binnare_x = ch;
       if (binnare_su_y < 6) dato_da_binnare_y = *(particelle + i*ndv + binnare_su_y);
       else if (binnare_su_y == 6) dato_da_binnare_y = gamma;
       else if (binnare_su_y == 7) dato_da_binnare_y = theta;
@@ -137,6 +139,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_y == 10) dato_da_binnare_y = ty;
       else if (binnare_su_y == 11) dato_da_binnare_y = tz;
       else if (binnare_su_y == 12) dato_da_binnare_y = w;
+      else if (binnare_su_y == 13) dato_da_binnare_y = ch;
     }
 
 
@@ -164,8 +167,8 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
     {
       whichbin_y = (int)(((dato_da_binnare_y - parametri->minimi[binnare_su_y]) / parametri->dimmi_dim(binnare_su_y)) + 1.0);
     }
-    if (parametri->p[WEIGHT] && !parametri->overwrite_weight)	data_binned[whichbin_x][whichbin_y] += fabs(*(particelle + i*ndv + ndv - 1));
-    else														data_binned[whichbin_x][whichbin_y] += parametri->overwrite_weight_value;
+
+    data_binned[whichbin_x][whichbin_y] += w;
   }
 }
 
@@ -173,7 +176,6 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
 {
   int binnare_su_x = 0;
   int whichbin_x = 0;
-  double_as_two_float acc;
 
   if (binx == "x") binnare_su_x = 0;
   else if (binx == "y") binnare_su_x = 1;
@@ -188,29 +190,29 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   else if (binx == "ty") binnare_su_x = 10;
   else if (binx == "tz") binnare_su_x = 11;
   else if (binx == "w") binnare_su_x = 12;
+  else if (binx == "ch") binnare_su_x = 13;
   else printf("variabile x non riconosciuta\n");
 
   //	float z;
-  float x, y, px, py, pz, w, gamma, theta, thetaT, E, ty, tz;
+  float x, y, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   float dato_da_binnare_x = 0.;
   fflush(stdout);
   for (int i = 0; i < npart; i++)
   {
-    if (ndv == 4 || ndv == 5)
+    if (((ndv == 4 || ndv == 5) && parametri->aladyn_version < 3) || (ndv == 6 && parametri->aladyn_version == 3) )
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
       px = *(particelle + i*ndv + 2);
       py = *(particelle + i*ndv + 3);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = *(particelle + i*ndv + 4);
-      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
-      {
-        acc.d = *(particelle + i*ndv + 4);
-        w = acc.f[0];
-      }
       else
         w = parametri->overwrite_weight_value;
+      if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+        ch = *(particelle + i*ndv + 5);
+      else
+        ch = parametri->overwrite_charge_value;
       gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
       theta = (float)(atan2(py, px)*180. / M_PI);				//theta
       thetaT = (float)atan(py / px);							//theta turch
@@ -232,20 +234,19 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_x == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
       else if (binnare_su_x == 12) dato_da_binnare_x = w;
     }
-    else if (ndv == 6 || ndv == 7)
+    else if (((ndv == 6 || ndv == 7) && parametri->aladyn_version < 3) || (ndv == 8 && parametri->aladyn_version == 3) )
     {
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
       pz = *(particelle + i*ndv + 5);
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = *(particelle + i*ndv + 6);
-      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
-      {
-        acc.d = *(particelle + i*ndv + 6);
-        w = acc.f[0];
-      }
       else
         w = parametri->overwrite_weight_value;
+      if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+        ch = *(particelle + i*ndv + 7);
+      else
+        ch = parametri->overwrite_charge_value;
       gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma
       theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
       thetaT = (float)atan(py / px);							//theta turch
@@ -268,6 +269,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_x == 10) dato_da_binnare_x = ty;
       else if (binnare_su_x == 11) dato_da_binnare_x = tz;
       else if (binnare_su_x == 12) dato_da_binnare_x = w;
+      else if (binnare_su_x == 13) dato_da_binnare_x = ch;
     }
 
     if (dato_da_binnare_x < parametri->minimi[binnare_su_x])
@@ -282,8 +284,8 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
     {
       whichbin_x = (int)(((dato_da_binnare_x - parametri->minimi[binnare_su_x]) / parametri->dimmi_dim(binnare_su_x)) + 1.0);
     }
-    if (parametri->p[WEIGHT] && !parametri->overwrite_weight)	data_binned[whichbin_x] += fabs(*(particelle + i*ndv + ndv - 1));
-    else														data_binned[whichbin_x] += parametri->overwrite_weight_value;
+
+    data_binned[whichbin_x] += w;
   }
 }
 
@@ -386,6 +388,13 @@ _Scrittura::_Scrittura(Parametri * parametri, float ** data_binned, std::string 
     xmax = (parametri->wmin);
     nbinx = (parametri->nbin_w + 3);
   }
+  else if (x == "ch")
+  {
+    dimx = (parametri->dimmi_dimch());
+    xmin = (parametri->chmin) - dimx;
+    xmax = (parametri->chmin);
+    nbinx = (parametri->nbin_ch + 3);
+  }
   else printf("variabile x non riconosciuta\n");
 
 
@@ -479,6 +488,13 @@ _Scrittura::_Scrittura(Parametri * parametri, float ** data_binned, std::string 
     ymin = (parametri->wmin) - dimy;
     ymax = (parametri->wmin);
     nbiny = (parametri->nbin_w + 3);
+  }
+  else if (y == "ch")
+  {
+    dimy = (parametri->dimmi_dimch());
+    ymin = (parametri->chmin) - dimy;
+    ymax = (parametri->chmin);
+    nbiny = (parametri->nbin_ch + 3);
   }
   else printf("variabile y non riconosciuta\n");
 
@@ -601,6 +617,13 @@ _Scrittura::_Scrittura(Parametri * parametri, float * data_binned, std::string x
     xmin = (parametri->wmin) - dimx;
     xmax = (parametri->wmin);
     nbinx = (parametri->nbin_w + 3);
+  }
+  else if (x == "ch")
+  {
+    dimx = (parametri->dimmi_dimch());
+    xmin = (parametri->chmin) - dimx;
+    xmax = (parametri->chmin);
+    nbinx = (parametri->nbin_ch + 3);
   }
   else printf("variabile x non riconosciuta\n");
 

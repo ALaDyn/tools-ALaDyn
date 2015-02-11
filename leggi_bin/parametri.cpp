@@ -22,23 +22,25 @@ Parametri::Parametri()
   stretched_grid = true;
   stretched_along_x = 1;
   massa_particella_MeV = 0.;
-  nbin = nbin_x = nbin_px = nbin_y = nbin_py = nbin_z = nbin_pz = nbin_w = nbin_E = nbin_gamma = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = 120;
+  nbin = nbin_x = nbin_px = nbin_y = nbin_py = nbin_z = nbin_pz = nbin_w = nbin_ch = nbin_E = nbin_gamma = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = NUMBER_OF_BIN_BY_DEFAULT;
   tnow = 0.0;
-  xmin = pxmin = ymin = pymin = zmin = pzmin = wmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
-  xmax = pxmax = ymax = pymax = zmax = pzmax = wmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
+  xmin = pxmin = ymin = pymin = zmin = pzmin = wmin = chmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
+  xmax = pxmax = ymax = pymax = zmax = pzmax = wmax = chmax = thetamax = thetaTmax = Emax = gammamax = 1.0;
   tymin = tzmin = -1.0;
   tymax = tzmax = 1.0;
-  ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = wmin_b = wmax_b = gammamin_b = gammamax_b = true;
+  ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = wmin_b = wmax_b = chmin_b = chmax_b = gammamin_b = gammamax_b = true;
   xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = true;
   tymin_b = tymax_b = tzmin_b = tzmax_b = nbin_ty_b = nbin_tz_b = true;
   nbin_b = true;
   nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
   nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
-  fai_plot_wspec = fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
+  fai_plot_wspec = fai_plot_chspec = fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
   fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
   fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = fai_plot_xw = fai_plot_rcf = false;
   overwrite_weight = false;
+  overwrite_charge = false;
   overwrite_weight_value = 1.0;
+  overwrite_charge_value = 1.0;
   do_not_ask_missing = false;
 
   last_cpu = MAX_NUMBER_OF_CPUS;		// il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
@@ -95,6 +97,10 @@ float Parametri::dimmi_dimw()
 {
   return (wmax - wmin) / static_cast <float> (nbin_w);
 }
+float Parametri::dimmi_dimch()
+{
+  return (chmax - chmin) / static_cast <float> (nbin_ch);
+}
 float Parametri::dimmi_dimgamma()
 {
   return (gammamax - gammamin) / static_cast <float> (nbin_gamma);
@@ -128,6 +134,7 @@ int Parametri::dimmi_nbin(int colonna)
   else if (colonna == 10)	return nbin_ty;
   else if (colonna == 11)	return nbin_tz;
   else if (colonna == 12)	return nbin_w;
+  else if (colonna == 13)	return nbin_ch;
   else return 120;
 }
 
@@ -148,6 +155,7 @@ float Parametri::dimmi_dim(int colonna)
   else if (colonna == 10)	return dimmi_dimty();
   else if (colonna == 11)	return dimmi_dimtz();
   else if (colonna == 12)	return dimmi_dimw();
+  else if (colonna == 13)	return dimmi_dimch();
   else return 1.0;
 }
 
@@ -208,7 +216,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     {
       p[WEIGHT] = 1;
       p_b[WEIGHT] = false;
-      if (ndv < 6) zmin = 0.0, zmax = 1.0;
+      if (ndv < 7) zmin = 0.0, zmax = 1.0; // a 2D file has 6 floats (columns): x, y, px, py, w, ch
       p[NCOLONNE] = ndv;
       p_b[NCOLONNE] = false;
     }
@@ -886,6 +894,12 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       overwrite_weight_value = (float)atof(argv[i + 1]);
       i++;
     }
+    else if (std::string(argv[i]) == "-charge")
+    {
+      overwrite_charge = true;
+      overwrite_charge_value = (float)atof(argv[i + 1]);
+      i++;
+    }
     else if (std::string(argv[i]) == "-wmin")
     {
       wmin = (float)atof(argv[i + 1]);
@@ -896,6 +910,18 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     {
       wmax = (float)atof(argv[i + 1]);
       wmax_b = false;
+      i++;
+    }
+    else if (std::string(argv[i]) == "-chmin")
+    {
+      chmin = (float)atof(argv[i + 1]);
+      chmin_b = false;
+      i++;
+    }
+    else if (std::string(argv[i]) == "-chmax")
+    {
+      chmax = (float)atof(argv[i + 1]);
+      chmax_b = false;
       i++;
     }
     else if (std::string(argv[i]) == "-ymin")
@@ -1229,6 +1255,17 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     {
       fai_plot_Espec = 1;
     }
+    else if (std::string(argv[i]) == "-plot_chspec")
+    {
+      if (aladyn_version == 3)
+      {
+        fai_plot_chspec = 1;
+      }
+      else
+      {
+        std::cout << "Unable to do a plot with charge using a file without charges!" << std::endl;
+      }
+    }
     else if (std::string(argv[i]) == "-plot_wspec")
     {
       if (p[WEIGHT])
@@ -1237,7 +1274,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       }
       else
       {
-        std::cout << "Unable to do a plot with weight using a file without weight!" << std::endl;
+        std::cout << "Unable to do a plot with weight using a file without weights!" << std::endl;
       }
     }
     else if (std::string(argv[i]) == "-plot_thetaspec")
@@ -1264,6 +1301,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       if (nbin_theta_b) nbin_thetaT = nbin;
       if (nbin_E_b) nbin_E = nbin;
       if (nbin_w_b) nbin_w = nbin;
+      if (nbin_ch_b) nbin_ch = nbin;
       nbin_b = false;
       i++;
     }
@@ -1355,6 +1393,13 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     {
       nbin_w = atoi(argv[i + 1]);
       nbin_w_b = false;
+      nbin_b = false;
+      i++;
+    }
+    else if (std::string(argv[i]) == "-nbinch")
+    {
+      nbin_ch = atoi(argv[i + 1]);
+      nbin_ch_b = false;
       nbin_b = false;
       i++;
     }
@@ -1511,6 +1556,16 @@ void Parametri::parse_command_line(int argc, const char ** argv)
           wmax = (float)std::atof(leggi.c_str());
           wmax_b = false;
         }
+        else if ((nomepar == "chmin" || nomepar == "CHMIN") && chmin_b)
+        {
+          chmin = (float)std::atof(leggi.c_str());
+          chmin_b = false;
+        }
+        else if ((nomepar == "chmax" || nomepar == "CHMAX") && chmax_b)
+        {
+          chmax = (float)std::atof(leggi.c_str());
+          chmax_b = false;
+        }
         /*
         else
         {
@@ -1536,7 +1591,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     {
       std::cout << "Quanti bin per asse vuoi usare? (consiglio: 120): ";
       std::cin >> nbin;
-      nbin_x = nbin_y = nbin_z = nbin_px = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = nbin;
+      nbin_x = nbin_y = nbin_z = nbin_px = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = nbin_w = nbin_ch = nbin;
     }
 
     if (p[DO_BINNING] == 1 && !do_not_ask_missing)
@@ -1725,6 +1780,8 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     std::cout << "TZMAX = " << tzmax << std::endl;
     std::cout << "WMIN = " << wmin << std::endl;
     std::cout << "WMAX = " << wmax << std::endl;
+    std::cout << "CHMIN = " << chmin << std::endl;
+    std::cout << "CHMAX = " << chmax << std::endl;
 #endif
     if (p_b[OUT_VTK] && !do_not_ask_missing)
     {
@@ -2180,6 +2237,11 @@ bool Parametri::check_parametri()
       printf("Attenzione: wmin > wmax\n");
       test = false;
     }
+    if (chmin > chmax)
+    {
+      printf("Attenzione: chmin > chmax\n");
+      test = false;
+    }
     if (nbin_x <= 0)
     {
       printf("Attenzione: nbin_x < 0\n");
@@ -2238,6 +2300,11 @@ bool Parametri::check_parametri()
     if (nbin_w <= 0)
     {
       printf("Attenzione: nbin_w < 0\n");
+      test = false;
+    }
+    if (nbin_ch <= 0)
+    {
+      printf("Attenzione: nbin_ch < 0\n");
       test = false;
     }
   }
@@ -2467,6 +2534,7 @@ void Parametri::organizza_minimi_massimi()
   minimi[10] = tymin;
   minimi[11] = tzmin;
   minimi[12] = wmin;
+  minimi[13] = chmin;
 
   massimi[0] = xmax;
   massimi[1] = ymax;
@@ -2481,7 +2549,7 @@ void Parametri::organizza_minimi_massimi()
   massimi[10] = tymax;
   massimi[11] = tzmax;
   massimi[12] = wmax;
-
+  massimi[13] = chmax;
 }
 
 

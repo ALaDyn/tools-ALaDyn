@@ -204,7 +204,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   // field=(float*)malloc(npunti_x*npunti_y*npunti_z*sizeof(float));
   x_lineout = new double[npunti_x];
 
-  if (!parametri->aladyn_version > 1)
+  if (parametri->aladyn_version == 1)
   {
     nomefile_bin.str("");
     nomefile_bin << basefilename << ".bin";

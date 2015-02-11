@@ -9,8 +9,8 @@
 #define _USE_MATH_DEFINES			// VS does not bother anymore with M_PI not defined
 
 #define MAJOR_RELEASE  5
-#define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 2
+#define MINOR_RELEASE  3
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -84,6 +84,7 @@
 #define MAX_LENGTH_FILENAME			200
 #define MAX_NUMBER_OF_CPUS			32768
 #define NUMERO_PARAMETRI_FILE_DAT	20
+#define NUMBER_OF_BIN_BY_DEFAULT 120
 
 #define NPARAMETRI			17
 #define WEIGHT				0
@@ -108,11 +109,11 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define OUT_VTK_NOSTRETCH	16
 
 #define SEI_DIMENSIONI  6 // x, y, z, px, py, pz
-#define ALTRI_PARAMETRI 7 // gamma, theta, thetaT, E, ty, tz, w
+#define ALTRI_PARAMETRI 8 // gamma, theta, thetaT, E, ty, tz, w, ch
 
 // definizione numero filtri "abilitati"
 # ifndef NUM_FILTRI
-# define NUM_FILTRI 24
+# define NUM_FILTRI 26
 # endif
 
 # define __0X00 0x1
@@ -137,11 +138,11 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 # define __0X19 0x80000
 # define __0X20 0x100000
 # define __0X21 0x200000
-// fine filtri in uso, i prossimi sono codici liberi
 # define __0X22 0x400000
 # define __0X23 0x800000
 # define __0X24 0x1000000
 # define __0X25 0x2000000
+// fine filtri in uso, i prossimi sono codici liberi
 # define __0X26 0x4000000
 # define __0X27 0x8000000
 # define __0X28 0x10000000
@@ -160,24 +161,24 @@ struct Parametri
   bool stretched_grid; 	//nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
   int stretched_along_x;
   float massa_particella_MeV;
-  int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_w, nbin_E, nbin_gamma, nbin_theta, nbin_thetaT, nbin_ty, nbin_tz;
+  int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_w, nbin_ch, nbin_E, nbin_gamma, nbin_theta, nbin_thetaT, nbin_ty, nbin_tz;
   int endian_file, endian_machine;
   int last_cpu;
   int p[NPARAMETRI];
   bool p_b[NPARAMETRI];
   char support_label[MAX_LENGTH_FILENAME];
-  float minimi[SEI_DIMENSIONI + ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI + ALTRI_PARAMETRI];  // x, y, z, px, py, pz, gamma, theta, thetaT, E, ty, tz
-  float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, wmin, wmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
+  float minimi[SEI_DIMENSIONI + ALTRI_PARAMETRI], massimi[SEI_DIMENSIONI + ALTRI_PARAMETRI];
+  float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, wmin, wmax, chmin, chmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
   std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
   std::vector<float> xcoord, ycoord, zcoord, realpar;
   std::vector<int> intpar;
-  bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, wmin_b, wmax_b, Emin_b, Emax_b,
+  bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, wmin_b, wmax_b, chmin_b, chmax_b, Emin_b, Emax_b,
     tymin_b, tymax_b, tzmin_b, tzmax_b, gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b,
-    nbin_z_b, nbin_ty_b, nbin_tz_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_w_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
-  bool overwrite_weight;
+    nbin_z_b, nbin_ty_b, nbin_tz_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_w_b, nbin_ch_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
+  bool overwrite_weight, overwrite_charge;
   bool do_not_ask_missing;
-  float overwrite_weight_value;
-  int fai_plot_wspec, fai_plot_Espec, fai_plot_thetaspec, fai_plot_thetaTspec, fai_plot_Etheta, fai_plot_EthetaT;
+  float overwrite_weight_value, overwrite_charge_value;
+  int fai_plot_wspec, fai_plot_Espec, fai_plot_thetaspec, fai_plot_thetaTspec, fai_plot_chspec, fai_plot_Etheta, fai_plot_EthetaT;
   int fai_plot_xy, fai_plot_xz, fai_plot_yz, fai_plot_xpx, fai_plot_xpy, fai_plot_xpz, fai_plot_ypx;
   int fai_plot_ypy, fai_plot_ypz, fai_plot_zpx, fai_plot_zpy, fai_plot_zpz, fai_plot_pxpy, fai_plot_pxpz, fai_plot_pypz;
   int fai_plot_xw, fai_plot_rcf;
@@ -197,6 +198,7 @@ struct Parametri
   float dimmi_dimpy();
   float dimmi_dimpz();
   float dimmi_dimw();
+  float dimmi_dimch();
   float dimmi_dimgamma();
   float dimmi_dimtheta();
   float dimmi_dimthetaT();
@@ -214,11 +216,12 @@ struct Parametri
   void organizza_minimi_massimi();
 };
 
-
+/*
 union double_as_two_float {
   double d;
   float f[2]; //f[0] = peso, f[1] = carica
 };
+*/
 
 
 struct _Binnaggio
@@ -242,7 +245,7 @@ struct _Filtro
     xmin, ymin, zmin, xmax, ymax, zmax,
     pxmin, pymin, pzmin, pxmax, pymax, pzmax,
     emin, emax, thetamin, thetamax, thetaTmin, thetaTmax,
-    tymin, tymax, tzmin, tzmax, wmin, wmax
+    tymin, tymax, tzmin, tzmax, wmin, wmax, chmin, chmax
   } nomi;
   static float * costruisci_filtro(const char *, ...);
   static float * costruisci_filtro(int, const char **);
@@ -275,6 +278,8 @@ struct _Filtro
     unsigned piu_tzmax : 1;
     unsigned meno_wmin : 1;
     unsigned piu_wmax : 1;
+    unsigned meno_chmin : 1;
+    unsigned piu_chmax : 1;
     _flag_filtri operator=(int o)
     {
       meno_xmin = meno_ymin = meno_zmin =
@@ -284,7 +289,7 @@ struct _Filtro
         meno_Emin = piu_Emax = meno_thetamin = piu_thetamax =
         meno_thetaTmin = piu_thetaTmax = meno_tymin =
         piu_tymax = meno_tzmin = piu_tzmax =
-        meno_wmin = piu_wmax = 0;
+        meno_wmin = piu_wmax = meno_chmin = piu_chmax = 0;
       return *this;
     }
     // varie ed eventuali

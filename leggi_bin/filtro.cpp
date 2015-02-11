@@ -118,6 +118,8 @@ namespace cost
   unsigned int tzmax = __0X21;
   unsigned int wmin = __0X22;
   unsigned int wmax = __0X23;
+  unsigned int chmin = __0X24;
+  unsigned int chmax = __0X25;
 
   unsigned int tutte[] =
   {
@@ -130,19 +132,18 @@ namespace cost
     thetaTmin, thetaTmax,
     tymin, tymax,
     tzmin, tzmax,
-    wmin, wmax
+    wmin, wmax,
+    chmin, chmax
   };
-  // varie ed eventuali
 }
 
 
 _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
 {
-  float * pntt_loc, p[] = { 0, 0, 0 }, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0., w = 0.;
+  float * pntt_loc, p[] = { 0, 0, 0 }, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0., w = 0., ch = 0.;
   unsigned int corrente = 0, tests[32];
   bool flag;
   unsigned char tot_test = 0;
-  double_as_two_float acc;
 
   flag_filtri = 0;
   if (!maschera) maschera = maschera_interna;
@@ -160,32 +161,31 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
   {
     pntt_loc = dati + i*n_dati[1];
     flag = true;
-    if (parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7)
+
+    if ( ((parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) && parametri->aladyn_version < 3) || (parametri->p[NCOLONNE] == 8 && parametri->aladyn_version == 3) )
     {
       p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = pntt_loc[6];
-      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
-      {
-        acc.d = pntt_loc[6];
-        w = (double)acc.f[0];
-      }
       else
         w = parametri->overwrite_weight_value;
+      if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+        ch = pntt_loc[7];
+      else
+        ch = parametri->overwrite_charge_value;
     }
 
-    else if (parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5)
+    else if (((parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) && parametri->aladyn_version < 3) || (parametri->p[NCOLONNE] == 6 && parametri->aladyn_version == 3))
     {
       p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version < 3)
+      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = pntt_loc[4];
-      else if (parametri->p[WEIGHT] && !parametri->overwrite_weight && parametri->aladyn_version == 3)
-      {
-        acc.d = pntt_loc[4];
-        w = (double)acc.f[0];
-      }
       else
         w = parametri->overwrite_weight_value;
+      if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+        ch = pntt_loc[5];
+      else
+        ch = parametri->overwrite_charge_value;
     }
 
 
@@ -330,6 +330,16 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
         flag_filtri.piu_wmax = w <= val[23];
         flag = flag && flag_filtri.piu_wmax;
         break;
+      case __0X24: // cost::chmin
+        nomi = chmin;
+        flag_filtri.meno_chmin = ch >= val[24];
+        flag = flag && flag_filtri.meno_chmin;
+        break;
+      case __0X25: // cost::chmax
+        nomi = chmax;
+        flag_filtri.piu_chmax = ch <= val[25];
+        flag = flag && flag_filtri.piu_chmax;
+        break;
       }
 
     }
@@ -366,7 +376,9 @@ const char * _Filtro::descr[] =
   "+tzmin",
   "+tzmax",
   "+wmin",
-  "+wmax"
+  "+wmax",
+  "+chmin",
+  "+chmax"
   // varie ed eventuali
 };
 
@@ -421,6 +433,8 @@ float * _Filtro::costruisci_filtro(int narg, const char **args)
     miei_args[21], miei_val[21],
     miei_args[22], miei_val[22],
     miei_args[23], miei_val[23],
+    miei_args[24], miei_val[24],
+    miei_args[25], miei_val[25],
     miei_args[NUM_FILTRI]);
 }
 
@@ -428,7 +442,7 @@ float * _Filtro::costruisci_filtro(int narg, const char **args)
 float * _Filtro::costruisci_filtro(const char *p, ...)
 {
   va_list app;
-  char * buff = new char[128], *z = buff;
+  char * buff = new char[MAX_LENGTH_FILENAME], *z = buff;
   float val, *tutti_val = new float[NUM_FILTRI];
   va_start(app, p);
   strcpy(buff, p);
@@ -440,7 +454,6 @@ float * _Filtro::costruisci_filtro(const char *p, ...)
     z = va_arg(app, char *);
     if (!z) break;
     strcpy(buff, z);
-
   } while (1);
   va_end(app);
   return tutti_val;
