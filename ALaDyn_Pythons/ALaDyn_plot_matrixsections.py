@@ -69,7 +69,7 @@ if __name__ == '__main__':
 			K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
 			np.savetxt( os.path.join(path,'data','rho',('rho_bunch_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose()+K.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(M.transpose())+np.abs(K.transpose()),fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
