@@ -1942,7 +1942,7 @@ bool Parametri::check_parametri()
       test = false;
     }
   }
-  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
+  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
   {
     if (!p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1)
     {
