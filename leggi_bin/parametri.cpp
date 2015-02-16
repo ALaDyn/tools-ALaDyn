@@ -2152,20 +2152,20 @@ bool Parametri::check_parametri()
         test = false;
       }
     }
-    if (!p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7)
+    if (!p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7 && p[NCOLONNE] != 8)
     {
       printf("Attenzione: ncolonne mal definite\n");
       test = false;
     }
     else
     {
-      if (!p_b[NCOLONNE] && (p[NCOLONNE] == 4 || p[NCOLONNE] == 5 || p[NCOLONNE] == 6 || p[NCOLONNE] == 7))
+      if (!p_b[NCOLONNE] && (p[NCOLONNE] == 4 || p[NCOLONNE] == 5 || p[NCOLONNE] == 6 || p[NCOLONNE] == 7 || p[NCOLONNE] == 8))
       {
         test = true;		// tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[NCOLONNE] && do_not_ask_missing)
       {
-        p[NCOLONNE] = 7;
+        p[NCOLONNE] = 8;
         p_b[NCOLONNE] = false;
         test = true;
       }
