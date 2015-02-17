@@ -98,7 +98,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   char nomefile_binnato[MAX_LENGTH_FILENAME];
 
   size_t fread_size = 0;
-  int npe, nx, nz, ibx, iby, ibz, model, dmodel, nsp, ndimen, lpord, deord, nptot, np_loc, ny_loc, ndv;
+  unsigned int npe, nx, nz, ibx, iby, ibz, model, dmodel, nsp, ndimen, lpord, deord, nptot, np_loc, ny_loc, ndv;
   //int curr;
   ndv = parametri->p[NCOLONNE];
   float tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0x, w0y, nrat, a0, lam0, E0, ompe, xt_in, xt_end, charge, mass, np_over_nm;
@@ -494,7 +494,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       }
       if (feof(file_in)) break;
       if (out_swap) swap_endian_i(&npart_loc, 1);
-      if (npart_loc > nptot || npart_loc < 0)
+      if (npart_loc > (long long int) nptot || npart_loc < 0)
       {
         printf("Read a npart=%i, non valid. Exiting!", npart_loc);
         break;
@@ -530,7 +530,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       num_of_passes = (int)((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) + 1;
       num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
       dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
-      if (dimensione_array_particelle > nptot || dimensione_array_particelle < 0)
+      if (dimensione_array_particelle > (long long int) nptot || dimensione_array_particelle < 0)
       {
         printf("Read a npart=%i, non valid. Exiting!", dimensione_array_particelle);
         break;
