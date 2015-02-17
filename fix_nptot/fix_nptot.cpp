@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 
   std::ifstream datfile;
   std::vector<int> intpar(NUMERO_PARAMETRI_FILE_DAT,0);
+  std::string riga_persa;
   int nptot_dat, ndv;
   unsigned long long int nptot_calculated = 0;
 
@@ -38,6 +39,8 @@ int main(int argc, char* argv[])
     std::cout << "Unable to find " << argv[1] << ".dat" << std::endl;
     exit(-1);
   }
+
+  std::getline(datfile, riga_persa);	// per leggere la riga Integer parameters
 
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
@@ -64,7 +67,7 @@ int main(int argc, char* argv[])
     if (binfile == NULL)
     {
       std::cout << "Reading ended at file #" << indice_multifile << std::endl;
-      exit(-1);
+      break;
     }
 
     fseeko(binfile, 0, SEEK_END);
