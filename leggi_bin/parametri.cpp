@@ -164,7 +164,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 {
   std::string riga_persa;
   int fattore_ricampionamento;
-  int discriminante_versione_file;
+//  int discriminante_versione_file;
   float coord;
   std::getline(file_dat, riga_persa);	// per leggere la riga Integer parameters
 
@@ -199,7 +199,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   npz_per_cpu = intpar[7];
   nptot = intpar[16];
   ndv = intpar[17];
-  discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->aladyn_version secondo la logica che i numeri negativi identificano le versioni di aladyn nuove, -1 --> aladyn_v2, -2 --> aladyn_v3, ...
+  //  discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->aladyn_version secondo la logica che i numeri negativi identificano le versioni di aladyn nuove, -1 --> aladyn_v2, -2 --> aladyn_v3, ...
+  aladyn_version = intpar[18];
   endianness = intpar[19];
 
   std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
@@ -230,8 +231,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   zmin = realpar[5];
   zmax = realpar[6];
 
-  if (discriminante_versione_file == -1) aladyn_version = 2;
-  if (discriminante_versione_file == -2) aladyn_version = 3;
+  //if (discriminante_versione_file == -1) aladyn_version = 2;
+  //if (discriminante_versione_file == -2) aladyn_version = 3;
 
   if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
   {
@@ -268,17 +269,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       std::getline(file_dat, riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
 
 
-      for (int i = 0; i < npunti_x_ricampionati; i++)
+      for (unsigned int i = 0; i < npunti_x_ricampionati; i++)
       {
         file_dat >> coord;
         xcoord.push_back(coord);
       }
-      for (int i = 0; i < npunti_y_ricampionati; i++)
+      for (unsigned int i = 0; i < npunti_y_ricampionati; i++)
       {
         file_dat >> coord;
         ycoord.push_back(coord);
       }
-      for (int i = 0; i < npunti_z_ricampionati; i++)
+      for (unsigned int i = 0; i < npunti_z_ricampionati; i++)
       {
         file_dat >> coord;
         zcoord.push_back(coord);
@@ -294,17 +295,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       if (npunti_z_ricampionati > 1) dz = (zmax - zmin) / (npunti_z_ricampionati - 1);
       else dz = (zmax - zmin);
 
-      for (int i = 0; i < npunti_x_ricampionati; i++)
+      for (unsigned int i = 0; i < npunti_x_ricampionati; i++)
       {
         coord = xmin + dx*i;
         xcoord.push_back(coord);
       }
-      for (int i = 0; i < npunti_y_ricampionati; i++)
+      for (unsigned int i = 0; i < npunti_y_ricampionati; i++)
       {
         coord = ymin + dy*i;
         ycoord.push_back(coord);
       }
-      for (int i = 0; i < npunti_z_ricampionati; i++)
+      for (unsigned int i = 0; i < npunti_z_ricampionati; i++)
       {
         coord = zmin + dz*i;
         zcoord.push_back(coord);

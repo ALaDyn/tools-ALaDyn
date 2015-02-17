@@ -153,10 +153,10 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 
 struct Parametri
 {
-  int ncpu_x, ncpu_y, ncpu_z, ncpu;
-  int nptot, ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
+  unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
+  unsigned int nptot, ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   int endianness;
-  int aladyn_version;
+  unsigned int aladyn_version;
   bool multifile;
   bool stretched_grid; 	//nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
   int stretched_along_x;
@@ -171,7 +171,7 @@ struct Parametri
   float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, wmin, wmax, chmin, chmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
   std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
   std::vector<float> xcoord, ycoord, zcoord, realpar;
-  std::vector<int> intpar;
+  std::vector<unsigned int> intpar;
   bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, wmin_b, wmax_b, chmin_b, chmax_b, Emin_b, Emax_b,
     tymin_b, tymax_b, tzmin_b, tzmax_b, gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b,
     nbin_z_b, nbin_ty_b, nbin_tz_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_w_b, nbin_ch_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;

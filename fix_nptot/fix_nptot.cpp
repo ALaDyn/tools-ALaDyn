@@ -20,9 +20,10 @@
 #endif
 
 #define NUMERO_PARAMETRI_FILE_DAT	20
+#define ALADYN_VERSION 3
 
 
-void fix_nptot_dat_file(char *, unsigned long long int);
+void fix_nptot_dat_file(char *, unsigned long long int, unsigned int);
 
 
 int main(int argc, char* argv[])
@@ -91,14 +92,14 @@ int main(int argc, char* argv[])
   std::cout << "Read from dat this nptot value: " << nptot_dat << std::endl;
   std::cout << "Calculated from bin files this nptot value: " << nptot_calculated << std::endl;
 
-  if (nptot_dat != nptot_calculated) fix_nptot_dat_file(argv[1], nptot_calculated);
+  if (nptot_dat != nptot_calculated) fix_nptot_dat_file(argv[1], nptot_calculated, ALADYN_VERSION);
 
   return 0;
 }
 
 
 
-void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
+void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto, unsigned int aladyn_version)
 {
   std::ifstream datfile_in;
   std::ofstream datfile_out;
@@ -107,7 +108,7 @@ void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
   nomefile_in << std::string(nomefile) << ".dat";
   nomefile_out << std::string(nomefile) << "_fix.dat";
 
-  std::vector<int> intpar(NUMERO_PARAMETRI_FILE_DAT, 0);
+  std::vector<unsigned int> intpar(NUMERO_PARAMETRI_FILE_DAT, 0);
   std::vector<std::string> datfile;
   std::string riga;
 
@@ -139,14 +140,14 @@ void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
     }
   }
 
-  if (nptot_corretto < INT_MAX) intpar[16] = (int)nptot_corretto;
-  else std::cout << "nptot too large for an int value!" << std::endl;
-
+  if (nptot_corretto < UINT_MAX) intpar[16] = (unsigned int)nptot_corretto;
+  else std::cout << "nptot too large for a uint value!" << std::endl;
+  if (intpar[18] != aladyn_version) intpar[18] = aladyn_version;
 
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
     dati_out << std::setw(14) << intpar[i];
-    if (i>0 && !(i % 4))
+    if (i>0 && !((i+1) % 4))
     {
       dati_out << std::endl;
       datfile.push_back(dati_out.str());
@@ -154,7 +155,11 @@ void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
       dati_out.str("");
     }
   }
-  if (dati_out.str().size()) datfile.push_back(dati_out.str());
+  if (dati_out.str().size())
+  {
+    dati_out << std::endl;
+    datfile.push_back(dati_out.str());
+  }
 
   std::getline(datfile_in, riga);	// per pulire i caratteri rimanenti sull'ultima riga degli interi, non salvata
 
