@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
   while (true)
   {
     nomefile_bin.clear();
+    nomefile_bin.str("");
     nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile << ".bin";
     binfile = fopen(nomefile_bin.str().c_str(), "rb");
     if (binfile == NULL)
