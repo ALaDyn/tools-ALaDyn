@@ -168,7 +168,23 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   float coord;
   std::getline(file_dat, riga_persa);	// per leggere la riga Integer parameters
 
-  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++) file_dat >> intpar[i];
+
+  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  {
+    file_dat >> intpar[i];
+    if (std::cin.fail())
+    {
+      std::cout << "Unable to parse int_par #" << i + 1 << std::endl;
+      if (i <= 7 || i >= 17)
+      {
+        std::cout << "Bad error; please fix the .dat file if possibile and then re-run the program" << std::endl;
+        exit(-77);
+      }
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
+    }
+  }
+
   ncpu_x = 1;
   ncpu_y = intpar[0];
   ncpu_z = intpar[1];
@@ -188,7 +204,23 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
   std::getline(file_dat, riga_persa);	// per leggere la riga Real parameters
 
-  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++) file_dat >> realpar[i];
+  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  {
+    file_dat >> realpar[i];
+    if (std::cin.fail())
+    {
+      std::cout << "Unable to parse real_par #" << i + 1 << std::endl;
+      if (i <= 6)
+      {
+        std::cout << "Bad error; please fix the .dat file if possibile and then re-run the program" << std::endl;
+        exit(-77);
+      }
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
+    }
+  }
+
+
   tnow = realpar[0];
   xmin = realpar[1];
   xmax = realpar[2];
