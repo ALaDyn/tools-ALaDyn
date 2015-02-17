@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <climits>
 #include <limits>
 #include <cstdlib>
 #if defined (_MSC_VER)
@@ -125,6 +126,7 @@ void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
   }
 
   std::getline(datfile_in, riga);
+  riga += '\n';
   datfile.push_back(riga);
 
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
@@ -152,11 +154,14 @@ void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
       dati_out.str("");
     }
   }
+  if (dati_out.str().size()) datfile.push_back(dati_out.str());
+
   std::getline(datfile_in, riga);	// per pulire i caratteri rimanenti sull'ultima riga degli interi, non salvata
 
   while (!datfile_in.eof())
   {
-    std::getline(datfile_in, riga);	// per leggere la riga Real parameters
+    std::getline(datfile_in, riga);
+    riga += '\n';
     datfile.push_back(riga);
   }
 
