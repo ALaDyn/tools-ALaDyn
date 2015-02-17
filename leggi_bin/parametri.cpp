@@ -15,7 +15,7 @@ Parametri::Parametri()
   subsample = 1;
   span = 5;
   ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
-  ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
+  nptot = ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
   endianness = 0;
   aladyn_version = 1;
   multifile = false;
@@ -197,6 +197,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   npy_per_cpu = intpar[5];
   npunti_z_ricampionati = intpar[6];
   npz_per_cpu = intpar[7];
+  nptot = intpar[16];
   ndv = intpar[17];
   discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->aladyn_version secondo la logica che i numeri negativi identificano le versioni di aladyn nuove, -1 --> aladyn_v2, -2 --> aladyn_v3, ...
   endianness = intpar[19];

@@ -154,7 +154,7 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 struct Parametri
 {
   int ncpu_x, ncpu_y, ncpu_z, ncpu;
-  int ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
+  int nptot, ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   int endianness;
   int aladyn_version;
   bool multifile;
