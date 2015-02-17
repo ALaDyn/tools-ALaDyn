@@ -176,7 +176,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     {
       file_dat.clear();
       std::cout << "Unable to parse int_par #" << i + 1 << std::endl;
-      if (i <= 7 || i >= 17)
+      if (i <= 7 || i >= 16)
       {
         std::cout << "Bad error; please fix the .dat file if possibile and then re-run the program" << std::endl;
         exit(-77);

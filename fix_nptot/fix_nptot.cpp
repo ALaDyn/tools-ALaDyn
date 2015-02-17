@@ -20,6 +20,10 @@
 
 #define NUMERO_PARAMETRI_FILE_DAT	20
 
+
+void fix_nptot_dat_file(char *, unsigned long long int);
+
+
 int main(int argc, char* argv[])
 {
   int indice_multifile = 0;
@@ -53,6 +57,8 @@ int main(int argc, char* argv[])
     }
   }
 
+  datfile.close();
+
   nptot_dat = intpar[16];
   ndv = intpar[17];
 
@@ -84,6 +90,78 @@ int main(int argc, char* argv[])
   std::cout << "Read from dat this nptot value: " << nptot_dat << std::endl;
   std::cout << "Calculated from bin files this nptot value: " << nptot_calculated << std::endl;
 
+  if (nptot_dat != nptot_calculated) fix_nptot_dat_file(argv[1], nptot_calculated);
+
   return 0;
 }
+
+
+
+void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
+{
+  std::ifstream datfile_in;
+  std::ofstream datfile_out;
+  std::ostringstream nomefile_in, nomefile_out, dati_out;
+
+  nomefile_in << std::string(nomefile) << ".dat";
+  nomefile_out << std::string(nomefile) << "_fix.dat";
+
+  std::vector<int> intpar(NUMERO_PARAMETRI_FILE_DAT, 0);
+  std::vector<std::string> datfile;
+  std::string riga;
+
+  datfile_in.open(nomefile_in.str().c_str(), std::ios::in);
+  if (datfile_in.fail())
+  {
+    std::cout << "Unable to open " << nomefile << ".dat" << std::endl;
+    exit(-1);
+  }
+
+  datfile_out.open(nomefile_out.str().c_str(), std::ios::out);
+  if (datfile_out.fail())
+  {
+    std::cout << "Unable to open " << nomefile << "_fix.dat" << std::endl;
+    exit(-1);
+  }
+
+  std::getline(datfile_in, riga);
+  datfile.push_back(riga);
+
+  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  {
+    datfile_in >> intpar[i];
+    if (datfile_in.fail())
+    {
+      datfile_in.clear();
+      datfile_in.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
+    }
+  }
+
+  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  {
+    dati_out << std::setw(14) << intpar[i];
+    if (i>0 && !(i % 4))
+    {
+      dati_out << std::endl;
+      datfile.push_back(dati_out.str());
+      dati_out.clear();
+      dati_out.str("");
+    }
+  }
+  std::getline(datfile_in, riga);	// per pulire i caratteri rimanenti sull'ultima riga degli interi, non salvata
+
+  while (!datfile_in.eof())
+  {
+    std::getline(datfile_in, riga);	// per leggere la riga Real parameters
+    datfile.push_back(riga);
+  }
+
+//  for (auto i : datfile) datfile_out << i;
+  for (unsigned int i = 0; i < datfile.size(); i++) datfile_out << datfile[i];
+
+
+  datfile_in.close();
+  datfile_out.close();
+}
+
 
