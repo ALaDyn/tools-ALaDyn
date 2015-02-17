@@ -312,6 +312,27 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     }
   }
   endian_file = (endianness - 1);
+
+  debug_dat_parse();
+}
+
+
+
+void Parametri::debug_dat_parse()
+{
+  std::cout << "Integer parameters" << std::endl;
+  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  {
+    std::cout << std::setw(14) << intpar[i];
+    if (i>0 && i % 4) std::cout << std::endl;
+  }
+
+  std::cout << "Real parameters" << std::endl;
+  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  {
+    std::cout << std::setw(14) << realpar[i];
+    if (i>0 && i % 4) std::cout << std::endl;
+  }
 }
 
 void Parametri::chiedi_numero_colonne()

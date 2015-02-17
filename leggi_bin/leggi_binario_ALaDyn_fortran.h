@@ -208,6 +208,7 @@ struct Parametri
   void parse_command_line(int, const char **);
   void leggi_interattivo();
   void leggi_file_dat(std::ifstream &);
+  void debug_dat_parse();
   void chiedi_endian_file();
   void chiedi_numero_colonne();
   void chiedi_2Do3D();
