@@ -172,16 +172,16 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
     file_dat >> intpar[i];
-    if (std::cin.fail())
+    if (file_dat.fail())
     {
+      file_dat.clear();
       std::cout << "Unable to parse int_par #" << i + 1 << std::endl;
       if (i <= 7 || i >= 17)
       {
         std::cout << "Bad error; please fix the .dat file if possibile and then re-run the program" << std::endl;
         exit(-77);
       }
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
+      file_dat.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
     }
   }
 
@@ -207,16 +207,16 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
     file_dat >> realpar[i];
-    if (std::cin.fail())
+    if (file_dat.fail())
     {
+      file_dat.clear();
       std::cout << "Unable to parse real_par #" << i + 1 << std::endl;
       if (i <= 6)
       {
         std::cout << "Bad error; please fix the .dat file if possibile and then re-run the program" << std::endl;
         exit(-77);
       }
-      std::cin.clear();
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
+      file_dat.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
     }
   }
 
