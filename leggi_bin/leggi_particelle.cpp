@@ -219,9 +219,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     estremi_max[i] = (float)-NUMERO_MASSIMO;
   }
 
-  printf("nptot=%i\n", nptot);
-  fflush(stdout);
-
+  std::cout << "nptot=" << nptot << std::endl << std::flush;
 
   float **xw = new float*[parametri->nbin_x + 3];
   for (int i = 0; i < parametri->nbin_x + 3; i++)
@@ -424,7 +422,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     contatori[0] += fprintf(binary_vtk, "titolo nostro\n");
     contatori[0] += fprintf(binary_vtk, "BINARY\n");
     contatori[0] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
-    contatori[0] += fprintf(binary_vtk, "POINTS %i float\n", nptot);
+    contatori[0] += fprintf(binary_vtk, "POINTS %ui float\n", nptot);
 
     fseeko(binary_vtk, contatori[0] + nptot*sizeof(float) * 3, SEEK_SET);
 
@@ -441,10 +439,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
       // Scrittura terzo Header VTK e memorizzazione sua dimensione in contatori[2]
       //			contatori[2] += fprintf(binary_vtk,"DATASET STRUCTURED_POINTS\n");
-      //			contatori[2] += fprintf(binary_vtk,"DIMENSIONS %i %i %i\n",nptot, 1, 1);
+      //			contatori[2] += fprintf(binary_vtk,"DIMENSIONS %ui %i %i\n",nptot, 1, 1);
       //			contatori[2] += fprintf(binary_vtk,"ORIGIN 0 0 0\n");
       //			contatori[2] += fprintf(binary_vtk,"SPACING 1 1 1\n");
-      //			contatori[2] += fprintf(binary_vtk,"POINT_DATA %i\n",nptot);
+      //			contatori[2] += fprintf(binary_vtk,"POINT_DATA %ui\n",nptot);
       contatori[2] += fprintf(binary_vtk, "SCALARS w float 1\n");
       contatori[2] += fprintf(binary_vtk, "LOOKUP_TABLE default\n");
     }
@@ -1072,7 +1070,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     fprintf(parameters, "lpord=%i\n", lpord); //ordine dello schema leapfrog
     fprintf(parameters, "deord=%i\n", deord); //ordine derivate
     fprintf(parameters, "pID=%i\n", pID);
-    fprintf(parameters, "nptot=%i\n", nptot);
+    fprintf(parameters, "nptot=%ui\n", nptot);
     fprintf(parameters, "ndv=%i\n", ndv);
     fprintf(parameters, "========= fine interi\n");
     fprintf(parameters, "\n floating\n");
