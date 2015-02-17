@@ -137,6 +137,10 @@ void fix_nptot_dat_file(char * nomefile, unsigned long long int nptot_corretto)
     }
   }
 
+  if (nptot_corretto < INT_MAX) intpar[16] = (int)nptot_corretto;
+  else std::cout << "nptot too large for an int value!" << std::endl;
+
+
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
     dati_out << std::setw(14) << intpar[i];
