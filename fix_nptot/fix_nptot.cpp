@@ -5,6 +5,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <limits>
+#include <cstdlib>
 #if defined (_MSC_VER)
 #include<wchar.h>
 #define fseeko _fseeki64
