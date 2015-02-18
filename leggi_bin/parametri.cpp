@@ -29,10 +29,9 @@ Parametri::Parametri()
   tymin = tzmin = -1.0;
   tymax = tzmax = 1.0;
   ymin_b = ymax_b = pymin_b = pymax_b = zmin_b = zmax_b = pzmin_b = pzmax_b = wmin_b = wmax_b = chmin_b = chmax_b = gammamin_b = gammamax_b = true;
-  xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = true;
-  tymin_b = tymax_b = tzmin_b = tzmax_b = nbin_ty_b = nbin_tz_b = true;
+  xmin_b = xmax_b = pxmin_b = pxmax_b = Emin_b = Emax_b = thetaTmin_b = thetaTmax_b = thetamin_b = thetamax_b = tymin_b = tymax_b = tzmin_b = tzmax_b = true;
   nbin_b = true;
-  nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_gamma_b = true;
+  nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_ty_b = nbin_tz_b = nbin_gamma_b = true;
   nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
   fai_plot_wspec = fai_plot_chspec = fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
   fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
@@ -1467,7 +1466,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 
   std::string nomepar, evita, leggi;
 
-  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
+  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
   {
     if (usa_file_parametri)
     {
