@@ -1134,8 +1134,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
     Estremi_out << "CHMIN = " << estremi_min[12] << std::endl;
     Estremi_out << "CHMAX = " << estremi_max[12] << std::endl;
-    Estremi_out << "peso_accumulato = " << peso_accumulato << std::endl;
-    Estremi_out << "carica_accumulata = " << carica_accumulata << std::endl;
+    if (out_parameters) Estremi_out << "peso_accumulato = " << peso_accumulato << std::endl;
+    if (out_parameters) Estremi_out << "carica_accumulata = " << carica_accumulata << std::endl;
     Estremi_out.close();
   }
 

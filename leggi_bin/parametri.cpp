@@ -231,8 +231,9 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   zmin = realpar[5];
   zmax = realpar[6];
 
-  //if (discriminante_versione_file == -1) aladyn_version = 2;
-  //if (discriminante_versione_file == -2) aladyn_version = 3;
+  // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
+  if (aladyn_version == -1) aladyn_version = 2;
+  if (aladyn_version == -2) aladyn_version = 3;
 
   if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
   {

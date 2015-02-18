@@ -40,7 +40,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   else printf("variabile y non riconosciuta\n");
 
 
-  float x, y, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
+  float x, y, z, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
   for (int i = 0; i < npart; i++)
   {
@@ -97,6 +97,9 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
     }
     else if (((ndv == 6 || ndv == 7) && parametri->aladyn_version < 3) || (ndv == 8 && parametri->aladyn_version == 3))
     {
+      x = *(particelle + i*ndv);
+      y = *(particelle + i*ndv + 1);
+      z = *(particelle + i*ndv + 2);
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
       pz = *(particelle + i*ndv + 5);
