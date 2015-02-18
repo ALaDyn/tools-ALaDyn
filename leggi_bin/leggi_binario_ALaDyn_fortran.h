@@ -156,7 +156,7 @@ struct Parametri
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
   unsigned int nptot, ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   int endianness;
-  unsigned int aladyn_version;
+  int aladyn_version;
   bool multifile;
   bool stretched_grid; 	//nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
   int stretched_along_x;
