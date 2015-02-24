@@ -196,7 +196,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   npy_per_cpu = intpar[5];
   npunti_z_ricampionati = intpar[6];
   npz_per_cpu = intpar[7];
-  nptot = intpar[16];
+  nptot = (long long int) intpar[16];
   ndv = intpar[17];
   //  discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->aladyn_version secondo la logica che i numeri negativi identificano le versioni di aladyn nuove, -1 --> aladyn_v2, -2 --> aladyn_v3, ...
   aladyn_version = intpar[18];
@@ -221,14 +221,13 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     }
   }
 
-
   tnow = realpar[0];
-  xmin = realpar[1];
-  xmax = realpar[2];
-  ymin = realpar[3];
-  ymax = realpar[4];
-  zmin = realpar[5];
-  zmax = realpar[6];
+//  xmin = realpar[1];
+//  xmax = realpar[2];
+//  ymin = realpar[3];
+//  ymax = realpar[4];
+//  zmin = realpar[5];
+//  zmax = realpar[6];
 
   // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
   if (aladyn_version == -1) aladyn_version = 2;
@@ -253,6 +252,12 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       if (ndv < 7) zmin = 0.0, zmax = 1.0; // a 2D file has 6 floats (columns): x, y, px, py, w, ch
       p[NCOLONNE] = ndv;
       p_b[NCOLONNE] = false;
+      if (nptot == -1)
+      {
+        std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei real
+        std::getline(file_dat, riga_persa);	// per leggere la riga Number of particles
+        file_dat >> nptot;
+      }
     }
   }
   else

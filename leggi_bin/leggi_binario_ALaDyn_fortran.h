@@ -154,7 +154,8 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 struct Parametri
 {
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
-  unsigned int nptot, ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
+  unsigned int ndv, npunti_x, npunti_x_ricampionati, fattore_ricampionamento, npunti_y_ricampionati, npunti_z_ricampionati, npx_per_cpu, npy_per_cpu, npz_per_cpu;
+  long long int nptot;
   int endianness;
   int aladyn_version;
   bool multifile;
@@ -217,12 +218,6 @@ struct Parametri
   void organizza_minimi_massimi();
 };
 
-/*
-union double_as_two_float {
-  double d;
-  float f[2]; //f[0] = peso, f[1] = carica
-};
-*/
 
 
 struct _Binnaggio
