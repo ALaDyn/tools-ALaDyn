@@ -222,12 +222,12 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
 
   tnow = realpar[0];
-//  xmin = realpar[1];
-//  xmax = realpar[2];
-//  ymin = realpar[3];
-//  ymax = realpar[4];
-//  zmin = realpar[5];
-//  zmax = realpar[6];
+  xmin = realpar[1];
+  xmax = realpar[2];
+  ymin = realpar[3];
+  ymax = realpar[4];
+  zmin = realpar[5];
+  zmax = realpar[6];
 
   // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
   if (aladyn_version == -1) aladyn_version = 2;
