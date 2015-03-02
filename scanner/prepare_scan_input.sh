@@ -34,11 +34,6 @@ do
 #do
 
 
-mkdir pre_${pre}_den_${dens}_ramp_${ramp}
-cd pre_${pre}_den_${dens}_ramp_${ramp}
-cp ../job_gcc.cmd .
-touch epic.txt
-touch opic.txt
 
 ALADYN_VERSION=3
 NCPU=64
@@ -91,15 +86,18 @@ ALGORITMO_INTEGRAZIONE=0
 ##### mdl,dmdl,ibeam 
 ##NB: per il seguente dato, 1=polarizzato p, 2=polarizzato s, 3=polarizzato circolarmente
 LASER_MODEL=1
-##NB: per il seguente dato, 1=plasma di soli elettroni e protoni, in tutti e 5 i layers
-##                          2=plasma a 4 specie, con la targhetta centrale (piu' rampa eventuale) fatta di Heavy Ions ed elettroni (ascolta solo x2,x3), 
-##                            permette di definire Z_i ed A_i, piu' layer posteriore di contaminanti fatto di Light Ions+H+elettroni
-##                          3=plasma di 3 specie: C, H ed elettroni, con il rapporto CHn definito dal BEAM_MODEL seguente
-##                          4=plasma a 3 o 4 specie, con foam anteriore fatta di elettroni e H (con BEAM_MODEL=0 e NUMERO_SPECIE=3), 
-##                            oppure di carbonio "light ions" (con BEAM_MODEL=0 e NUMERO_SPECIE=4) oppure infine dello stesso materiale
-##                            del bulk della targhetta "heavy ions" (con BEAM_MODEL=1 e NUMERO_SPECIE=3);
-##                            la targhetta centrale e' sempre fatta di "Heavy Ions" ed elettroni, e i contaminanti di solo idrogeno+elettroni
-PLASMA_MODEL=4
+##NB: per il seguente dato, ecco le chiamate effettuate nel codice
+# case(1)
+#  call one_layer_multisp(ny_targ,xf0)  !e+Z1+Z2
+# case(3)
+#  call preplasma_multisp(ny_targ,xf0) !foam+ high Z +H coating
+# case(4)
+#  call multi_layer_multisp(ny_targ,xf0) !foam+ high Z +H coating
+# case(5)
+#  call one_layer_nano_wires(ny_targ,xf0) !foam+ high Z +H coating mass lim
+# case(6)
+#  call one_layer_nano_tubes(ny_targ,xf0)  ! (e+ (Z,A) ions now nsp=2
+PLASMA_MODEL=3
 
 
 
@@ -449,7 +447,6 @@ npe_yz=${NCPU}
  printf '\n\n' >> ${INPUTFILE}
 
 
-cd ..
 done
 done
 done
