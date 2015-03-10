@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "combina_vtk", "combina_vtk\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exponential_fit", "exponential_fit\exponential_fit.vcxproj", "{C828CCD7-65D4-4F2C-A395-F018D9DADBBC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scanner", "scanner\scanner.vcxproj", "{FECA0C33-DDF4-4BC5-9CD6-6927C37F9B70}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lightweight_coredump_analyzer", "lightweight_coredump_analyzer\lightweight_coredump_analyzer.vcxproj", "{4CC3D161-5BDB-453A-AFA9-42101277BD5A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fix_nptot", "fix_nptot\fix_nptot.vcxproj", "{FF41224B-C853-449D-9C09-1747EA58CE51}"
@@ -57,10 +55,6 @@ Global
 		{C828CCD7-65D4-4F2C-A395-F018D9DADBBC}.Debug|Win32.Build.0 = Debug|Win32
 		{C828CCD7-65D4-4F2C-A395-F018D9DADBBC}.Release|Win32.ActiveCfg = Release|Win32
 		{C828CCD7-65D4-4F2C-A395-F018D9DADBBC}.Release|Win32.Build.0 = Release|Win32
-		{FECA0C33-DDF4-4BC5-9CD6-6927C37F9B70}.Debug|Win32.ActiveCfg = Debug|Win32
-		{FECA0C33-DDF4-4BC5-9CD6-6927C37F9B70}.Debug|Win32.Build.0 = Debug|Win32
-		{FECA0C33-DDF4-4BC5-9CD6-6927C37F9B70}.Release|Win32.ActiveCfg = Release|Win32
-		{FECA0C33-DDF4-4BC5-9CD6-6927C37F9B70}.Release|Win32.Build.0 = Release|Win32
 		{4CC3D161-5BDB-453A-AFA9-42101277BD5A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4CC3D161-5BDB-453A-AFA9-42101277BD5A}.Debug|Win32.Build.0 = Debug|Win32
 		{4CC3D161-5BDB-453A-AFA9-42101277BD5A}.Release|Win32.ActiveCfg = Release|Win32
