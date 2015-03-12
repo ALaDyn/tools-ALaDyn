@@ -204,18 +204,18 @@ void Diag_data::read_header_v1_v2(std::ifstream &infile) {
 
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  mod_id = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  dmodel_id = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  LP_ord = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  der_ord = boost::lexical_cast<boost::int32_t>(tokens[3]);
+  mod_id = boost::lexical_cast<int32_t>(tokens[0]);
+  dmodel_id = boost::lexical_cast<int32_t>(tokens[1]);
+  LP_ord = boost::lexical_cast<int32_t>(tokens[2]);
+  der_ord = boost::lexical_cast<int32_t>(tokens[3]);
 
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  Z_i = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  A_i = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  iform = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  ibeam = boost::lexical_cast<boost::int32_t>(tokens[3]);
+  Z_i = boost::lexical_cast<int32_t>(tokens[0]);
+  A_i = boost::lexical_cast<int32_t>(tokens[1]);
+  iform = boost::lexical_cast<int32_t>(tokens[2]);
+  ibeam = boost::lexical_cast<int32_t>(tokens[3]);
 
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
@@ -267,21 +267,21 @@ void Diag_data::read_header_v1_v2(std::ifstream &infile) {
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  Nx = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  Ny = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  Nz = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  n_cell = boost::lexical_cast<boost::int32_t>(tokens[3]);
-  Nsp = boost::lexical_cast<boost::int32_t>(tokens[4]);
-  Nsb = boost::lexical_cast<boost::int32_t>(tokens[5]);
+  Nx = boost::lexical_cast<int32_t>(tokens[0]);
+  Ny = boost::lexical_cast<int32_t>(tokens[1]);
+  Nz = boost::lexical_cast<int32_t>(tokens[2]);
+  n_cell = boost::lexical_cast<int32_t>(tokens[3]);
+  Nsp = boost::lexical_cast<int32_t>(tokens[4]);
+  Nsb = boost::lexical_cast<int32_t>(tokens[5]);
 
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  iter = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  nst = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  sp_step = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  nvar = boost::lexical_cast<boost::int32_t>(tokens[3]);
-  npvar = boost::lexical_cast<boost::int32_t>(tokens[4]);
+  iter = boost::lexical_cast<int32_t>(tokens[0]);
+  nst = boost::lexical_cast<int32_t>(tokens[1]);
+  sp_step = boost::lexical_cast<int32_t>(tokens[2]);
+  nvar = boost::lexical_cast<int32_t>(tokens[3]);
+  npvar = boost::lexical_cast<int32_t>(tokens[4]);
 }
 
 void Diag_data::read_header_v3(std::ifstream &infile) {
@@ -291,20 +291,20 @@ void Diag_data::read_header_v3(std::ifstream &infile) {
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  mod_id = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  dmodel_id = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  LP_ord = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  der_ord = boost::lexical_cast<boost::int32_t>(tokens[3]);
+  mod_id = boost::lexical_cast<int32_t>(tokens[0]);
+  dmodel_id = boost::lexical_cast<int32_t>(tokens[1]);
+  LP_ord = boost::lexical_cast<int32_t>(tokens[2]);
+  der_ord = boost::lexical_cast<int32_t>(tokens[3]);
 
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  Z1_i = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  A1_i = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  Z2_i = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  A2_i = boost::lexical_cast<boost::int32_t>(tokens[3]);
-  iform = boost::lexical_cast<boost::int32_t>(tokens[4]);
-  str = boost::lexical_cast<boost::int32_t>(tokens[5]);
+  Z1_i = boost::lexical_cast<int32_t>(tokens[0]);
+  A1_i = boost::lexical_cast<int32_t>(tokens[1]);
+  Z2_i = boost::lexical_cast<int32_t>(tokens[2]);
+  A2_i = boost::lexical_cast<int32_t>(tokens[3]);
+  iform = boost::lexical_cast<int32_t>(tokens[4]);
+  str = boost::lexical_cast<int32_t>(tokens[5]);
 
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
@@ -356,20 +356,20 @@ void Diag_data::read_header_v3(std::ifstream &infile) {
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  Nx = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  Ny = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  Nz = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  n_cell = boost::lexical_cast<boost::int32_t>(tokens[3]);
-  Nsp = boost::lexical_cast<boost::int32_t>(tokens[4]);
-  Nsb = boost::lexical_cast<boost::int32_t>(tokens[5]);
+  Nx = boost::lexical_cast<int32_t>(tokens[0]);
+  Ny = boost::lexical_cast<int32_t>(tokens[1]);
+  Nz = boost::lexical_cast<int32_t>(tokens[2]);
+  n_cell = boost::lexical_cast<int32_t>(tokens[3]);
+  Nsp = boost::lexical_cast<int32_t>(tokens[4]);
+  Nsb = boost::lexical_cast<int32_t>(tokens[5]);
 
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  iter = boost::lexical_cast<boost::int32_t>(tokens[0]);
-  nst = boost::lexical_cast<boost::int32_t>(tokens[1]);
-  nvar = boost::lexical_cast<boost::int32_t>(tokens[2]);
-  npvar = boost::lexical_cast<boost::int32_t>(tokens[3]);
+  iter = boost::lexical_cast<int32_t>(tokens[0]);
+  nst = boost::lexical_cast<int32_t>(tokens[1]);
+  nvar = boost::lexical_cast<int32_t>(tokens[2]);
+  npvar = boost::lexical_cast<int32_t>(tokens[3]);
 }
 
 void Diag_data::decode_diag_v1_v2(std::ifstream &infile) {
@@ -663,7 +663,7 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  int32_t nbin = boost::lexical_cast<boost::int32_t>(tokens[0]);
+  int32_t nbin = boost::lexical_cast<int32_t>(tokens[0]);
   int32_t contatore_bin;
 
   selected_spectrum = new float[nbin];
