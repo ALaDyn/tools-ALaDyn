@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright 2014 Stefano Sinigardi
+Copyright 2014, 2015 Stefano Sinigardi
 The program is distributed under the terms of the GNU General Public License
 ******************************************************************************/
 
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
   double sum_x = 0., sum_x2 = 0.;
   double sum_y = 0., sum_y2 = 0., sum_logy = 0., sum_x2y = 0., sum_ylogy = 0., sum_xy = 0., sum_xylogy = 0.;
   double sum_z = 0., sum_z2 = 0., sum_logz = 0., sum_x2z = 0., sum_zlogz = 0., sum_xz = 0., sum_xzlogz = 0.;
-  double x, y, z;
+  double x, y, z, logx, logy, logz;
 
   unsigned int inizio = (int)(righe.size() / 5.);
   unsigned int fine = (int)(4. * righe.size() / 5.);
@@ -147,23 +147,26 @@ int main(int argc, char* argv[])
     x = energies[it];
     y = particles[it];
     z = particles_selected[it];
+    x > 0.0 ? logx = log(x) : 0.0;
+    y > 0.0 ? logy = log(y) : 0.0;
+    z > 0.0 ? logz = log(z) : 0.0;
 
     sum_x += x;
     sum_x2 += x*x;
     sum_y += y;
     sum_y2 += y*y;
-    sum_logy += log(x);
+    sum_logy += logx;
     sum_x2y += x*x*y;
-    sum_ylogy += y*log(y);
+    sum_ylogy += y*logy;
     sum_xy += x*y;
-    sum_xylogy += x*y*log(y);
+    sum_xylogy += x*y*logy;
     sum_z += z;
     sum_z2 += z*z;
-    sum_logz += log(z);
+    sum_logz += logz;
     sum_x2z += x*x*z;
-    sum_zlogz += z*log(z);
+    sum_zlogz += z*logz;
     sum_xz += x*z;
-    sum_xzlogz += x*z*log(z);
+    sum_xzlogz += x*z*logz;
   }
 
 
