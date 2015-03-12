@@ -747,7 +747,7 @@ int main(int argc, const char* argv[]) {
     exit(2);
   }
 
-  oDiag_data.versione = boost::lexical_cast<boost::uint32_t>(argv[2][1]);
+  oDiag_data.versione = boost::lexical_cast<int32_t>(argv[2][1]);
   oDiag_data.tipofile = argv[1][0];
   oDiag_data.nomefile = argv[1];
   if (oDiag_data.tipofile != 's' && oDiag_data.tipofile != 'd')  std::cout << "File non riconosciuto" << std::endl;
