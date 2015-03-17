@@ -44,18 +44,18 @@ do
   PROTON_MAX_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $5}'))
   PROTON_TOT_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $4}'))
  else
-  PROTON_MAX_ENERGY="0.0"
-  PROTON_TOT_ENERGY="0.0"
+  PROTON_MAX_ENERGY="-1"
+  PROTON_TOT_ENERGY="-1"
  fi
  if [ -f "spec${DIAG_STEP_TO_BE_READ}.dat" ];
  then
   ${SPEC_DECODER} spec${DIAG_STEP_TO_BE_READ}.dat v3
   aveData=($( ${EXP_FIT_SOFTWARE} -scan spec${DIAG_STEP_TO_BE_READ}.dat_${PARTICLE_TYPE}_${SPEC_TIME_TO_BE_READ}.txt  ))
  else
-  aveData[0]="0.0"
-  aveData[1]="0.0"
-  aveData[2]="0.0"
-  aveData[3]="0.0"
+  aveData[0]="-1"
+  aveData[1]="-1"
+  aveData[2]="-1"
+  aveData[3]="-1"
  fi
  PROTON_AVE_ENERGY=${aveData[0]}
  PROTON_TOT_NUMBER=${aveData[1]}
