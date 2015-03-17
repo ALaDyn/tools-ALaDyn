@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
   double sum_x = 0., sum_x2 = 0.;
   double sum_y = 0., sum_y2 = 0., sum_logy = 0., sum_x2y = 0., sum_ylogy = 0., sum_xy = 0., sum_xylogy = 0.;
   double sum_z = 0., sum_z2 = 0., sum_logz = 0., sum_x2z = 0., sum_zlogz = 0., sum_xz = 0., sum_xzlogz = 0.;
-  double x, y, z, logx, logy, logz;
+  double x = 0., y = 0., z = 0., logx = 0., logy = 0., logz = 0.;
 
   unsigned int inizio = (int)(righe.size() / 5.);
   unsigned int fine = (int)(4. * righe.size() / 5.);
@@ -173,11 +173,26 @@ int main(int argc, char* argv[])
   double fit_a1, fit_b1; // see http://mathworld.wolfram.com/LeastSquaresFittingExponential.html
   double fit_a2, fit_b2;
 
-  fit_a1 = (sum_x2y*sum_ylogy - sum_xy*sum_xylogy) / (sum_y*sum_x2y - sum_xy*sum_xy);
-  fit_b1 = (sum_y*sum_xylogy - sum_xy*sum_ylogy) / (sum_y*sum_x2y - sum_xy*sum_xy);
+  double den;
 
-  fit_a2 = (sum_x2z*sum_zlogz - sum_xz*sum_xzlogz) / (sum_z*sum_x2z - sum_xz*sum_xz);
-  fit_b2 = (sum_z*sum_xzlogz - sum_xz*sum_zlogz) / (sum_z*sum_x2z - sum_xz*sum_xz);
+  den = (sum_y*sum_x2y - sum_xy*sum_xy);
+  if (den > 0 || den < 0) {
+    fit_a1 = (sum_x2y*sum_ylogy - sum_xy*sum_xylogy) / den;
+    fit_b1 = (sum_y*sum_xylogy - sum_xy*sum_ylogy) / den;
+  }
+  else {
+    fit_a1 = fit_b1 = 0.0;
+  }
+
+  den = (sum_z*sum_x2z - sum_xz*sum_xz);
+  if (den > 0 || den < 0) {
+    fit_a2 = (sum_x2z*sum_zlogz - sum_xz*sum_xzlogz) / den;
+    fit_b2 = (sum_z*sum_xzlogz - sum_xz*sum_zlogz) / den;
+  }
+  else {
+    fit_a2 = fit_b2 = 0.0;
+  }
+
 
   double aveE1 = -1. / fit_b1;
   double aveE2 = -1. / fit_b2;
