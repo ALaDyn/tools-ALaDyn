@@ -26,6 +26,8 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
 
+#define SKIP_INIZIALE  (1./5.)    // skip the first one fifth of the data
+#define SKIP_FINALE    (4./5.)    // skip the last fifth of the data, since they do not fit very well into an exponential
 
 
 #include <iostream>
@@ -37,9 +39,14 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <limits>
 
 
-using namespace std;
+
+bool AreSame(double a, double b) {
+  return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
+}
+
 
 
 
@@ -47,11 +54,11 @@ int main(int argc, char* argv[])
 {
   if (argc < 3)
   {
-    cerr << "Please write input file on command line and also working mode!" << endl;
-    cerr << "-scan to write on the output, on a single line and without the newline at the end, just the mean energy and the total number of particles (fitting parameters)" << endl;
-    cerr << "-func to write on the output the fitting functions" << endl;
-    cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curves" << endl;
-    cerr << "\nIn all cases, this program works best using output redirection" << endl;
+    std::cerr << "Please write input file on command line and also working mode!" << std::endl;
+    std::cerr << "-scan to write on the output, on a single line and without the newline at the end, just the mean energy and the total number of particles (fitting parameters)" << std::endl;
+    std::cerr << "-func to write on the output the fitting functions" << std::endl;
+    std::cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curves" << std::endl;
+    std::cerr << "\nIn all cases, this program works best using output redirection" << std::endl;
     exit(1);
   }
 
@@ -87,21 +94,21 @@ int main(int argc, char* argv[])
 
   if (inputfile_position < 1)
   {
-    cerr << "Unable to find an input file on the command line" << endl;
-    cerr << "Scan[0:disabled, 1:enabled] --> " << scan << endl;
-    cerr << "Gnuplot[0:disabled, 1:enabled] --> " << gnuplot << endl;
-    cerr << "Func[0:disabled, 1:enabled] --> " << func << endl;
+    std::cerr << "Unable to find an input file on the command line" << std::endl;
+    std::cerr << "Scan[0:disabled, 1:enabled] --> " << scan << std::endl;
+    std::cerr << "Gnuplot[0:disabled, 1:enabled] --> " << gnuplot << std::endl;
+    std::cerr << "Func[0:disabled, 1:enabled] --> " << func << std::endl;
     exit(2);
   }
 
-  string riga;
-  vector<string> righe;
+  std::string riga;
+  std::vector<std::string> righe;
 
-  ifstream infile;
-  infile.open(argv[inputfile_position], ifstream::in);
+  std::ifstream infile;
+  infile.open(argv[inputfile_position], std::ifstream::in);
   if (!infile.is_open())
   {
-    cerr << "Unable to open input file " << argv[inputfile_position] << "!" << endl;
+    std::cerr << "Unable to open input file " << argv[inputfile_position] << "!" << std::endl;
     exit(3);
   }
 
@@ -125,11 +132,11 @@ int main(int argc, char* argv[])
   double * energies = new double[righe.size()];
   double * particles = new double[righe.size()];
   double * particles_selected = new double[righe.size()];
-  stringstream ss;
+  std::stringstream ss;
 
   for (unsigned int it = 0; it < righe.size(); it++)
   {
-    stringstream ss(righe.at(it));
+    std::stringstream ss(righe.at(it));
     ss >> energies[it] >> particles[it] >> particles_selected[it];
   }
 
@@ -139,9 +146,8 @@ int main(int argc, char* argv[])
   double sum_z = 0., sum_z2 = 0., sum_logz = 0., sum_x2z = 0., sum_zlogz = 0., sum_xz = 0., sum_xzlogz = 0.;
   double x = 0., y = 0., z = 0., logx = 0., logy = 0., logz = 0.;
 
-  unsigned int inizio = (int)(righe.size() / 5.);
-  unsigned int fine = (int)(4. * righe.size() / 5.);
-  //  for (unsigned int it = 0; it < righe.size(); it++)
+  unsigned int inizio = (int)(SKIP_INIZIALE * righe.size());
+  unsigned int fine = (int)(SKIP_FINALE * righe.size());
   for (unsigned int it = inizio; it < fine; it++)
   {
     x = energies[it];
@@ -170,44 +176,39 @@ int main(int argc, char* argv[])
   }
 
 
-  double fit_a1, fit_b1; // see http://mathworld.wolfram.com/LeastSquaresFittingExponential.html
-  double fit_a2, fit_b2;
+  double fit_a1 = 0.0, fit_b1 = 0.0; // see http://mathworld.wolfram.com/LeastSquaresFittingExponential.html
+  double fit_a2 = 0.0, fit_b2 = 0.0;
+  double denom_1 = 0.0, denom_2 = 0.0;
+  double aveE1 = 0.0, aveE2 = 0.0;
+  int N0_1 = 0, N0_2 = 0;
 
-  double den;
-
-  den = (sum_y*sum_x2y - sum_xy*sum_xy);
-  if (den > 0 || den < 0) {
-    fit_a1 = (sum_x2y*sum_ylogy - sum_xy*sum_xylogy) / den;
-    fit_b1 = (sum_y*sum_xylogy - sum_xy*sum_ylogy) / den;
-  }
-  else {
-    fit_a1 = fit_b1 = 0.0;
-  }
-
-  den = (sum_z*sum_x2z - sum_xz*sum_xz);
-  if (den > 0 || den < 0) {
-    fit_a2 = (sum_x2z*sum_zlogz - sum_xz*sum_xzlogz) / den;
-    fit_b2 = (sum_z*sum_xzlogz - sum_xz*sum_zlogz) / den;
-  }
-  else {
-    fit_a2 = fit_b2 = 0.0;
+  denom_1 = (sum_y*sum_x2y - sum_xy*sum_xy);
+  denom_2 = (sum_z*sum_x2z - sum_xz*sum_xz);
+  if (!AreSame(denom_1, 0.0) && !AreSame(denom_2, 0.0)) {
+    fit_a1 = (sum_x2y*sum_ylogy - sum_xy*sum_xylogy) / denom_1;
+    fit_b1 = (sum_y*sum_xylogy - sum_xy*sum_ylogy) / denom_1;
+    fit_a2 = (sum_x2z*sum_zlogz - sum_xz*sum_xzlogz) / denom_2;
+    fit_b2 = (sum_z*sum_xzlogz - sum_xz*sum_zlogz) / denom_2;
+    aveE1 = -1. / fit_b1;
+    aveE2 = -1. / fit_b2;
+    N0_1 = (int)(exp(fit_a1) * aveE1);
+    N0_2 = (int)(exp(fit_a2) * aveE2);
   }
 
 
-  double aveE1 = -1. / fit_b1;
-  double aveE2 = -1. / fit_b2;
-  int N0_1 = (int)(exp(fit_a1) * aveE1);
-  int N0_2 = (int)(exp(fit_a2) * aveE2);
-  int weight = 2; // fix, read it from the first line of the infile
-  int subsample_factor = 48230; // fix, read it from the first line of the infile
+
+
+
+  int weight = 1; // fix, read it from the first line of the infile
+  int subsample_factor = 1; // fix, read it from the first line of the infile
 
 
 
 
   if (func)
   {
-    cout << "Fit for full spectrum: y=" << exp(fit_a1) << "e^(" << fit_b1 << "x)" << endl;
-    cout << "Fit for selected spectrum: y=" << exp(fit_a2) << "e^(" << fit_b2 << "x)" << endl;
+    std::cout << "Fit for full spectrum: y=" << exp(fit_a1) << "e^(" << fit_b1 << "x)" << std::endl;
+    std::cout << "Fit for selected spectrum: y=" << exp(fit_a2) << "e^(" << fit_b2 << "x)" << std::endl;
   }
 
 
