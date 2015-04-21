@@ -4,7 +4,7 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-int is_big_endian(void)
+int is_big_endian()
 {
   union {
     uint32_t i;
