@@ -74,8 +74,10 @@ public:
   void read_header_v3(std::ifstream &);
   void decode_diag_v1_v2(std::ifstream &);
   void decode_diag_v3(std::ifstream &);
+  void decode_diag_v4(std::ifstream &);
   void decode_spec_v1_v2(std::ifstream &);
   void decode_spec_v3(std::ifstream &);
+  void decode_spec_v4(std::ifstream &);
 };
 
 Diag_data::Diag_data() {
@@ -580,6 +582,12 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
 
 }
 
+
+void Diag_data::decode_diag_v4(std::ifstream &infile) {
+  decode_diag_v3(infile);
+}
+
+
 void Diag_data::decode_spec_v1_v2(std::ifstream &infile) {
   int ntimestep = sp_step;
   std::string riga, tipo;
@@ -730,9 +738,95 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
   }
 }
 
+void Diag_data::decode_spec_v4(std::ifstream &infile) {
+  std::string riga;
+
+  std::vector<std::string> tipo(Nsp);
+  std::vector<std::string> tokens;
+
+  float time, emax, energy, dE, *spectrum, *selected_spectrum_1, *selected_spectrum_2;
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  int32_t nbin = boost::lexical_cast<int32_t>(tokens[0]);
+  int32_t contatore_bin;
+
+  selected_spectrum_1 = new float[nbin];
+  selected_spectrum_2 = new float[nbin];
+  spectrum = new float[nbin];
+
+  for (int i = 0; i < Nsp; i++)
+  {
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    tipo[i] = tokens[0];
+
+    for (int j = 0; j < nst; j++)
+    {
+      riga.clear(), std::getline(infile, riga);
+      riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+      boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+      time = boost::lexical_cast<float>(tokens[0]);
+      emax = boost::lexical_cast<float>(tokens[1]);
+      energy = emax / nbin;
+      dE = emax / nbin;
+
+      contatore_bin = 0;
+      riga.clear(), std::getline(infile, riga);
+      while (contatore_bin < nbin) {
+        riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+        boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+        for (size_t j = 0; j < tokens.size(); j++) spectrum[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+      }
+
+      contatore_bin = 0;
+      riga.clear(), std::getline(infile, riga);
+      while (contatore_bin < nbin) {
+        riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+        boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum_1[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+      }
+
+      contatore_bin = 0;
+      riga.clear(), std::getline(infile, riga);
+      while (contatore_bin < nbin) {
+        riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+        boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum_2[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+      }
+
+      std::ostringstream nomefile_out;
+      nomefile_out.str("\0");
+      nomefile_out.seekp(0, std::ios::beg);
+      nomefile_out << std::string(nomefile) << "_" << tipo[i] << "_" << time << ".txt";
+      std::ofstream outfile;
+      outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+
+
+      outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
+      outfile << "# " << Z1_i << "\t" << A1_i << "\t" << Z2_i << "\t" << A2_i << "\t" << iform << "\t" << str << std::endl;
+      outfile << "# " << xmax << "\t" << xmin << "\t" << ymax << "\t" << ymin << std::endl;
+      outfile << "# " << lam0 << "\t" << w0x << "\t" << w0y << "\t" << chann_rad << std::endl;
+      outfile << "# " << a0 << "\t" << lp_int << "\t" << lp_pow << std::endl;
+      outfile << "# " << targ_x1 << "\t" << targ_x2 << "\t" << n_over_nc << "\t" << el_lp << std::endl;
+      outfile << "# " << np1 << "\t" << lx1 << "\t" << lx3 << "\t" << np2 << "\t" << lx5 << std::endl;
+      outfile << "# " << ompe2 << "\t" << nmacro << "\t" << np_per_cell << std::endl;
+      outfile << "# " << Nx << "\t" << Ny << "\t" << Nz << "\t" << n_cell << "\t" << Nsp << "\t" << Nsb << std::endl;
+      outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
+
+      for (int ik = 0; ik < nbin; ik++) {
+        outfile << energy << "\t" << spectrum[ik] << "\t" << selected_spectrum_1[ik] << "\t" << selected_spectrum_2[ik] << std::endl;
+        energy += dE;
+      }
+
+      outfile.close();
+    }
+  }
+}
+
 int main(int argc, const char* argv[]) {
   if (argc < 3) {
-    std::cout << "Usage: ./leggi_diag filename v1/v2/v3" << std::endl;
+    std::cout << "Usage: ./leggi_diag filename v1/v2/v3/v4" << std::endl;
     exit(1);
   }
 
@@ -760,14 +854,16 @@ int main(int argc, const char* argv[]) {
   if (oDiag_data.tipofile == 'd')
   {
     if (oDiag_data.versione < 3) oDiag_data.decode_diag_v1_v2(infile);
-    else oDiag_data.decode_diag_v3(infile);
+    else if (oDiag_data.versione == 3) oDiag_data.decode_diag_v3(infile);
+    else oDiag_data.decode_diag_v4(infile);
   }
 
 
   if (oDiag_data.tipofile == 's')
   {
     if (oDiag_data.versione < 3) oDiag_data.decode_spec_v1_v2(infile);
-    else oDiag_data.decode_spec_v3(infile);
+    else if (oDiag_data.versione == 3) oDiag_data.decode_spec_v3(infile);
+    else oDiag_data.decode_spec_v4(infile);
   }
 
   infile.close();
