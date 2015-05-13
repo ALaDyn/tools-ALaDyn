@@ -11,19 +11,20 @@ then
  exit
 fi
 
-JOBFILE=eurora-64.cmd
+JOBFILE=galileo-64.cmd
+INPUTFILE=input.nml
 
 
-preplasmas=$(awk 'BEGIN{for(i=1.0;i<=2.0;i+=0.5)print i}')
+preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
 #preplasmas=0.0
 
 #densities=$(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}')
-densities=1.5
+densities=1.0
 
-ramps=$(awk 'BEGIN{for(i=0.3;i<=0.5;i+=0.1)print i}')
+ramps=$(awk 'BEGIN{for(i=0.25;i<=0.75;i+=0.25)print i}')
 #ramps=0.0
 
-centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
+centrals=$(awk 'BEGIN{for(i=5.0;i<=10.0;i+=1.0)print i}')
 #centrals=2.4
 
 #contams=$(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}')
@@ -50,7 +51,7 @@ cp ../${JOBFILE} .
 
 ALADYN_VERSION=3
 NCPU=64
-CREA_FILE_DUMP=0
+CREA_FILE_DUMP=1
 
 
 ##### nx, ny,nz
@@ -357,7 +358,6 @@ npe_yz=${NCPU}
 
 
 
- INPUTFILE=input.nml
 
  rm -f ${INPUTFILE}
  touch ${INPUTFILE}
@@ -460,7 +460,7 @@ npe_yz=${NCPU}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
 
-qsub eurora-64.cmd
+qsub $JOBFILE
 
 cd ..
 

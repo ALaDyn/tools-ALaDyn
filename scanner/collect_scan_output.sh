@@ -12,7 +12,7 @@ SPEC_DECODER=$HOME/bin/leggi_diag
 SCANNER=$HOME/bin/scan-columns
 DO_SCAN=false
 #per il seguente, copiarsi dal prepare_scan_input la riga che genera tutti i valori (in questo caso di bulk lengths scannerizzate)
-columns_values=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
+columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=1.0)print i}')
 column=4
 # 1:{PREPLASMA_LENGTH} 2:{DENSITY} 3:{RAMP_LENGTH} 4:{BULK_LENGTH} 5:{CONT_LENGTH} 
 # 6:{PROTON_MAX_ENERGY} 7:{PROTON_TOT_ENERGY} 8:{PROTON_AVE_ENERGY} 9:{PROTON_TOT_NUMBER}" 
@@ -51,7 +51,7 @@ do
  if [ -f "spec${DIAG_STEP_TO_BE_READ}.dat" ];
  then
   ${SPEC_DECODER} spec${DIAG_STEP_TO_BE_READ}.dat v4
-  aveData=($( ${EXP_FIT_SOFTWARE} -scan spec${DIAG_STEP_TO_BE_READ}.dat_${PARTICLE_TYPE}_${SPEC_TIME_TO_BE_READ}.txt  ))
+  aveData=($( ${EXP_FIT_SOFTWARE} -scan spec${DIAG_STEP_TO_BE_READ}.dat_${PARTICLE_TYPE}_${SPEC_TIME_TO_BE_READ}.*  ))
  else
   aveData[0]="-1"
   aveData[1]="-1"

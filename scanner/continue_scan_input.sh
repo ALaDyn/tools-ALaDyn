@@ -1,30 +1,29 @@
 #! /bin/bash
 
-if [ $# != 5 ]
+if [ $# != 3 ]
 then
  echo "In input devono esser passati:"
- echo "\$1 : new o restart ('0' oppure '1')"
- echo "\$2 : id file iniziale (tipo '4' per partire con *out04.*, ad esempio)"
- echo "\$3 : t_finale (tipo '10.0')"
- echo "\$4 : numero output completi (tipo '2')"
- echo "\$5 : numero output ridotti (tipo '20')"
+ echo "\$1 : t_finale (tipo '10.0')"
+ echo "\$2 : numero output completi (tipo '2')"
+ echo "\$3 : numero output ridotti (tipo '20')"
  exit
 fi
 
-JOBFILE=eurora-64.cmd
-PREVIOUS_STEP=0
+JOBFILE=galileo-64.cmd
+PREVIOUS_STEP=5
 INPUTFILE=input.nml
 
-preplasmas=$(awk 'BEGIN{for(i=1.0;i<=2.0;i+=0.5)print i}')
+preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
 #preplasmas=0.0
 
 #densities=$(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}')
-densities=1.5
+densities=1.0
 
-ramps=$(awk 'BEGIN{for(i=0.3;i<=0.5;i+=0.1)print i}')
+ramps=$(awk 'BEGIN{for(i=0.25;i<=0.75;i+=0.25)print i}')
 #ramps=0.0
 
-centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
+#centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
+centrals=$(awk 'BEGIN{for(i=5.0;i<=10.0;i+=1.0)print i}')
 #centrals=2.4
 
 #contams=$(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}')
@@ -49,7 +48,7 @@ cd pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
 
 ALADYN_VERSION=3
 NCPU=64
-CREA_FILE_DUMP=0
+CREA_FILE_DUMP=1
 
 
 ##### nx, ny,nz
@@ -332,8 +331,8 @@ wi_time=${MW_START_TIME}
 wf_time=${MW_END_TIME}
 w_speed=${MW_SPEED}
 
-nouts=$4
-iene=$5
+nouts=$2
+iene=$3
 nvout=${NUMERO_OUTPUT_CAMPI}
 nden=${NUMERO_OUTPUT_DENSITA_GRIGLIA}
 npout=${NUMERO_OUTPUT_SPAZIOFASI_PARTICELLE}
@@ -346,11 +345,11 @@ xp0_out=${X0_TAGLIO_OUTPUT}
 xp1_out=${X1_TAGLIO_OUTPUT}
 yp_out=${SEMILATO_BASE_TAGLIO_OUTPUT}
 
-tmax=$3
+tmax=$1
 cfl=${COURANT_FRIEDRICHS_LEWY_PARAMETER}
 
-new_sim=$1
-id_new=$2
+new_sim=1
+id_new=${PREVIOUS_STEP}
 dump=${CREA_FILE_DUMP}
 npe_yz=${NCPU}
 
@@ -463,7 +462,7 @@ npe_yz=${NCPU}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
 
-qsub eurora-64.cmd
+qsub $JOBFILE
 
 cd ..
 
