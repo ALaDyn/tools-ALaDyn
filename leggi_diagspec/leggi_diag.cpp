@@ -28,7 +28,7 @@ public:
   double lam0, w0x, w0y, chann_rad;
   double a0, lp_int, lp_pow;
   double targ_x1, targ_x2, n_over_nc, el_lp;
-  double np1, lx1, lx3, np2, lx5;
+  double np1, np2, lx1, lx2, lx3, lx4, lx5;
   double ompe2, nmacro, np_over_nmacro, np_per_cell;
   int32_t Nx, Ny, Nz, n_cell, Nsp, Nsb;
   int32_t iter, nst, sp_step, nvar, npvar;
@@ -70,8 +70,10 @@ public:
 
   void print_debug_v1_v2();
   void print_debug_v3();
+  void print_debug_v4();
   void read_header_v1_v2(std::ifstream &);
   void read_header_v3(std::ifstream &);
+  void read_header_v4(std::ifstream &);
   void decode_diag_v1_v2(std::ifstream &);
   void decode_diag_v3(std::ifstream &);
   void decode_diag_v4(std::ifstream &);
@@ -186,6 +188,19 @@ void Diag_data::print_debug_v3() {
   std::cout << a0 << "\t" << lp_int << "\t" << lp_pow << std::endl;
   std::cout << targ_x1 << "\t" << targ_x2 << "\t" << n_over_nc << "\t" << el_lp << std::endl;
   std::cout << np1 << "\t" << lx1 << "\t" << lx3 << "\t" << np2 << "\t" << lx5 << std::endl;
+  std::cout << ompe2 << "\t" << nmacro << "\t" << np_per_cell << std::endl;
+  std::cout << Nx << "\t" << Ny << "\t" << Nz << "\t" << n_cell << "\t" << Nsp << "\t" << Nsb << std::endl;
+  std::cout << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
+}
+
+void Diag_data::print_debug_v4() {
+  std::cout << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
+  std::cout << Z1_i << "\t" << A1_i << "\t" << Z2_i << "\t" << A2_i << "\t" << iform << "\t" << str << std::endl;
+  std::cout << xmax << "\t" << xmin << "\t" << ymax << "\t" << ymin << std::endl;
+  std::cout << lam0 << "\t" << w0x << "\t" << w0y << "\t" << chann_rad << std::endl;
+  std::cout << a0 << "\t" << lp_int << "\t" << lp_pow << std::endl;
+  std::cout << targ_x1 << "\t" << targ_x2 << "\t" << n_over_nc << "\t" << el_lp << std::endl;
+  std::cout << lx1 << "\t" << lx2 << "\t" << lx3 << "\t" << lx4 << "\t" << lx5 << std::endl;
   std::cout << ompe2 << "\t" << nmacro << "\t" << np_per_cell << std::endl;
   std::cout << Nx << "\t" << Ny << "\t" << Nz << "\t" << n_cell << "\t" << Nsp << "\t" << Nsb << std::endl;
   std::cout << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
@@ -346,6 +361,94 @@ void Diag_data::read_header_v3(std::ifstream &infile) {
   lx1 = boost::lexical_cast<double>(tokens[1]);
   lx3 = boost::lexical_cast<double>(tokens[2]);
   np2 = boost::lexical_cast<double>(tokens[3]);
+  lx5 = boost::lexical_cast<double>(tokens[4]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  ompe2 = boost::lexical_cast<double>(tokens[0]);
+  nmacro = boost::lexical_cast<double>(tokens[1]);
+  np_per_cell = boost::lexical_cast<double>(tokens[2]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  Nx = boost::lexical_cast<int32_t>(tokens[0]);
+  Ny = boost::lexical_cast<int32_t>(tokens[1]);
+  Nz = boost::lexical_cast<int32_t>(tokens[2]);
+  n_cell = boost::lexical_cast<int32_t>(tokens[3]);
+  Nsp = boost::lexical_cast<int32_t>(tokens[4]);
+  Nsb = boost::lexical_cast<int32_t>(tokens[5]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  iter = boost::lexical_cast<int32_t>(tokens[0]);
+  nst = boost::lexical_cast<int32_t>(tokens[1]);
+  nvar = boost::lexical_cast<int32_t>(tokens[2]);
+  npvar = boost::lexical_cast<int32_t>(tokens[3]);
+}
+
+void Diag_data::read_header_v4(std::ifstream &infile) {
+  std::string riga;
+  std::vector<std::string> tokens;
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  mod_id = boost::lexical_cast<int32_t>(tokens[0]);
+  dmodel_id = boost::lexical_cast<int32_t>(tokens[1]);
+  LP_ord = boost::lexical_cast<int32_t>(tokens[2]);
+  der_ord = boost::lexical_cast<int32_t>(tokens[3]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  Z1_i = boost::lexical_cast<int32_t>(tokens[0]);
+  A1_i = boost::lexical_cast<int32_t>(tokens[1]);
+  Z2_i = boost::lexical_cast<int32_t>(tokens[2]);
+  A2_i = boost::lexical_cast<int32_t>(tokens[3]);
+  iform = boost::lexical_cast<int32_t>(tokens[4]);
+  str = boost::lexical_cast<int32_t>(tokens[5]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  xmax = boost::lexical_cast<double>(tokens[0]);
+  xmin = boost::lexical_cast<double>(tokens[1]);
+  ymax = boost::lexical_cast<double>(tokens[2]);
+  ymin = boost::lexical_cast<double>(tokens[3]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  lam0 = boost::lexical_cast<double>(tokens[0]);
+  w0x = boost::lexical_cast<double>(tokens[1]);
+  w0y = boost::lexical_cast<double>(tokens[2]);
+  chann_rad = boost::lexical_cast<double>(tokens[3]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  a0 = boost::lexical_cast<double>(tokens[0]);
+  lp_int = boost::lexical_cast<double>(tokens[1]);
+  lp_pow = boost::lexical_cast<double>(tokens[2]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  targ_x1 = boost::lexical_cast<double>(tokens[0]);
+  targ_x2 = boost::lexical_cast<double>(tokens[1]);
+  n_over_nc = boost::lexical_cast<double>(tokens[2]);
+  el_lp = boost::lexical_cast<double>(tokens[3]);
+
+  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  lx1 = boost::lexical_cast<double>(tokens[0]);
+  lx2 = boost::lexical_cast<double>(tokens[1]);
+  lx3 = boost::lexical_cast<double>(tokens[2]);
+  lx4 = boost::lexical_cast<double>(tokens[3]);
   lx5 = boost::lexical_cast<double>(tokens[4]);
 
   riga.clear(), std::getline(infile, riga);
@@ -847,7 +950,8 @@ int main(int argc, const char* argv[]) {
   if (oDiag_data.tipofile != 's' && oDiag_data.tipofile != 'd')  std::cout << "File non riconosciuto" << std::endl;
 
   if (oDiag_data.versione < 3) oDiag_data.read_header_v1_v2(infile);
-  else oDiag_data.read_header_v3(infile);
+  else if (oDiag_data.versione == 3) oDiag_data.read_header_v3(infile);
+  else oDiag_data.read_header_v4(infile);
 
   oDiag_data.allocate_arrays();
 
