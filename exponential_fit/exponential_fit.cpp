@@ -22,7 +22,6 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-#define LUNGHEZZA_MAX_RIGA 1024
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -58,11 +57,12 @@ int main(int argc, char* argv[])
     std::cerr << "-scan to write on the output, on a single line and without the newline at the end, just the mean energy and the total number of particles (fitting parameters)" << std::endl;
     std::cerr << "-func to write on the output the fitting functions" << std::endl;
     std::cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curves" << std::endl;
+    std::cerr << "-piccante to read spectra made by piccante" << std::endl;
     std::cerr << "\nIn all cases, this program works best using output redirection" << std::endl;
     exit(1);
   }
 
-  bool scan = false, func = false, gnuplot = false;
+  bool scan = false, func = false, gnuplot = false, piccante = false;
   int inputfile_position = 0;
 
   for (int i = 1; i < argc; i++)
@@ -84,12 +84,14 @@ int main(int argc, char* argv[])
     {
       func = true;
     }
+    else if (std::string(argv[i]) == "-piccante")
+    {
+      piccante = true;
+    }
     else
     {
       inputfile_position = i;
     }
-
-
   }
 
   if (inputfile_position < 1)
@@ -113,14 +115,10 @@ int main(int argc, char* argv[])
   }
 
 
-  char * riga_letta;
-  riga_letta = new char[LUNGHEZZA_MAX_RIGA];
-
   while (true)
   {
-    infile.getline(riga_letta, LUNGHEZZA_MAX_RIGA);
+    std::getline(infile, riga);
     if (infile.eof()) break;
-    riga = riga_letta;
     std::size_t found;
     found = riga.find("#");
     if ((found == std::string::npos || found > 1) && !infile.eof())
@@ -130,15 +128,29 @@ int main(int argc, char* argv[])
   infile.close();
 
   double * energies = new double[righe.size()];
+  double min_energy, max_energy;
   double * particles = new double[righe.size()];
   double * particles_front = new double[righe.size()];
   double * particles_rear = new double[righe.size()];
   std::stringstream ss;
 
-  for (unsigned int it = 0; it < righe.size(); it++)
+  if (piccante)
   {
-    std::stringstream ss(righe.at(it));
-    ss >> energies[it] >> particles[it] >> particles_front[it] >> particles_rear[it];
+    for (unsigned int it = 0; it < righe.size(); it++)
+    {
+      std::stringstream ss(righe.at(it));
+      ss >> min_energy >> max_energy >> particles[it];
+      energies[it] = 0.5*(min_energy + max_energy);
+      particles_front[it] = particles_rear[it] = 0.0;
+    }
+  }
+  else
+  {
+    for (unsigned int it = 0; it < righe.size(); it++)
+    {
+      std::stringstream ss(righe.at(it));
+      ss >> energies[it] >> particles[it] >> particles_front[it] >> particles_rear[it];
+    }
   }
 
 
@@ -180,7 +192,7 @@ int main(int argc, char* argv[])
     sum_flogf += f*logf;
     sum_xf += x*f;
     sum_xflogf += x*f*logf;
-    
+
     sum_r += r;
     sum_r2 += r*r;
     sum_logr += logr;
@@ -221,8 +233,8 @@ int main(int argc, char* argv[])
   }
 
 
-  int weight = 1; // fix, read it from the first line of the infile
-  int subsample_factor = 1; // fix, read it from the first line of the infile
+  int weight = 1; // fix, read it from the infile
+  int subsample_factor = 1; // fix, read it from the infile
 
 
   if (func)
