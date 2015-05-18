@@ -118,6 +118,8 @@ int main(int argc, char* argv[])
     exit(3);
   }
 
+  if (!piccante) mass = 1.0;
+
   std::string riga;
   std::vector<std::string> righe;
 
@@ -157,9 +159,8 @@ int main(int argc, char* argv[])
       ss >> min_energy >> max_energy >> particles[it];
       energies[it] = 0.5*(min_energy + max_energy);
       particles_front[it] = particles_rear[it] = 0.0;
-      tot_energy += particles[it] * energies[it] * mass * MEV_TO_JOULE;
+      tot_energy += particles[it] * energies[it];
     }
-    max_energy = energies[righe.size() - 1] * mass;
   }
   else
   {
@@ -167,13 +168,16 @@ int main(int argc, char* argv[])
     {
       std::stringstream ss(righe.at(it));
       ss >> energies[it] >> particles[it] >> particles_front[it] >> particles_rear[it];
-      tot_energy += particles[it] * energies[it] * MEV_TO_JOULE;
-      tot_energy_front += particles_front[it] * energies[it] * MEV_TO_JOULE;
-      tot_energy_rear += particles_rear[it] * energies[it] * MEV_TO_JOULE;
+      tot_energy += particles[it] * energies[it];
+      tot_energy_front += particles_front[it] * energies[it];
+      tot_energy_rear += particles_rear[it] * energies[it];
     }
-    max_energy = energies[righe.size() - 1];
   }
 
+  max_energy = energies[righe.size() - 1] * mass;
+  tot_energy *= mass * MEV_TO_JOULE;
+  tot_energy_front *= mass * MEV_TO_JOULE;
+  tot_energy_rear *= mass * MEV_TO_JOULE;
 
   double sum_x = 0., sum_x2 = 0.;
   double sum_y = 0., sum_y2 = 0., sum_logy = 0., sum_x2y = 0., sum_ylogy = 0., sum_xy = 0., sum_xylogy = 0.;
