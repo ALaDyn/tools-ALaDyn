@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
   infile.close();
 
   double * energies = new double[righe.size()];
-  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0, max_energy;
+  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0;
   double * particles = new double[righe.size()];
   double * particles_front = new double[righe.size()];
   double * particles_rear = new double[righe.size()];
