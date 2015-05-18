@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
 
   if (scan)
   {
-    printf(" \t %3.2f \t %i \t %3.2f \t %i \t %3.2f \t %i \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3);
+    printf(" \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %i \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3);
   }
 
 
