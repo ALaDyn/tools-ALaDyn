@@ -24,6 +24,7 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
+#define MEV_TO_JOULE 1.602176565E-13
 
 #define SKIP_INIZIALE  (1./5.)    // skip the first one fifth of the data
 #define SKIP_FINALE    (4./5.)    // skip the last fifth of the data, since they do not fit very well into an exponential
@@ -57,13 +58,14 @@ int main(int argc, char* argv[])
     std::cerr << "-scan to write on the output, on a single line and without the newline at the end, just the mean energy and the total number of particles (fitting parameters)" << std::endl;
     std::cerr << "-func to write on the output the fitting functions" << std::endl;
     std::cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curves" << std::endl;
-    std::cerr << "-piccante to read spectra made by piccante" << std::endl;
+    std::cerr << "-piccante to read spectra made by piccante [in this case a -mass with the particle mass in MeV following is MANDATORY]" << std::endl;
     std::cerr << "\nIn all cases, this program works best using output redirection" << std::endl;
     exit(1);
   }
 
   bool scan = false, func = false, gnuplot = false, piccante = false;
   int inputfile_position = 0;
+  double mass = -1.0;
 
   for (int i = 1; i < argc; i++)
     /************************************************************************
@@ -88,6 +90,11 @@ int main(int argc, char* argv[])
     {
       piccante = true;
     }
+    else if (std::string(argv[i]) == "-mass")
+    {
+      mass = atof(argv[i + 1]);
+      i++;
+    }
     else
     {
       inputfile_position = i;
@@ -103,6 +110,14 @@ int main(int argc, char* argv[])
     exit(2);
   }
 
+  if (piccante && mass <= 0)
+  {
+    std::cerr << "With piccante mode, you must give a particle mass in MeV/c^2 in order to calculate the total energy." << std::endl;
+    std::cerr << "Please use -mass 1.0 and then disregard the total energy if not required" << std::endl;
+    std::cerr << "Useful masses: proton=938.272013, electron=0.51099891" << std::endl;
+    exit(3);
+  }
+
   std::string riga;
   std::vector<std::string> righe;
 
@@ -111,7 +126,7 @@ int main(int argc, char* argv[])
   if (!infile.is_open())
   {
     std::cerr << "Unable to open input file " << argv[inputfile_position] << "!" << std::endl;
-    exit(3);
+    exit(4);
   }
 
 
@@ -128,7 +143,7 @@ int main(int argc, char* argv[])
   infile.close();
 
   double * energies = new double[righe.size()];
-  double min_energy, max_energy;
+  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0;
   double * particles = new double[righe.size()];
   double * particles_front = new double[righe.size()];
   double * particles_rear = new double[righe.size()];
@@ -142,6 +157,7 @@ int main(int argc, char* argv[])
       ss >> min_energy >> max_energy >> particles[it];
       energies[it] = 0.5*(min_energy + max_energy);
       particles_front[it] = particles_rear[it] = 0.0;
+      tot_energy += particles[it] * energies[it] * mass * MEV_TO_JOULE;
     }
   }
   else
@@ -150,6 +166,9 @@ int main(int argc, char* argv[])
     {
       std::stringstream ss(righe.at(it));
       ss >> energies[it] >> particles[it] >> particles_front[it] >> particles_rear[it];
+      tot_energy += particles[it] * energies[it] * MEV_TO_JOULE;
+      tot_energy_front += particles_front[it] * energies[it] * MEV_TO_JOULE;
+      tot_energy_rear += particles_rear[it] * energies[it] * MEV_TO_JOULE;
     }
   }
 
@@ -296,7 +315,7 @@ int main(int argc, char* argv[])
 
   if (scan)
   {
-    printf(" \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %i \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3);
+    printf(" \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %3.2g \t %3.2g \t %3.2g \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3, energies[righe.size() - 1], tot_energy, tot_energy_front, tot_energy_rear);
   }
 
 
