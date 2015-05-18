@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
   infile.close();
 
   double * energies = new double[righe.size()];
-  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0;
+  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0, max_energy;
   double * particles = new double[righe.size()];
   double * particles_front = new double[righe.size()];
   double * particles_rear = new double[righe.size()];
@@ -159,6 +159,7 @@ int main(int argc, char* argv[])
       particles_front[it] = particles_rear[it] = 0.0;
       tot_energy += particles[it] * energies[it] * mass * MEV_TO_JOULE;
     }
+    max_energy = energies[righe.size() - 1] * mass;
   }
   else
   {
@@ -170,6 +171,7 @@ int main(int argc, char* argv[])
       tot_energy_front += particles_front[it] * energies[it] * MEV_TO_JOULE;
       tot_energy_rear += particles_rear[it] * energies[it] * MEV_TO_JOULE;
     }
+    max_energy = energies[righe.size() - 1];
   }
 
 
@@ -315,7 +317,7 @@ int main(int argc, char* argv[])
 
   if (scan)
   {
-    printf(" \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %3.2g \t %3.2g \t %3.2g \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3, energies[righe.size() - 1], tot_energy, tot_energy_front, tot_energy_rear);
+    printf(" \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %3.2g \t %3.2g \t %3.2g \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3, max_energy, tot_energy, tot_energy_front, tot_energy_rear);
   }
 
 
