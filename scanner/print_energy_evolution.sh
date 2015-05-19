@@ -114,13 +114,14 @@ do
    printf "c=10/3\n" >> ${GNUPLOT_FILE}
    printf "set terminal ${IMAGE_TYPE} truecolor enhanced size ${SIZEX},${SIZEY}\n" >> ${GNUPLOT_FILE}
    printf "set output FILE_OUT\n" >> ${GNUPLOT_FILE}
-   printf "set title 'el\_pre\_%s\_ramp\_%s\_den\_%s\_bulk\_%s\_cont\_%s.png'\n" "${PREPLASMA_LENGTH}" "${RAMP_LENGTH}" "${DENSITY}" "${BULK_LENGTH}" "${CONT_LENGTH}" >> ${GNUPLOT_FILE}
+   printf "set title 'pre\_%s\_ramp\_%s\_den\_%s\_bulk\_%s\_cont\_%s.png'\n" "${PREPLASMA_LENGTH}" "${RAMP_LENGTH}" "${DENSITY}" "${BULK_LENGTH}" "${CONT_LENGTH}" >> ${GNUPLOT_FILE}
   # printf "set xrange[22:29]\n" >> ${GNUPLOT_FILE}
   # printf "set yrange[-nc*1.1:nc*1.1]\n" >> ${GNUPLOT_FILE}
    printf "set xlabel 't (fs)'\n" >> ${GNUPLOT_FILE}
    printf "set ylabel 'E_{max} (MeV)'\n" >> ${GNUPLOT_FILE}
-   printf "set y2label 'E_{tot} (uJ)'\n" >> ${GNUPLOT_FILE}
+   printf "set y2label 'E/E_{tot}'\n" >> ${GNUPLOT_FILE}
    printf "set y2range[0:100]\n" >> ${GNUPLOT_FILE}
+   printf "set format y2 '%%g %%%%'\n" >> ${GNUPLOT_FILE}
    printf "set key top left\n" >> ${GNUPLOT_FILE}
   # printf "set format y2 '%.4f'\n" >> ${GNUPLOT_FILE}
   # printf "set format y2 '%.0s 10^{%T}'\n" >> ${GNUPLOT_FILE}
@@ -150,7 +151,7 @@ do
    printf "c=10/3\n" >> ${GNUPLOT_FILE}
    printf "set terminal ${IMAGE_TYPE} truecolor enhanced size ${SIZEX},${SIZEY}\n" >> ${GNUPLOT_FILE}
    printf "set output FILE_OUT\n" >> ${GNUPLOT_FILE}
-   printf "set title 'el\_pre\_%s\_ramp\_%s\_den\_%s\_bulk\_%s\_cont\_%s.png'\n" "${PREPLASMA_LENGTH}" "${RAMP_LENGTH}" "${DENSITY}" "${BULK_LENGTH}" "${CONT_LENGTH}" >> ${GNUPLOT_FILE}
+   printf "set title 'pre\_%s\_ramp\_%s\_den\_%s\_bulk\_%s\_cont\_%s.png'\n" "${PREPLASMA_LENGTH}" "${RAMP_LENGTH}" "${DENSITY}" "${BULK_LENGTH}" "${CONT_LENGTH}" >> ${GNUPLOT_FILE}
   # printf "set xrange[22:29]\n" >> ${GNUPLOT_FILE}
   # printf "set yrange[-nc*1.1:nc*1.1]\n" >> ${GNUPLOT_FILE}
    printf "set xlabel 't (fs)'\n" >> ${GNUPLOT_FILE}
