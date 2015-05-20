@@ -321,7 +321,8 @@ int main(int argc, char* argv[])
 
   if (scan)
   {
-    printf(" \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %i \t %3.2g \t %3.2g \t %3.2g \t %3.2g \t ", aveE1, N0_1, aveE2, N0_2, aveE3, N0_3, max_energy, tot_energy, tot_energy_front, tot_energy_rear);
+    printf(" \t %g  \t  %g \t  %g  \t  %g \t  %g  \t  %g \t   %g     \t   %g     \t       %g       \t     %g       \t ",
+               aveE1,  N0_1,  aveE2,  N0_2,  aveE3,  N0_3, max_energy, tot_energy, tot_energy_front, tot_energy_rear);
   }
 
 
