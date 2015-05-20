@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
   double fit_a3 = 0.0, fit_b3 = 0.0;
   double denom_1 = 0.0, denom_2 = 0.0, denom_3 = 0.0;
   double aveE1 = 0.0, aveE2 = 0.0, aveE3 = 0.0;
-  int N0_1 = 0, N0_2 = 0, N0_3 = 0;
+  double N0_1 = 0, N0_2 = 0, N0_3 = 0;
 
   denom_1 = (sum_y*sum_x2y - sum_xy*sum_xy);
   denom_2 = (sum_f*sum_x2f - sum_xf*sum_xf);
@@ -248,24 +248,20 @@ int main(int argc, char* argv[])
     fit_a1 = (sum_x2y*sum_ylogy - sum_xy*sum_xylogy) / denom_1;
     fit_b1 = (sum_y*sum_xylogy - sum_xy*sum_ylogy) / denom_1;
     aveE1 = -1. / fit_b1;
-    N0_1 = (int)(exp(fit_a1) * aveE1);
+    N0_1 = (exp(fit_a1) * aveE1 * nmacro_to_nphys);
   }
   if (!AreSame(denom_2, 0.0)) {
     fit_a2 = (sum_x2f*sum_flogf - sum_xf*sum_xflogf) / denom_2;
     fit_b2 = (sum_f*sum_xflogf - sum_xf*sum_flogf) / denom_2;
     aveE2 = -1. / fit_b2;
-    N0_2 = (int)(exp(fit_a2) * aveE2);
+    N0_2 = (exp(fit_a2) * aveE2 * nmacro_to_nphys);
   }
   if (!AreSame(denom_3, 0.0)) {
     fit_a3 = (sum_x2r*sum_rlogr - sum_xr*sum_xrlogr) / denom_3;
     fit_b3 = (sum_r*sum_xrlogr - sum_xr*sum_rlogr) / denom_3;
     aveE3 = -1. / fit_b3;
-    N0_3 = (int)(exp(fit_a3) * aveE3);
+    N0_3 = (exp(fit_a3) * aveE3 * nmacro_to_nphys);
   }
-
-
-  int weight = 1; // fix, read it from the infile
-  int subsample_factor = 1; // fix, read it from the infile
 
 
   if (func)
@@ -295,11 +291,9 @@ int main(int argc, char* argv[])
     fprintf(outfile, "AVERAGE_E1 = %3.2f\n", aveE1);
     fprintf(outfile, "AVERAGE_E2 = %3.2f\n", aveE2);
     fprintf(outfile, "AVERAGE_E3 = %3.2f\n", aveE3);
-    fprintf(outfile, "WEIGHT = %i\n", weight);
-    fprintf(outfile, "SUBSAMPLE = %i\n", subsample_factor);
-    fprintf(outfile, "N0_1 = %i*WEIGHT*SUBSAMPLE\n", N0_1);
-    fprintf(outfile, "N0_2 = %i*WEIGHT*SUBSAMPLE\n", N0_2);
-    fprintf(outfile, "N0_3 = %i*WEIGHT*SUBSAMPLE\n", N0_3);
+    fprintf(outfile, "N0_1 = %i\n", N0_1);
+    fprintf(outfile, "N0_2 = %i\n", N0_2);
+    fprintf(outfile, "N0_3 = %i\n", N0_3);
     fprintf(outfile, "f(x) = (N0_1 / AVERAGE_E1)*exp(-x / AVERAGE_E1)\n");
     fprintf(outfile, "g(x) = (N0_2 / AVERAGE_E2)*exp(-x / AVERAGE_E2)\n");
     fprintf(outfile, "h(x) = (N0_3 / AVERAGE_E3)*exp(-x / AVERAGE_E3)\n");
@@ -308,11 +302,11 @@ int main(int argc, char* argv[])
     fprintf(outfile, "set format y '10^{%%L}'\n");
     //  fprintf(outfile, "set xrange[%i:%i]\n", Emin, Emax);
     fprintf(outfile, "set logscale y\n");
-    fprintf(outfile, "plot FILE_IN u 1:($2*%i*%i) w histeps lt 1 lc rgb 'blue' lw 3 t 'full spectrum',\\", weight, subsample_factor);
+    fprintf(outfile, "plot FILE_IN u 1:($2*%g) w histeps lt 1 lc rgb 'blue' lw 3 t 'full spectrum',\\", nmacro_to_nphys);
     fprintf(outfile, "\n");
-    fprintf(outfile, "FILE_IN u 1:($3*%i*%i) w histeps lt 1 lc rgb 'red' lw 3 t 'front spectrum',\\", weight, subsample_factor);
+    fprintf(outfile, "FILE_IN u 1:($3*%g) w histeps lt 1 lc rgb 'red' lw 3 t 'front spectrum',\\", nmacro_to_nphys);
     fprintf(outfile, "\n");
-    fprintf(outfile, "FILE_IN u 1:($4*%i*%i) w histeps lt 1 lc rgb 'cyan' lw 3 t 'rear spectrum',\\", weight, subsample_factor);
+    fprintf(outfile, "FILE_IN u 1:($4*%g) w histeps lt 1 lc rgb 'cyan' lw 3 t 'rear spectrum',\\", nmacro_to_nphys);
     fprintf(outfile, "\n");
     fprintf(outfile, "f(x) w lines lt 1 lc rgb 'purple' lw 3 t 'exponential fit E_01 = %1.1f MeV',\\", aveE1);
     fprintf(outfile, "\n");
