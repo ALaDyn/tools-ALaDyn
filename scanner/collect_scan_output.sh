@@ -2,10 +2,8 @@
 module load gnu/4.9.2
 SIM_HEADER="pre_"
 
-#PARTICLE_TYPE='A1-Z1 Ions'
-#PARTICLE_TYPE='A2-Z2 Ions'
-#PARTICLE_TYPE='Hion'
-PARTICLE_TYPE='Electron'
+PARTICLE_TYPE="Hion"
+#PARTICLE_TYPE="Electron"
 EXP_FIT_SOFTWARE=$HOME/bin/exponential_fit
 SPEC_DECODER=$HOME/bin/leggi_diag
 
@@ -32,23 +30,18 @@ NPHYS_OVER_NMACRO=696800
 SIMULATION_FOLDERS=($(find . -name "${SIM_HEADER}*" -type d))
 
 
-#if [ ${PARTICLE_TYPE} == 'Electrons' ]
-#then
-# COLUMN_MAX_ENERGY=3
-# COLUMN_TOT_ENERGY=2
-#elif [ ${PARTICLE_TYPE} == 'Hion' ]
-# COLUMN_MAX_ENERGY=7
-# COLUMN_TOT_ENERGY=6
-#elif [ ${PARTICLE_TYPE} == 'A1-Z1 Ions' ]
-# COLUMN_MAX_ENERGY=5
-# COLUMN_TOT_ENERGY=4
-#elif [ ${PARTICLE_TYPE} == 'A2-Z2 Ions' ]
-# COLUMN_MAX_ENERGY=7
-# COLUMN_TOT_ENERGY=6
-#else
-# echo "Unrecognized particle type"
-# exit
-#fi
+if [ ${PARTICLE_TYPE} == "Electron" ]
+then
+ COLUMN_MAX_ENERGY=3
+ COLUMN_TOT_ENERGY=2
+elif [ ${PARTICLE_TYPE} == "Hion" ]
+then
+ COLUMN_MAX_ENERGY=7
+ COLUMN_TOT_ENERGY=6
+else
+ echo "Unrecognized particle type"
+ exit
+fi
 
 rm -f ${OUTPUT_FILE}
 touch ${OUTPUT_FILE}
@@ -64,15 +57,15 @@ do
  CONT_LENGTH=($(echo $sim | awk -F'_' '{print $10}'))
  cd $sim
 
-# if [ -f "diag${DIAG_STEP_TO_BE_READ}.dat" ];
-# then
-#  ${SPEC_DECODER} diag${DIAG_STEP_TO_BE_READ}.dat v${DIAG_VERSION}
-#  MAX_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $${COLUMN_MAX_ENERGY}}'))
-#  TOT_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $${COLUMN_TOT_ENERGY}}'))
-# else
-#  MAX_ENERGY="-1"
-#  TOT_ENERGY="-1"
-# fi
+ if [ -f "diag${DIAG_STEP_TO_BE_READ}.dat" ];
+ then
+  ${SPEC_DECODER} diag${DIAG_STEP_TO_BE_READ}.dat v${DIAG_VERSION}
+  DIAG_MAX_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $'${COLUMN_MAX_ENERGY}'}'))
+  DIAG_TOT_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $'${COLUMN_TOT_ENERGY}'}'))
+ else
+  DIAG_MAX_ENERGY="-1"
+  DIAG_TOT_ENERGY="-1"
+ fi
 
  if [ -f "spec${DIAG_STEP_TO_BE_READ}.dat" ];
  then
@@ -103,7 +96,7 @@ do
  REAR_TOT_ENERGY_INTEGRATED_SPECTRUM=${aveData[9]}
 
  cd ..
- printf '%.1f;%.1f;%.1f;%.1f;%.2f;%g;%g;%g;%g;%g;%g;%g;%g;%g;%g;%g' "${PREPLASMA_LENGTH}" "${DENSITY}" "${RAMP_LENGTH}" "${BULK_LENGTH}" "${CONT_LENGTH}" "${MAX_ENERGY}" "${TOT_ENERGY}" "${TOT_ENERGY_INTEGRATED_SPECTRUM}" "${FRONT_TOT_ENERGY_INTEGRATED_SPECTRUM}" "${REAR_TOT_ENERGY_INTEGRATED_SPECTRUM}" "${AVE_ENERGY}" "${TOT_NUMBER}" "${FRONT_AVE_ENERGY}" "${FRONT_TOT_NUMBER}" "${REAR_AVE_ENERGY}" "${REAR_TOT_NUMBER}" >> ${OUTPUT_FILE}
+ printf '%.1f;%.1f;%.1f;%.1f;%.2f;%g;%g;%g;%g;%g;%g;%g;%g;%g;%g;%g;%g;%g' "${PREPLASMA_LENGTH}" "${DENSITY}" "${RAMP_LENGTH}" "${BULK_LENGTH}" "${CONT_LENGTH}" "${MAX_ENERGY}" "${TOT_ENERGY}" "${TOT_ENERGY_INTEGRATED_SPECTRUM}" "${FRONT_TOT_ENERGY_INTEGRATED_SPECTRUM}" "${REAR_TOT_ENERGY_INTEGRATED_SPECTRUM}" "${AVE_ENERGY}" "${TOT_NUMBER}" "${FRONT_AVE_ENERGY}" "${FRONT_TOT_NUMBER}" "${REAR_AVE_ENERGY}" "${REAR_TOT_NUMBER}" "${DIAG_MAX_ENERGY}" "${DIAG_TOT_ENERGY}" >> ${OUTPUT_FILE}
  printf '\n'  >> ${OUTPUT_FILE}
 
 done
