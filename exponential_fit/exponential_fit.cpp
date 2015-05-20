@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
   bool scan = false, func = false, gnuplot = false, piccante = false;
   int inputfile_position = 0;
   double mass = -1.0;
+  double nmacro_to_nphys = 1.0;
 
   for (int i = 1; i < argc; i++)
     /************************************************************************
@@ -93,6 +94,11 @@ int main(int argc, char* argv[])
     else if (std::string(argv[i]) == "-mass")
     {
       mass = atof(argv[i + 1]);
+      i++;
+    }
+    else if (std::string(argv[i]) == "-nm")
+    {
+      nmacro_to_nphys = atof(argv[i + 1]);
       i++;
     }
     else
@@ -145,7 +151,7 @@ int main(int argc, char* argv[])
   infile.close();
 
   double * energies = new double[righe.size()];
-  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0, max_energy;
+  double min_energy, max_energy, tot_energy = 0.0, tot_energy_front = 0.0, tot_energy_rear = 0.0;
   double * particles = new double[righe.size()];
   double * particles_front = new double[righe.size()];
   double * particles_rear = new double[righe.size()];
@@ -175,9 +181,9 @@ int main(int argc, char* argv[])
   }
 
   max_energy = energies[righe.size() - 1] * mass;
-  tot_energy *= mass * MEV_TO_JOULE;
-  tot_energy_front *= mass * MEV_TO_JOULE;
-  tot_energy_rear *= mass * MEV_TO_JOULE;
+  tot_energy *= mass * nmacro_to_nphys * MEV_TO_JOULE;
+  tot_energy_front *= mass * nmacro_to_nphys * MEV_TO_JOULE;
+  tot_energy_rear *= mass * nmacro_to_nphys * MEV_TO_JOULE;
 
   double sum_x = 0., sum_x2 = 0.;
   double sum_y = 0., sum_y2 = 0., sum_logy = 0., sum_x2y = 0., sum_ylogy = 0., sum_xy = 0., sum_xylogy = 0.;
