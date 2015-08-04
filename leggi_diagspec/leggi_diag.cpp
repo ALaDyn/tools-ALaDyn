@@ -606,9 +606,15 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
       Ex2[j] = boost::lexical_cast<float>(tokens[0]);
       Ey2[j] = boost::lexical_cast<float>(tokens[1]);
+      Ez2[j] = 0.0;
+      Bx2[j] = 0.0;
+      By2[j] = 0.0;
       Bz2[j] = boost::lexical_cast<float>(tokens[2]);
       Ex_max[j] = boost::lexical_cast<float>(tokens[3]);
       Ey_max[j] = boost::lexical_cast<float>(tokens[4]);
+      Ez_max[j] = 0.0;
+      Bx_max[j] = 0.0;
+      By_max[j] = 0.0;
       Bz_max[j] = boost::lexical_cast<float>(tokens[5]);
     }
   }
@@ -653,12 +659,16 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
       By2_on_solid_target[j] = boost::lexical_cast<float>(tokens[4]);
       Bz2_on_solid_target[j] = boost::lexical_cast<float>(tokens[5]);
     }
-    else
+    else {
+      Ez2_on_solid_target[j] = 0.0;
+      Bx2_on_solid_target[j] = 0.0;
+      By2_on_solid_target[j] = 0.0;
       Bz2_on_solid_target[j] = boost::lexical_cast<float>(tokens[2]);
+    }
   }
 
   std::ostringstream nomefile_out;
-  nomefile_out << std::string(nomefile) << ".txt";
+  nomefile_out << std::string(nomefile) << ".particles.txt";
   std::ofstream outfile;
   outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
 
@@ -673,12 +683,41 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   outfile << "# " << ompe2 << "\t" << nmacro << "\t" << np_per_cell << std::endl;
   outfile << "# " << Nx << "\t" << Ny << "\t" << Nz << "\t" << n_cell << "\t" << Nsp << "\t" << Nsb << std::endl;
   outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
+  outfile << "# " << "timestep Efields2 Etot  Emax  Jz  px  py  pz  sigma_px  sigma_py  sigma_pz  mean_charge  charge_per_cell" << std::endl;
+  outfile << "# " << "last line (except first two columns) is repeated horizontally for each species, so that each line is a full description of a timestep" << std::endl;
 
   for (int i = 0; i < nst; i++)
   {
-    outfile << timesteps[i];
-    for (int j = 0; j < Nsp; j++) outfile << "\t" << Etot[j][i] << "\t" << Emax[j][i];
+    outfile << timesteps[i] << "\t" << Ex2[i]+Ey2[i]+Ez2[i]+Bx2[i]+By2[i]+Bz2[i];
+    for (int j = 0; j < Nsp; j++) outfile << "\t" << Etot[j][i] << "\t" << Emax[j][i] << "\t" << Jz[j][i] << "\t" << px[j][i] << "\t" << py[j][i] << "\t" << pz[j][i] << "\t" << sigma_px[j][i] << "\t" << sigma_py[j][i] << "\t" << sigma_pz[j][i] << "\t" << mean_charge[j][i] << "\t" << charge_per_cell[j][i];
     outfile << std::endl;
+  }
+
+  outfile.close();
+
+  nomefile_out.str("\0");
+  nomefile_out.seekp(0, std::ios::beg);
+  nomefile_out << std::string(nomefile) << ".fields.txt";
+  outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+
+  outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
+
+  outfile << "# " << Z1_i << "\t" << A1_i << "\t" << Z2_i << "\t" << A2_i << "\t" << iform << "\t" << str << std::endl;
+  outfile << "# " << xmax << "\t" << xmin << "\t" << ymax << "\t" << ymin << std::endl;
+  outfile << "# " << lam0 << "\t" << w0x << "\t" << w0y << "\t" << chann_rad << std::endl;
+  outfile << "# " << a0 << "\t" << lp_int << "\t" << lp_pow << std::endl;
+  outfile << "# " << targ_x1 << "\t" << targ_x2 << "\t" << n_over_nc << "\t" << el_lp << std::endl;
+  outfile << "# " << np1 << "\t" << lx1 << "\t" << lx3 << "\t" << np2 << "\t" << lx5 << std::endl;
+  outfile << "# " << ompe2 << "\t" << nmacro << "\t" << np_per_cell << std::endl;
+  outfile << "# " << Nx << "\t" << Ny << "\t" << Nz << "\t" << n_cell << "\t" << Nsp << "\t" << Nsb << std::endl;
+  outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
+  outfile << "# " << "timestep  Ex2  Ey2  Ez2  Ex_max  Ey_max  Ez_max  Bx2  By2  Bz2  Bx_max  By_max  Bz_max  Ex2_on_solid_target  Ey2_on_solid_target  Ez2_on_solid_target  Bx2_on_solid_target  By2_on_solid_target  Bz2_on_solid_target" << std::endl;
+
+  for (int i = 0; i < nst; i++)
+  {
+    outfile << timesteps[i] << "\t"
+      << Ex2[i] << "\t" << Ey2[i] << "\t" << Ez2[i] << "\t" << Ex_max[i] << "\t" << Ey_max[i] << "\t" << Ez_max[i] << "\t" << Bx2[i] << "\t" << By2[i] << "\t" << Bz2[i] << "\t" << Bx_max[i] << "\t" << By_max[i] << "\t" << Bz_max[i] << "\t" << Ex2_on_solid_target[i] << "\t" << Ey2_on_solid_target[i] << "\t" << Ez2_on_solid_target[i] << "\t" << Bx2_on_solid_target[i] << "\t" << By2_on_solid_target[i] << "\t" << Bz2_on_solid_target[i]
+      << std::endl;
   }
 
   outfile.close();
