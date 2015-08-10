@@ -90,4 +90,32 @@ void swap_endian_f(float* in_f, int n)
   }
 }
 
+
+void swap_endian_f(float*** in_f, size_t size_x, size_t size_y, size_t size_z)
+{
+  size_t i, j, k;
+  union { int imio; float fmio; char arr[4]; }x;
+  char buff;
+  for (i = 0; i < size_x; i++)
+  {
+    for (j = 0; j < size_y; j++)
+    {
+      for (k = 0; k < size_z; k++)
+      {
+        x.fmio = in_f[i][j][k];
+        buff = x.arr[0];
+        x.arr[0] = x.arr[3];
+        x.arr[3] = buff;
+        buff = x.arr[1];
+        x.arr[1] = x.arr[2];
+        x.arr[2] = buff;
+        in_f[i][j][k] = x.fmio;
+      }
+    }
+  }
+}
+
+
+
+
 #endif

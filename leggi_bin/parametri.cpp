@@ -15,7 +15,10 @@ Parametri::Parametri()
   subsample = 1;
   span = 5;
   ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
-  nptot = ndv = npunti_x = npunti_x_ricampionati = fattore_ricampionamento = npunti_y_ricampionati = npunti_z_ricampionati = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
+  nptot = ndv = 0;
+  npx = npy = npz = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
+  npx_ricampionati = npy_ricampionati = npz_ricampionati = npx_ricampionati_per_cpu = npy_ricampionati_per_cpu = npz_ricampionati_per_cpu = 0;
+  fattore_ricampionamento = 0;
   endianness = 0;
   aladyn_version = 1;
   multifile = false;
@@ -163,7 +166,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 {
   std::string riga_persa;
   int fattore_ricampionamento;
-//  int discriminante_versione_file;
+  //  int discriminante_versione_file;
   float coord;
   std::getline(file_dat, riga_persa);	// per leggere la riga Integer parameters
 
@@ -184,23 +187,65 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     }
   }
 
-  ncpu_x = 1;
-  ncpu_y = intpar[0];
-  ncpu_z = intpar[1];
-  ncpu = ncpu_x * ncpu_y * ncpu_z;
-  npunti_x = intpar[2];
-  npunti_x_ricampionati = intpar[3];
-  fattore_ricampionamento = npunti_x / npunti_x_ricampionati;
-  npx_per_cpu = npunti_x_ricampionati;
-  npunti_y_ricampionati = intpar[4];
-  npy_per_cpu = intpar[5];
-  npunti_z_ricampionati = intpar[6];
-  npz_per_cpu = intpar[7];
-  nptot = (long long int) intpar[16];
-  ndv = intpar[17];
-  //  discriminante_versione_file = intpar[18];	// poco piu' sotto viene poi associato a parametri->aladyn_version secondo la logica che i numeri negativi identificano le versioni di aladyn nuove, -1 --> aladyn_v2, -2 --> aladyn_v3, ...
+
   aladyn_version = intpar[18];
-  endianness = intpar[19];
+  // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
+  if (aladyn_version == -1) aladyn_version = 2;
+  if (aladyn_version == -2) aladyn_version = 3;
+
+
+  if (aladyn_version < 4) {
+    ncpu_x = 1;
+    ncpu_y = intpar[0];
+    ncpu_z = intpar[1];
+    ncpu = ncpu_x * ncpu_y * ncpu_z;
+    npx_per_cpu = intpar[2];
+    npx_ricampionati_per_cpu = intpar[3];
+    fattore_ricampionamento = npx_per_cpu / npx_ricampionati_per_cpu;
+    npy_ricampionati_per_cpu = intpar[4];
+    npy_per_cpu = intpar[5];
+    npz_ricampionati_per_cpu = intpar[6];
+    npz_per_cpu = intpar[7];
+    npx = npx_per_cpu * ncpu_x;
+    npy = npy_per_cpu * ncpu_y;
+    npz = npz_per_cpu * ncpu_z;
+    npx_ricampionati = npx_ricampionati_per_cpu * ncpu_x;
+    npy_ricampionati = npy_ricampionati_per_cpu * ncpu_y;
+    npz_ricampionati = npz_ricampionati_per_cpu * ncpu_z;
+    nptot = (long long int) intpar[16];
+    ndv = intpar[17];
+    endianness = intpar[19];
+  }
+  else if (aladyn_version == 4) {
+    /*
+    int_par(1:20) = (/ npe_loc, npe_zloc, npe_xloc, nx1, ny1, nz1, &
+    jump, ibx, iby, iform, pid, &
+    model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
+    nptot, ndv, aladyn_version, i_end / )
+    */
+
+    /*npe_xloc*/ ncpu_x = intpar[2];
+    /*npe_loc*/  ncpu_y = intpar[0];
+    /*npe_zloc*/ ncpu_z = intpar[1];
+    /**/         ncpu = ncpu_x * ncpu_y * ncpu_z;
+    /*nx1*/      npx_per_cpu = intpar[3];
+    /*jump*/     fattore_ricampionamento = intpar[6];
+    /**/         npx_ricampionati_per_cpu = npx_per_cpu / fattore_ricampionamento;
+    /*ny1*/      npy_per_cpu = intpar[4];
+    /**/         npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
+    /*nz1*/      npz_per_cpu = intpar[5];
+    /**/         npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
+    /**/         npx = npx_per_cpu * ncpu_x;
+    /**/         npy = npy_per_cpu * ncpu_y;
+    /**/         npz = npz_per_cpu * ncpu_z;
+    /**/         npx_ricampionati = npx_ricampionati_per_cpu * ncpu_x;
+    /**/         npy_ricampionati = npy_ricampionati_per_cpu * ncpu_y;
+    /**/         npz_ricampionati = npz_ricampionati_per_cpu * ncpu_z;
+    /*nptot*/    nptot = (long long int) intpar[16];
+    /*ndv*/      ndv = intpar[17];
+    /*i_end*/    endianness = intpar[19];
+  }
+
 
   std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
   std::getline(file_dat, riga_persa);	// per leggere la riga Real parameters
@@ -220,7 +265,11 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       file_dat.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
     }
   }
-
+  /*
+  real_par(1:20) = (/ tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0_x, w0_y, &
+  n_over_nc, a0, lam0, E0, ompe, targ_in, targ_end, &
+  gam0, vbeam, unit_charge(pid),mass(pid) / )
+  */
   tnow = realpar[0];
   xmin = realpar[1];
   xmax = realpar[2];
@@ -228,10 +277,6 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   ymax = realpar[4];
   zmin = realpar[5];
   zmax = realpar[6];
-
-  // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
-  if (aladyn_version == -1) aladyn_version = 2;
-  if (aladyn_version == -2) aladyn_version = 3;
 
   if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
   {
@@ -262,9 +307,9 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
   else
   {
-    if (npunti_z_ricampionati == 1) zmin = 0.0, zmax = 1.0;
+    if (npz == 1) zmin = 0.0, zmax = 1.0;
     p[WEIGHT] = 0;
-    p[NCOLONNE] = npunti_z_ricampionati;
+    p[NCOLONNE] = npz;
     p_b[NCOLONNE] = false;
     p_b[WEIGHT] = false;
 
@@ -274,17 +319,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       std::getline(file_dat, riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
 
 
-      for (unsigned int i = 0; i < npunti_x_ricampionati; i++)
+      for (unsigned int i = 0; i < npx_ricampionati; i++)
       {
         file_dat >> coord;
         xcoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npunti_y_ricampionati; i++)
+      for (unsigned int i = 0; i < npy_ricampionati; i++)
       {
         file_dat >> coord;
         ycoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npunti_z_ricampionati; i++)
+      for (unsigned int i = 0; i < npz_ricampionati; i++)
       {
         file_dat >> coord;
         zcoord.push_back(coord);
@@ -293,24 +338,24 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     else			// mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
     {
       float dx, dy, dz;
-      if (npunti_x_ricampionati > 1) dx = (xmax - xmin) / (npunti_x_ricampionati - 1);
+      if (npx_ricampionati > 1) dx = (xmax - xmin) / (npx_ricampionati - 1);
       else dx = (xmax - xmin);
-      if (npunti_y_ricampionati > 1) dy = (ymax - ymin) / (npunti_y_ricampionati - 1);
+      if (npy_ricampionati > 1) dy = (ymax - ymin) / (npy_ricampionati - 1);
       else dy = (ymax - ymin);
-      if (npunti_z_ricampionati > 1) dz = (zmax - zmin) / (npunti_z_ricampionati - 1);
+      if (npz_ricampionati > 1) dz = (zmax - zmin) / (npz_ricampionati - 1);
       else dz = (zmax - zmin);
 
-      for (unsigned int i = 0; i < npunti_x_ricampionati; i++)
+      for (unsigned int i = 0; i < npx_ricampionati; i++)
       {
         coord = xmin + dx*i;
         xcoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npunti_y_ricampionati; i++)
+      for (unsigned int i = 0; i < npy_ricampionati; i++)
       {
         coord = ymin + dy*i;
         ycoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npunti_z_ricampionati; i++)
+      for (unsigned int i = 0; i < npz_ricampionati; i++)
       {
         coord = zmin + dz*i;
         zcoord.push_back(coord);
@@ -329,14 +374,14 @@ void Parametri::debug_dat_parse()
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
     std::cout << std::setw(14) << intpar[i];
-    if (i>0 && !(i % 4)) std::cout << std::endl;
+    if (i > 0 && !(i % 4)) std::cout << std::endl;
   }
 
   std::cout << "Real parameters" << std::endl;
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
     std::cout << std::setw(14) << realpar[i];
-    if (i>0 && !(i % 4)) std::cout << std::endl;
+    if (i > 0 && !(i % 4)) std::cout << std::endl;
   }
 }
 
