@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 0
+#define BUGFIX_RELEASE 1
 
 #include <iostream>
 #include <vector>
@@ -158,7 +158,7 @@ struct Parametri
   unsigned int ndv, fattore_ricampionamento;
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   size_t npx_ricampionati, npy_ricampionati, npz_ricampionati, npx_ricampionati_per_cpu, npy_ricampionati_per_cpu, npz_ricampionati_per_cpu;
-  long long int nptot;
+  unsigned long long int nptot;
   int endianness;
   int aladyn_version;
   bool multifile;

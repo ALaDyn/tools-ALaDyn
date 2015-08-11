@@ -764,30 +764,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     sprintf(nomefile_parametri, "%s.parameters", argv[1]);
     parameters = fopen(nomefile_parametri, "w");
     printf("\nWriting parameters to file\n");
-    fprintf(parameters, "interi\n");
-    fprintf(parameters, "parametri->ncpu_x=%i\n", parametri->ncpu_x);
-    fprintf(parameters, "parametri->ncpu_y=%i\n", parametri->ncpu_y);
-    fprintf(parameters, "parametri->ncpu_z=%i\n", parametri->ncpu_z);
-    fprintf(parameters, "parametri->npx_ricampionati=%i\n", parametri->npx_ricampionati);
-    fprintf(parameters, "parametri->npy_ricampionati=%i\n", parametri->npy_ricampionati);
-    fprintf(parameters, "parametri->npz_ricampionati=%i\n", parametri->npz_ricampionati);
+    fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
+    fprintf(parameters, "ncpu_y=%i\n", parametri->ncpu_y);
+    fprintf(parameters, "ncpu_z=%i\n", parametri->ncpu_z);
+    fprintf(parameters, "npx_ricampionati=%i\n", parametri->npx_ricampionati);
+    fprintf(parameters, "npy_ricampionati=%i\n", parametri->npy_ricampionati);
+    fprintf(parameters, "npz_ricampionati=%i\n", parametri->npz_ricampionati);
     fprintf(parameters, "npx_ricampionati_per_cpu=%i\n", parametri->npx_ricampionati_per_cpu);
     fprintf(parameters, "npy_ricampionati_per_cpu=%i\n", parametri->npy_ricampionati_per_cpu);
     fprintf(parameters, "npz_ricampionati_per_cpu=%i\n", parametri->npz_ricampionati_per_cpu);
-    /*
-    fprintf(parameters, "ibx=%i\n", ibx);
-    fprintf(parameters, "iby=%i\n", iby);
-    fprintf(parameters, "ibz=%i\n", ibz);
-    fprintf(parameters, "model=%i\n", model);
-    fprintf(parameters, "dmodel=%i\n", dmodel);
-    fprintf(parameters, "nsp=%i\n", nsp);
-    fprintf(parameters, "np_loc=%i\n", np_loc);
-    fprintf(parameters, "lpord=%i\n", lpord);
-    fprintf(parameters, "deord=%i\n", deord);
-    fprintf(parameters, "fvar=%i\n", fvar);
-    */
-    fprintf(parameters, "========= fine interi\n");
-    fprintf(parameters, "\n floating\n");
     fprintf(parameters, "tnow=%f\n", parametri->tnow);
     fprintf(parameters, "xmin=%f\n", parametri->xmin);
     fprintf(parameters, "xmax=%f\n", parametri->xmax);
@@ -795,20 +780,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fprintf(parameters, "ymax=%f\n", parametri->ymax);
     fprintf(parameters, "zmin=%f\n", parametri->zmin);
     fprintf(parameters, "zmax=%f\n", parametri->zmax);
-    /*
-    fprintf(parameters, "w0x=%f\n", w0x);
-    fprintf(parameters, "w0y=%f\n", w0y);
-    fprintf(parameters, "nrat=%f\n", nrat);
-    fprintf(parameters, "a0=%f\n", a0);
-    fprintf(parameters, "lam0=%f\n", lam0);
-    fprintf(parameters, "E0=%f\n", E0);
-    fprintf(parameters, "B0=%f\n", B0);
-    fprintf(parameters, "ompe=%f\n", ompe);
-    fprintf(parameters, "xt_in=%f\n", xt_in);
-    fprintf(parameters, "xt_end=%f\n", xt_end);
-    fprintf(parameters, "charge=%f\n", charge);
-    fprintf(parameters, "mass=%f\n", mass);
-    */
 
     fprintf(parameters, "\n\nGrid along x axis\n");
     for (unsigned int i = 0; i < parametri->npx_ricampionati; i++)
