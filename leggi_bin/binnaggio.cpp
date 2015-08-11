@@ -248,10 +248,10 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         ch = *(particelle + i*ndv + 7);
       else
         ch = parametri->overwrite_charge_value;
-      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);       //gamma
-      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);  //theta nb: py e pz sono quelli trasversi in ALaDyn!
-      thetaT = (float)atan(py / px);                                //theta turch
-      E = (float)(gamma*parametri->massa_particella_MeV);           //energia
+      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);             //gamma
+      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);        //theta sgatto
+      thetaT = (float)atan(sqrt((py*py / (px*px)) + (pz*pz / (px*px))));  //theta turch
+      E = (float)(gamma*parametri->massa_particella_MeV);                 //energia
       if (px > 0.0)
       {
         ty = py / px;
