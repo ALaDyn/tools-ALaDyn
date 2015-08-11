@@ -69,7 +69,7 @@ int main(const int argc, const char *argv[])
     std::cout << "Unable to find " << argv[1] << ".dat, using routines for aladyn v1" << std::endl;
 
     if (parametri.p_b[SWAP])
-      
+
       parametri.chiedi_endian_file();
 
     parametri.leggi_parametri_da_file_bin(argv[1]);
@@ -79,7 +79,7 @@ int main(const int argc, const char *argv[])
 
       parametri.chiedi_numero_colonne();
 
-    
+
     if ((parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
       || parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
       || parametri.file_densita_elettroni || parametri.file_densita_protoni

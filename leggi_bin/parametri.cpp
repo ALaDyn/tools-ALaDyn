@@ -47,7 +47,7 @@ Parametri::Parametri()
   overwrite_charge_value = 1.0;
   do_not_ask_missing = false;
 
-  last_cpu = MAX_NUMBER_OF_CPUS;		// il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
+  last_cpu = MAX_NUMBER_OF_CPUS;    // il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
 
   for (int i = 0; i < NPARAMETRI; i++)
   {
@@ -125,20 +125,20 @@ float Parametri::dimmi_dimE()
 
 int Parametri::dimmi_nbin(int colonna)
 {
-  if (colonna == 0)		return nbin_x;
-  else if (colonna == 1)	return nbin_y;
-  else if (colonna == 2)	return nbin_z;
-  else if (colonna == 3)	return nbin_px;
-  else if (colonna == 4)	return nbin_py;
-  else if (colonna == 5)	return nbin_pz;
-  else if (colonna == 6)	return nbin_gamma;
-  else if (colonna == 7)	return nbin_theta;
-  else if (colonna == 8)	return nbin_E;
-  else if (colonna == 9)	return nbin_thetaT;
-  else if (colonna == 10)	return nbin_ty;
-  else if (colonna == 11)	return nbin_tz;
-  else if (colonna == 12)	return nbin_w;
-  else if (colonna == 13)	return nbin_ch;
+  if (colonna == 0)       return nbin_x;
+  else if (colonna == 1)  return nbin_y;
+  else if (colonna == 2)  return nbin_z;
+  else if (colonna == 3)  return nbin_px;
+  else if (colonna == 4)  return nbin_py;
+  else if (colonna == 5)  return nbin_pz;
+  else if (colonna == 6)  return nbin_gamma;
+  else if (colonna == 7)  return nbin_theta;
+  else if (colonna == 8)  return nbin_E;
+  else if (colonna == 9)  return nbin_thetaT;
+  else if (colonna == 10) return nbin_ty;
+  else if (colonna == 11) return nbin_tz;
+  else if (colonna == 12) return nbin_w;
+  else if (colonna == 13) return nbin_ch;
   else return 120;
 }
 
@@ -146,26 +146,26 @@ int Parametri::dimmi_nbin(int colonna)
 
 float Parametri::dimmi_dim(int colonna)
 {
-  if (colonna == 0)		return dimmi_dimx();
-  else if (colonna == 1)	return dimmi_dimy();
-  else if (colonna == 2)	return dimmi_dimz();
-  else if (colonna == 3)	return dimmi_dimpx();
-  else if (colonna == 4)	return dimmi_dimpy();
-  else if (colonna == 5)	return dimmi_dimpz();
-  else if (colonna == 6)	return dimmi_dimgamma();
-  else if (colonna == 7)	return dimmi_dimtheta();
-  else if (colonna == 8)	return dimmi_dimE();
-  else if (colonna == 9)	return dimmi_dimthetaT();
-  else if (colonna == 10)	return dimmi_dimty();
-  else if (colonna == 11)	return dimmi_dimtz();
-  else if (colonna == 12)	return dimmi_dimw();
-  else if (colonna == 13)	return dimmi_dimch();
+  if (colonna == 0)       return dimmi_dimx();
+  else if (colonna == 1)  return dimmi_dimy();
+  else if (colonna == 2)  return dimmi_dimz();
+  else if (colonna == 3)  return dimmi_dimpx();
+  else if (colonna == 4)  return dimmi_dimpy();
+  else if (colonna == 5)  return dimmi_dimpz();
+  else if (colonna == 6)  return dimmi_dimgamma();
+  else if (colonna == 7)  return dimmi_dimtheta();
+  else if (colonna == 8)  return dimmi_dimE();
+  else if (colonna == 9)  return dimmi_dimthetaT();
+  else if (colonna == 10) return dimmi_dimty();
+  else if (colonna == 11) return dimmi_dimtz();
+  else if (colonna == 12) return dimmi_dimw();
+  else if (colonna == 13) return dimmi_dimch();
   else return 1.0;
 }
 
 
 
-void Parametri::leggi_parametri_da_file_bin(const char * filename) 
+void Parametri::leggi_parametri_da_file_bin(const char * filename)
 {
   std::FILE * file_in = NULL;
   int fortran_buff;
@@ -214,7 +214,7 @@ void Parametri::leggi_parametri_da_file_bin(const char * filename)
   ymax = realpar[4];  //estremi della griglia
   zmin = realpar[5];  //estremi della griglia
   zmax = realpar[6];  //estremi della griglia
-  
+
   header_size_bytes = (7 + nparams) * sizeof(int) + nparams * sizeof(float);
   if (fread_size != header_size_bytes) std::cout << "error: header size is different than expected" << std::endl << std::flush;
 }
@@ -227,7 +227,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   int fattore_ricampionamento;
   //  int discriminante_versione_file;
   float coord;
-  std::getline(file_dat, riga_persa);	// per leggere la riga Integer parameters
+  std::getline(file_dat, riga_persa); // per leggere la riga Integer parameters
 
 
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
@@ -306,8 +306,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
 
 
-  std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga degli interi
-  std::getline(file_dat, riga_persa);	// per leggere la riga Real parameters
+  std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga degli interi
+  std::getline(file_dat, riga_persa); // per leggere la riga Real parameters
 
   for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
   {
@@ -358,8 +358,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       p_b[NCOLONNE] = false;
       if (nptot == -1)
       {
-        std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei real
-        std::getline(file_dat, riga_persa);	// per leggere la riga Number of particles
+        std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga dei real
+        std::getline(file_dat, riga_persa); // per leggere la riga Number of particles
         file_dat >> nptot;
       }
     }
@@ -374,8 +374,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 
     if (aladyn_version > 1)
     {
-      std::getline(file_dat, riga_persa);	// per pulire i caratteri rimanenti sull'ultima riga dei float
-      std::getline(file_dat, riga_persa);	// per togliere la riga vuota che separa la griglia dai parametri
+      std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga dei float
+      std::getline(file_dat, riga_persa); // per togliere la riga vuota che separa la griglia dai parametri
 
 
       for (unsigned int i = 0; i < npx_ricampionati; i++)
@@ -394,7 +394,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
         zcoord.push_back(coord);
       }
     }
-    else			// mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
+    else      // mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
     {
       float dx, dy, dz;
       if (npx_ricampionati > 1) dx = (xmax - xmin) / (npx_ricampionati - 1);
@@ -784,7 +784,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     which is supposed to be given as the first argument and so is in argv[1]
     ************************************************************************/
   {
-    //	  std::cout << argv[i] << std::endl;
+    //    std::cout << argv[i] << std::endl;
 
     if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile")
     {
@@ -2082,7 +2082,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
 bool Parametri::check_parametri()
 {
   bool test = true;
-  if (!p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1)		// check swap o non-swap
+  if (!p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1)   // check swap o non-swap
   {
     printf("Attenzione: modalita` swap mal definita\n");
     test = false;
@@ -2091,7 +2091,7 @@ bool Parametri::check_parametri()
   {
     if (!p_b[SWAP] && (p[SWAP] == 0 || p[SWAP] == 1))
     {
-      test = true;		// tutto ok, in questo caso il parametro va bene!
+      test = true;    // tutto ok, in questo caso il parametro va bene!
     }
     else if (p_b[SWAP] && do_not_ask_missing)
     {
@@ -2116,7 +2116,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[WEIGHT] && (p_b[WEIGHT] == 0 || p_b[WEIGHT] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[WEIGHT] && do_not_ask_missing)
       {
@@ -2130,7 +2130,7 @@ bool Parametri::check_parametri()
         test = false;
       }
     }
-    if (!p_b[OUT_CSV] && p[OUT_CSV] != 0 && p[OUT_CSV] != 1)	// check leggi_particelle: out-ascii o non-out-ascii
+    if (!p_b[OUT_CSV] && p[OUT_CSV] != 0 && p[OUT_CSV] != 1)  // check leggi_particelle: out-ascii o non-out-ascii
     {
       printf("Attenzione: output csv mal definito\n");
       test = false;
@@ -2139,7 +2139,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_CSV] && (p_b[OUT_CSV] == 0 || p_b[OUT_CSV] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_CSV] && do_not_ask_missing)
       {
@@ -2153,7 +2153,7 @@ bool Parametri::check_parametri()
         test = false;
       }
     }
-    if (!p_b[OUT_PROPAGA] && p[OUT_PROPAGA] != 0 && p[OUT_PROPAGA] != 1)	// check leggi_particelle: out-ascii o non-out-ascii
+    if (!p_b[OUT_PROPAGA] && p[OUT_PROPAGA] != 0 && p[OUT_PROPAGA] != 1)  // check leggi_particelle: out-ascii o non-out-ascii
     {
       printf("Attenzione: output ppg mal definito\n");
       test = false;
@@ -2162,7 +2162,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_PROPAGA] && (p_b[OUT_PROPAGA] == 0 || p_b[OUT_PROPAGA] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_PROPAGA] && do_not_ask_missing)
       {
@@ -2185,7 +2185,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_XYZE] && (p_b[OUT_XYZE] == 0 || p_b[OUT_XYZE] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_XYZE] && do_not_ask_missing)
       {
@@ -2208,7 +2208,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_VTK] && (p[OUT_VTK] == 0 || p[OUT_VTK] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_VTK] && do_not_ask_missing)
       {
@@ -2231,7 +2231,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_CLEAN_BINARY] && (p[OUT_CLEAN_BINARY] == 0 || p[OUT_CLEAN_BINARY] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_CLEAN_BINARY] && do_not_ask_missing)
       {
@@ -2255,7 +2255,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[FIND_MINMAX] && (p[FIND_MINMAX] == 0 || p[FIND_MINMAX] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[FIND_MINMAX] && do_not_ask_missing)
       {
@@ -2278,7 +2278,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[DO_BINNING] && (p[DO_BINNING] == 0 || p[DO_BINNING] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[DO_BINNING] && do_not_ask_missing)
       {
@@ -2301,7 +2301,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_PARAMS] && do_not_ask_missing)
       {
@@ -2324,7 +2324,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[NCOLONNE] && (p[NCOLONNE] == 4 || p[NCOLONNE] == 5 || p[NCOLONNE] == 6 || p[NCOLONNE] == 7 || p[NCOLONNE] == 8))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[NCOLONNE] && do_not_ask_missing)
       {
@@ -2482,7 +2482,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_VTK_NOSTRETCH] && (p[OUT_VTK_NOSTRETCH] == 0 || p[OUT_VTK_NOSTRETCH] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_VTK_NOSTRETCH] && do_not_ask_missing)
       {
@@ -2505,7 +2505,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_VTK] && (p[OUT_VTK] == 0 || p[OUT_VTK] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_VTK] && do_not_ask_missing)
       {
@@ -2528,7 +2528,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_PARAMS] && do_not_ask_missing)
       {
@@ -2551,7 +2551,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_LINEOUT_X] && (p[OUT_LINEOUT_X] == 0 || p[OUT_LINEOUT_X] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_LINEOUT_X] && do_not_ask_missing)
       {
@@ -2574,7 +2574,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[NCOLONNE] && p[NCOLONNE] >= 1)
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else
       {
@@ -2592,7 +2592,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_CUTX] && (p[OUT_CUTX] == 0 || p[OUT_CUTX] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_CUTX] && do_not_ask_missing)
       {
@@ -2615,7 +2615,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_CUTY] && (p[OUT_CUTY] == 0 || p[OUT_CUTY] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_CUTY] && do_not_ask_missing)
       {
@@ -2638,7 +2638,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_CUTZ] && (p[OUT_CUTZ] == 0 || p[OUT_CUTZ] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_CUTZ] && do_not_ask_missing)
       {
@@ -2661,7 +2661,7 @@ bool Parametri::check_parametri()
     {
       if (!p_b[OUT_GRID2D] && (p[OUT_GRID2D] == 0 || p[OUT_GRID2D] == 1))
       {
-        test = true;		// tutto ok, in questo caso il parametro va bene!
+        test = true;    // tutto ok, in questo caso il parametro va bene!
       }
       else if (p_b[OUT_GRID2D] && do_not_ask_missing)
       {

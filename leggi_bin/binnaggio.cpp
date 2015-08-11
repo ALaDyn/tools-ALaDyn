@@ -44,7 +44,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
   for (int i = 0; i < npart; i++)
   {
-    if ( ((ndv == 4 || ndv == 5) && parametri->aladyn_version < 3) || (ndv == 6 && parametri->aladyn_version == 3) )
+    if (((ndv == 4 || ndv == 5) && parametri->aladyn_version < 3) || (ndv == 6 && parametri->aladyn_version == 3))
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
@@ -58,11 +58,10 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         ch = *(particelle + i*ndv + 5);
       else
         ch = parametri->overwrite_charge_value;
-      gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma-1
-      theta = (float)(atan2(py, px)*180. / M_PI);				//theta sgatto
-      thetaT = (float)atan(sqrt((py*py / (px*px))));			//theta turch                                                                        
-      //			thetaT=(float) atan(py/px);				//theta turch
-      E = (float)(gamma*parametri->massa_particella_MeV);	//energia
+      gamma = (float)(sqrt(1. + px*px + py*py) - 1.);      //gamma-1
+      theta = (float)(atan2(py, px)*180. / M_PI);          //theta sgatto
+      thetaT = (float)atan(sqrt((py*py / (px*px))));       //theta turch
+      E = (float)(gamma*parametri->massa_particella_MeV);  //energia
       if (px > 0.0) ty = py / px;
       else ty = FLT_MAX;
       tz = 0.0;
@@ -111,10 +110,10 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         ch = *(particelle + i*ndv + 7);
       else
         ch = parametri->overwrite_charge_value;
-      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);					    //gamma-1
-      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);			  //theta sgatto
-      thetaT = (float)atan(sqrt((py*py / (px*px)) + (pz*pz / (px*px))));	//theta turch
-      E = (float)(gamma*parametri->massa_particella_MeV);				          //energia
+      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);             //gamma-1
+      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);        //theta sgatto
+      thetaT = (float)atan(sqrt((py*py / (px*px)) + (pz*pz / (px*px))));  //theta turch
+      E = (float)(gamma*parametri->massa_particella_MeV);                 //energia
       if (px > 0.0)
       {
         ty = py / px;
@@ -196,13 +195,12 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   else if (binx == "ch") binnare_su_x = 13;
   else printf("variabile x non riconosciuta\n");
 
-  //	float z;
   float x, y, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   float dato_da_binnare_x = 0.;
   fflush(stdout);
   for (int i = 0; i < npart; i++)
   {
-    if (((ndv == 4 || ndv == 5) && parametri->aladyn_version < 3) || (ndv == 6 && parametri->aladyn_version == 3) )
+    if (((ndv == 4 || ndv == 5) && parametri->aladyn_version < 3) || (ndv == 6 && parametri->aladyn_version == 3))
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
@@ -216,10 +214,10 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         ch = *(particelle + i*ndv + 5);
       else
         ch = parametri->overwrite_charge_value;
-      gamma = (float)(sqrt(1. + px*px + py*py) - 1.);				//gamma
-      theta = (float)(atan2(py, px)*180. / M_PI);				//theta
-      thetaT = (float)atan(py / px);							//theta turch
-      E = (float)(gamma*parametri->massa_particella_MeV);	//energia
+      gamma = (float)(sqrt(1. + px*px + py*py) - 1.);      //gamma-1
+      theta = (float)(atan2(py, px)*180. / M_PI);          //theta sgatto
+      thetaT = (float)atan(sqrt((py*py / (px*px))));       //theta turch
+      E = (float)(gamma*parametri->massa_particella_MeV);  //energia
       if (px > 0.0) ty = py / px;
       else ty = 0.0;
       tz = 0.0;
@@ -237,7 +235,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_x == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
       else if (binnare_su_x == 12) dato_da_binnare_x = w;
     }
-    else if (((ndv == 6 || ndv == 7) && parametri->aladyn_version < 3) || (ndv == 8 && parametri->aladyn_version == 3) )
+    else if (((ndv == 6 || ndv == 7) && parametri->aladyn_version < 3) || (ndv == 8 && parametri->aladyn_version == 3))
     {
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
@@ -250,10 +248,10 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         ch = *(particelle + i*ndv + 7);
       else
         ch = parametri->overwrite_charge_value;
-      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);			//gamma
-      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);	//theta nb: py e pz sono quelli trasversi in ALaDyn!
-      thetaT = (float)atan(py / px);							//theta turch
-      E = (float)(gamma*parametri->massa_particella_MeV);		//energia
+      gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);       //gamma
+      theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);  //theta nb: py e pz sono quelli trasversi in ALaDyn!
+      thetaT = (float)atan(py / px);                                //theta turch
+      E = (float)(gamma*parametri->massa_particella_MeV);           //energia
       if (px > 0.0)
       {
         ty = py / px;

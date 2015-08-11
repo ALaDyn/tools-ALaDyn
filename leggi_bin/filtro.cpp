@@ -162,7 +162,7 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
     pntt_loc = dati + i*n_dati[1];
     flag = true;
 
-    if ( ((parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) && parametri->aladyn_version < 3) || (parametri->p[NCOLONNE] == 8 && parametri->aladyn_version == 3) )
+    if (((parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) && parametri->aladyn_version < 3) || (parametri->p[NCOLONNE] == 8 && parametri->aladyn_version == 3))
     {
       p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
       if (parametri->p[WEIGHT] && !parametri->overwrite_weight)

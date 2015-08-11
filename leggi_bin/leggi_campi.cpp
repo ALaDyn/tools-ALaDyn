@@ -72,9 +72,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
             std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
 #ifdef ENABLE_DEBUG
-          printf("processore ipz=%i/%i  ipy=%i/%i  ipx=%i/%i\n",ipz,parametri->ncpu_z,ipy,parametri->ncpu_y,ipx,parametri->ncpu_x);
+          printf("processore ipz=%i/%i  ipy=%i/%i  ipx=%i/%i\n", ipz, parametri->ncpu_z, ipy, parametri->ncpu_y, ipx, parametri->ncpu_x);
 #else
-          printf("processore ipz=%i/%i  ipy=%i/%i  ipx=%i/%i\r",ipz,parametri->ncpu_z,ipy,parametri->ncpu_y,ipx,parametri->ncpu_x);
+          printf("processore ipz=%i/%i  ipy=%i/%i  ipx=%i/%i\r", ipz, parametri->ncpu_z, ipy, parametri->ncpu_y, ipx, parametri->ncpu_x);
 #endif
           fflush(stdout);
 
@@ -99,7 +99,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     // se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei parametri
 
 
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);	// facciamo il test sul buffer Fortran della prima coordinata;
+    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
     // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i dati non e' di alcun interesse
 
     if (!std::feof(file_in))
@@ -591,11 +591,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     //////// DATASET STRUCTURED_POINTS VERSION    ////////
 
     float xmin_non_stretchato = parametri->xcoord[inizio_punti_non_stretchati_x];
-    //		float xmax_non_stretchato = parametri->xcoord[fine_punti_non_stretchati_x];
+    //    float xmax_non_stretchato = parametri->xcoord[fine_punti_non_stretchati_x];
     float ymin_non_stretchato = parametri->ycoord[inizio_punti_non_stretchati_y];
-    //		float ymax_non_stretchato = parametri->ycoord[fine_punti_non_stretchati_y];
+    //    float ymax_non_stretchato = parametri->ycoord[fine_punti_non_stretchati_y];
     float zmin_non_stretchato = parametri->zcoord[inizio_punti_non_stretchati_z];
-    //		float zmax_non_stretchato = parametri->zcoord[fine_punti_non_stretchati_z];
+    //    float zmax_non_stretchato = parametri->zcoord[fine_punti_non_stretchati_z];
 
     dx = parametri->xcoord[parametri->npx_ricampionati / 2] - parametri->xcoord[parametri->npx_ricampionati / 2 - 1];
     dy = parametri->ycoord[parametri->npy_ricampionati / 2] - parametri->ycoord[parametri->npy_ricampionati / 2 - 1];
