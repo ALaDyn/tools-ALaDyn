@@ -52,6 +52,24 @@ void swap_endian_i(int* in_i, int n)
 }
 
 
+void swap_endian_i(std::vector<int> &in_i)
+{
+  union { int imio; float fmio; char arr[4]; }x;
+  char buff;
+  for (size_t i = 0; i < in_i.size(); i++)
+  {
+    x.imio = in_i[i];
+    buff = x.arr[0];
+    x.arr[0] = x.arr[3];
+    x.arr[3] = buff;
+    buff = x.arr[1];
+    x.arr[1] = x.arr[2];
+    x.arr[2] = buff;
+    in_i[i] = x.imio;
+  }
+}
+
+
 void swap_endian_f(float* in_f, size_t n)
 {
   size_t i;
@@ -78,6 +96,24 @@ void swap_endian_f(float* in_f, int n)
   union { int imio; float fmio; char arr[4]; }x;
   char buff;
   for (i = 0; i < n; i++)
+  {
+    x.fmio = in_f[i];
+    buff = x.arr[0];
+    x.arr[0] = x.arr[3];
+    x.arr[3] = buff;
+    buff = x.arr[1];
+    x.arr[1] = x.arr[2];
+    x.arr[2] = buff;
+    in_f[i] = x.fmio;
+  }
+}
+
+
+void swap_endian_f(std::vector<float> &in_f)
+{
+  union { int imio; float fmio; char arr[4]; }x;
+  char buff;
+  for (size_t i = 0; i < in_f.size(); i++)
   {
     x.fmio = in_f[i];
     buff = x.arr[0];

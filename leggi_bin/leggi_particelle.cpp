@@ -77,7 +77,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   const int stop_at_cpu_number = parametri->last_cpu;
   const int sottocampionamento = parametri->subsample;
 
-  int N_param, *int_param, npart_loc;
+  int npart_loc;
   int buff;
 
   float x, y, z, px, py, pz, ptot;
@@ -88,7 +88,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
   short buffshort[2];
   float *particelle = NULL;
-  float *real_param = NULL;
   char nomefile_vtk[MAX_LENGTH_FILENAME];
   char nomefile_bin_clean[MAX_LENGTH_FILENAME];
   char nomefile_propaga[MAX_LENGTH_FILENAME];
@@ -104,59 +103,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   double emittance_x = 0.0, emittance_y = 0.0, emittance_z = 0.0;
   double em_x2 = 0.0, em_x = 0.0, em_y2 = 0.0, em_y = 0.0, em_z2 = 0.0, em_z = 0.0;
   double em_px2 = 0.0, em_px = 0.0, em_py2 = 0.0, em_py = 0.0, em_pz2 = 0.0, em_pz = 0.0, em_xpx = 0.0, em_ypy = 0.0, em_zpz = 0.0;
-  int tipo = 0;
-  if (argv[1][0] == 'E') tipo = 3;
-  else if (argv[1][0] == 'P') tipo = 1;
-  else if (argv[1][0] == 'H') tipo = 1;
-  else if (argv[1][0] == 'L') tipo = 1;
-  else printf("Tipo non riconosciuto!\n");
-
-  if (parametri->aladyn_version == 1)
-  {
-    file_in = fopen(nomefile_bin.str().c_str(), "rb");
-    if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
-    else std::cout << "File opened to read parameters!" << std::endl;
-
-    fread_size = std::fread(&buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(&N_param, sizeof(int), 1, file_in);
-    fread_size = std::fread(&buff, sizeof(int), 1, file_in);
-
-    if (out_swap) swap_endian_i(&N_param, 1);
-
-    int_param = new int[N_param];
-    real_param = new float[N_param];
-    fread_size = std::fread(&buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(int_param, sizeof(int), N_param, file_in);
-    fread_size = std::fread(&buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(&buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(real_param, sizeof(float), N_param, file_in);
-    fread_size = std::fread(&buff, sizeof(int), 1, file_in);
-
-    if (out_swap) swap_endian_i(int_param, N_param);
-    if (out_swap) swap_endian_f(real_param, N_param);
-
-    fclose(file_in);
-
-    /* overwrite default with good values */
-    parametri->ncpu_x = 1;
-    parametri->ncpu_y = int_param[0];
-    parametri->ncpu_z = int_param[1];
-    parametri->npx_ricampionati_per_cpu = int_param[2];
-    parametri->npx = int_param[3];
-    parametri->npy = int_param[4];
-    parametri->npy_ricampionati_per_cpu = int_param[5];
-    parametri->npz = int_param[6];
-    parametri->npz_ricampionati_per_cpu = int_param[7];
-    parametri->tnow = real_param[0];  //tempo dell'output
-    parametri->xmin = real_param[1];  //estremi della griglia
-    parametri->xmax = real_param[2];  //estremi della griglia
-    parametri->ymin = real_param[3];  //estremi della griglia
-    parametri->ymax = real_param[4];  //estremi della griglia
-    parametri->zmin = real_param[5];  //estremi della griglia
-    parametri->zmax = real_param[6];  //estremi della griglia
-  }
-
-
 
   estremi_min = new float[SEI_DIMENSIONI + ALTRI_PARAMETRI];
   estremi_max = new float[SEI_DIMENSIONI + ALTRI_PARAMETRI];
@@ -429,6 +375,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       if (conta_processori >= stop_at_cpu_number) break;
       if (parametri->aladyn_version == 1)
       {
+        /*skip header*/
+        std::fseek(file_in, parametri->header_size_bytes, SEEK_SET);
+
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
@@ -750,7 +699,10 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               //else
               //  ch = parametri->overwrite_charge_value;
 
-              if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, tipo, w, i + 1);
+              if (i % sottocampionamento == 0) {
+                if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 3, w, i + 1);
+                else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 1, w, i + 1);
+              }
             }
           }
           else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
@@ -769,7 +721,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               //  ch = particelle[i*parametri->ndv + 5];
               //else
               //  ch = parametri->overwrite_charge_value;
-              if (i % sottocampionamento == 0) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, tipo, w, i + 1);
+
+              if (i % sottocampionamento == 0) {
+                if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 3, w, i + 1);
+                else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 1, w, i + 1);
+              }
             }
           }
         }

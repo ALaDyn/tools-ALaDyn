@@ -10,8 +10,10 @@ non puo' nemmeno calcolare le le dimensioni dei bin!
 Verificare che non ci siano cose intelligenti da poter fare! */
 Parametri::Parametri()
 {
+  nparams = NUMERO_PARAMETRI_FILE_DAT;
   intpar.resize(NUMERO_PARAMETRI_FILE_DAT, 0);
   realpar.resize(NUMERO_PARAMETRI_FILE_DAT, 0.0);
+  header_size_bytes = 0;
   subsample = 1;
   span = 5;
   ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
@@ -160,6 +162,63 @@ float Parametri::dimmi_dim(int colonna)
   else if (colonna == 13)	return dimmi_dimch();
   else return 1.0;
 }
+
+
+
+void Parametri::leggi_parametri_da_file_bin(const char * filename) 
+{
+  std::FILE * file_in = NULL;
+  int fortran_buff;
+  size_t fread_size = 0;
+
+  file_in = fopen(filename, "rb");
+  if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
+  else std::cout << "File opened to read parameters!" << std::endl;
+
+  fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+  fread_size += std::fread(&nparams, sizeof(int), 1, file_in);
+  fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+
+  if (p[SWAP]) swap_endian_i(&nparams, 1);
+
+  fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+  fread_size += std::fread(&intpar[0], sizeof(int), nparams, file_in);
+  fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+  fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+  fread_size += std::fread(&realpar[0], sizeof(float), nparams, file_in);
+  fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+
+  if (p[SWAP]) swap_endian_i(intpar);
+  if (p[SWAP]) swap_endian_f(realpar);
+
+  fclose(file_in);
+
+  /* overwrite default with good values */
+  ncpu_x = 1;
+  ncpu_y = intpar[0];
+  ncpu_z = intpar[1];
+  npx_ricampionati_per_cpu = intpar[2];
+  npx = intpar[3];
+  npy = intpar[4];
+  npy_ricampionati_per_cpu = intpar[5];
+  npz = intpar[6];
+  npz_ricampionati_per_cpu = intpar[7];
+  nptot = (long long int) intpar[16];
+  ndv = intpar[17];
+  aladyn_version = intpar[18];
+  endianness = intpar[19];
+  tnow = realpar[0];  //tempo dell'output
+  xmin = realpar[1];  //estremi della griglia
+  xmax = realpar[2];  //estremi della griglia
+  ymin = realpar[3];  //estremi della griglia
+  ymax = realpar[4];  //estremi della griglia
+  zmin = realpar[5];  //estremi della griglia
+  zmax = realpar[6];  //estremi della griglia
+  
+  header_size_bytes = (7 + nparams) * sizeof(int) + nparams * sizeof(float);
+  if (fread_size != header_size_bytes) std::cout << "error: header size is different than expected" << std::endl << std::flush;
+}
+
 
 
 void Parametri::leggi_file_dat(std::ifstream& file_dat)

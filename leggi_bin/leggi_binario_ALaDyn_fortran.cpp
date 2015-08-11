@@ -72,7 +72,8 @@ int main(const int argc, const char *argv[])
       
       parametri.chiedi_endian_file();
 
-    
+    parametri.leggi_parametri_da_file_bin(argv[1]);
+
     if ((parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI || parametri.file_particelle_generic_ion)
       && parametri.p_b[NCOLONNE])
 

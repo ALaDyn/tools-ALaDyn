@@ -8,32 +8,17 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   std::string basefilename = std::string(argv[1]);
   std::ostringstream nomefile_bin;
 
-  const int out_swap = parametri->p[SWAP];
-  const int out_parameters = parametri->p[OUT_PARAMS];
-  const int out_vtk = parametri->p[OUT_VTK];
-  const int out_vtk_nostretch = parametri->p[OUT_VTK_NOSTRETCH];
-  const int out_cutx = parametri->p[OUT_CUTX];
-  const int out_cuty = parametri->p[OUT_CUTY];
-  const int out_cutz = parametri->p[OUT_CUTZ];
-  const int out_lineoutx = parametri->p[OUT_LINEOUT_X];
-  const int out_2d = parametri->p[OUT_GRID2D];
-
-  int span = parametri->span;
   float taglio;
   std::vector<float> cutx, cuty, cutz;
   std::vector<size_t> gridIndex_cutx, gridIndex_cuty, gridIndex_cutz;
 
   int indice_multifile = 0;
-
-  int N_param, fortran_buff;
-  N_param = fortran_buff = 0;
-  int header_size = 3;
-  int * header = new int[header_size];
   float dx = 0., dy = 0., dz = 0., xx = 0., yy = 0.;
 
+  int fortran_buff;
+  int header_size = 3;
+  int * header = new int[header_size];
 
-  int *int_param = NULL;
-  float *real_param = NULL;
   float *** field = NULL;
   float *buffer = NULL;
   float *x_lineout = NULL;
@@ -45,80 +30,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   std::FILE *clean_fields = NULL;
 
   size_t fread_size = 0;
-
-
-  if (parametri->aladyn_version == 1)
-  {
-    nomefile_bin << basefilename << ".bin";
-    file_in = fopen(nomefile_bin.str().c_str(), "rb");
-    if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
-    else std::cout << "File opened to read parameters!" << std::endl;
-
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(&N_param, sizeof(int), 1, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-
-    if (out_swap) swap_endian_i(&N_param, 1);
-
-    int_param = new int[N_param];
-    real_param = new float[N_param];
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(int_param, sizeof(int), N_param, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(real_param, sizeof(float), N_param, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-
-    if (out_swap) swap_endian_i(int_param, N_param);
-    if (out_swap) swap_endian_f(real_param, N_param);
-
-    fclose(file_in);
-
-    /* overwrite default with good values */
-    parametri->ncpu_x = 1;
-    parametri->ncpu_y = int_param[0];
-    parametri->ncpu_z = int_param[1];
-    parametri->npx_ricampionati_per_cpu = int_param[2];
-    parametri->npx = int_param[3];
-    parametri->npy = int_param[4];
-    parametri->npy_ricampionati_per_cpu = int_param[5];
-    parametri->npz = int_param[6];
-    parametri->npz_ricampionati_per_cpu = int_param[7];
-    /*
-    ibx = int_param[8];
-    iby = int_param[9];
-    ibz = int_param[10];
-    model = int_param[11];  //modello di laser utilizzato
-    dmodel = int_param[12]; //modello di condizioni iniziali
-    nsp = int_param[13];    //numero di speci
-    np_loc = int_param[14];  //numero di componenti dello spazio dei momenti
-    lpord = int_param[15]; //ordine dello schema leapfrog
-    deord = int_param[16]; //ordine derivate
-    fvar = int_param[17];
-    */
-    parametri->tnow = real_param[0];  //tempo dell'output
-    parametri->xmin = real_param[1];  //estremi della griglia
-    parametri->xmax = real_param[2];  //estremi della griglia
-    parametri->ymin = real_param[3];  //estremi della griglia
-    parametri->ymax = real_param[4];  //estremi della griglia
-    parametri->zmin = real_param[5];  //estremi della griglia
-    parametri->zmax = real_param[6];  //estremi della griglia
-    /*
-    w0x = real_param[7];      //waist del laser in x
-    w0y = real_param[8];      //waist del laser in y
-    nrat = real_param[9];     //n orver n critical
-    a0 = real_param[10];      // a0 laser
-    lam0 = real_param[11];    // lambda
-    E0 = real_param[12];      //conversione da campi numerici a TV/m
-    B0 = E0 + (float)(33.3);
-    ompe = real_param[13];    //costante accoppiamento correnti campi
-    xt_in = real_param[14];   //inizio plasma
-    xt_end = real_param[15];
-    charge = real_param[16];  //carica particella su carica elettrone
-    mass = real_param[17];    //massa particelle su massa elettrone
-    */
-  }
-
 
   std::cout << "READING" << std::endl;
   size_t prodotto = parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati;
@@ -140,20 +51,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
     else std::cout << "File opened to read data!" << std::endl;
 
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(&N_param, sizeof(int), 1, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-
-    if (out_swap) swap_endian_i(&N_param, 1);
-    int_param = new int[N_param];
-    real_param = new float[N_param];
-
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(int_param, sizeof(int), N_param, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-    fread_size = std::fread(real_param, sizeof(float), N_param, file_in);
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
+    /*skip header*/
+    std::fseek(file_in, parametri->header_size_bytes, SEEK_SET);
 
     for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
     {
@@ -165,7 +64,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
           fread_size = std::fread(header, sizeof(int), header_size, file_in);
           fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
-          if (out_swap) swap_endian_i(header, header_size);
+          if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
           if (header[0] != parametri->npx_ricampionati_per_cpu ||
             header[1] != parametri->npy_ricampionati_per_cpu ||
@@ -184,7 +83,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
           fread_size = std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
           fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
-          if (out_swap) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+          if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
           for (size_t k = 0; k < parametri->npz_ricampionati_per_cpu; k++)
             for (size_t j = 0; j < parametri->npy_ricampionati_per_cpu; j++)
@@ -218,7 +117,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       fread_size = std::fread(z_coordinates, sizeof(float), parametri->npz_ricampionati, file_in);
       fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
-      if (out_swap)
+      if (parametri->p[SWAP])
       {
         swap_endian_f(x_coordinates, parametri->npx_ricampionati);
         swap_endian_f(y_coordinates, parametri->npy_ricampionati);
@@ -255,7 +154,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
           for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
           {
             fread_size = std::fread(header, sizeof(int), header_size, file_in);
-            if (out_swap) swap_endian_i(header, header_size);
+            if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
             if (header[0] != parametri->npx_ricampionati_per_cpu ||
               header[1] != parametri->npy_ricampionati_per_cpu ||
@@ -272,7 +171,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
             buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
             fread_size = std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
 
-            if (out_swap) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+            if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
             for (size_t k = 0; k < parametri->npz_ricampionati_per_cpu; k++)
               for (size_t j = 0; j < parametri->npy_ricampionati_per_cpu; j++)
@@ -308,7 +207,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
             for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
             {
               fread_size = std::fread(header, sizeof(int), header_size, file_in);
-              if (out_swap) swap_endian_i(header, header_size);
+              if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
               if (header[0] != parametri->npx_ricampionati_per_cpu ||
                 header[1] != parametri->npy_ricampionati_per_cpu ||
@@ -325,7 +224,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
               buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
               fread_size = std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
 
-              if (out_swap) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+              if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
               for (size_t k = 0; k < parametri->npz_ricampionati_per_cpu; k++)
                 for (size_t j = 0; j < parametri->npy_ricampionati_per_cpu; j++)
@@ -345,7 +244,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
   std::cout << "END READING" << std::endl << std::flush;
 
-  if (parametri->npz_ricampionati == 1 && out_2d)
+  if (parametri->npz_ricampionati == 1 && parametri->p[OUT_GRID2D])
   {
     printf("\nWriting the ASCII 2D fields file\n");
     sprintf(nomefile_campi, "%s.txt", argv[1]);
@@ -367,7 +266,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   }
 
 
-  if (parametri->npz_ricampionati == 1 && out_lineoutx)
+  if (parametri->npz_ricampionati == 1 && parametri->p[OUT_LINEOUT_X])
   {
     int myj;
     printf("\nScrittura lineout 1D\n");
@@ -387,12 +286,12 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
 
     fprintf(clean_fields, "#");
-    for (int j = myj - span; j < (myj + span + 1); j++)
+    for (int j = myj - parametri->span; j < (myj + parametri->span + 1); j++)
     {
       fprintf(clean_fields, "%.4g\t", parametri->ycoord[j]);
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       {
-        x_lineout[i] += field[i][j][0] / (2.0f * span + 1.0f);
+        x_lineout[i] += field[i][j][0] / (2.0f * parametri->span + 1.0f);
       }
     }
     fprintf(clean_fields, "\n");
@@ -404,7 +303,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fclose(clean_fields);
   }
 
-  if (parametri->npz_ricampionati > 1 && out_lineoutx)
+  if (parametri->npz_ricampionati > 1 && parametri->p[OUT_LINEOUT_X])
   {
     int myj;
     printf("\nScrittura lineout 1D\n");
@@ -423,15 +322,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       }
     }
     fprintf(clean_fields, "#");
-    for (int k = myj - span; k < (myj + span + 1); k++)
+    for (int k = myj - parametri->span; k < (myj + parametri->span + 1); k++)
     {
       fprintf(clean_fields, "%.4g\t", parametri->zcoord[k]);
 
-      for (int j = myj - span; j < (myj + span + 1); j++)
+      for (int j = myj - parametri->span; j < (myj + parametri->span + 1); j++)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
-          x_lineout[i] += field[i][j][k] / ((2.0f * span + 1.0f)*(2.0f * span + 1.0f));
+          x_lineout[i] += field[i][j][k] / ((2.0f * parametri->span + 1.0f)*(2.0f * parametri->span + 1.0f));
         }
       }
     }
@@ -445,7 +344,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   }
 
 
-  if (parametri->npz_ricampionati > 1 && out_cutz)
+  if (parametri->npz_ricampionati > 1 && parametri->p[OUT_CUTZ])
   {
     if (parametri->posizioni_taglio_griglia_z.size() == 0)
     {
@@ -489,7 +388,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
   }
 
-  if (parametri->npz_ricampionati > 1 && out_cuty)
+  if (parametri->npz_ricampionati > 1 && parametri->p[OUT_CUTY])
   {
     if (parametri->posizioni_taglio_griglia_y.size() == 0)
     {
@@ -533,7 +432,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
   }
 
-  if (parametri->npz_ricampionati > 1 && out_cutx)
+  if (parametri->npz_ricampionati > 1 && parametri->p[OUT_CUTX])
   {
     if (parametri->posizioni_taglio_griglia_x.size() == 0)
     {
@@ -578,7 +477,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   }
 
 
-  if (out_vtk)
+  if (parametri->p[OUT_VTK])
   {
     printf("%lu\nScrittura vtk\n\n", (unsigned long)fread_size);
 
@@ -636,7 +535,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
 
 
-  if (out_vtk_nostretch)
+  if (parametri->p[OUT_VTK_NOSTRETCH])
   {
     printf("%lu\nScrittura vtk della parte non stretchata della griglia\n\n", (unsigned long)fread_size);
 
@@ -759,7 +658,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fclose(clean_fields);
   }
 
-  if (out_parameters)
+  if (parametri->p[OUT_PARAMS])
   {
     sprintf(nomefile_parametri, "%s.parameters", argv[1]);
     parameters = fopen(nomefile_parametri, "w");

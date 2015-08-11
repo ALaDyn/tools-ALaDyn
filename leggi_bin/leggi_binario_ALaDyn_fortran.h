@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 1
+#define BUGFIX_RELEASE 2
 
 #include <iostream>
 #include <vector>
@@ -158,6 +158,7 @@ struct Parametri
   unsigned int ndv, fattore_ricampionamento;
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   size_t npx_ricampionati, npy_ricampionati, npz_ricampionati, npx_ricampionati_per_cpu, npy_ricampionati_per_cpu, npz_ricampionati_per_cpu;
+  size_t header_size_bytes;
   unsigned long long int nptot;
   int endianness;
   int aladyn_version;
@@ -168,6 +169,7 @@ struct Parametri
   int nbin, nbin_x, nbin_y, nbin_z, nbin_px, nbin_py, nbin_pz, nbin_w, nbin_ch, nbin_E, nbin_gamma, nbin_theta, nbin_thetaT, nbin_ty, nbin_tz;
   int endian_file, endian_machine;
   int last_cpu;
+  int nparams;
   int p[NPARAMETRI];
   bool p_b[NPARAMETRI];
   char support_label[MAX_LENGTH_FILENAME];
@@ -175,7 +177,7 @@ struct Parametri
   float tnow, xmin, xmax, pxmin, pxmax, ymin, ymax, pymin, pymax, zmin, zmax, pzmin, pzmax, wmin, wmax, chmin, chmax, Emin, Emax, gammamin, gammamax, thetamin, thetamax, thetaTmin, thetaTmax, tymin, tymax, tzmin, tzmax;
   std::vector<float> posizioni_taglio_griglia_x, posizioni_taglio_griglia_y, posizioni_taglio_griglia_z;
   std::vector<float> xcoord, ycoord, zcoord, realpar;
-  std::vector<unsigned int> intpar;
+  std::vector<int> intpar;
   bool xmin_b, xmax_b, pxmin_b, pxmax_b, ymin_b, ymax_b, pymin_b, pymax_b, zmin_b, zmax_b, pzmin_b, pzmax_b, wmin_b, wmax_b, chmin_b, chmax_b, Emin_b, Emax_b,
     tymin_b, tymax_b, tzmin_b, tzmax_b, gammamin_b, gammamax_b, thetamin_b, thetamax_b, thetaTmin_b, thetaTmax_b, nbin_b, nbin_x_b, nbin_y_b,
     nbin_z_b, nbin_ty_b, nbin_tz_b, nbin_px_b, nbin_py_b, nbin_pz_b, nbin_w_b, nbin_ch_b, nbin_E_b, nbin_theta_b, nbin_thetaT_b, nbin_gamma_b;
@@ -218,6 +220,7 @@ struct Parametri
   bool check_parametri();
   void check_filename(const char *);
   void organizza_minimi_massimi();
+  void leggi_parametri_da_file_bin(const char *);
 };
 
 
@@ -302,9 +305,11 @@ int leggi_particelle(int, const char **, Parametri *);
 int is_big_endian(void);
 void swap_endian_s(short*, int);
 void swap_endian_i(int*, int);
+void swap_endian_i(std::vector<int> &);
 void swap_endian_f(float*, size_t);
 void swap_endian_f(float*, int);
 void swap_endian_f(float***, size_t, size_t, size_t);
+void swap_endian_f(std::vector<float> &);
 
 
 #endif
