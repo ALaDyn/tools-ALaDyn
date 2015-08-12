@@ -2,11 +2,11 @@
 #define __LEGGI_ALADYN_FORTRAN
 
 
-// #define ENABLE_DEBUG
+//#define ENABLE_DEBUG
 
 
 #define _CRT_SECURE_NO_WARNINGS   // VS does not bother anymore with sprintf and strtok
-#define _USE_MATH_DEFINES     // VS does not bother anymore with M_PI not defined
+#define _USE_MATH_DEFINES         // VS does not bother anymore with M_PI not defined
 #define _SCL_SECURE_NO_WARNINGS
 
 #define MAJOR_RELEASE  5
@@ -213,7 +213,7 @@ struct Parametri
   int dimmi_nbin(int);
   void parse_command_line(int, const char **);
   void leggi_file_dat(std::ifstream &);
-  void debug_dat_parse();
+  void debug_read_parameters();
   void chiedi_endian_file();
   void chiedi_numero_colonne();
   void chiedi_2Do3D();

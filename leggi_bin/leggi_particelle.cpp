@@ -461,7 +461,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           //  printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
           val[0] = (unsigned int)dimensione_array_particelle;
 #ifdef ENABLE_DEBUG
-          printf("npart_loc = %i\t\t ndv=%i\n", val[0], ndv);
+          printf("npart_loc = %i\t\t ndv=%i\n", val[0], parametri->ndv);
 #else
           printf("npart_loc = %i\t\t ndv=%i\r", val[0], parametri->ndv);
 #endif
