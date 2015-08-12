@@ -109,6 +109,11 @@ int main(const int argc, const char *argv[])
     parametri.p_b[SWAP] = false;
   }
 
+#ifdef ENABLE_DEBUG
+  if (parametri.p[SWAP]) std::cout << "Swap is enabled" << std::endl;
+  else std::cout << "Swap is disabled" << std::endl;
+#endif
+
   parametri.parse_command_line(argc, argv);
 
 

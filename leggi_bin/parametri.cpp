@@ -230,7 +230,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   std::getline(file_dat, riga_persa); // per leggere la riga Integer parameters
 
 
-  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  for (int i = 0; i < nparams; i++)
   {
     file_dat >> intpar[i];
     if (file_dat.fail())
@@ -247,7 +247,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
   std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga degli interi
   std::getline(file_dat, riga_persa); // per leggere la riga Real parameters
-  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  for (int i = 0; i < nparams; i++)
   {
     file_dat >> realpar[i];
     if (file_dat.fail())
@@ -389,7 +389,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   {
     if (npz == 1) zmin = 0.0, zmax = 1.0;
     p[WEIGHT] = 0;
-    p[NCOLONNE] = npz;
+    p[NCOLONNE] = (int) npz;
     p_b[NCOLONNE] = false;
     p_b[WEIGHT] = false;
 

@@ -376,7 +376,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       if (parametri->aladyn_version == 1)
       {
         /*skip header*/
-        std::fseek(file_in, parametri->header_size_bytes, SEEK_SET);
+        std::fseek(file_in, (long) parametri->header_size_bytes, SEEK_SET);
 
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
@@ -960,12 +960,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
     fprintf(parameters, "ncpu_y=%i\n", parametri->ncpu_y);
     fprintf(parameters, "ncpu_z=%i\n", parametri->ncpu_z);
-    fprintf(parameters, "npx_ricampionati=%i\n", parametri->npx_ricampionati);
-    fprintf(parameters, "npy_ricampionati=%i\n", parametri->npy_ricampionati);
-    fprintf(parameters, "npz_ricampionati=%i\n", parametri->npz_ricampionati);
-    fprintf(parameters, "npx_ricampionati_per_cpu=%i\n", parametri->npx_ricampionati_per_cpu);
-    fprintf(parameters, "npy_ricampionati_per_cpu=%i\n", parametri->npy_ricampionati_per_cpu);
-    fprintf(parameters, "npz_ricampionati_per_cpu=%i\n", parametri->npz_ricampionati_per_cpu);
+    fprintf(parameters, "npx_ricampionati=%llu\n", parametri->npx_ricampionati);
+    fprintf(parameters, "npy_ricampionati=%llu\n", parametri->npy_ricampionati);
+    fprintf(parameters, "npz_ricampionati=%llu\n", parametri->npz_ricampionati);
+    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", parametri->npx_ricampionati_per_cpu);
+    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", parametri->npy_ricampionati_per_cpu);
+    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", parametri->npz_ricampionati_per_cpu);
     fprintf(parameters, "tnow=%f\n", parametri->tnow);
     fprintf(parameters, "xmin=%f\n", parametri->xmin);
     fprintf(parameters, "xmax=%f\n", parametri->xmax);

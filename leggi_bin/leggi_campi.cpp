@@ -32,13 +32,12 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   size_t fread_size = 0;
 
   std::cout << "READING" << std::endl;
-  size_t prodotto = parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati;
-  printf("nx*ny*nz: %i %i %i = %.10e\n", parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati, (double)prodotto);
+  printf("nx*ny*nz: %llu %llu %llu = %llu\n", parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati);
   fflush(stdout);
 
-  **field = new float[parametri->npx_ricampionati];
+  field = new float**[parametri->npx_ricampionati];
   for (size_t i = 0; i < parametri->npx_ricampionati; i++) {
-    *field[i] = new float[parametri->npy_ricampionati];
+    field[i] = new float*[parametri->npy_ricampionati];
     for (size_t j = 0; j < parametri->npy_ricampionati; j++) field[i][j] = new float[parametri->npz_ricampionati];
   }
   x_lineout = new float[parametri->npx_ricampionati];
@@ -50,9 +49,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     file_in = fopen(nomefile_bin.str().c_str(), "rb");
     if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
     else std::cout << "File opened to read data!" << std::endl;
-
     /*skip header*/
-    std::fseek(file_in, parametri->header_size_bytes, SEEK_SET);
+    std::fseek(file_in, (long) parametri->header_size_bytes, SEEK_SET);
+
+    std::cout << "Fseek after header done" << std::endl << std::flush;
+    std::cin.get();
 
     for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
     {
@@ -60,9 +61,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       {
         for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
         {
-          fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-          fread_size = std::fread(header, sizeof(int), header_size, file_in);
-          fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += std::fread(header, sizeof(int), header_size, file_in);
+          fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
@@ -72,16 +73,16 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
             std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
 #ifdef ENABLE_DEBUG
-          printf("processore ipz=%i/%i  ipy=%i/%i  ipx=%i/%i\n", ipz, parametri->ncpu_z, ipy, parametri->ncpu_y, ipx, parametri->ncpu_x);
+          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\n", header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #else
-          printf("processore ipz=%i/%i  ipy=%i/%i  ipx=%i/%i\r", ipz, parametri->ncpu_z, ipy, parametri->ncpu_y, ipx, parametri->ncpu_x);
+          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #endif
           fflush(stdout);
 
           buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-          fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-          fread_size = std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
-          fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
+          fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
@@ -99,7 +100,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     // se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei parametri
 
 
-    fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
+    fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
     // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i dati non e' di alcun interesse
 
     if (!std::feof(file_in))
@@ -108,14 +109,14 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       x_coordinates = new float[parametri->npx_ricampionati];
       y_coordinates = new float[parametri->npy_ricampionati];
       z_coordinates = new float[parametri->npz_ricampionati];
-      fread_size = std::fread(x_coordinates, sizeof(float), parametri->npx_ricampionati, file_in);
-      fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size = std::fread(y_coordinates, sizeof(float), parametri->npy_ricampionati, file_in);
-      fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size = std::fread(z_coordinates, sizeof(float), parametri->npz_ricampionati, file_in);
-      fread_size = std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += std::fread(x_coordinates, sizeof(float), parametri->npx_ricampionati, file_in);
+      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += std::fread(y_coordinates, sizeof(float), parametri->npy_ricampionati, file_in);
+      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += std::fread(z_coordinates, sizeof(float), parametri->npz_ricampionati, file_in);
+      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
       if (parametri->p[SWAP])
       {
@@ -153,7 +154,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
         {
           for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
           {
-            fread_size = std::fread(header, sizeof(int), header_size, file_in);
+            fread_size += std::fread(header, sizeof(int), header_size, file_in);
             if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
             if (header[0] != parametri->npx_ricampionati_per_cpu ||
@@ -162,14 +163,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
               std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
 #ifdef ENABLE_DEBUG
-            printf("file %i, processore ipy=%i/%i, reading %i elements\n", indice_multifile, ipy, parametri->ncpu_y, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\n", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #else
-            printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, parametri->ncpu_y);
+            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #endif
-            fflush(stdout);
 
             buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-            fread_size = std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
+            fread_size += std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
 
             if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
@@ -206,7 +206,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
           {
             for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
             {
-              fread_size = std::fread(header, sizeof(int), header_size, file_in);
+              fread_size += std::fread(header, sizeof(int), header_size, file_in);
               if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
               if (header[0] != parametri->npx_ricampionati_per_cpu ||
@@ -215,14 +215,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
                 std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
 #ifdef ENABLE_DEBUG
-              printf("file %i, processore ipy=%i/%i, reading %i elements\n", indice_multifile, ipy, parametri->ncpu_y, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+              printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\n", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #else
-              printf("file %i, processore ipy=%i/%i\r", indice_multifile, ipy, parametri->ncpu_y);
+              printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #endif
-              fflush(stdout);
 
               buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-              fread_size = std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
+              fread_size += std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
 
               if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
@@ -251,7 +250,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     clean_fields = fopen(nomefile_campi, "w");
 
     //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-    fprintf(clean_fields, "#%lu\n#%lu\n#%lu\n", parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati);
+    fprintf(clean_fields, "#%lu\n#%lu\n#%lu\n", (long)parametri->npx_ricampionati, (long)parametri->npy_ricampionati, (long)parametri->npz_ricampionati);
     fprintf(clean_fields, "#%f %f\n#%f %f\n", parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
     for (size_t j = 0; j < parametri->npy_ricampionati; j++)
     {
@@ -268,7 +267,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_LINEOUT_X])
   {
-    int myj;
+    size_t myj;
     printf("\nScrittura lineout 1D\n");
     sprintf(nomefile_campi, "%s_lineout.txt", argv[1]);
     clean_fields = fopen(nomefile_campi, "w");
@@ -286,7 +285,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
 
     fprintf(clean_fields, "#");
-    for (int j = myj - parametri->span; j < (myj + parametri->span + 1); j++)
+    for (size_t j = myj - parametri->span; j < (myj + parametri->span + 1); j++)
     {
       fprintf(clean_fields, "%.4g\t", parametri->ycoord[j]);
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
@@ -305,7 +304,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
   if (parametri->npz_ricampionati > 1 && parametri->p[OUT_LINEOUT_X])
   {
-    int myj;
+    size_t myj;
     printf("\nScrittura lineout 1D\n");
     sprintf(nomefile_campi, "%s_lineout.txt", argv[1]);
     clean_fields = fopen(nomefile_campi, "w");
@@ -322,11 +321,11 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       }
     }
     fprintf(clean_fields, "#");
-    for (int k = myj - parametri->span; k < (myj + parametri->span + 1); k++)
+    for (size_t k = myj - parametri->span; k < (myj + parametri->span + 1); k++)
     {
       fprintf(clean_fields, "%.4g\t", parametri->zcoord[k]);
 
-      for (int j = myj - parametri->span; j < (myj + parametri->span + 1); j++)
+      for (size_t j = myj - parametri->span; j < (myj + parametri->span + 1); j++)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
@@ -372,7 +371,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       printf("\nWriting the fields file 2D (not vtk)\n");
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at z=%g\n", cutz[n]);
-      fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", parametri->npx_ricampionati, parametri->npy_ricampionati, 1);
+      fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npx_ricampionati, (long)parametri->npy_ricampionati, 1);
       fprintf(clean_fields, "#%f %f\n#%f %f\n", parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
       size_t k = gridIndex_cutz[n];
       for (size_t j = 0; j < parametri->npy_ricampionati; j++)
@@ -416,7 +415,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       printf("\nWriting the fields file 2D (not vtk)\n");
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at y=%g\n", cuty[n]);
-      fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", parametri->npx_ricampionati, parametri->npz_ricampionati, 1);
+      fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npx_ricampionati, (long)parametri->npz_ricampionati, 1);
       fprintf(clean_fields, "#%f %f\n#%f %f\n", parametri->xmin, parametri->zmin, parametri->xmax, parametri->zmax);
       size_t j = gridIndex_cuty[n];
       for (size_t k = 0; k < parametri->npz_ricampionati; k++)
@@ -460,7 +459,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       printf("\nWriting the fields file 2D (not vtk)\n");
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at x=%g\n", cutx[n]);
-      fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", parametri->npy_ricampionati, parametri->npz_ricampionati, 1);
+      fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npy_ricampionati, (long)parametri->npz_ricampionati, 1);
       fprintf(clean_fields, "#%f %f\n#%f %f\n", parametri->ymin, parametri->zmin, parametri->ymax, parametri->zmax);
       size_t i = gridIndex_cutx[n];
       for (size_t k = 0; k < parametri->npz_ricampionati; k++)
@@ -510,7 +509,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fprintf(clean_fields, "titolo mio\n");
     fprintf(clean_fields, "BINARY\n");
     fprintf(clean_fields, "DATASET UNSTRUCTURED_GRID\n");
-    fprintf(clean_fields, "POINTS %lu float\n", parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati);
+    fprintf(clean_fields, "POINTS %lu float\n", (long)(parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati));
     float rr[3];
     for (size_t k = 0; k < parametri->npz_ricampionati; k++)
     {
@@ -526,7 +525,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       }
     }
 
-    fprintf(clean_fields, "POINT_DATA %lu\n", parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati);
+    fprintf(clean_fields, "POINT_DATA %lu\n", (long)(parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati));
     fprintf(clean_fields, "SCALARS %s float 1\n", parametri->support_label);
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
     fwrite((void*)field, sizeof(float), parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati, clean_fields);
@@ -607,10 +606,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fprintf(clean_fields, "titolo mio\n");
     fprintf(clean_fields, "BINARY\n");
     fprintf(clean_fields, "DATASET STRUCTURED_POINTS\n");
-    fprintf(clean_fields, "DIMENSIONS %lu %lu %lu\n", npunti_non_stretchati_x, npunti_non_stretchati_y, npunti_non_stretchati_z);
+    fprintf(clean_fields, "DIMENSIONS %lu %lu %lu\n", (long)npunti_non_stretchati_x, (long)npunti_non_stretchati_y, (long)npunti_non_stretchati_z);
     fprintf(clean_fields, "ORIGIN %f %f %f\n", xmin_non_stretchato, ymin_non_stretchato, zmin_non_stretchato);
     fprintf(clean_fields, "SPACING %f %f %f\n", dx, dy, dz);
-    fprintf(clean_fields, "POINT_DATA %lu\n", npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z);
+    fprintf(clean_fields, "POINT_DATA %lu\n", (long)(npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z));
     fprintf(clean_fields, "SCALARS %s float 1\n", parametri->support_label);
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
     fwrite((void*)field_non_stretchato, sizeof(float), npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z, clean_fields);
@@ -663,15 +662,15 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     sprintf(nomefile_parametri, "%s.parameters", argv[1]);
     parameters = fopen(nomefile_parametri, "w");
     printf("\nWriting parameters to file\n");
-    fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
-    fprintf(parameters, "ncpu_y=%i\n", parametri->ncpu_y);
-    fprintf(parameters, "ncpu_z=%i\n", parametri->ncpu_z);
-    fprintf(parameters, "npx_ricampionati=%i\n", parametri->npx_ricampionati);
-    fprintf(parameters, "npy_ricampionati=%i\n", parametri->npy_ricampionati);
-    fprintf(parameters, "npz_ricampionati=%i\n", parametri->npz_ricampionati);
-    fprintf(parameters, "npx_ricampionati_per_cpu=%i\n", parametri->npx_ricampionati_per_cpu);
-    fprintf(parameters, "npy_ricampionati_per_cpu=%i\n", parametri->npy_ricampionati_per_cpu);
-    fprintf(parameters, "npz_ricampionati_per_cpu=%i\n", parametri->npz_ricampionati_per_cpu);
+    fprintf(parameters, "ncpu_x=%u\n", parametri->ncpu_x);
+    fprintf(parameters, "ncpu_y=%u\n", parametri->ncpu_y);
+    fprintf(parameters, "ncpu_z=%u\n", parametri->ncpu_z);
+    fprintf(parameters, "npx_ricampionati=%llu\n", parametri->npx_ricampionati);
+    fprintf(parameters, "npy_ricampionati=%llu\n", parametri->npy_ricampionati);
+    fprintf(parameters, "npz_ricampionati=%llu\n", parametri->npz_ricampionati);
+    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", parametri->npx_ricampionati_per_cpu);
+    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", parametri->npy_ricampionati_per_cpu);
+    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", parametri->npz_ricampionati_per_cpu);
     fprintf(parameters, "tnow=%f\n", parametri->tnow);
     fprintf(parameters, "xmin=%f\n", parametri->xmin);
     fprintf(parameters, "xmax=%f\n", parametri->xmax);
