@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 4
+#define BUGFIX_RELEASE 5
 
 #include <iostream>
 #include <vector>
@@ -190,6 +190,7 @@ struct Parametri
   int fai_plot_xw, fai_plot_rcf;
   int subsample;
   int span;
+  bool file_griglia, file_spaziofasi;
   bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI, file_particelle_generic_ion;
   bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
   bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI, file_densita_generic_ion, file_densita_driver;

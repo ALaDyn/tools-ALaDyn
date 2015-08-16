@@ -57,6 +57,8 @@ Parametri::Parametri()
 
   endian_file = 0;
   endian_machine = is_big_endian();
+  file_spaziofasi = false;
+  file_griglia = false;
   file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = file_particelle_generic_ion = false;
   file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
   file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = file_densita_generic_ion = file_densita_driver = false;
@@ -286,7 +288,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ncpu_x = intpar[2];
     ncpu = ncpu_x * ncpu_y * ncpu_z;
     npx_ricampionati = intpar[3];
-    npx_ricampionati_per_cpu = npx_ricampionati/ncpu_x;
+    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
     npy_ricampionati = intpar[4];
     npy_ricampionati_per_cpu = intpar[5];
     npz_ricampionati = intpar[6];
@@ -309,6 +311,11 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ymax = realpar[4];
     zmin = realpar[5];
     zmax = realpar[6];
+
+    if ((file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion) && (aladyn_version == 3))
+      header_size_bytes = 0;
+    else
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float); // in realtà questo else è valido solo per file di campi di aladyn versione 3. DA ESTENDERE e FIXARE!!!
   }
   else if (aladyn_version == 4) {
     /*
@@ -389,7 +396,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   {
     if (npz == 1) zmin = 0.0, zmax = 1.0;
     p[WEIGHT] = 0;
-    p[NCOLONNE] = (int) npz;
+    p[NCOLONNE] = (int)npz;
     p_b[NCOLONNE] = false;
     p_b[WEIGHT] = false;
 
@@ -553,10 +560,12 @@ void Parametri::check_filename(const char *nomefile)
       {
         massa_particella_MeV = (float)MP_MEV;
         file_particelle_P = true;
+        file_spaziofasi = true;
       }
       else if (nomefile[2] == 'e')
       {
         file_densita_energia_griglia_protoni = true;
+        file_griglia = true;
         sprintf(support_label, "pren");
       }
       else
@@ -568,6 +577,7 @@ void Parametri::check_filename(const char *nomefile)
     else if (nomefile[1] == 'd')
     {
       file_densita_protoni = true;
+      file_griglia = true;
       sprintf(support_label, "pden");
     }
     else
@@ -584,15 +594,18 @@ void Parametri::check_filename(const char *nomefile)
       {
         massa_particella_MeV = (float)MP_MEV; // fix wrong!
         file_particelle_HI = true;
+        file_spaziofasi = true;
       }
       else if (nomefile[2] == 'd')
       {
         file_densita_HI = true;
+        file_griglia = true;
         sprintf(support_label, "hidn");
       }
       else if (nomefile[2] == 'e')
       {
         file_densita_energia_griglia_HI = true;
+        file_griglia = true;
         sprintf(support_label, "hien");
       }
       else
@@ -607,15 +620,18 @@ void Parametri::check_filename(const char *nomefile)
       {
         massa_particella_MeV = (float)MP_MEV; // fix wrong!
         file_particelle_generic_ion = true;
+        file_spaziofasi = true;
       }
       else if (nomefile[2] == 'd')
       {
         file_densita_generic_ion = true;
+        file_griglia = true;
         sprintf(support_label, "h1dn");
       }
       else if (nomefile[2] == 'e')
       {
         file_densita_energia_griglia_generic_ion = true;
+        file_griglia = true;
         sprintf(support_label, "h1en");
       }
       else
@@ -630,15 +646,18 @@ void Parametri::check_filename(const char *nomefile)
       {
         massa_particella_MeV = (float)MP_MEV; // fix wrong!
         file_particelle_generic_ion = true;
+        file_spaziofasi = true;
       }
       else if (nomefile[2] == 'd')
       {
         file_densita_generic_ion = true;
+        file_griglia = true;
         sprintf(support_label, "h2dn");
       }
       else if (nomefile[2] == 'e')
       {
         file_densita_energia_griglia_generic_ion = true;
+        file_griglia = true;
         sprintf(support_label, "h2en");
       }
       else
@@ -661,15 +680,18 @@ void Parametri::check_filename(const char *nomefile)
       {
         massa_particella_MeV = (float)MP_MEV; // fix wrong!
         file_particelle_LI = true;
+        file_spaziofasi = true;
       }
       else if (nomefile[2] == 'd')
       {
         file_densita_LI = true;
+        file_griglia = true;
         sprintf(support_label, "lidn");
       }
       else if (nomefile[2] == 'e')
       {
         file_densita_energia_griglia_LI = true;
+        file_griglia = true;
         sprintf(support_label, "lien");
       }
       else
@@ -692,10 +714,12 @@ void Parametri::check_filename(const char *nomefile)
       {
         massa_particella_MeV = (float)ME_MEV;
         file_particelle_E = true;
+        file_spaziofasi = true;
       }
       else if (nomefile[2] == 'e')
       {
         file_densita_energia_griglia_elettroni = true;
+        file_griglia = true;
         sprintf(support_label, "elen");
       }
       else
@@ -709,6 +733,7 @@ void Parametri::check_filename(const char *nomefile)
       if (nomefile[2] == 'f')
       {
         file_campi_Ex = true;
+        file_griglia = true;
         sprintf(support_label, "Ex");
       }
       else
@@ -722,6 +747,7 @@ void Parametri::check_filename(const char *nomefile)
       if (nomefile[2] == 'f')
       {
         file_campi_Ey = true;
+        file_griglia = true;
         sprintf(support_label, "Ey");
       }
       else
@@ -735,6 +761,7 @@ void Parametri::check_filename(const char *nomefile)
       if (nomefile[2] == 'f')
       {
         file_campi_Ez = true;
+        file_griglia = true;
         sprintf(support_label, "Ez");
       }
       else
@@ -746,6 +773,7 @@ void Parametri::check_filename(const char *nomefile)
     else if (nomefile[1] == 'd')
     {
       file_densita_elettroni = true;
+      file_griglia = true;
       sprintf(support_label, "eden");
     }
     else
@@ -761,6 +789,7 @@ void Parametri::check_filename(const char *nomefile)
       if (nomefile[2] == 'f')
       {
         file_campi_Bx = true;
+        file_griglia = true;
         sprintf(support_label, "Bx");
       }
       else
@@ -774,6 +803,7 @@ void Parametri::check_filename(const char *nomefile)
       if (nomefile[2] == 'f')
       {
         file_campi_By = true;
+        file_griglia = true;
         sprintf(support_label, "By");
       }
       else
@@ -787,6 +817,7 @@ void Parametri::check_filename(const char *nomefile)
       if (nomefile[2] == 'f')
       {
         file_campi_Bz = true;
+        file_griglia = true;
         sprintf(support_label, "Bz");
       }
       else
@@ -798,6 +829,7 @@ void Parametri::check_filename(const char *nomefile)
     else if (nomefile[1] == 'd')
     {
       file_densita_driver = true;
+      file_griglia = true;
       sprintf(support_label, "Bd");
     }
     else
@@ -811,7 +843,6 @@ void Parametri::check_filename(const char *nomefile)
     std::cout << "File non riconosciuto" << std::endl;
     exit(-15);
   }
-
 }
 
 void Parametri::parse_command_line(int argc, const char ** argv)

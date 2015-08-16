@@ -68,27 +68,12 @@ int main(const int argc, const char *argv[])
     parametri.aladyn_version = 1;
     std::cout << "Unable to find " << argv[1] << ".dat, using routines for aladyn v1" << std::endl;
 
-    if (parametri.p_b[SWAP])
-
-      parametri.chiedi_endian_file();
+    if (parametri.p_b[SWAP]) parametri.chiedi_endian_file();
 
     parametri.leggi_parametri_da_file_bin(argv[1]);
 
-    if ((parametri.file_particelle_P || parametri.file_particelle_E || parametri.file_particelle_HI || parametri.file_particelle_LI || parametri.file_particelle_generic_ion)
-      && parametri.p_b[NCOLONNE])
-
-      parametri.chiedi_numero_colonne();
-
-
-    if ((parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
-      || parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
-      || parametri.file_densita_elettroni || parametri.file_densita_protoni
-      || parametri.file_densita_HI || parametri.file_densita_LI || parametri.file_densita_generic_ion
-      || parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni
-      || parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI || parametri.file_densita_energia_griglia_generic_ion)
-      && parametri.p_b[NCOLONNE])
-
-      parametri.chiedi_2Do3D();
+    if (parametri.file_spaziofasi && parametri.p_b[NCOLONNE]) parametri.chiedi_numero_colonne();
+    if (parametri.file_griglia && parametri.p_b[NCOLONNE]) parametri.chiedi_2Do3D();
   }
   else
   {
@@ -144,50 +129,42 @@ int main(const int argc, const char *argv[])
 
 
 #ifdef ENABLE_DEBUG
-  printf("Tipo file: file_campi_Ex? %i\n", parametri.file_campi_Ex);
-  printf("Tipo file: file_campi_Ey? %i\n", parametri.file_campi_Ey);
-  printf("Tipo file: file_campi_Ez? %i\n", parametri.file_campi_Ez);
-  printf("Tipo file: file_campi_Bx? %i\n", parametri.file_campi_Bx);
-  printf("Tipo file: file_campi_By? %i\n", parametri.file_campi_By);
-  printf("Tipo file: file_campi_Bz? %i\n", parametri.file_campi_Bz);
+  printf("file_griglia? %i\n", parametri.file_griglia);
+  printf("file_spaziofasi? %i\n", parametri.file_spaziofasi);
 
-  printf("Tipo file: file_eden? %i\n", parametri.file_densita_elettroni);
-  printf("Tipo file: file_pden? %i\n", parametri.file_densita_protoni);
-  printf("Tipo file: file_hiden? %i\n", parametri.file_densita_HI);
-  printf("Tipo file: file_liden? %i\n", parametri.file_densita_LI);
-  printf("Tipo file: file_genionden? %i\n", parametri.file_densita_generic_ion);
-  printf("Tipo file: file_driverden? %i\n", parametri.file_densita_driver);
+  printf("file_campi_Ex? %i\n", parametri.file_campi_Ex);
+  printf("file_campi_Ey? %i\n", parametri.file_campi_Ey);
+  printf("file_campi_Ez? %i\n", parametri.file_campi_Ez);
+  printf("file_campi_Bx? %i\n", parametri.file_campi_Bx);
+  printf("file_campi_By? %i\n", parametri.file_campi_By);
+  printf("file_campi_Bz? %i\n", parametri.file_campi_Bz);
 
-  printf("Tipo file: file_Prpout? %i\n", parametri.file_particelle_P);
-  printf("Tipo file: file_Elpout? %i\n", parametri.file_particelle_E);
-  printf("Tipo file: file_Hipout? %i\n", parametri.file_particelle_HI);
-  printf("Tipo file: file_Lipout? %i\n", parametri.file_particelle_LI);
-  printf("Tipo file: file_genericIon? %i\n", parametri.file_particelle_generic_ion);
+  printf("file_eden? %i\n", parametri.file_densita_elettroni);
+  printf("file_pden? %i\n", parametri.file_densita_protoni);
+  printf("file_hiden? %i\n", parametri.file_densita_HI);
+  printf("file_liden? %i\n", parametri.file_densita_LI);
+  printf("file_genionden? %i\n", parametri.file_densita_generic_ion);
+  printf("file_driverden? %i\n", parametri.file_densita_driver);
 
-  printf("Tipo file: file_denen_el? %i\n", parametri.file_densita_energia_griglia_elettroni);
-  printf("Tipo file: file_denen_pr? %i\n", parametri.file_densita_energia_griglia_protoni);
-  printf("Tipo file: file_denen_Hi? %i\n", parametri.file_densita_energia_griglia_HI);
-  printf("Tipo file: file_denen_Li? %i\n", parametri.file_densita_energia_griglia_LI);
-  printf("Tipo file: file_denen_genericIon? %i\n", parametri.file_densita_energia_griglia_generic_ion);
+  printf("file_Prpout? %i\n", parametri.file_particelle_P);
+  printf("file_Elpout? %i\n", parametri.file_particelle_E);
+  printf("file_Hipout? %i\n", parametri.file_particelle_HI);
+  printf("file_Lipout? %i\n", parametri.file_particelle_LI);
+  printf("file_genericIon? %i\n", parametri.file_particelle_generic_ion);
+
+  printf("file_denen_el? %i\n", parametri.file_densita_energia_griglia_elettroni);
+  printf("file_denen_pr? %i\n", parametri.file_densita_energia_griglia_protoni);
+  printf("file_denen_Hi? %i\n", parametri.file_densita_energia_griglia_HI);
+  printf("file_denen_Li? %i\n", parametri.file_densita_energia_griglia_LI);
+  printf("file_denen_genericIon? %i\n", parametri.file_densita_energia_griglia_generic_ion);
   fflush(stdout);
 #endif
 
 
-  if (parametri.file_campi_Ex || parametri.file_campi_Ey || parametri.file_campi_Ez
-    || parametri.file_campi_Bx || parametri.file_campi_By || parametri.file_campi_Bz
-    || parametri.file_densita_elettroni || parametri.file_densita_protoni
-    || parametri.file_densita_HI || parametri.file_densita_LI || parametri.file_densita_generic_ion || parametri.file_densita_driver
-    || parametri.file_densita_energia_griglia_elettroni || parametri.file_densita_energia_griglia_protoni
-    || parametri.file_densita_energia_griglia_HI || parametri.file_densita_energia_griglia_LI || parametri.file_densita_energia_griglia_generic_ion)
-
-    leggi_campi(argc, argv, &parametri);
-
-
-  else if (parametri.file_particelle_P || parametri.file_particelle_E
-    || parametri.file_particelle_HI || parametri.file_particelle_LI
-    || parametri.file_particelle_generic_ion)
-
-    leggi_particelle(argc, argv, &parametri);
+  if (parametri.file_griglia)         leggi_campi(argc, argv, &parametri);
+  else if (parametri.file_spaziofasi) leggi_particelle(argc, argv, &parametri);
+  else printf("Unuseful file\n");
+  fflush(stdout);
 
   return 0;
 }

@@ -52,7 +52,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     /*skip header*/
     std::fseek(file_in, (long) parametri->header_size_bytes, SEEK_SET);
 
-    std::cout << "Fseek after header done" << std::endl << std::flush;
+    std::cout << "Fseek of " << parametri->header_size_bytes << "bytes from beginning of file done" << std::endl << std::flush;
     std::cin.get();
 
     for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
