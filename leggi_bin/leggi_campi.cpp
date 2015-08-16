@@ -50,9 +50,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
     else std::cout << "File opened to read data!" << std::endl;
     /*skip header*/
-    std::fseek(file_in, (long) parametri->header_size_bytes, SEEK_SET);
+    std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
 
-    std::cout << "Fseek of " << parametri->header_size_bytes << "bytes from beginning of file done" << std::endl << std::flush;
+    std::cout << "Fseek of " << parametri->header_size_bytes << " bytes from beginning of file done" << std::endl << std::flush;
     std::cin.get();
 
     for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
@@ -67,29 +67,31 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
           if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
+#ifdef ENABLE_DEBUG
           if (header[0] != parametri->npx_ricampionati_per_cpu ||
             header[1] != parametri->npy_ricampionati_per_cpu ||
             header[2] != parametri->npz_ricampionati_per_cpu)
             std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
-#ifdef ENABLE_DEBUG
           printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\n", header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #else
           printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #endif
           fflush(stdout);
 
-          buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
+          buffer = new float[header[0] * header[1] * header[2]];
           fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-          fread_size += std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
+          fread_size += std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
           fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
-          for (size_t k = 0; k < parametri->npz_ricampionati_per_cpu; k++)
-            for (size_t j = 0; j < parametri->npy_ricampionati_per_cpu; j++)
-              for (size_t i = 0; i < parametri->npx_ricampionati_per_cpu; i++)
-                field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
+          for (size_t i = 0; i < header[0]; i++)
+            for (size_t k = 0; k < header[2]; k++)
+              for (size_t j = 0; j < header[1]; j++)
+                //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
+                //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
+                //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*header[1] + i*header[1] * header[2]];
           delete[] buffer;
           buffer = NULL;
         }
@@ -157,26 +159,30 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
             fread_size += std::fread(header, sizeof(int), header_size, file_in);
             if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
+#ifdef ENABLE_DEBUG
             if (header[0] != parametri->npx_ricampionati_per_cpu ||
               header[1] != parametri->npy_ricampionati_per_cpu ||
               header[2] != parametri->npz_ricampionati_per_cpu)
               std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
-#ifdef ENABLE_DEBUG
             printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\n", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #else
             printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #endif
+            fflush(stdout);
 
-            buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-            fread_size += std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
+
+            buffer = new float[header[0] * header[1] * header[2]];
+            fread_size += std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
 
             if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
-            for (size_t k = 0; k < parametri->npz_ricampionati_per_cpu; k++)
-              for (size_t j = 0; j < parametri->npy_ricampionati_per_cpu; j++)
-                for (size_t i = 0; i < parametri->npx_ricampionati_per_cpu; i++)
-                  field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
+            for (size_t i = 0; i < header[0]; i++)
+              for (size_t k = 0; k < header[2]; k++)
+                for (size_t j = 0; j < header[1]; j++)
+                  //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
+                  //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
+                  //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*header[1] + i*header[1] * header[2]];
             delete[] buffer;
             buffer = NULL;
           }
@@ -209,26 +215,29 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
               fread_size += std::fread(header, sizeof(int), header_size, file_in);
               if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
+#ifdef ENABLE_DEBUG
               if (header[0] != parametri->npx_ricampionati_per_cpu ||
                 header[1] != parametri->npy_ricampionati_per_cpu ||
                 header[2] != parametri->npz_ricampionati_per_cpu)
                 std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
-#ifdef ENABLE_DEBUG
               printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\n", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #else
               printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
 #endif
+              fflush(stdout);
 
-              buffer = new float[parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-              fread_size += std::fread(buffer, sizeof(float), parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu, file_in);
+              buffer = new float[header[0] * header[1] * header[2]];
+              fread_size += std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
 
               if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
-              for (size_t k = 0; k < parametri->npz_ricampionati_per_cpu; k++)
-                for (size_t j = 0; j < parametri->npy_ricampionati_per_cpu; j++)
-                  for (size_t i = 0; i < parametri->npx_ricampionati_per_cpu; i++)
-                    field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
+              for (size_t i = 0; i < header[0]; i++)
+                for (size_t k = 0; k < header[2]; k++)
+                  for (size_t j = 0; j < header[1]; j++)
+                    //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
+                    //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
+                    //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*header[1] + i*header[1] * header[2]];
               delete[] buffer;
               buffer = NULL;
             }
@@ -710,3 +719,4 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 }
 
 #endif
+

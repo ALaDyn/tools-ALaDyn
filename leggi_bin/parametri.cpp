@@ -312,10 +312,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    if ((file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion) && (aladyn_version == 3))
-      header_size_bytes = 0;
-    else
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float); // in realtà questo else è valido solo per file di campi di aladyn versione 3. DA ESTENDERE e FIXARE!!!
+    if (file_griglia) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
   else if (aladyn_version == 4) {
     /*
