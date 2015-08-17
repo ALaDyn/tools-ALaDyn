@@ -312,7 +312,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    if (file_griglia) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+    if (file_griglia && aladyn_version == 1) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
+    else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
   else if (aladyn_version == 4) {
     /*

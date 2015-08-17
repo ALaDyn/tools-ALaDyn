@@ -8,6 +8,8 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   std::string basefilename = std::string(argv[1]);
   std::ostringstream nomefile_bin;
 
+  std::cin.get();
+
   float taglio;
   std::vector<float> cutx, cuty, cutz;
   std::vector<size_t> gridIndex_cutx, gridIndex_cuty, gridIndex_cutz;
@@ -32,8 +34,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   size_t fread_size = 0;
 
   std::cout << "READING" << std::endl;
-  printf("nx*ny*nz: %llu %llu %llu = %llu\n", parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati);
-  fflush(stdout);
 
   field = new float**[parametri->npx_ricampionati];
   for (size_t i = 0; i < parametri->npx_ricampionati; i++) {
@@ -42,6 +42,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   }
   x_lineout = new float[parametri->npx_ricampionati];
 
+#ifdef ENABLE_DEBUG
+  printf("Allocated field[%llu][%llu][%llu] and x_lineout[%llu]; ", parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->npx_ricampionati);
+  printf("ready to allocate buffer[%llu]\n", parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+  printf("Expected at least %f MB of RAM occupancy\n", (parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati + parametri->npx_ricampionati + parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu)*sizeof(float) / 1024. / 1024.);
+  fflush(stdout);
+#endif
+
   if (parametri->aladyn_version == 1)
   {
     nomefile_bin.str("");
@@ -49,11 +56,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     file_in = fopen(nomefile_bin.str().c_str(), "rb");
     if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
     else std::cout << "File opened to read data!" << std::endl;
+
     /*skip header*/
     std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
-
     std::cout << "Fseek of " << parametri->header_size_bytes << " bytes from beginning of file done" << std::endl << std::flush;
-    std::cin.get();
 
     for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
     {
@@ -89,9 +95,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
           for (size_t i = 0; i < header[0]; i++)
             for (size_t k = 0; k < header[2]; k++)
               for (size_t j = 0; j < header[1]; j++)
-                //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
-                //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-                //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*header[1] + i*header[1] * header[2]];
+                field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
           delete[] buffer;
           buffer = NULL;
         }
@@ -150,6 +154,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
       else std::cout << "File opened to read data!" << std::endl;
 
+      /*skip header*/
+      std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
+      std::cout << "Fseek of " << parametri->header_size_bytes << " bytes from beginning of file done" << std::endl << std::flush;
+
       for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
       {
         for (unsigned int ipz = 0; ipz < parametri->ncpu_z; ipz++)
@@ -180,9 +188,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
             for (size_t i = 0; i < header[0]; i++)
               for (size_t k = 0; k < header[2]; k++)
                 for (size_t j = 0; j < header[1]; j++)
-                  //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
-                  //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-                  //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*header[1] + i*header[1] * header[2]];
+                  field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
             delete[] buffer;
             buffer = NULL;
           }
@@ -205,6 +211,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
         }
         else std::cout << "Opened file #" << indice_multifile << " to read data!" << std::endl;
 
+        /*skip header*/
+        std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
+        std::cout << "Fseek of " << parametri->header_size_bytes << " bytes from beginning of file done" << std::endl << std::flush;
 
         for (unsigned int ipx = 0; ipx < parametri->ncpu_x; ipx++)
         {
@@ -235,9 +244,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
               for (size_t i = 0; i < header[0]; i++)
                 for (size_t k = 0; k < header[2]; k++)
                   for (size_t j = 0; j < header[1]; j++)
-                    //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[i + j*parametri->npx_ricampionati_per_cpu + k*parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu];
-                    //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
-                    //field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*header[1] + i*header[1] * header[2]];
+                    field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
               delete[] buffer;
               buffer = NULL;
             }
