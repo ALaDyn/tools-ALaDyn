@@ -63,26 +63,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   std::ofstream Estremi_out;
   int conta_processori = 0;
 
-  const int out_swap = parametri->p[SWAP];
-  const int out_vtk = parametri->p[OUT_VTK];
-  const int out_ascii_propaga = parametri->p[OUT_PROPAGA];
-  const int out_ascii_csv = parametri->p[OUT_CSV];
-  const int out_parameters = parametri->p[OUT_PARAMS];
-  const int fai_binning = parametri->p[DO_BINNING];
-  const int cerca_minmax = parametri->p[FIND_MINMAX];
-  const int out_xyzE = parametri->p[OUT_XYZE];
-  const int out_clean_binary = parametri->p[OUT_CLEAN_BINARY];
-
-  const int stop_at_cpu_number = parametri->last_cpu;
-  const int sottocampionamento = parametri->subsample;
-
   int npart_loc;
   int buff;
 
   float x, y, z, px, py, pz, ptot;
   float ch, w;
   float gamma, theta, thetaT, E, ty, tz;
-  //  float rx, ry, rz, ux, uy, uz, wgh;
   float *estremi_min, *estremi_max;
 
   short buffshort[2];
@@ -107,8 +93,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     estremi_min[i] = (float)NUMERO_MASSIMO;
     estremi_max[i] = (float)-NUMERO_MASSIMO;
   }
-
-  std::cout << "nptot=" << parametri->nptot << std::endl << std::flush;
 
   float **xw = new float*[parametri->nbin_x + 3];
   for (int i = 0; i < parametri->nbin_x + 3; i++)
@@ -258,8 +242,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   float *thetaTspec = new float[parametri->nbin_thetaT + 3];
   for (int i = 0; i < parametri->nbin_thetaT + 3; i++) thetaTspec[i] = 0.0;
 
-
-
   sprintf(nomefile_propaga, "%s.ppg", argv[1]);
   sprintf(nomefile_xyze, "%s_xyzE.ppg", argv[1]);
   sprintf(nomefile_csv, "%s.csv", argv[1]);
@@ -268,7 +250,8 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 
 #ifdef ENABLE_DEBUG
-  if (fai_binning)
+  std::cout << "NPTOT = " << parametri->nptot << std::endl;
+  if (parametri->p[DO_BINNING])
   {
     std::cout << "XMIN = " << parametri->xmin << std::endl;
     std::cout << "XMAX = " << parametri->xmax << std::endl;
@@ -301,7 +284,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   }
 #endif
 
-  if (out_vtk)
+  if (parametri->p[OUT_VTK])
   {
     printf("\nRichiesta scrittura file .vtk\n");
     binary_vtk = fopen(nomefile_vtk, "wb");
@@ -337,26 +320,26 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     }
   }
 
-  if (out_clean_binary)
+  if (parametri->p[OUT_CLEAN_BINARY])
   {
     printf("\nRichiesta scrittura file binario unico e pulito\n");
     binary_clean = fopen(nomefile_bin_clean, "wb");
   }
 
 
-  if (out_ascii_propaga)
+  if (parametri->p[OUT_PROPAGA])
   {
     printf("\nRichiesta scrittura file ASCII per Propaga\n");
     ascii_propaga = fopen(nomefile_propaga, "w");
   }
 
-  if (out_xyzE)
+  if (parametri->p[OUT_XYZE])
   {
     printf("\nRichiesta scrittura file ASCII con x, y, z, E\n");
     ascii_xyze = fopen(nomefile_xyze, "w");
   }
 
-  if (out_ascii_csv)
+  if (parametri->p[OUT_CSV])
   {
     printf("\nRichiesta scrittura file ASCII CSV per Paraview\n");
     ascii_csv = fopen(nomefile_csv, "w");
@@ -368,7 +351,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   {
     if (!parametri->multifile)
     {
-      if (conta_processori >= stop_at_cpu_number) break;
+      if (conta_processori >= parametri->last_cpu) break;
       /*skip header*/
       std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
 
@@ -384,7 +367,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       }
 
       if (feof(file_in)) break;
-      if (out_swap) swap_endian_i(&npart_loc, 1);
+      if (parametri->p[SWAP]) swap_endian_i(&npart_loc, 1);
       if (npart_loc > (long long int) parametri->nptot || npart_loc < 0)
       {
         printf("Read a npart=%i, non valid. Exiting!", npart_loc);
@@ -448,7 +431,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
             fread_size = std::fread(&buff, sizeof(int), 1, file_in);
           }
           else fread_size = std::fread(particelle, sizeof(float), npart_loc*parametri->ndv, file_in);
-          if (out_swap) swap_endian_f(particelle, (size_t)npart_loc*parametri->ndv);
+          if (parametri->p[SWAP]) swap_endian_f(particelle, (size_t)npart_loc*parametri->ndv);
         }
         else
         {
@@ -465,12 +448,12 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           printf("\n");
           fflush(stdout);
           fread_size = std::fread(particelle, sizeof(float), val[0] * parametri->ndv, file_in);
-          if (out_swap) swap_endian_f(particelle, (size_t)val[0] * parametri->ndv);
+          if (parametri->p[SWAP]) swap_endian_f(particelle, (size_t)val[0] * parametri->ndv);
         }
 
         _Filtro(parametri, particelle, val, _Filtro::costruisci_filtro(argc, argv));
 
-        if (out_parameters)
+        if (parametri->p[OUT_PARAMS])
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
@@ -536,7 +519,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           }
         }
 
-        if (cerca_minmax)
+        if (parametri->p[FIND_MINMAX])
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
@@ -647,7 +630,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
             }
           }
         }
-        if (fai_binning)
+        if (parametri->p[DO_BINNING])
         {
           if (parametri->fai_plot_xy)     _Binnaggio(particelle, val[0], parametri->ndv, parametri, xy, "x", "y");
           if (parametri->fai_plot_xz)     _Binnaggio(particelle, val[0], parametri->ndv, parametri, xz, "x", "z");
@@ -675,7 +658,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           if (parametri->fai_plot_thetaTspec) _Binnaggio(particelle, val[0], parametri->ndv, parametri, thetaTspec, "thetaT");
         }
 
-        if (out_ascii_propaga)
+        if (parametri->p[OUT_PROPAGA])
         {
           if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
           {
@@ -696,7 +679,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               //else
               //  ch = parametri->overwrite_charge_value;
 
-              if (i % sottocampionamento == 0) {
+              if (i % parametri->subsample == 0) {
                 if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 3, w, i + 1);
                 else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 1, w, i + 1);
               }
@@ -719,7 +702,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               //else
               //  ch = parametri->overwrite_charge_value;
 
-              if (i % sottocampionamento == 0) {
+              if (i % parametri->subsample == 0) {
                 if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 3, w, i + 1);
                 else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 1, w, i + 1);
               }
@@ -729,7 +712,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
 
 
-        if (out_xyzE)
+        if (parametri->p[OUT_XYZE])
         {
           if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
           {
@@ -743,7 +726,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               pz = particelle[i*parametri->ndv + 3];
               gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);     //gamma
               E = (float)(gamma*parametri->massa_particella_MeV);         //energia
-              if (i % sottocampionamento == 0) fprintf(ascii_xyze, "%e %e %e %e\n", x, y, z, E);
+              if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e %e\n", x, y, z, E);
             }
           }
           else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
@@ -756,14 +739,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               pz = particelle[i*parametri->ndv + 2];
               gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
               E = (float)(gamma*parametri->massa_particella_MeV);   //energia
-              if (i % sottocampionamento == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
+              if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
             }
           }
         }
 
 
 
-        if (out_ascii_csv)
+        if (parametri->p[OUT_CSV])
         {
           if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
           {
@@ -779,7 +762,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               else w = parametri->overwrite_weight_value;
               if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 7];
               else ch = parametri->overwrite_charge_value;
-              if (i % sottocampionamento == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
+              if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
             }
           }
           else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
@@ -794,14 +777,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               else w = parametri->overwrite_weight_value;
               if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 5];
               else ch = parametri->overwrite_charge_value;
-              if (i % sottocampionamento == 0) fprintf(ascii_csv, "%e, 0, %e, %e, 0, %e, %e, %e\n", x, z, px, pz, w, ch);
+              if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, 0, %e, %e, 0, %e, %e, %e\n", x, z, px, pz, w, ch);
             }
           }
         }
 
 
 
-        if (out_clean_binary)
+        if (parametri->p[OUT_CLEAN_BINARY])
         {
           if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
           {
@@ -818,7 +801,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 7];
               else array_supporto8[7] = parametri->overwrite_charge_value;
 
-              if (i % sottocampionamento == 0) fwrite((void*)(array_supporto8), sizeof(float), 8, binary_clean);
+              if (i % parametri->subsample == 0) fwrite((void*)(array_supporto8), sizeof(float), 8, binary_clean);
             }
           }
           else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
@@ -834,13 +817,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
               if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) array_supporto6[5] = particelle[i*parametri->ndv + 5];
               else array_supporto6[5] = parametri->overwrite_charge_value;
 
-              if (i % sottocampionamento == 0) fwrite((void*)(array_supporto6), sizeof(float), 6, binary_clean);
+              if (i % parametri->subsample == 0) fwrite((void*)(array_supporto6), sizeof(float), 6, binary_clean);
             }
           }
         }
 
 
-        if (out_vtk)
+        if (parametri->p[OUT_VTK])
         {
           if (parametri->endian_machine == 0)
           {
@@ -929,7 +912,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   }
 
 
-  if (out_parameters)
+  if (parametri->p[OUT_PARAMS])
   {
     em_x /= (double)peso_accumulato;
     em_y /= (double)peso_accumulato;
@@ -978,7 +961,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     fclose(parameters);
   }
 
-  if (cerca_minmax)
+  if (parametri->p[FIND_MINMAX])
   {
     nomefile_Estremi << argv[1] << ".extremes";
     Estremi_out.open(nomefile_Estremi.str().c_str());
@@ -1011,13 +994,13 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
     Estremi_out << "CHMIN = " << estremi_min[12] << std::endl;
     Estremi_out << "CHMAX = " << estremi_max[12] << std::endl;
-    if (out_parameters) Estremi_out << "peso_accumulato = " << peso_accumulato << std::endl;
-    if (out_parameters) Estremi_out << "carica_accumulata = " << carica_accumulata << std::endl;
+    if (parametri->p[OUT_PARAMS]) Estremi_out << "peso_accumulato = " << peso_accumulato << std::endl;
+    if (parametri->p[OUT_PARAMS]) Estremi_out << "carica_accumulata = " << carica_accumulata << std::endl;
     Estremi_out.close();
   }
 
 
-  if (fai_binning)
+  if (parametri->p[DO_BINNING])
   {
     if (parametri->fai_plot_xy)
     {
@@ -1144,31 +1127,31 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   printf("fread_size=%lu\nFine\n\n", (unsigned long)fread_size);
 
 
-  if (out_vtk)
+  if (parametri->p[OUT_VTK])
   {
     fflush(binary_vtk);
     fclose(binary_vtk);
   }
 
-  if (out_clean_binary)
+  if (parametri->p[OUT_CLEAN_BINARY])
   {
     fflush(binary_clean);
     fclose(binary_clean);
   }
 
-  if (out_ascii_propaga)
+  if (parametri->p[OUT_PROPAGA])
   {
     fflush(ascii_propaga);
     fclose(ascii_propaga);
   }
 
-  if (out_xyzE)
+  if (parametri->p[OUT_XYZE])
   {
     fflush(ascii_xyze);
     fclose(ascii_xyze);
   }
 
-  if (out_ascii_csv)
+  if (parametri->p[OUT_CSV])
   {
     fflush(ascii_csv);
     fclose(ascii_csv);
