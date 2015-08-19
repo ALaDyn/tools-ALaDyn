@@ -6,29 +6,20 @@
 int leggi_campi(int argc, const char** argv, Parametri * parametri)
 {
   std::ostringstream nomefile_bin;
-
-  std::cin.get();
-
   float taglio;
   std::vector<float> cutx, cuty, cutz;
   std::vector<size_t> gridIndex_cutx, gridIndex_cuty, gridIndex_cutz;
-
   int indice_multifile = 0;
-  float dx = 0., dy = 0., dz = 0., xx = 0., yy = 0.;
-
   int fortran_buff;
   int header_size = 3;
   int * header = new int[header_size];
-
   float *buffer = NULL;
   float *x_lineout = NULL;
   char nomefile_parametri[MAX_LENGTH_FILENAME];
   char nomefile_campi[MAX_LENGTH_FILENAME];
-
   std::FILE *file_in = NULL;
   std::FILE *parameters = NULL;
   std::FILE *clean_fields = NULL;
-
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
@@ -91,10 +82,14 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
           if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
-          for (size_t i = 0; i < header[0]; i++)
-            for (size_t k = 0; k < header[2]; k++)
-              for (size_t j = 0; j < header[1]; j++)
-                field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
+          for (size_t k = 0; k < header[2]; k++)
+            for (size_t j = 0; j < header[1]; j++)
+              for (size_t i = 0; i < header[0]; i++)
+                field[i + (ipx * parametri->npx_ricampionati_per_cpu)]
+                /* */[j + (ipy * parametri->npy_ricampionati_per_cpu)]
+          /*       */[k + (ipz * parametri->npz_ricampionati_per_cpu)] =
+            /*     */ buffer[i + j*header[0] + k*header[0]*header[1]];
+
           delete[] buffer;
           buffer = NULL;
         }
@@ -103,7 +98,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
     // leggiamo ora le coordinate dei punti di griglia, presenti solo nelle versioni che possono prevedere griglia stretchata e che ancora non la scrivevano nel .dat
     // se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei parametri
-
 
     fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
     // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i dati non e' di alcun interesse
@@ -187,10 +181,13 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
             if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
-            for (size_t i = 0; i < header[0]; i++)
-              for (size_t k = 0; k < header[2]; k++)
-                for (size_t j = 0; j < header[1]; j++)
-                  field[i + (ipx * parametri->npx_ricampionati_per_cpu)][j + (ipy * parametri->npy_ricampionati_per_cpu)][k + (ipz * parametri->npz_ricampionati_per_cpu)] = buffer[j + k*parametri->npy_ricampionati_per_cpu + i*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu];
+            for (size_t k = 0; k < header[2]; k++)
+              for (size_t j = 0; j < header[1]; j++)
+                for (size_t i = 0; i < header[0]; i++)
+                  field[i + (ipx * parametri->npx_ricampionati_per_cpu)]
+                  /* */[j + (ipy * parametri->npy_ricampionati_per_cpu)]
+            /*       */[k + (ipz * parametri->npz_ricampionati_per_cpu)] =
+              /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
             delete[] buffer;
             buffer = NULL;
           }
@@ -216,9 +213,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     {
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       {
-        xx = parametri->xcoord[i];//xmin+dx*i;
-        yy = parametri->ycoord[j];//ymin+dy*j;
-        fprintf(clean_fields, "%.4g %.4g %.4g\n", xx, yy, field[i][j][0]);
+        fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[i][j][0]);
       }
     }
     fclose(clean_fields);
@@ -256,8 +251,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fprintf(clean_fields, "\n");
     for (size_t i = 0; i < parametri->npx_ricampionati; i++)
     {
-      xx = parametri->xcoord[i];//xmin+dx*i;
-      fprintf(clean_fields, "%.4g %.4g\n", xx, x_lineout[i]);
+      fprintf(clean_fields, "%.4g %.4g\n", parametri->xcoord[i], x_lineout[i]);
     }
     fclose(clean_fields);
   }
@@ -296,8 +290,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fprintf(clean_fields, "\n");
     for (size_t i = 0; i < parametri->npx_ricampionati; i++)
     {
-      xx = parametri->xcoord[i];//xmin+dx*i;
-      fprintf(clean_fields, "%.4g %.4g\n", xx, x_lineout[i]);
+      fprintf(clean_fields, "%.4g %.4g\n", parametri->xcoord[i], x_lineout[i]);
     }
     fclose(clean_fields);
   }
@@ -338,9 +331,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
-          xx = parametri->xcoord[i];//xx=xmin+dx*i;
-          yy = parametri->ycoord[j];//yy=ymin+dy*j;
-          fprintf(clean_fields, "%.4g %.4g %.4g\n", xx, yy, field[i][j][k]);
+          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[i][j][k]);
         }
       }
       fclose(clean_fields);
@@ -382,9 +373,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
-          xx = parametri->xcoord[i];//xx=xmin+dx*i;
-          yy = parametri->ycoord[k];//yy=ymin+dy*j;
-          fprintf(clean_fields, "%.4g %.4g %.4g\n", xx, yy, field[i][j][k]);
+          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->zcoord[k], field[i][j][k]);
         }
       }
       fclose(clean_fields);
@@ -426,9 +415,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
       {
         for (size_t j = 0; j < parametri->npy_ricampionati; j++)
         {
-          xx = parametri->ycoord[j];//xx=xmin+dx*i;
-          yy = parametri->zcoord[k];//yy=ymin+dy*j;
-          fprintf(clean_fields, "%.4g %.4g %.4g\n", xx, yy, field[i][j][k]);
+          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->ycoord[j], parametri->zcoord[k], field[i][j][k]);
         }
       }
       fclose(clean_fields);
@@ -556,9 +543,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     float zmin_non_stretchato = parametri->zcoord[inizio_punti_non_stretchati_z];
     //    float zmax_non_stretchato = parametri->zcoord[fine_punti_non_stretchati_z];
 
-    dx = parametri->xcoord[parametri->npx_ricampionati / 2] - parametri->xcoord[parametri->npx_ricampionati / 2 - 1];
-    dy = parametri->ycoord[parametri->npy_ricampionati / 2] - parametri->ycoord[parametri->npy_ricampionati / 2 - 1];
-    dz = parametri->zcoord[parametri->npz_ricampionati / 2] - parametri->zcoord[parametri->npz_ricampionati / 2 - 1];
     sprintf(nomefile_campi, "%s_nostretch.vtk", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "wb");
     printf("\nWriting the fields file\n");
@@ -568,7 +552,10 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     fprintf(clean_fields, "DATASET STRUCTURED_POINTS\n");
     fprintf(clean_fields, "DIMENSIONS %lu %lu %lu\n", (long)npunti_non_stretchati_x, (long)npunti_non_stretchati_y, (long)npunti_non_stretchati_z);
     fprintf(clean_fields, "ORIGIN %f %f %f\n", xmin_non_stretchato, ymin_non_stretchato, zmin_non_stretchato);
-    fprintf(clean_fields, "SPACING %f %f %f\n", dx, dy, dz);
+    fprintf(clean_fields, "SPACING %f %f %f\n",
+      parametri->xcoord[parametri->npx_ricampionati / 2] - parametri->xcoord[parametri->npx_ricampionati / 2 - 1],
+      parametri->ycoord[parametri->npy_ricampionati / 2] - parametri->ycoord[parametri->npy_ricampionati / 2 - 1],
+      parametri->zcoord[parametri->npz_ricampionati / 2] - parametri->zcoord[parametri->npz_ricampionati / 2 - 1]);
     fprintf(clean_fields, "POINT_DATA %lu\n", (long)(npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z));
     fprintf(clean_fields, "SCALARS %s float 1\n", parametri->support_label);
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
