@@ -242,11 +242,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   float *thetaTspec = new float[parametri->nbin_thetaT + 3];
   for (int i = 0; i < parametri->nbin_thetaT + 3; i++) thetaTspec[i] = 0.0;
 
-  sprintf(nomefile_propaga, "%s.ppg", argv[1]);
-  sprintf(nomefile_xyze, "%s_xyzE.ppg", argv[1]);
-  sprintf(nomefile_csv, "%s.csv", argv[1]);
-  sprintf(nomefile_vtk, "%s.vtk", argv[1]);
-  sprintf(nomefile_bin_clean, "%s_clean.bin", argv[1]);
+  sprintf(nomefile_propaga, "%s.ppg", parametri->filebasename.c_str());
+  sprintf(nomefile_xyze, "%s_xyzE.ppg", parametri->filebasename.c_str());
+  sprintf(nomefile_csv, "%s.csv", parametri->filebasename.c_str());
+  sprintf(nomefile_vtk, "%s.vtk", parametri->filebasename.c_str());
+  sprintf(nomefile_bin_clean, "%s_clean.bin", parametri->filebasename.c_str());
 
 
 #ifdef ENABLE_DEBUG
@@ -399,7 +399,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       rewind(file_in);
       num_of_floats_in_file = (dim_file_in_bytes / sizeof(float));
       num_of_particles_in_file = (int)(num_of_floats_in_file / parametri->ndv);
-      printf("Il file %s_%.3i.bin contiene %llu particelle\n", argv[1], indice_multifile, num_of_particles_in_file);
+      printf("Il file %s_%.3i.bin contiene %llu particelle\n", parametri->filebasename.c_str(), indice_multifile, num_of_particles_in_file);
       fflush(stdout);
       num_of_passes = (int)((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) + 1;
       num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
@@ -423,7 +423,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
         {
           particelle = new float[npart_loc*parametri->ndv];
           //  particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
-          //  printf("Reading file %s.bin \n",argv[1]);
+          //  printf("Reading file %s.bin \n",parametri->filebasename);
           if (parametri->aladyn_version == 1)
           {
             fread_size = std::fread(buffshort, sizeof(short), 2, file_in);
@@ -438,7 +438,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           if (h == num_of_passes - 1 && num_of_passes > 1) dimensione_array_particelle = num_residual_particles;
           particelle = new float[dimensione_array_particelle*parametri->ndv];
           //  particelle=(float*)malloc(dimensione_array_particelle*ndv*sizeof(float));
-          //  printf("File %s has been splitted, reading %s_%.3i.bin\n",argv[1],argv[1],indice_multifile);
+          //  printf("File %s has been splitted, reading %s_%.3i.bin\n",parametri->filebasename,parametri->filebasename,indice_multifile);
           val[0] = (unsigned int)dimensione_array_particelle;
 #ifdef ENABLE_DEBUG
           printf("npart_loc = %i\t\t ndv=%i\n", val[0], parametri->ndv);
@@ -934,7 +934,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     emittance_y = sqrt((em_y2 - em_y*em_y)*(em_py2 - em_py*em_py) - (em_ypy - em_y*em_py)*(em_ypy - em_y*em_py));
     emittance_z = sqrt((em_z2 - em_z*em_z)*(em_pz2 - em_pz*em_pz) - (em_zpz - em_z*em_pz)*(em_zpz - em_z*em_pz));
 
-    sprintf(nomefile_parametri, "%s.parameters", argv[1]);
+    sprintf(nomefile_parametri, "%s.parameters", parametri->filebasename.c_str());
     parameters = fopen(nomefile_parametri, "w");
     printf("\nWriting the parameters file\n");
     fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
@@ -963,7 +963,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 
   if (parametri->p[FIND_MINMAX])
   {
-    nomefile_Estremi << argv[1] << ".extremes";
+    nomefile_Estremi << parametri->filebasename << ".extremes";
     Estremi_out.open(nomefile_Estremi.str().c_str());
     if (Estremi_out.fail()) printf("unable to create .extremes file");
     Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
@@ -1004,122 +1004,122 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   {
     if (parametri->fai_plot_xy)
     {
-      sprintf(nomefile_binnato, "%s_xy.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_xy.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, xy, "x", "y", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_xz)
     {
-      sprintf(nomefile_binnato, "%s_xz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_xz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, xz, "x", "z", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_yz)
     {
-      sprintf(nomefile_binnato, "%s_yz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_yz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, yz, "y", "z", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_rcf)
     {
-      sprintf(nomefile_binnato, "%s_rcf.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_rcf.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, rcf, "ty", "tz", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_xpx)
     {
-      sprintf(nomefile_binnato, "%s_xpx.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_xpx.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, xpx, "x", "px", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_xpy)
     {
-      sprintf(nomefile_binnato, "%s_xpy.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_xpy.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, xpy, "x", "py", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_xpz)
     {
-      sprintf(nomefile_binnato, "%s_xpz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_xpz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, xpz, "x", "pz", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_ypx)
     {
-      sprintf(nomefile_binnato, "%s_ypx.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_ypx.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, ypx, "y", "px", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_ypy)
     {
-      sprintf(nomefile_binnato, "%s_ypy.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_ypy.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, ypy, "y", "py", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_ypz)
     {
-      sprintf(nomefile_binnato, "%s_ypz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_ypz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, ypz, "y", "pz", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_zpx)
     {
-      sprintf(nomefile_binnato, "%s_zpx.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_zpx.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, zpx, "z", "px", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_zpy)
     {
-      sprintf(nomefile_binnato, "%s_zpy.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_zpy.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, zpy, "z", "py", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_xpz)
     {
-      sprintf(nomefile_binnato, "%s_zpz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_zpz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, zpz, "z", "pz", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_pxpy)
     {
-      sprintf(nomefile_binnato, "%s_pxpy.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_pxpy.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, pxpy, "px", "py", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_pxpz)
     {
-      sprintf(nomefile_binnato, "%s_pxpz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_pxpz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, pxpz, "px", "pz", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_pypz)
     {
-      sprintf(nomefile_binnato, "%s_pypz.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_pypz.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, pypz, "py", "pz", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_xw)
     {
-      sprintf(nomefile_binnato, "%s_xw.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_xw.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, xw, "x", "w", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_Etheta)
     {
-      sprintf(nomefile_binnato, "%s_Etheta.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_Etheta.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, Etheta, "E", "theta", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_EthetaT)
     {
-      sprintf(nomefile_binnato, "%s_EthetaT.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_EthetaT.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, EthetaT, "E", "thetaT", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_Espec)
     {
-      sprintf(nomefile_binnato, "%s_Espec.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_Espec.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, Espec, "E", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_wspec)
     {
-      sprintf(nomefile_binnato, "%s_wspec.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_wspec.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, wspec, "w", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_chspec)
     {
-      sprintf(nomefile_binnato, "%s_chspec.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_chspec.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, chspec, "ch", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_thetaspec)
     {
-      sprintf(nomefile_binnato, "%s_thetaspec.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_thetaspec.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, thetaspec, "theta", std::string(nomefile_binnato));
     }
     if (parametri->fai_plot_thetaTspec)
     {
-      sprintf(nomefile_binnato, "%s_thetaTspec.txt", argv[1]);
+      sprintf(nomefile_binnato, "%s_thetaTspec.txt", parametri->filebasename.c_str());
       _Scrittura(parametri, thetaTspec, "thetaT", std::string(nomefile_binnato));
     }
   }

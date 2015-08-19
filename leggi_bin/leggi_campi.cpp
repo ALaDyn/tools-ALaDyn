@@ -32,7 +32,9 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
-  std::cout << "READING" << std::endl;
+  printf("Expected at least %f MB of RAM occupancy\n", ((parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati + parametri->npx_ricampionati + parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu)*sizeof(float) + ((parametri->npx_ricampionati*parametri->npy_ricampionati + 1)*sizeof(buffer))) / 1024. / 1024.);
+  printf("READING\n");
+  fflush(stdout);
 
   float *** field = new float**[parametri->npx_ricampionati];
   for (size_t i = 0; i < parametri->npx_ricampionati; i++)
@@ -48,12 +50,6 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 #endif
   }
   x_lineout = new float[parametri->npx_ricampionati];
-
-#ifdef ENABLE_DEBUG
-  printf("Allocated field[%llu][%llu][%llu] and x_lineout[%llu]; ", parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->npx_ricampionati);
-  printf("Expected at least %f MB of RAM occupancy\n", ((parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati + parametri->npx_ricampionati + parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu)*sizeof(float) + ((parametri->npx_ricampionati*parametri->npy_ricampionati + 1)*sizeof(field))) / 1024. / 1024.);
-  fflush(stdout);
-#endif
 
   if (!parametri->multifile)
   {
@@ -210,7 +206,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_GRID2D])
   {
     printf("\nWriting the ASCII 2D fields file\n");
-    sprintf(nomefile_campi, "%s.txt", argv[1]);
+    sprintf(nomefile_campi, "%s.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
 
     //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
@@ -233,7 +229,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   {
     size_t myj;
     printf("\nScrittura lineout 1D\n");
-    sprintf(nomefile_campi, "%s_lineout.txt", argv[1]);
+    sprintf(nomefile_campi, "%s_lineout.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
     printf("\nWriting the lineout file 1D (not vtk)\n");
 
@@ -270,7 +266,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
   {
     size_t myj;
     printf("\nScrittura lineout 1D\n");
-    sprintf(nomefile_campi, "%s_lineout.txt", argv[1]);
+    sprintf(nomefile_campi, "%s_lineout.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
     printf("\nWriting the lineout file 1D (not vtk)\n");
 
@@ -329,7 +325,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
     for (size_t n = 0; n < cutz.size(); n++)
     {
-      sprintf(nomefile_campi, "%s_cutz_%g.txt", argv[1], cutz[n]);
+      sprintf(nomefile_campi, "%s_cutz_%g.txt", parametri->filebasename.c_str(), cutz[n]);
       printf("\nScrittura file gnuplot taglio z=%g\n", cutz[n]);
       clean_fields = fopen(nomefile_campi, "wb");
       printf("\nWriting the fields file 2D (not vtk)\n");
@@ -373,7 +369,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
     for (size_t n = 0; n < cuty.size(); n++)
     {
-      sprintf(nomefile_campi, "%s_cuty_%g.txt", argv[1], cuty[n]);
+      sprintf(nomefile_campi, "%s_cuty_%g.txt", parametri->filebasename.c_str(), cuty[n]);
       printf("\nScrittura file gnuplot taglio y=%g\n", cuty[n]);
       clean_fields = fopen(nomefile_campi, "wb");
       printf("\nWriting the fields file 2D (not vtk)\n");
@@ -417,7 +413,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     }
     for (size_t n = 0; n < cutx.size(); n++)
     {
-      sprintf(nomefile_campi, "%s_cutx_%g.txt", argv[1], cutx[n]);
+      sprintf(nomefile_campi, "%s_cutx_%g.txt", parametri->filebasename.c_str(), cutx[n]);
       printf("\nScrittura file gnuplot taglio x=%g\n", cutx[n]);
       clean_fields = fopen(nomefile_campi, "wb");
       printf("\nWriting the fields file 2D (not vtk)\n");
@@ -466,7 +462,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
     //////// DATASET UNSTRUCTURED_GRID VERSION    ////////
 
-    sprintf(nomefile_campi, "%s.vtk", argv[1]);
+    sprintf(nomefile_campi, "%s.vtk", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
     printf("\nWriting the fields file\n");
     fprintf(clean_fields, "# vtk DataFile Version 2.0\n");
@@ -563,7 +559,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     dx = parametri->xcoord[parametri->npx_ricampionati / 2] - parametri->xcoord[parametri->npx_ricampionati / 2 - 1];
     dy = parametri->ycoord[parametri->npy_ricampionati / 2] - parametri->ycoord[parametri->npy_ricampionati / 2 - 1];
     dz = parametri->zcoord[parametri->npz_ricampionati / 2] - parametri->zcoord[parametri->npz_ricampionati / 2 - 1];
-    sprintf(nomefile_campi, "%s_nostretch.vtk", argv[1]);
+    sprintf(nomefile_campi, "%s_nostretch.vtk", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "wb");
     printf("\nWriting the fields file\n");
     fprintf(clean_fields, "# vtk DataFile Version 2.0\n");
@@ -598,7 +594,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
     swap_endian_f(z_coordinates,npunti_non_stretchati_z);
     }
 
-    sprintf(nomefile_campi,"%s_out.vtk",argv[1]);
+    sprintf(nomefile_campi,"%s_out.vtk",parametri->filebasename);
     clean_fields=fopen(nomefile_campi, "wb");
     printf("\nWriting the fields file\n");
     fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
@@ -623,7 +619,7 @@ int leggi_campi(int argc, const char** argv, Parametri * parametri)
 
   if (parametri->p[OUT_PARAMS])
   {
-    sprintf(nomefile_parametri, "%s.parameters", argv[1]);
+    sprintf(nomefile_parametri, "%s.parameters", parametri->filebasename.c_str());
     parameters = fopen(nomefile_parametri, "w");
     printf("\nWriting parameters to file\n");
     fprintf(parameters, "ncpu_x=%u\n", parametri->ncpu_x);
