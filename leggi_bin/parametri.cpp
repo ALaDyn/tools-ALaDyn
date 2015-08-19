@@ -870,7 +870,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       }
       else
       {
-        nomefile = std::string(argv[1]) + ".extremes";
+        nomefile = filebasename + ".extremes";
         usa_file_parametri = true;
         std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
       }

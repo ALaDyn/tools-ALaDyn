@@ -5,48 +5,58 @@
 
 int main(const int argc, const char *argv[])
 {
-
   Parametri parametri;
   bool testParametri = true;
 
-  std::cout << "Binary file reader v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
+  std::ostringstream nomefile_bin, nomefile_dat;
+  std::string riga_persa, endianness, columns;
+  std::ifstream file_dat, file_bin;
+
+  std::cout << "ALaDyn output reader v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
+
+  if (argc > 1) 
+  {
+    if (argv[1] == "-help" || argv[1] == "/help" || argv[1] == "-h" || argv[1] == "/h")
+    {
+      std::cout << "-interactive: ./" << argv[0] << std::endl;
+      std::cout << "-batch:       ./" << argv[0] << " filebasename -arguments" << std::endl;
+
+      std::cout << "----------Argument list------------------- " << std::endl;
+      std::cout << "-params (write a .parameters file with params from .bin/.dat files)" << std::endl;
+      std::cout << "-swap/-noswap (force endianess swap) -force_v2 -force_v3 (force new format)" << std::endl;
+      std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
+      std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
+      std::cout << "(use -no_stretch_x if the grid is not stretched along x axis)" << std::endl;
+      std::cout << "-dump_propaga -dump_csv -dump_clean -dump_xyzE -parameters -find_minxmax" << std::endl;
+      std::cout << "-do_binning [REQUIRED TO ENABLE BINNING FOR PLOTTING]" << std::endl;
+      std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #number" << std::endl;
+      std::cout << "-plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
+      std::cout << "-plot_etheta -plot_ethetaT -plot_rfc -plot_espec -plot_thetaspec -plot_thetaTspec -plot_chspec" << std::endl;
+      std::cout << "-nbin #num" << std::endl;
+      std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch] #num" << std::endl;
+      std::cout << "-dontask [TRY TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
+      std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #num" << std::endl;
+      std::cout << "----------Argument list------------------- " << std::endl;
+      return -1;
+    }
+  }
 
   if (argc == 1)
   {
-    std::cout << "-interactive: ./reader filebasename (so do not put file extension!)" << std::endl;
-    std::cout << "-batch:       ./reader filebasename -arguments" << std::endl;
-
-    std::cout << "----------Argument list------------------- " << std::endl;
-    std::cout << "-params (write a .parameters file with params from .bin/.dat files)" << std::endl;
-    std::cout << "-swap/-noswap (force endianess swap) -force_new (force new format)" << std::endl;
-    std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
-    std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
-    std::cout << "(use -no_stretch_x if the grid is not stretched along x axis)" << std::endl;
-    std::cout << "-dump_propaga -dump_csv -dump_clean -dump_xyzE -parameters -find_minxmax" << std::endl;
-    std::cout << "-do_binning [REQUIRED TO ENABLE BINNING FOR PLOTTING]" << std::endl;
-    std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #number" << std::endl;
-    std::cout << "-plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
-    std::cout << "-plot_etheta -plot_ethetaT -plot_rfc -plot_espec -plot_thetaspec -plot_thetaTspec -plot_chspec" << std::endl;
-    std::cout << "-nbin #num" << std::endl;
-    std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch] #num" << std::endl;
-    std::cout << "-dontask [TRY TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
-    std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #num" << std::endl;
-    std::cout << "----------Argument list------------------- " << std::endl;
-    return -1;
+    std::cout << "File basename (without extension): ";
+    std::cin >> parametri.filebasename;
   }
+  else parametri.filebasename = std::string(argv[1]);
 
-  std::ostringstream nomefile_bin, nomefile_dat;
-  nomefile_bin << std::string(argv[1]) << ".bin";
-  nomefile_dat << std::string(argv[1]) << ".dat";
-  std::string riga_persa, endianness, columns;
-  std::ifstream file_dat, file_bin;
+  nomefile_bin << parametri.filebasename << ".bin";
+  nomefile_dat << parametri.filebasename << ".dat";
 
   /* Controllo file binario */
   file_bin.open(nomefile_bin.str().c_str(), std::ios::binary | std::ios::in);
   if (file_bin.fail())
   {
     nomefile_bin.str("");
-    nomefile_bin << std::string(argv[1]) << "_000.bin";
+    nomefile_bin << parametri.filebasename << "_000.bin";
     file_bin.open(nomefile_bin.str().c_str(), std::ios::binary | std::ios::in);
     if (file_bin.fail())
     {
@@ -56,9 +66,9 @@ int main(const int argc, const char *argv[])
     else parametri.multifile = true;
   }
   else parametri.multifile = false;
-  if (parametri.multifile) std::cout << "Input files are " << argv[1] << "_???.bin" << std::endl;
-  else std::cout << "Input file is " << argv[1] << ".bin" << std::endl;
-  parametri.check_filename(argv[1]);
+  if (parametri.multifile) std::cout << "Input files are " << parametri.filebasename << "_???.bin" << std::endl;
+  else std::cout << "Input file is " << parametri.filebasename << ".bin" << std::endl;
+  parametri.check_filename(parametri.filebasename.c_str());
   file_bin.close();
 
   /* Controllo file ascii */
@@ -66,18 +76,18 @@ int main(const int argc, const char *argv[])
   if (file_dat.fail())
   {
     parametri.aladyn_version = 1;
-    std::cout << "Unable to find " << argv[1] << ".dat, using routines for aladyn v1" << std::endl;
+    std::cout << "Unable to find " << parametri.filebasename << ".dat, using routines for aladyn v1" << std::endl;
 
     if (parametri.p_b[SWAP]) parametri.chiedi_endian_file();
 
-    parametri.leggi_parametri_da_file_bin(argv[1]);
+    parametri.leggi_parametri_da_file_bin(parametri.filebasename.c_str());
 
     if (parametri.file_spaziofasi && parametri.p_b[NCOLONNE]) parametri.chiedi_numero_colonne();
     if (parametri.file_griglia && parametri.p_b[NCOLONNE]) parametri.chiedi_2Do3D();
   }
   else
   {
-    std::cout << "Found " << argv[1] << ".dat, using new routines" << std::endl;
+    std::cout << "Found " << parametri.filebasename << ".dat, using new routines" << std::endl;
     parametri.leggi_file_dat(file_dat);
   }
   file_dat.close();

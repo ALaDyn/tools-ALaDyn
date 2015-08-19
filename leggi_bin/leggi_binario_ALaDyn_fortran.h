@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 7
+#define BUGFIX_RELEASE 8
 
 #include <iostream>
 #include <vector>
@@ -154,12 +154,13 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 
 struct Parametri
 {
+  std::string filebasename;
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
   unsigned int ndv, fattore_ricampionamento;
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   size_t npx_ricampionati, npy_ricampionati, npz_ricampionati, npx_ricampionati_per_cpu, npy_ricampionati_per_cpu, npz_ricampionati_per_cpu;
   size_t header_size_bytes;
-  unsigned long long int nptot;
+  size_t nptot;
   int endianness;
   int aladyn_version;
   bool multifile;

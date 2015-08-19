@@ -35,8 +35,8 @@ union double_as_two_float {
 int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
 {
   std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
-  nomefile_bin << std::string(argv[1]) << ".bin";
-  nomefile_dat << std::string(argv[1]) << ".dat";
+  nomefile_bin << parametri->filebasename << ".bin";
+  nomefile_dat << parametri->filebasename << ".dat";
   std::string riga_persa;
   char* trascura;
   trascura = new char[MAX_LENGTH_FILENAME];
@@ -47,8 +47,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   long long particelle_accumulate = 0;
   double peso_accumulato = 0.0;
   double carica_accumulata = 0.0;
-  int dim_file_in_bytes, num_of_floats_in_file, num_of_particles_in_file, num_of_passes, num_residual_particles;
-  int dimensione_array_particelle;
+  size_t dim_file_in_bytes, num_of_floats_in_file, num_of_particles_in_file, num_of_passes, num_residual_particles, dimensione_array_particelle;
   unsigned int val[2];
   float array_supporto8[8];
   float array_supporto6[6];
@@ -97,9 +96,6 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
   char nomefile_binnato[MAX_LENGTH_FILENAME];
 
   size_t fread_size = 0;
-  //unsigned int npe, nx, nz, ibx, iby, ibz, model, dmodel, nsp, ndimen, lpord, deord, nptot, np_loc, ny_loc, ndv;
-  //ndv = parametri->p[NCOLONNE];
-  //float tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0x, w0y, nrat, a0, lam0, E0, ompe, xt_in, xt_end, charge, mass, np_over_nm;
   double emittance_x = 0.0, emittance_y = 0.0, emittance_z = 0.0;
   double em_x2 = 0.0, em_x = 0.0, em_y2 = 0.0, em_y = 0.0, em_z2 = 0.0, em_z = 0.0;
   double em_px2 = 0.0, em_px = 0.0, em_py2 = 0.0, em_py = 0.0, em_pz2 = 0.0, em_pz = 0.0, em_xpx = 0.0, em_ypy = 0.0, em_zpz = 0.0;
@@ -373,11 +369,11 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     if (!parametri->multifile)
     {
       if (conta_processori >= stop_at_cpu_number) break;
+      /*skip header*/
+      std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
+
       if (parametri->aladyn_version == 1)
       {
-        /*skip header*/
-        std::fseek(file_in, (long) parametri->header_size_bytes, SEEK_SET);
-
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
@@ -386,6 +382,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       {
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
       }
+
       if (feof(file_in)) break;
       if (out_swap) swap_endian_i(&npart_loc, 1);
       if (npart_loc > (long long int) parametri->nptot || npart_loc < 0)
@@ -408,7 +405,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     else  //we do have multifiles i.e. Prpout00_000.bin
     {
       nomefile_bin.str("");
-      nomefile_bin << std::string(argv[1]) << "_" << std::setfill('0') << std::setw(3) << indice_multifile << ".bin";
+      nomefile_bin << parametri->filebasename << "_" << std::setfill('0') << std::setw(3) << indice_multifile << ".bin";
       if ((file_in = fopen(nomefile_bin.str().c_str(), "rb")) == NULL)
       {
         printf("Sono finiti i files! \n");
@@ -419,14 +416,14 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
       rewind(file_in);
       num_of_floats_in_file = (dim_file_in_bytes / sizeof(float));
       num_of_particles_in_file = (int)(num_of_floats_in_file / parametri->ndv);
-      printf("Il file %s_%.3i.bin contiene %i particelle\n", argv[1], indice_multifile, num_of_particles_in_file);
+      printf("Il file %s_%.3i.bin contiene %llu particelle\n", argv[1], indice_multifile, num_of_particles_in_file);
       fflush(stdout);
       num_of_passes = (int)((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) + 1;
       num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
       dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
-      if (dimensione_array_particelle > (long long int) parametri->nptot || dimensione_array_particelle < 0)
+      if (dimensione_array_particelle > parametri->nptot)
       {
-        printf("Read a npart=%i, non valid. Exiting!", dimensione_array_particelle);
+        printf("Read a npart=%llu, non valid. Exiting!", dimensione_array_particelle);
         break;
       }
       val[0] = (unsigned int)dimensione_array_particelle;
@@ -436,9 +433,9 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
     if (val[0] > 0)
     {
       fflush(stdout);
-      for (int h = 0; h < num_of_passes; h++)
+      for (size_t h = 0; h < num_of_passes; h++)
       {
-        if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %i of %i\n", h + 1, num_of_passes);
+        if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %llu of %llu\n", h + 1, num_of_passes);
         if (!parametri->multifile)
         {
           particelle = new float[npart_loc*parametri->ndv];
