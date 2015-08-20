@@ -17,6 +17,15 @@ PRINT_ENERGY_COMPARISON=true
 PRINT_JUST_P=false
 PRINT_JUST_E=false
 
+FIELD_ETOT_COLUMN=2
+PROTON_ETOT_COLUMN=25
+PROTON_EMAX_COLUMN=26
+ELECTRON_ETOT_COLUMN=3
+ELECTRON_EMAX_COLUMN=4
+ION_ETOT_COLUMN=14
+ION_EMAX_COLUMN=15
+
+
 
 for sim in "${SIMULATION_FOLDERS[@]}"
 do
@@ -39,7 +48,7 @@ do
   ${LEGGI_DIAG} $another1_filename v${DIAG_VERSION}
   ${LEGGI_DIAG} $another2_filename v${DIAG_VERSION}
 
-  cat ${another1_filename}.txt ${another2_filename}.txt ${filename}.txt > temp.txt
+  cat ${another1_filename}.particles.txt ${another2_filename}.particles.txt ${filename}.particles.txt > temp.txt
   sort -k1 -n temp.txt > temp_sort.txt
   filename=temp_sort
 
@@ -67,11 +76,11 @@ do
   # printf "set format y2 '%.0s 10^{%T}'\n" >> ${GNUPLOT_FILE}
    printf "set ytics nomirror\n" >> ${GNUPLOT_FILE}
    printf "set y2tics\n" >> ${GNUPLOT_FILE}
-   printf "plot FILE_IN u (\$1*c):7 w points pt 7 ps 2 lc rgb 'red' t 'E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
-  # printf "plot FILE_IN u (\$1*c):7 w lines lt 1 lw 5 lc rgb 'red' t 'E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
+   printf "plot FILE_IN u (\$1*c):%s w points pt 7 ps 2 lc rgb 'red' t 'E_{max}' axes x1y1,\\" "${PROTON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
+  # printf "plot FILE_IN u (\$1*c):%s w lines lt 1 lw 5 lc rgb 'red' t 'E_{max}' axes x1y1,\\" "${PROTON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):(\$6*1E6) w points pt 7 ps 2 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):(\$6*1E6) w lines lt 1 lw 5 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):(\$%s*1E6) w points pt 7 ps 2 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" "${PROTON_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
+  # printf "FILE_IN u (\$1*c):(\$%s*1E6) w lines lt 1 lw 5 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" "${PROTON_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
   
    $GNUPLOT ${GNUPLOT_FILE}
    mv diag_prot_pre_${PREPLASMA_LENGTH}_ramp_${RAMP_LENGTH}_den_${DENSITY}_bulk_${BULK_LENGTH}_cont_${CONT_LENGTH}.png ../
@@ -96,11 +105,11 @@ do
   # printf "set format y2 '%.0s 10^{%T}'\n" >> ${GNUPLOT_FILE}
    printf "set ytics nomirror\n" >> ${GNUPLOT_FILE}
    printf "set y2tics\n" >> ${GNUPLOT_FILE}
-   printf "plot FILE_IN u (\$1*c):3 w points pt 7 ps 2 lc rgb 'red' t 'E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
-  # printf "plot FILE_IN u (\$1*c):3 w lines lt 1 lw 5 lc rgb 'red' t 'E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
+   printf "plot FILE_IN u (\$1*c):%s w points pt 7 ps 2 lc rgb 'red' t 'E_{max}' axes x1y1,\\" "${ELECTRON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
+  # printf "plot FILE_IN u (\$1*c):%s w lines lt 1 lw 5 lc rgb 'red' t 'E_{max}' axes x1y1,\\" "${ELECTRON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):(\$2*1E6) w points pt 7 ps 2 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):(\$2*1E6) w lines lt 1 lw 5 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):(\$%s*1E6) w points pt 7 ps 2 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" "${ELECTRON_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
+  # printf "FILE_IN u (\$1*c):(\$%s*1E6) w lines lt 1 lw 5 lc rgb 'blue' t 'E_{tot}' axes x1y2\n" "${ELECTRON_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
 
    $GNUPLOT ${GNUPLOT_FILE}
    mv diag_el_pre_${PREPLASMA_LENGTH}_ramp_${RAMP_LENGTH}_den_${DENSITY}_bulk_${BULK_LENGTH}_cont_${CONT_LENGTH}.png ../
@@ -127,20 +136,13 @@ do
   # printf "set format y2 '%.0s 10^{%T}'\n" >> ${GNUPLOT_FILE}
    printf "set ytics nomirror\n" >> ${GNUPLOT_FILE}
    printf "set y2tics\n" >> ${GNUPLOT_FILE}
-  # printf "plot FILE_IN u (\$1*c):((\$2*1E6)+(\$4*1E6)+(\$6*1E6)) w points pt 7 ps 1.5 lc rgb 'black' t 'E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
-  # printf "plot FILE_IN u (\$1*c):((\$2*1E6)+(\$4*1E6)+(\$6*1E6)) w lines lt 1 lw 5 lc rgb 'black' t 'E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
-  # printf "\n" >> ${GNUPLOT_FILE}
-  # printf "plot FILE_IN u (\$1*c):3 w points pt 7 ps 1.5 lc rgb 'red' t 'el E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
-   printf "plot FILE_IN u (\$1*c):3 w lines lt 1 lw 5 lc rgb 'red' t 'Emax_{el}' axes x1y1,\\" >> ${GNUPLOT_FILE}
+   printf "plot FILE_IN u (\$1*c):%s w lines lt 1 lw 5 lc rgb 'red' t 'Emax_{el}' axes x1y1,\\"  "${ELECTRON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):(\$2*1E6) w points pt 7 ps 1.5 lc rgb 'blue' t 'el E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):(\$2*1E6)*100.0/((\$2*1E6)+(\$4*1E6)+(\$6*1E6)) w lines lt 1 lw 5 lc rgb 'blue' t 'Etot_{el}/E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):(\$%s*1E6)*100.0/((\$%s*1E6)+(\$%s*1E6)+(\$%s*1E6)+(\$%s*1E6)) w lines lt 1 lw 5 lc rgb 'blue' t 'Etot_{el}/E_{tot}' axes x1y2,\\" "${ELECTRON_ETOT_COLUMN}" "${FIELD_ETOT_COLUMN}" "${ELECTRON_ETOT_COLUMN}" "${PROTON_ETOT_COLUMN}" "${ION_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):7 w points pt 7 ps 1.5 lc rgb 'orange' t 'pr E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):7 w lines lt 1 lw 5 lc rgb 'orange' t 'Emax_{pr}' axes x1y1,\\" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):%s w lines lt 1 lw 5 lc rgb 'orange' t 'Emax_{pr}' axes x1y1,\\"  "${PROTON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):(\$6*1E6) w points pt 7 ps 1.5 lc rgb 'cyan' t 'pr E_{tot}' axes x1y2" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):(\$6*1E6)*100.0/((\$2*1E6)+(\$4*1E6)+(\$6*1E6)) w lines lt 1 lw 5 lc rgb 'cyan' t 'Etot_{pr}/E_{tot}' axes x1y2" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):(\$%s*1E6)*100.0/((\$%s*1E6)+(\$%s*1E6)+(\$%s*1E6)+(\$%s*1E6)) w lines lt 1 lw 5 lc rgb 'cyan' t 'Etot_{pr}/E_{tot}' axes x1y2" "${PROTON_ETOT_COLUMN}" "${FIELD_ETOT_COLUMN}" "${ELECTRON_ETOT_COLUMN}" "${PROTON_ETOT_COLUMN}" "${ION_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
 
    $GNUPLOT ${GNUPLOT_FILE}
@@ -162,20 +164,15 @@ do
   # printf "set format y2 '%.0s 10^{%T}'\n" >> ${GNUPLOT_FILE}
    printf "set ytics nomirror\n" >> ${GNUPLOT_FILE}
    printf "set y2tics\n" >> ${GNUPLOT_FILE}
-  # printf "plot FILE_IN u (\$1*c):((\$2*1E6)+(\$4*1E6)+(\$6*1E6)) w points pt 7 ps 1.5 lc rgb 'black' t 'E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
-   printf "plot FILE_IN u (\$1*c):((\$2*1E6)+(\$4*1E6)+(\$6*1E6)) w lines lt 1 lw 5 lc rgb 'black' t 'E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
+   printf "plot FILE_IN u (\$1*c):((\$%s*1E6)+(\$%s*1E6)+(\$%s*1E6)) w lines lt 1 lw 5 lc rgb 'black' t 'E_{tot}' axes x1y2,\\" "${ELECTRON_ETOT_COLUMN}" "${PROTON_ETOT_COLUMN}" "${ION_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):3 w points pt 7 ps 1.5 lc rgb 'red' t 'el E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):3 w lines lt 1 lw 5 lc rgb 'red' t 'el E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):%s w lines lt 1 lw 5 lc rgb 'red' t 'el E_{max}' axes x1y1,\\" "${ELECTRON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):(\$2*1E6) w points pt 7 ps 1.5 lc rgb 'blue' t 'el E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):(\$2*1E6) w lines lt 1 lw 5 lc rgb 'blue' t 'el E_{tot}' axes x1y2,\\" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):(\$%s*1E6) w lines lt 1 lw 5 lc rgb 'blue' t 'el E_{tot}' axes x1y2,\\" "${ELECTRON_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):7 w points pt 7 ps 1.5 lc rgb 'orange' t 'pr E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):7 w lines lt 1 lw 5 lc rgb 'orange' t 'pr E_{max}' axes x1y1,\\" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):%s w lines lt 1 lw 5 lc rgb 'orange' t 'pr E_{max}' axes x1y1,\\" "${PROTON_EMAX_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
-  # printf "FILE_IN u (\$1*c):(\$6*1E6) w points pt 7 ps 1.5 lc rgb 'cyan' t 'pr E_{tot}' axes x1y2" >> ${GNUPLOT_FILE}
-   printf "FILE_IN u (\$1*c):(\$6*1E6) w lines lt 1 lw 5 lc rgb 'cyan' t 'pr E_{tot}' axes x1y2" >> ${GNUPLOT_FILE}
+   printf "FILE_IN u (\$1*c):(\$%s*1E6) w lines lt 1 lw 5 lc rgb 'cyan' t 'pr E_{tot}' axes x1y2" "${PROTON_ETOT_COLUMN}" >> ${GNUPLOT_FILE}
    printf "\n" >> ${GNUPLOT_FILE}
 
    $GNUPLOT ${GNUPLOT_FILE}
