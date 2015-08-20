@@ -1,17 +1,16 @@
 #ifndef __LEGGI_ALADYN_FORTRAN
 #define __LEGGI_ALADYN_FORTRAN
 
+//#define ENABLE_DEBUG
 
-#define ENABLE_DEBUG
-
-
-#define _CRT_SECURE_NO_WARNINGS   // VS does not bother anymore with sprintf and strtok
-#define _USE_MATH_DEFINES         // VS does not bother anymore with M_PI not defined
+#define _GNU_SOURCE
+#define _CRT_SECURE_NO_WARNINGS
+#define _USE_MATH_DEFINES
 #define _SCL_SECURE_NO_WARNINGS
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 12
+#define BUGFIX_RELEASE 14
 
 #include <iostream>
 #include <vector>

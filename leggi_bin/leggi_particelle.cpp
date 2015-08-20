@@ -54,12 +54,12 @@ int leggi_particelle(Parametri * parametri)
 
   if (!parametri->multifile) file_in = fopen(nomefile_bin.str().c_str(), "rb");
 
-  std::FILE *binary_vtk;
-  std::FILE *binary_clean;
-  std::FILE *ascii_propaga;
-  std::FILE *ascii_xyze;
-  std::FILE *ascii_csv;
-  std::FILE *parameters;
+  std::FILE *binary_vtk = NULL;
+  std::FILE *binary_clean = NULL;
+  std::FILE *ascii_propaga = NULL;
+  std::FILE *ascii_xyze = NULL;
+  std::FILE *ascii_csv = NULL;
+  std::FILE *parameters = NULL;
   std::ofstream Estremi_out;
   int conta_processori = 0;
 

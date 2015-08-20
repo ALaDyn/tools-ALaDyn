@@ -20,21 +20,22 @@ int leggi_campi(Parametri * parametri)
   std::FILE *file_in = NULL;
   std::FILE *parameters = NULL;
   std::FILE *clean_fields = NULL;
+  std::ofstream output_file;
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
-  printf("Expected at least %f MB of RAM occupancy\n", ((parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati + parametri->npx_ricampionati + parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu)*sizeof(float) + ((parametri->npx_ricampionati*parametri->npy_ricampionati + 1)*sizeof(buffer))) / 1024. / 1024.);
-  printf("READING\n");
+  printf("Expected at least %f MB of RAM occupancy\n", ((parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati + parametri->npx_ricampionati + parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu)*sizeof(float) + ((parametri->npy_ricampionati*parametri->npz_ricampionati + 1)*sizeof(buffer))) / 1024. / 1024.);
+  printf("ALLOCATING MEMORY\n");
   fflush(stdout);
 
-  float *** field = new float**[parametri->npx_ricampionati];
-  for (size_t i = 0; i < parametri->npx_ricampionati; i++)
+  float *** field = new float**[parametri->npz_ricampionati];
+  for (size_t i = 0; i < parametri->npz_ricampionati; i++)
   {
     field[i] = new float*[parametri->npy_ricampionati];
     for (size_t j = 0; j < parametri->npy_ricampionati; j++)
     {
-      field[i][j] = new float[parametri->npz_ricampionati];
-      allocated_size += (parametri->npz_ricampionati)*sizeof(float);
+      field[i][j] = new float[parametri->npx_ricampionati];
+      allocated_size += (parametri->npx_ricampionati)*sizeof(float);
     }
 #ifdef ENABLE_DEBUG
     printf("Allocated %llu bytes for fields\r", allocated_size);
@@ -42,6 +43,7 @@ int leggi_campi(Parametri * parametri)
   }
   x_lineout = new float[parametri->npx_ricampionati];
 
+  printf("READING\n");
   if (!parametri->multifile)
   {
     nomefile_bin.str("");
@@ -85,9 +87,9 @@ int leggi_campi(Parametri * parametri)
           for (size_t k = 0; k < header[2]; k++)
             for (size_t j = 0; j < header[1]; j++)
               for (size_t i = 0; i < header[0]; i++)
-                field[i + (ipx * parametri->npx_ricampionati_per_cpu)]
+                field[k + (ipz * parametri->npz_ricampionati_per_cpu)]
                 /* */[j + (ipy * parametri->npy_ricampionati_per_cpu)]
-          /*       */[k + (ipz * parametri->npz_ricampionati_per_cpu)] =
+          /*       */[i + (ipx * parametri->npx_ricampionati_per_cpu)] =
             /*     */ buffer[i + j*header[0] + k*header[0]*header[1]];
 
           delete[] buffer;
@@ -184,9 +186,9 @@ int leggi_campi(Parametri * parametri)
             for (size_t k = 0; k < header[2]; k++)
               for (size_t j = 0; j < header[1]; j++)
                 for (size_t i = 0; i < header[0]; i++)
-                  field[i + (ipx * parametri->npx_ricampionati_per_cpu)]
+                  field[k + (ipz * parametri->npz_ricampionati_per_cpu)]
                   /* */[j + (ipy * parametri->npy_ricampionati_per_cpu)]
-            /*       */[k + (ipz * parametri->npz_ricampionati_per_cpu)] =
+            /*       */[i + (ipx * parametri->npx_ricampionati_per_cpu)] =
               /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
             delete[] buffer;
             buffer = NULL;
@@ -202,31 +204,30 @@ int leggi_campi(Parametri * parametri)
 
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_GRID2D])
   {
-    printf("\nWriting the ASCII 2D fields file\n");
+    printf("\nWriting the ASCII 2D field file\n");
     sprintf(nomefile_campi, "%s.txt", parametri->filebasename.c_str());
-    clean_fields = fopen(nomefile_campi, "w");
+    output_file.open(nomefile_campi, std::ofstream::out);
 
     //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-    fprintf(clean_fields, "#%lu\n#%lu\n#%lu\n", (long)parametri->npx_ricampionati, (long)parametri->npy_ricampionati, (long)parametri->npz_ricampionati);
-    fprintf(clean_fields, "#%f %f\n#%f %f\n", parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
+    output_file << '#' << parametri->npx_ricampionati << '\n' << '#' << parametri->npy_ricampionati << '\n' << '#' << parametri->npz_ricampionati << '\n';
+    output_file << '#' << parametri->xmin << ' ' << parametri->ymin << '\n' << '#' << parametri->xmax << ' ' << parametri->ymax << '\n';
     for (size_t j = 0; j < parametri->npy_ricampionati; j++)
     {
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       {
-        fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[i][j][0]);
+        output_file << std::setprecision(6) << parametri->xcoord[i] << ' ' << parametri->ycoord[j] << ' ' << field[0][j][i] << '\n';
       }
     }
-    fclose(clean_fields);
+    output_file.close();
   }
 
 
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_LINEOUT_X])
   {
     size_t myj;
-    printf("\nScrittura lineout 1D\n");
+    printf("\nWriting 1D lineout\n");
     sprintf(nomefile_campi, "%s_lineout.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
-    printf("\nWriting the lineout file 1D (not vtk)\n");
 
     for (size_t i = 0; i < parametri->npx_ricampionati; i++) x_lineout[i] = 0;
 
@@ -245,7 +246,7 @@ int leggi_campi(Parametri * parametri)
       fprintf(clean_fields, "%.4g\t", parametri->ycoord[j]);
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       {
-        x_lineout[i] += field[i][j][0] / (2.0f * parametri->span + 1.0f);
+        x_lineout[i] += field[0][j][i] / (2.0f * parametri->span + 1.0f);
       }
     }
     fprintf(clean_fields, "\n");
@@ -259,10 +260,9 @@ int leggi_campi(Parametri * parametri)
   if (parametri->npz_ricampionati > 1 && parametri->p[OUT_LINEOUT_X])
   {
     size_t myj;
-    printf("\nScrittura lineout 1D\n");
+    printf("\nWriting 1D lineout\n");
     sprintf(nomefile_campi, "%s_lineout.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
-    printf("\nWriting the lineout file 1D (not vtk)\n");
 
     for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       x_lineout[i] = 0;
@@ -283,7 +283,7 @@ int leggi_campi(Parametri * parametri)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
-          x_lineout[i] += field[i][j][k] / ((2.0f * parametri->span + 1.0f)*(2.0f * parametri->span + 1.0f));
+          x_lineout[i] += field[k][j][i] / ((2.0f * parametri->span + 1.0f)*(2.0f * parametri->span + 1.0f));
         }
       }
     }
@@ -319,9 +319,8 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cutz.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cutz_%g.txt", parametri->filebasename.c_str(), cutz[n]);
-      printf("\nScrittura file gnuplot taglio z=%g\n", cutz[n]);
+      printf("\nWriting the 2D field file (not vtk) at z=%g\n", cutz[n]);
       clean_fields = fopen(nomefile_campi, "wb");
-      printf("\nWriting the fields file 2D (not vtk)\n");
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at z=%g\n", cutz[n]);
       fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npx_ricampionati, (long)parametri->npy_ricampionati, 1);
@@ -331,7 +330,7 @@ int leggi_campi(Parametri * parametri)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
-          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[i][j][k]);
+          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[k][j][i]);
         }
       }
       fclose(clean_fields);
@@ -361,9 +360,8 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cuty.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cuty_%g.txt", parametri->filebasename.c_str(), cuty[n]);
-      printf("\nScrittura file gnuplot taglio y=%g\n", cuty[n]);
+      printf("\nWriting the 2D field file (not vtk) at y=%g\n", cuty[n]);
       clean_fields = fopen(nomefile_campi, "wb");
-      printf("\nWriting the fields file 2D (not vtk)\n");
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at y=%g\n", cuty[n]);
       fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npx_ricampionati, (long)parametri->npz_ricampionati, 1);
@@ -373,7 +371,7 @@ int leggi_campi(Parametri * parametri)
       {
         for (size_t i = 0; i < parametri->npx_ricampionati; i++)
         {
-          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->zcoord[k], field[i][j][k]);
+          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->zcoord[k], field[k][j][i]);
         }
       }
       fclose(clean_fields);
@@ -403,9 +401,8 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cutx.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cutx_%g.txt", parametri->filebasename.c_str(), cutx[n]);
-      printf("\nScrittura file gnuplot taglio x=%g\n", cutx[n]);
+      printf("\nWriting the 2D field file (not vtk) at x=%g\n", cutx[n]);
       clean_fields = fopen(nomefile_campi, "wb");
-      printf("\nWriting the fields file 2D (not vtk)\n");
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at x=%g\n", cutx[n]);
       fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npy_ricampionati, (long)parametri->npz_ricampionati, 1);
@@ -415,7 +412,7 @@ int leggi_campi(Parametri * parametri)
       {
         for (size_t j = 0; j < parametri->npy_ricampionati; j++)
         {
-          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->ycoord[j], parametri->zcoord[k], field[i][j][k]);
+          fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->ycoord[j], parametri->zcoord[k], field[k][j][i]);
         }
       }
       fclose(clean_fields);
@@ -425,7 +422,7 @@ int leggi_campi(Parametri * parametri)
 
   if (parametri->p[OUT_VTK])
   {
-    printf("%lu\nScrittura vtk\n\n", (unsigned long)fread_size);
+    printf("%lu\nWriting the vtk fields file\n\n", (unsigned long)fread_size);
 
     float *x_coordinates, *y_coordinates, *z_coordinates;
     x_coordinates = new float[parametri->npx_ricampionati];
@@ -441,7 +438,7 @@ int leggi_campi(Parametri * parametri)
 
     if (parametri->endian_machine == 0)
     {
-      swap_endian_f(field, parametri->npx_ricampionati, parametri->npy_ricampionati, parametri->npz_ricampionati);
+      swap_endian_f(field, parametri->npz_ricampionati, parametri->npy_ricampionati, parametri->npx_ricampionati);
       swap_endian_f(x_coordinates, parametri->npx_ricampionati);
       swap_endian_f(y_coordinates, parametri->npy_ricampionati);
       swap_endian_f(z_coordinates, parametri->npz_ricampionati);
@@ -451,7 +448,6 @@ int leggi_campi(Parametri * parametri)
 
     sprintf(nomefile_campi, "%s.vtk", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
-    printf("\nWriting the fields file\n");
     fprintf(clean_fields, "# vtk DataFile Version 2.0\n");
     fprintf(clean_fields, "titolo mio\n");
     fprintf(clean_fields, "BINARY\n");
@@ -475,7 +471,7 @@ int leggi_campi(Parametri * parametri)
     fprintf(clean_fields, "POINT_DATA %lu\n", (long)(parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati));
     fprintf(clean_fields, "SCALARS %s float 1\n", parametri->support_label);
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
-    fwrite((void*)field, sizeof(float), parametri->npx_ricampionati*parametri->npy_ricampionati*parametri->npz_ricampionati, clean_fields);
+    fwrite((void*)field, sizeof(float), parametri->npz_ricampionati*parametri->npy_ricampionati*parametri->npx_ricampionati, clean_fields);
     fclose(clean_fields);
   }
 
@@ -483,7 +479,7 @@ int leggi_campi(Parametri * parametri)
 
   if (parametri->p[OUT_VTK_NOSTRETCH])
   {
-    printf("%lu\nScrittura vtk della parte non stretchata della griglia\n\n", (unsigned long)fread_size);
+    printf("%lu\nWriting the vtk file related to the unstretched part of the grid\n\n", (unsigned long)fread_size);
 
     int inizio_punti_non_stretchati_x, inizio_punti_non_stretchati_y, inizio_punti_non_stretchati_z;
     int fine_punti_non_stretchati_x, fine_punti_non_stretchati_y, fine_punti_non_stretchati_z;
@@ -525,7 +521,7 @@ int leggi_campi(Parametri * parametri)
         for (int i = inizio_punti_non_stretchati_x; i < fine_punti_non_stretchati_x; i++)
         {
           a = i - inizio_punti_non_stretchati_x;
-          field_non_stretchato[a + b*npunti_non_stretchati_x + c*npunti_non_stretchati_x*npunti_non_stretchati_y] = field[i][j][k];
+          field_non_stretchato[a + b*npunti_non_stretchati_x + c*npunti_non_stretchati_x*npunti_non_stretchati_y] = field[k][j][i];
         }
       }
     }
@@ -545,7 +541,6 @@ int leggi_campi(Parametri * parametri)
 
     sprintf(nomefile_campi, "%s_nostretch.vtk", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "wb");
-    printf("\nWriting the fields file\n");
     fprintf(clean_fields, "# vtk DataFile Version 2.0\n");
     fprintf(clean_fields, "titolo mio\n");
     fprintf(clean_fields, "BINARY\n");
