@@ -171,8 +171,8 @@ int main(const int argc, const char *argv[])
 #endif
 
 
-  if (parametri.file_griglia)         leggi_campi(argc, argv, &parametri);
-  else if (parametri.file_spaziofasi) leggi_particelle(argc, argv, &parametri);
+  if (parametri.file_griglia)         leggi_campi(&parametri);
+  else if (parametri.file_spaziofasi) leggi_particelle(&parametri);
   else printf("Unuseful file\n");
   fflush(stdout);
 

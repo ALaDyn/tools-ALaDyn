@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  5
 #define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 11
+#define BUGFIX_RELEASE 12
 
 #include <iostream>
 #include <vector>
@@ -61,10 +61,10 @@
 #endif
 
 
-#define MAX(x,y) ((x)>(y)?(x):(y))
-#define MIN(x,y) ((x)<(y)?(x):(y))
-#define TRUE 1
-#define FALSE 0
+#define MAX(x,y)                  ((x)>(y)?(x):(y))
+#define MIN(x,y)                  ((x)<(y)?(x):(y))
+#define TRUE                      1
+#define FALSE                     0
 
 #define UMA_G                     1.660538921E-24     // fattore di conversione uma -> grammi
 #define C                         2.99792458E+10      // cm / s
@@ -154,6 +154,8 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 
 struct Parametri
 {
+  int argc;
+  std::string * argv;
   std::string filebasename;
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
   unsigned int ndv, fattore_ricampionamento;
@@ -213,7 +215,7 @@ struct Parametri
   float dimmi_dimE();
   float dimmi_dim(int);
   int dimmi_nbin(int);
-  void parse_command_line(int, const char **);
+  void parse_command_line(const int, const char **);
   void leggi_file_dat(std::ifstream &);
   void debug_read_parameters();
   void chiedi_endian_file();
@@ -251,7 +253,7 @@ struct _Filtro
     tymin, tymax, tzmin, tzmax, wmin, wmax, chmin, chmax
   } nomi;
   static float * costruisci_filtro(const char *, ...);
-  static float * costruisci_filtro(int, const char **);
+  static float * costruisci_filtro(Parametri *);
   static void individua_filtro(char *, float, float *&);
   static const unsigned int cost[];
   static unsigned int maschera_interna;
@@ -283,7 +285,7 @@ struct _Filtro
     unsigned piu_wmax : 1;
     unsigned meno_chmin : 1;
     unsigned piu_chmax : 1;
-    _flag_filtri operator=(int o)
+    _flag_filtri operator=(int )
     {
       meno_xmin = meno_ymin = meno_zmin =
         meno_pxmin = meno_pymin = meno_pzmin =
@@ -301,8 +303,8 @@ struct _Filtro
   _Filtro(Parametri*, float *, unsigned int[], float *, unsigned int = 0);
 };
 
-int leggi_campi(int, const char **, Parametri *);
-int leggi_particelle(int, const char **, Parametri *);
+int leggi_campi(Parametri *);
+int leggi_particelle(Parametri *);
 
 int is_big_endian(void);
 void swap_endian_s(short*, int);

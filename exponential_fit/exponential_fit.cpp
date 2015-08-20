@@ -291,9 +291,9 @@ int main(int argc, char* argv[])
     fprintf(outfile, "AVERAGE_E1 = %3.2f\n", aveE1);
     fprintf(outfile, "AVERAGE_E2 = %3.2f\n", aveE2);
     fprintf(outfile, "AVERAGE_E3 = %3.2f\n", aveE3);
-    fprintf(outfile, "N0_1 = %i\n", N0_1);
-    fprintf(outfile, "N0_2 = %i\n", N0_2);
-    fprintf(outfile, "N0_3 = %i\n", N0_3);
+    fprintf(outfile, "N0_1 = %g\n", N0_1);
+    fprintf(outfile, "N0_2 = %g\n", N0_2);
+    fprintf(outfile, "N0_3 = %g\n", N0_3);
     fprintf(outfile, "f(x) = (N0_1 / AVERAGE_E1)*exp(-x / AVERAGE_E1)\n");
     fprintf(outfile, "g(x) = (N0_2 / AVERAGE_E2)*exp(-x / AVERAGE_E2)\n");
     fprintf(outfile, "h(x) = (N0_3 / AVERAGE_E3)*exp(-x / AVERAGE_E3)\n");

@@ -843,12 +843,17 @@ void Parametri::check_filename(const char *nomefile)
   }
 }
 
-void Parametri::parse_command_line(int argc, const char ** argv)
+void Parametri::parse_command_line(const int cl_argc, const char ** cl_argv)
 {
   std::ifstream fileParametri;
   std::string nomefile;
   bool usa_file_parametri = false;
   bool failed_opening_file;
+
+  argc = cl_argc;
+  argv = new std::string[argc];
+  for (int i = 0; i < argc; i++) argv[i] = std::string(cl_argv[i]);
+
   for (int i = 2; i < argc; i++)
     /************************************************************************
     We will iterate over argv[] to get the parameters stored inside.
@@ -857,9 +862,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
     which is supposed to be given as the first argument and so is in argv[1]
     ************************************************************************/
   {
-    //    std::cout << argv[i] << std::endl;
-
-    if (std::string(argv[i]) == "-readParamsfromFile" || std::string(argv[i]) == "-readParamsFromFile" || std::string(argv[i]) == "-readParams" || std::string(argv[i]) == "-readparamsfromfile")
+    if (argv[i] == "-readParamsfromFile" || argv[i] == "-readParamsFromFile" || argv[i] == "-readParams" || argv[i] == "-readparamsfromfile")
     {
       if (i < argc - 1 && argv[i + 1][0] != '-')
       {
@@ -875,51 +878,51 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-params")
+    else if (argv[i] == "-params")
     {
-      std::cout << "Forcing the output of the parameters from .dat/.bin files" << std::endl;
+      std::cout << "Enabled the output of the parameters from .dat/.bin files" << std::endl;
       p[OUT_PARAMS] = 1;
       p_b[OUT_PARAMS] = false;
     }
-    else if (std::string(argv[i]) == "-swap")
+    else if (argv[i] == "-swap")
     {
-      std::cout << "Forcing a bit endianness swapping" << std::endl;
+      std::cout << "Forcing byte swapping (endianness)" << std::endl;
       p[SWAP] = 1;
       p_b[SWAP] = false;
     }
-    else if (std::string(argv[i]) == "-noswap")
+    else if (argv[i] == "-noswap")
     {
-      std::cout << "Forcing a bit endianness NON swapping" << std::endl;
+      std::cout << "Forcing byte NON swapping (endianness)" << std::endl;
       p[SWAP] = 0;
       p_b[SWAP] = false;
     }
-    else if (std::string(argv[i]) == "-force_v2")
+    else if (argv[i] == "-force_v2")
     {
       std::cout << "Forced using routines for aladyn v2" << std::endl;
       aladyn_version = 2;
     }
-    else if (std::string(argv[i]) == "-force_v3")
+    else if (argv[i] == "-force_v3")
     {
       std::cout << "Forced using routines for aladyn v3" << std::endl;
       aladyn_version = 3;
     }
-    else if (std::string(argv[i]) == "-stop")
+    else if (argv[i] == "-stop")
     {
-      last_cpu = atoi(argv[i + 1]);
+      last_cpu = atoi(argv[i + 1].c_str());
       if (last_cpu < 1) last_cpu = 1;
       std::cout << "Forced stopping reading at CPU #" << last_cpu << std::endl;
       i++;
     }
-    else if (std::string(argv[i]) == "-span")
+    else if (argv[i] == "-span")
     {
-      span = atoi(argv[i + 1]);
+      span = atoi(argv[i + 1].c_str());
       if (span < 0) span = 0;
       std::cout << "Span factor for lineout: " << span << std::endl;
       i++;
     }
-    else if (std::string(argv[i]) == "-subsample")
+    else if (argv[i] == "-subsample")
     {
-      subsample = atoi(argv[i + 1]);
+      subsample = atoi(argv[i + 1].c_str());
       if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
       {
         if (subsample < 1)
@@ -938,9 +941,9 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       }
       i++;
     }
-    else if (std::string(argv[i]) == "-ncol")
+    else if (argv[i] == "-ncol")
     {
-      int ncolumns = atoi(argv[i + 1]);
+      int ncolumns = atoi(argv[i + 1].c_str());
       p[NCOLONNE] = ncolumns;
       if (ncolumns == 6) p[WEIGHT] = 0;
       else if (ncolumns == 7) p[WEIGHT] = 1;
@@ -949,31 +952,31 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       p_b[WEIGHT] = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-dump_vtk")
+    else if (argv[i] == "-dump_vtk")
     {
       std::cout << "You asked to have a VTK dump of the input file" << std::endl;
       p[OUT_VTK] = 1;
       p_b[OUT_VTK] = false;
     }
-    else if (std::string(argv[i]) == "-dump_vtk_nostretch")
+    else if (argv[i] == "-dump_vtk_nostretch")
     {
       std::cout << "You asked to have a VTK dump of the non-stretched grid.\n";
       std::cout << "If not explicitly said, the grid will be considered stretched in ALL directions" << std::endl;
       p[OUT_VTK_NOSTRETCH] = 1;
       p_b[OUT_VTK_NOSTRETCH] = false;
     }
-    else if (std::string(argv[i]) == "-no_stretch_x")
+    else if (argv[i] == "-no_stretch_x")
     {
       std::cout << "Assuming the grid is NOT stretched along x axis.\n";
       stretched_along_x = 0;
     }
-    else if (std::string(argv[i]) == "-dump_cutx")
+    else if (argv[i] == "-dump_cutx")
     {
       if (p[NCOLONNE] > 1)
       {
         if (argv[i + 1][0] != '-')
         {
-          float posizione_taglio = (float)atof(argv[i + 1]);
+          float posizione_taglio = (float)atof(argv[i + 1].c_str());
           posizioni_taglio_griglia_x.push_back(posizione_taglio);
           std::cout << "You asked to cut the grid at x = " << posizione_taglio << std::endl;
           i++;
@@ -994,13 +997,13 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       }
     }
 
-    else if (std::string(argv[i]) == "-dump_cuty")
+    else if (argv[i] == "-dump_cuty")
     {
       if (p[NCOLONNE] > 1)
       {
         if (argv[i + 1][0] != '-')
         {
-          float posizione_taglio = (float)atof(argv[i + 1]);
+          float posizione_taglio = (float)atof(argv[i + 1].c_str());
           posizioni_taglio_griglia_y.push_back(posizione_taglio);
           std::cout << "You asked to cut the grid at y = " << posizione_taglio << std::endl;
           i++;
@@ -1021,13 +1024,13 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       }
     }
 
-    else if (std::string(argv[i]) == "-dump_cutz")
+    else if (argv[i] == "-dump_cutz")
     {
       if (p[NCOLONNE] > 1)
       {
         if (argv[i + 1][0] != '-')
         {
-          float posizione_taglio = (float)atof(argv[i + 1]);
+          float posizione_taglio = (float)atof(argv[i + 1].c_str());
           posizioni_taglio_griglia_z.push_back(posizione_taglio);
           std::cout << "You asked to cut the grid at z = " << posizione_taglio << std::endl;
           i++;
@@ -1048,14 +1051,14 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       }
     }
 
-    else if (std::string(argv[i]) == "-dump_lineoutx")
+    else if (argv[i] == "-dump_lineoutx")
     {
       std::cout << "You asked to have a lineout of the grid along the x-axis" << std::endl;
       p[OUT_LINEOUT_X] = 1;
       p_b[OUT_LINEOUT_X] = false;
     }
 
-    else if (std::string(argv[i]) == "-dump_gnuplot")
+    else if (argv[i] == "-dump_gnuplot")
     {
       if (p[NCOLONNE] == 1)
       {
@@ -1070,113 +1073,113 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         p_b[OUT_GRID2D] = false;
       }
     }
-    else if (std::string(argv[i]) == "-dump_propaga")
+    else if (argv[i] == "-dump_propaga")
     {
       std::cout << "You asked to have a .ppg dump of the input phase space" << std::endl;
       p[OUT_PROPAGA] = 1;
       p_b[OUT_PROPAGA] = false;
     }
-    else if (std::string(argv[i]) == "-dump_csv")
+    else if (argv[i] == "-dump_csv")
     {
       std::cout << "You asked to have a .csv dump of the input phase space" << std::endl;
       p[OUT_CSV] = 1;
       p_b[OUT_CSV] = false;
     }
-    else if (std::string(argv[i]) == "-dump_xyzE")
+    else if (argv[i] == "-dump_xyzE")
     {
       std::cout << "You asked to have a xy(z)E dump of the input phase space" << std::endl;
       p[OUT_XYZE] = 1;
       p_b[OUT_XYZE] = false;
     }
-    else if (std::string(argv[i]) == "-dump_clean")
+    else if (argv[i] == "-dump_clean")
     {
       std::cout << "You asked to have a unique, clean binary file as the output" << std::endl;
       p[OUT_CLEAN_BINARY] = 1;
       p_b[OUT_CLEAN_BINARY] = false;
     }
-    else if (std::string(argv[i]) == "-parameters")
+    else if (argv[i] == "-parameters")
     {
       std::cout << "You asked to write the simulation parameters file" << std::endl;
       p[OUT_PARAMS] = 1;
       p_b[OUT_PARAMS] = false;
     }
-    else if (std::string(argv[i]) == "-find_minmax")
+    else if (argv[i] == "-find_minmax")
     {
       std::cout << "You asked to search for minima and maxima" << std::endl;
       p[FIND_MINMAX] = 1;
       p_b[FIND_MINMAX] = false;
     }
-    else if (std::string(argv[i]) == "-do_binning")
+    else if (argv[i] == "-do_binning")
     {
       std::cout << "You asked to enable plotting functions" << std::endl;
       p[DO_BINNING] = 1;
       p_b[DO_BINNING] = false;
     }
-    else if (std::string(argv[i]) == "-xmin")
+    else if (argv[i] == "-xmin")
     {
-      xmin = (float)atof(argv[i + 1]);
+      xmin = (float)atof(argv[i + 1].c_str());
       xmin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-xmax")
+    else if (argv[i] == "-xmax")
     {
-      xmax = (float)atof(argv[i + 1]);
+      xmax = (float)atof(argv[i + 1].c_str());
       xmax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-weight")
+    else if (argv[i] == "-weight")
     {
       overwrite_weight = true;
-      overwrite_weight_value = (float)atof(argv[i + 1]);
+      overwrite_weight_value = (float)atof(argv[i + 1].c_str());
       i++;
     }
-    else if (std::string(argv[i]) == "-charge")
+    else if (argv[i] == "-charge")
     {
       overwrite_charge = true;
-      overwrite_charge_value = (float)atof(argv[i + 1]);
+      overwrite_charge_value = (float)atof(argv[i + 1].c_str());
       i++;
     }
-    else if (std::string(argv[i]) == "-wmin")
+    else if (argv[i] == "-wmin")
     {
-      wmin = (float)atof(argv[i + 1]);
+      wmin = (float)atof(argv[i + 1].c_str());
       wmin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-wmax")
+    else if (argv[i] == "-wmax")
     {
-      wmax = (float)atof(argv[i + 1]);
+      wmax = (float)atof(argv[i + 1].c_str());
       wmax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-chmin")
+    else if (argv[i] == "-chmin")
     {
-      chmin = (float)atof(argv[i + 1]);
+      chmin = (float)atof(argv[i + 1].c_str());
       chmin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-chmax")
+    else if (argv[i] == "-chmax")
     {
-      chmax = (float)atof(argv[i + 1]);
+      chmax = (float)atof(argv[i + 1].c_str());
       chmax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-ymin")
+    else if (argv[i] == "-ymin")
     {
-      ymin = (float)atof(argv[i + 1]);
+      ymin = (float)atof(argv[i + 1].c_str());
       ymin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-ymax")
+    else if (argv[i] == "-ymax")
     {
-      ymax = (float)atof(argv[i + 1]);
+      ymax = (float)atof(argv[i + 1].c_str());
       ymax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-zmin")
+    else if (argv[i] == "-zmin")
     {
       if (p[NCOLONNE] > 5)
       {
-        zmin = (float)atof(argv[i + 1]);
+        zmin = (float)atof(argv[i + 1].c_str());
         zmin_b = false;
         i++;
       }
@@ -1185,11 +1188,11 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-zmax")
+    else if (argv[i] == "-zmax")
     {
       if (p[NCOLONNE] > 5)
       {
-        zmax = (float)atof(argv[i + 1]);
+        zmax = (float)atof(argv[i + 1].c_str());
         zmax_b = false;
         i++;
       }
@@ -1198,23 +1201,23 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-tymin")
+    else if (argv[i] == "-tymin")
     {
-      tymin = (float)atof(argv[i + 1]);
+      tymin = (float)atof(argv[i + 1].c_str());
       tymin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-tymax")
+    else if (argv[i] == "-tymax")
     {
-      tymax = (float)atof(argv[i + 1]);
+      tymax = (float)atof(argv[i + 1].c_str());
       tymax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-tzmin")
+    else if (argv[i] == "-tzmin")
     {
       if (p[NCOLONNE] > 5)
       {
-        tzmin = (float)atof(argv[i + 1]);
+        tzmin = (float)atof(argv[i + 1].c_str());
         tzmin_b = false;
         i++;
       }
@@ -1223,11 +1226,11 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-tzmax")
+    else if (argv[i] == "-tzmax")
     {
       if (p[NCOLONNE] > 5)
       {
-        tzmax = (float)atof(argv[i + 1]);
+        tzmax = (float)atof(argv[i + 1].c_str());
         tzmax_b = false;
         i++;
       }
@@ -1236,35 +1239,35 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-pxmin")
+    else if (argv[i] == "-pxmin")
     {
-      pxmin = (float)atof(argv[i + 1]);
+      pxmin = (float)atof(argv[i + 1].c_str());
       pxmin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-pxmax")
+    else if (argv[i] == "-pxmax")
     {
-      pxmax = (float)atof(argv[i + 1]);
+      pxmax = (float)atof(argv[i + 1].c_str());
       pxmax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-pymin")
+    else if (argv[i] == "-pymin")
     {
-      pymin = (float)atof(argv[i + 1]);
+      pymin = (float)atof(argv[i + 1].c_str());
       pymin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-pymax")
+    else if (argv[i] == "-pymax")
     {
-      pymax = (float)atof(argv[i + 1]);
+      pymax = (float)atof(argv[i + 1].c_str());
       pymax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-pzmin")
+    else if (argv[i] == "-pzmin")
     {
       if (p[NCOLONNE] > 5)
       {
-        pzmin = (float)atof(argv[i + 1]);
+        pzmin = (float)atof(argv[i + 1].c_str());
         pzmin_b = false;
         i++;
       }
@@ -1273,11 +1276,11 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-pzmax")
+    else if (argv[i] == "-pzmax")
     {
       if (p[NCOLONNE] > 5)
       {
-        pzmax = (float)atof(argv[i + 1]);
+        pzmax = (float)atof(argv[i + 1].c_str());
         pzmax_b = false;
         i++;
       }
@@ -1286,59 +1289,59 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-thetamin")
+    else if (argv[i] == "-thetamin")
     {
-      thetamin = (float)atof(argv[i + 1]);
+      thetamin = (float)atof(argv[i + 1].c_str());
       thetamin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-thetamax")
+    else if (argv[i] == "-thetamax")
     {
-      thetamax = (float)atof(argv[i + 1]);
+      thetamax = (float)atof(argv[i + 1].c_str());
       thetamax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-thetaTmin")
+    else if (argv[i] == "-thetaTmin")
     {
-      thetaTmin = (float)atof(argv[i + 1]);
+      thetaTmin = (float)atof(argv[i + 1].c_str());
       thetaTmin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-thetaTmax")
+    else if (argv[i] == "-thetaTmax")
     {
-      thetaTmax = (float)atof(argv[i + 1]);
+      thetaTmax = (float)atof(argv[i + 1].c_str());
       thetaTmax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-gammamin")
+    else if (argv[i] == "-gammamin")
     {
-      gammamin = (float)atof(argv[i + 1]);
+      gammamin = (float)atof(argv[i + 1].c_str());
       gammamin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-gammamax")
+    else if (argv[i] == "-gammamax")
     {
-      gammamax = (float)atof(argv[i + 1]);
+      gammamax = (float)atof(argv[i + 1].c_str());
       gammamax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-Emin")
+    else if (argv[i] == "-Emin")
     {
-      Emin = (float)atof(argv[i + 1]);
+      Emin = (float)atof(argv[i + 1].c_str());
       Emin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-Emax")
+    else if (argv[i] == "-Emax")
     {
-      Emax = (float)atof(argv[i + 1]);
+      Emax = (float)atof(argv[i + 1].c_str());
       Emax_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-plot_xy")
+    else if (argv[i] == "-plot_xy")
     {
       fai_plot_xy = 1;
     }
-    else if (std::string(argv[i]) == "-plot_xw")
+    else if (argv[i] == "-plot_xw")
     {
       if (p[WEIGHT])
       {
@@ -1349,7 +1352,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with weight using a file without weight!" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_xz")
+    else if (argv[i] == "-plot_xz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1360,7 +1363,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_yz")
+    else if (argv[i] == "-plot_yz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1371,7 +1374,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_rcf")
+    else if (argv[i] == "-plot_rcf")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1382,15 +1385,15 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with tz using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_xpx")
+    else if (argv[i] == "-plot_xpx")
     {
       fai_plot_xpx = 1;
     }
-    else if (std::string(argv[i]) == "-plot_xpy")
+    else if (argv[i] == "-plot_xpy")
     {
       fai_plot_xpy = 1;
     }
-    else if (std::string(argv[i]) == "-plot_xpz")
+    else if (argv[i] == "-plot_xpz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1401,15 +1404,15 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_ypx")
+    else if (argv[i] == "-plot_ypx")
     {
       fai_plot_ypx = 1;
     }
-    else if (std::string(argv[i]) == "-plot_ypy")
+    else if (argv[i] == "-plot_ypy")
     {
       fai_plot_ypy = 1;
     }
-    else if (std::string(argv[i]) == "-plot_ypz")
+    else if (argv[i] == "-plot_ypz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1420,7 +1423,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_zpx")
+    else if (argv[i] == "-plot_zpx")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1431,7 +1434,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_zpy")
+    else if (argv[i] == "-plot_zpy")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1442,7 +1445,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_zpz")
+    else if (argv[i] == "-plot_zpz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1453,11 +1456,11 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_pxpy")
+    else if (argv[i] == "-plot_pxpy")
     {
       fai_plot_pxpy = 1;
     }
-    else if (std::string(argv[i]) == "-plot_pxpz")
+    else if (argv[i] == "-plot_pxpz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1468,7 +1471,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_pypz")
+    else if (argv[i] == "-plot_pypz")
     {
       if (p[NCOLONNE] > 5)
       {
@@ -1479,19 +1482,19 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_etheta")
+    else if (argv[i] == "-plot_etheta")
     {
       fai_plot_Etheta = 1;
     }
-    else if (std::string(argv[i]) == "-plot_ethetaT")
+    else if (argv[i] == "-plot_ethetaT")
     {
       fai_plot_EthetaT = 1;
     }
-    else if (std::string(argv[i]) == "-plot_espec")
+    else if (argv[i] == "-plot_espec")
     {
       fai_plot_Espec = 1;
     }
-    else if (std::string(argv[i]) == "-plot_chspec")
+    else if (argv[i] == "-plot_chspec")
     {
       if (aladyn_version == 3)
       {
@@ -1502,7 +1505,7 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with charge using a file without charges!" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_wspec")
+    else if (argv[i] == "-plot_wspec")
     {
       if (p[WEIGHT])
       {
@@ -1513,17 +1516,17 @@ void Parametri::parse_command_line(int argc, const char ** argv)
         std::cout << "Unable to do a plot with weight using a file without weights!" << std::endl;
       }
     }
-    else if (std::string(argv[i]) == "-plot_thetaspec")
+    else if (argv[i] == "-plot_thetaspec")
     {
       fai_plot_thetaspec = 1;
     }
-    else if (std::string(argv[i]) == "-plot_thetaTspec")
+    else if (argv[i] == "-plot_thetaTspec")
     {
       fai_plot_thetaTspec = 1;
     }
-    else if (std::string(argv[i]) == "-nbin")
+    else if (argv[i] == "-nbin")
     {
-      nbin = atoi(argv[i + 1]);
+      nbin = atoi(argv[i + 1].c_str());
       if (nbin_x_b) nbin_x = nbin;
       if (nbin_y_b) nbin_y = nbin;
       if (nbin_z_b) nbin_z = nbin;
@@ -1541,105 +1544,105 @@ void Parametri::parse_command_line(int argc, const char ** argv)
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinx")
+    else if (argv[i] == "-nbinx")
     {
-      nbin_x = atoi(argv[i + 1]);
+      nbin_x = atoi(argv[i + 1].c_str());
       nbin_x_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbiny")
+    else if (argv[i] == "-nbiny")
     {
-      nbin_y = atoi(argv[i + 1]);
+      nbin_y = atoi(argv[i + 1].c_str());
       nbin_y_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinz")
+    else if (argv[i] == "-nbinz")
     {
-      nbin_z = atoi(argv[i + 1]);
+      nbin_z = atoi(argv[i + 1].c_str());
       nbin_z_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinty")
+    else if (argv[i] == "-nbinty")
     {
-      nbin_ty = atoi(argv[i + 1]);
+      nbin_ty = atoi(argv[i + 1].c_str());
       nbin_ty_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbintz")
+    else if (argv[i] == "-nbintz")
     {
-      nbin_tz = atoi(argv[i + 1]);
+      nbin_tz = atoi(argv[i + 1].c_str());
       nbin_tz_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinpx")
+    else if (argv[i] == "-nbinpx")
     {
-      nbin_px = atoi(argv[i + 1]);
+      nbin_px = atoi(argv[i + 1].c_str());
       nbin_px_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinpy")
+    else if (argv[i] == "-nbinpy")
     {
-      nbin_py = atoi(argv[i + 1]);
+      nbin_py = atoi(argv[i + 1].c_str());
       nbin_py_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinpz")
+    else if (argv[i] == "-nbinpz")
     {
-      nbin_pz = atoi(argv[i + 1]);
+      nbin_pz = atoi(argv[i + 1].c_str());
       nbin_pz_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbintheta")
+    else if (argv[i] == "-nbintheta")
     {
-      nbin_theta = atoi(argv[i + 1]);
+      nbin_theta = atoi(argv[i + 1].c_str());
       nbin_theta_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinthetaT")
+    else if (argv[i] == "-nbinthetaT")
     {
-      nbin_thetaT = atoi(argv[i + 1]);
+      nbin_thetaT = atoi(argv[i + 1].c_str());
       nbin_thetaT_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbingamma")
+    else if (argv[i] == "-nbingamma")
     {
-      nbin_gamma = atoi(argv[i + 1]);
+      nbin_gamma = atoi(argv[i + 1].c_str());
       nbin_gamma_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinE")
+    else if (argv[i] == "-nbinE")
     {
-      nbin_E = atoi(argv[i + 1]);
+      nbin_E = atoi(argv[i + 1].c_str());
       nbin_E_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinw")
+    else if (argv[i] == "-nbinw")
     {
-      nbin_w = atoi(argv[i + 1]);
+      nbin_w = atoi(argv[i + 1].c_str());
       nbin_w_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-nbinch")
+    else if (argv[i] == "-nbinch")
     {
-      nbin_ch = atoi(argv[i + 1]);
+      nbin_ch = atoi(argv[i + 1].c_str());
       nbin_ch_b = false;
       nbin_b = false;
       i++;
     }
-    else if (std::string(argv[i]) == "-dontask")
+    else if (argv[i] == "-dontask")
     {
       do_not_ask_missing = true;
     }

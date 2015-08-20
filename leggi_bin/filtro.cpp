@@ -390,14 +390,14 @@ const unsigned int _Filtro::cost[] =
   __0X24, __0X25, __0X26, __0X27, __0X28, __0X29, __0X30, __0X31
 };
 
-float * _Filtro::costruisci_filtro(int narg, const char **args)
+float * _Filtro::costruisci_filtro(Parametri * parametri)
 {
   char ** miei_args;
   float * miei_val;
   int indices[NUM_FILTRI], quanti = 0;
-  for (int i = 1; i < narg; ++i)
+  for (int i = 1; i < parametri->argc; ++i)
   {
-    if (args[i][0] == '+')
+    if (parametri->argv[i][0] == '+')
       indices[quanti++] = i;
   }
   indices[quanti] = -1;
@@ -405,8 +405,8 @@ float * _Filtro::costruisci_filtro(int narg, const char **args)
   miei_args = new char *[NUM_FILTRI + 1], miei_args[NUM_FILTRI] = 0;
   miei_val = new float[NUM_FILTRI + 1];
   for (int i = 0; i < quanti; ++i)
-    miei_args[i] = const_cast<char*>(args[indices[i]]),
-    miei_val[i] = (float)atof(args[indices[i] + 1]);
+    miei_args[i] = const_cast<char*>(parametri->argv[indices[i]].c_str()),
+    miei_val[i] = (float)atof(parametri->argv[indices[i] + 1].c_str());
   miei_args[quanti] = 0;
   return costruisci_filtro(
     miei_args[0], miei_val[0],

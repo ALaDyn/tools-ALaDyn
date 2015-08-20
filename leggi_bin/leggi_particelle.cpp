@@ -32,7 +32,7 @@ union double_as_two_float {
 };
 
 
-int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
+int leggi_particelle(Parametri * parametri)
 {
   std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
   nomefile_bin << parametri->filebasename << ".bin";
@@ -451,7 +451,7 @@ int leggi_particelle(int argc, const char ** argv, Parametri * parametri)
           if (parametri->p[SWAP]) swap_endian_f(particelle, (size_t)val[0] * parametri->ndv);
         }
 
-        _Filtro(parametri, particelle, val, _Filtro::costruisci_filtro(argc, argv));
+        _Filtro(parametri, particelle, val, _Filtro::costruisci_filtro(parametri));
 
         if (parametri->p[OUT_PARAMS])
         {

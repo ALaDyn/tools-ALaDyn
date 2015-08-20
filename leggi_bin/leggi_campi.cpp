@@ -3,7 +3,7 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-int leggi_campi(int argc, const char** argv, Parametri * parametri)
+int leggi_campi(Parametri * parametri)
 {
   std::ostringstream nomefile_bin;
   float taglio;
