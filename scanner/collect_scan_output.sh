@@ -1,9 +1,8 @@
 #! /bin/bash
-module load gnu/4.9.2
 SIM_HEADER="pre_"
 
-PARTICLE_TYPE="Hion"
-#PARTICLE_TYPE="Electron"
+#PARTICLE_TYPE="A2-ion"
+PARTICLE_TYPE="Electron"
 EXP_FIT_SOFTWARE=$HOME/bin/exponential_fit
 SPEC_DECODER=$HOME/bin/leggi_diag
 
@@ -14,7 +13,7 @@ SCANNER=$HOME/bin/scan-columns
 DO_SCAN=false
 
 #per il seguente, copiarsi dal prepare_scan_input la riga che genera tutti i valori (in questo caso di bulk lengths scannerizzate)
-columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=1.0)print i}')
+columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
 column=4
 # 1:{PREPLASMA_LENGTH} 2:{DENSITY} 3:{RAMP_LENGTH} 4:{BULK_LENGTH} 5:{CONT_LENGTH} 
 # 6:{PROTON_MAX_ENERGY} 7:{PROTON_TOT_ENERGY} 8:{PROTON_AVE_ENERGY} 9:{PROTON_TOT_NUMBER}" 
@@ -25,19 +24,24 @@ SPEC_TIME_TO_BE_READ=100
 SPEC_VERSION=4
 DIAG_VERSION=3
 OUTPUT_FILE="energy_scan_${PARTICLE_TYPE}.txt"
-NPHYS_OVER_NMACRO=696800
+NPHYS_OVER_NMACRO=1
 
 SIMULATION_FOLDERS=($(find . -name "${SIM_HEADER}*" -type d))
 
 
+# DESCRIPTION OF DIAG COLUMNS
+#              1:timestep 2:Efields2 
+# (Electrons)  3:Etot     4:Emax   5:Jz   6:px   7:py   8:pz   9:sigma_px  10:sigma_py  11:sigma_pz  12:mean_charge  13:charge_per_cell
+# (A1-ions)   14:Etot    15:Emax  16:Jz  17:px  18:py  19:pz  20:sigma_px  21:sigma_py  22:sigma_pz  23:mean_charge  24:charge_per_cell
+# (A2-ions)   25:Etot    26:Emax  27:Jz  28:px  29:py  30:pz  31:sigma_px  32:sigma_py  33:sigma_pz  34:mean_charge  35:charge_per_cell
 if [ ${PARTICLE_TYPE} == "Electron" ]
 then
- COLUMN_MAX_ENERGY=3
- COLUMN_TOT_ENERGY=2
-elif [ ${PARTICLE_TYPE} == "Hion" ]
+ COLUMN_MAX_ENERGY=4
+ COLUMN_TOT_ENERGY=3
+elif [ ${PARTICLE_TYPE} == "A2-ion" ]
 then
- COLUMN_MAX_ENERGY=7
- COLUMN_TOT_ENERGY=6
+ COLUMN_MAX_ENERGY=26
+ COLUMN_TOT_ENERGY=25
 else
  echo "Unrecognized particle type"
  exit
@@ -60,8 +64,8 @@ do
  if [ -f "diag${DIAG_STEP_TO_BE_READ}.dat" ];
  then
   ${SPEC_DECODER} diag${DIAG_STEP_TO_BE_READ}.dat v${DIAG_VERSION}
-  DIAG_MAX_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $'${COLUMN_MAX_ENERGY}'}'))
-  DIAG_TOT_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.txt | awk '{print $'${COLUMN_TOT_ENERGY}'}'))
+  DIAG_MAX_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt | awk '{print $'${COLUMN_MAX_ENERGY}'}'))
+  DIAG_TOT_ENERGY=($(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt | awk '{print $'${COLUMN_TOT_ENERGY}'}'))
  else
   DIAG_MAX_ENERGY="-1"
   DIAG_TOT_ENERGY="-1"
