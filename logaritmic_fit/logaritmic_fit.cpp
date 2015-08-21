@@ -25,8 +25,8 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
 
-#define SKIP_INIZIALE  (1./5.)    // skip the first one fifth of the data
-#define SKIP_FINALE    (4./5.)    // skip the last fifth of the data, since they do not fit very well into an exponential
+#define INITIAL_DATA_SKIP  (1./5.)
+#define FINAL_DATA_SKIP    (5./5.)  
 
 
 #include <iostream>
@@ -47,13 +47,17 @@ bool AreSame(double a, double b) {
 }
 
 
-
+// this program tries a logaritmic fit for energy evolution of particle species.
+// data is supposed to come from diags converted from aladyn output to columns through another tool in this collection
+// you have to specify on the command line the X column and the Y column
 
 int main(int argc, char* argv[])
 {
   if (argc < 3)
   {
-    std::cerr << "Please write on command line the two column input file (x,y) and also the working mode!" << std::endl;
+    std::cerr << "Please write on command line the input file (x,y), in which columns we will find the data and the working mode!" << std::endl;
+    std::cerr << "-x N means that the x data will be in the N column of the file" << std::endl;
+    std::cerr << "-y M means that the y data will be in the M column of the file" << std::endl;
     std::cerr << "-scan to write on the output, on a single line and without the newline at the end, just the fitting parameters" << std::endl;
     std::cerr << "-func to write on the output the fitting functions" << std::endl;
     std::cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curve" << std::endl;
@@ -64,7 +68,7 @@ int main(int argc, char* argv[])
   int Xres = 1280;
   int Yres = 720;
   char image_type[] = "png";
-
+  int colonna_x, colonna_y;
   bool scan = false, func = false, gnuplot = false;
   int inputfile_position = 0;
   std::string riga;
@@ -84,6 +88,8 @@ int main(int argc, char* argv[])
     if      (std::string(argv[i]) == "-scan")     scan = true;
     else if (std::string(argv[i]) == "-gnuplot")  gnuplot = true;
     else if (std::string(argv[i]) == "-func")     func = true;
+    else if (std::string(argv[i]) == "-x")        colonna_x = atoi(argv[++i]);
+    else if (std::string(argv[i]) == "-y")        colonna_y = atoi(argv[++i]);
     else                                          inputfile_position = i;
   }
 
@@ -110,19 +116,45 @@ int main(int argc, char* argv[])
       righe.push_back(riga);
   }
 
+
+  int contacolonne = 0;
+  char * pch;
+  char * str = new char[righe[0].length() + 1];
+  std::strcpy(str, righe[0].c_str());
+  pch = strtok(str, " \t");
+  if (pch != NULL) contacolonne++;
+  while (pch != NULL) {
+    pch = strtok(NULL, " \t");
+    if (pch != NULL) contacolonne++;
+  }
+  if (colonna_x > contacolonne || colonna_x < 1) {
+    std::cerr << "You have requested to analyze the x-column at a position (" << colonna_x << ") not available! " << contacolonne << " columns found." << std::endl;
+    exit(4);
+  }
+  if (colonna_y > contacolonne || colonna_y < 1) {
+    std::cerr << "You have requested to analyze the y-column at a position (" << colonna_y << ") not available! " << contacolonne << " columns found." << std::endl;
+    exit(5);
+  }
+
+  colonna_x--;  // to convert from human-form to C-style (first column in a file is represented as column #0 in C)
+  colonna_y--;
+
   infile.close();
   size_t n = righe.size();
   int reduced_n = 0;
   double * energy = new double[n];
   double * time = new double[n];
+  double * values = new double[contacolonne];
 
   for (size_t it = 0; it < n; it++) {
     std::stringstream ss(righe.at(it));
-    ss >> time[it] >> energy[it];
+    for (size_t line_it = 0; line_it < contacolonne; line_it++) ss >> values[line_it];
+    time[it] = values[colonna_x];
+    energy[it] = values[colonna_y];
   }
 
-  size_t inizio = (int)(SKIP_INIZIALE * n);
-  size_t fine = (int)(SKIP_FINALE * n);
+  size_t inizio = (int)(INITIAL_DATA_SKIP * n);
+  size_t fine = (int)(FINAL_DATA_SKIP * n);
 
   for (size_t it = inizio; it < fine; it++) {
     x = time[it];
@@ -157,16 +189,16 @@ int main(int argc, char* argv[])
     outfile = fopen("plot.plt", "w");
 
     fprintf(outfile, "#!/gnuplot\n");
-    fprintf(outfile, "FILE_IN='%s'\n", argv[1]);
-    fprintf(outfile, "FILE_OUT='%s.%s'\n", argv[1], image_type);
+    fprintf(outfile, "FILE_IN='%s'\n", argv[inputfile_position]);
+    fprintf(outfile, "FILE_OUT='%s.%s'\n", argv[inputfile_position], image_type);
     fprintf(outfile, "set terminal %s truecolor enhanced size %i,%i\n", image_type, Xres, Yres);
     fprintf(outfile, "set output FILE_OUT\n");
     fprintf(outfile, "a = %g\n", fit_a1);
     fprintf(outfile, "b = %g\n", fit_b1);
-    fprintf(outfile, "f(x) = a + b*ln(x)\n");
+    fprintf(outfile, "f(x) = a + b*log(x)\n");
     fprintf(outfile, "set xlabel 't' \n");
     fprintf(outfile, "set ylabel 'E (MeV)'\n");
-    fprintf(outfile, "plot FILE_IN u 1:2 w points pt 7 lc rgb 'blue' ps 1.5 notitle,\\");
+    fprintf(outfile, "plot FILE_IN u %i:%i w points pt 7 lc rgb 'blue' ps 1.5 notitle,\\",colonna_x+1, colonna_y+1);
     fprintf(outfile, "\n");
     fprintf(outfile, "f(x) w lines lt 1 lc rgb 'red' lw 2 notitle");
     fprintf(outfile, "\n");
