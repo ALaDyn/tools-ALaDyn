@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lightweight_coredump_analyz
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fix_nptot", "fix_nptot\fix_nptot.vcxproj", "{FF41224B-C853-449D-9C09-1747EA58CE51}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logaritmic_fit", "logaritmic_fit\logaritmic_fit.vcxproj", "{FF6B91C8-904C-4B71-82D0-E3DA2B103088}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -83,6 +85,14 @@ Global
 		{FF41224B-C853-449D-9C09-1747EA58CE51}.Release|Win32.ActiveCfg = Release|Win32
 		{FF41224B-C853-449D-9C09-1747EA58CE51}.Release|Win32.Build.0 = Release|Win32
 		{FF41224B-C853-449D-9C09-1747EA58CE51}.Release|x64.ActiveCfg = Release|Win32
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Debug|Win32.Build.0 = Debug|Win32
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Debug|x64.ActiveCfg = Debug|x64
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Debug|x64.Build.0 = Debug|x64
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|Win32.ActiveCfg = Release|Win32
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|Win32.Build.0 = Release|Win32
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|x64.ActiveCfg = Release|x64
+		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
