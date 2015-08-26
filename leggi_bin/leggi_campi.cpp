@@ -20,7 +20,6 @@ int leggi_campi(Parametri * parametri)
   std::FILE *file_in = NULL;
   std::FILE *parameters = NULL;
   std::FILE *clean_fields = NULL;
-  std::ofstream output_file;
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
@@ -206,19 +205,30 @@ int leggi_campi(Parametri * parametri)
   {
     printf("\nWriting the ASCII 2D field file\n");
     sprintf(nomefile_campi, "%s.txt", parametri->filebasename.c_str());
-    output_file.open(nomefile_campi, std::ofstream::out);
+    clean_fields = std::fopen(nomefile_campi, "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
-    //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
-    output_file << '#' << parametri->npx_ricampionati << '\n' << '#' << parametri->npy_ricampionati << '\n' << '#' << parametri->npz_ricampionati << '\n';
-    output_file << '#' << parametri->xmin << ' ' << parametri->ymin << '\n' << '#' << parametri->xmax << ' ' << parametri->ymax << '\n';
+    // create a buffer to optimize writing to output_file, here the buffer size is 1k
+    const int LEN = 1024;
+    char * buffer_out = new char[LEN];
+    if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
+      printf("Incorrect type or size of buffer for stream\n");
+#ifdef ENABLE_DEBUG
+    else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
+
+    fprintf(clean_fields, "# %llu \n # %llu \n # %llu\n# %g  %g \n # %g  %g\n", parametri->npx_ricampionati ,
+      parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
     for (size_t j = 0; j < parametri->npy_ricampionati; j++)
     {
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       {
-        output_file << std::setprecision(6) << parametri->xcoord[i] << ' ' << parametri->ycoord[j] << ' ' << field[0][j][i] << '\n';
+        fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[0][j][i]);
       }
+      printf("grid[y] = {%llu/%llu}\r", j, parametri->npy_ricampionati);
     }
-    output_file.close();
+    fclose(clean_fields);
+
+    delete[] buffer_out;
   }
 
 
@@ -319,8 +329,18 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cutz.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cutz_%g.txt", parametri->filebasename.c_str(), cutz[n]);
-      printf("\nWriting the 2D field file (not vtk) at z=%g\n", cutz[n]);
+      printf("\nWriting the 2D ASCII field file at z=%g\n", cutz[n]);
       clean_fields = fopen(nomefile_campi, "wb");
+
+      // create a buffer to optimize writing to output_file, here the buffer size is 1k
+      const int LEN = 1024;
+      char * buffer_out = new char[LEN];
+      if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
+        printf("Incorrect type or size of buffer for stream\n");
+#ifdef ENABLE_DEBUG
+      else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
+
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at z=%g\n", cutz[n]);
       fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npx_ricampionati, (long)parametri->npy_ricampionati, 1);
@@ -332,8 +352,11 @@ int leggi_campi(Parametri * parametri)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[k][j][i]);
         }
+        printf("grid[y] = {%llu/%llu}\r", j, parametri->npy_ricampionati);
       }
       fclose(clean_fields);
+
+      delete[] buffer_out;
     }
   }
 
@@ -360,8 +383,18 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cuty.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cuty_%g.txt", parametri->filebasename.c_str(), cuty[n]);
-      printf("\nWriting the 2D field file (not vtk) at y=%g\n", cuty[n]);
+      printf("\nWriting the 2D ASCII field file at y=%g\n", cuty[n]);
       clean_fields = fopen(nomefile_campi, "wb");
+
+      // create a buffer to optimize writing to output_file, here the buffer size is 1k
+      const int LEN = 1024;
+      char * buffer_out = new char[LEN];
+      if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
+        printf("Incorrect type or size of buffer for stream\n");
+#ifdef ENABLE_DEBUG
+      else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
+
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at y=%g\n", cuty[n]);
       fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npx_ricampionati, (long)parametri->npz_ricampionati, 1);
@@ -373,8 +406,11 @@ int leggi_campi(Parametri * parametri)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->zcoord[k], field[k][j][i]);
         }
+        printf("grid[z] = {%llu/%llu}\r", k, parametri->npz_ricampionati);
       }
       fclose(clean_fields);
+
+      delete[] buffer_out;
     }
   }
 
@@ -401,8 +437,18 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cutx.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cutx_%g.txt", parametri->filebasename.c_str(), cutx[n]);
-      printf("\nWriting the 2D field file (not vtk) at x=%g\n", cutx[n]);
+      printf("\nWriting the 2D ASCII field file at x=%g\n", cutx[n]);
       clean_fields = fopen(nomefile_campi, "wb");
+
+      // create a buffer to optimize writing to output_file, here the buffer size is 1k
+      const int LEN = 1024;
+      char * buffer_out = new char[LEN];
+      if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
+        printf("Incorrect type or size of buffer for stream\n");
+#ifdef ENABLE_DEBUG
+      else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
+
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
       fprintf(clean_fields, "# 2D cut at x=%g\n", cutx[n]);
       fprintf(clean_fields, "# %lu\n#%lu\n#%i\n", (long)parametri->npy_ricampionati, (long)parametri->npz_ricampionati, 1);
@@ -414,8 +460,11 @@ int leggi_campi(Parametri * parametri)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->ycoord[j], parametri->zcoord[k], field[k][j][i]);
         }
+        printf("grid[z] = {%llu/%llu}\r", k, parametri->npz_ricampionati);
       }
       fclose(clean_fields);
+
+      delete[] buffer_out;
     }
   }
 
