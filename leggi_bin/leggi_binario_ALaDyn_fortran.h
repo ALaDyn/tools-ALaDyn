@@ -111,6 +111,8 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define SEI_DIMENSIONI            6                   // x, y, z, px, py, pz
 #define ALTRI_PARAMETRI           8                   // gamma, theta, thetaT, E, ty, tz, w, ch
 
+#define FORCE_PRINTF_BUFFER_SIZE  1024
+
 // definizione numero filtri "abilitati"
 # ifndef NUM_FILTRI
 # define NUM_FILTRI               26

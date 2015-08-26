@@ -207,13 +207,15 @@ int leggi_campi(Parametri * parametri)
     sprintf(nomefile_campi, "%s.txt", parametri->filebasename.c_str());
     clean_fields = std::fopen(nomefile_campi, "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
     // create a buffer to optimize writing to output_file, here the buffer size is 1k
-    const int LEN = 1024;
+    const int LEN = FORCE_PRINTF_BUFFER_SIZE;
     char * buffer_out = new char[LEN];
     if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
       printf("Incorrect type or size of buffer for stream\n");
 #ifdef ENABLE_DEBUG
     else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
 #endif
 
     fprintf(clean_fields, "# %llu \n # %llu \n # %llu\n# %g  %g \n # %g  %g\n", parametri->npx_ricampionati ,
@@ -228,7 +230,9 @@ int leggi_campi(Parametri * parametri)
     }
     fclose(clean_fields);
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
     delete[] buffer_out;
+#endif
   }
 
 
@@ -332,13 +336,15 @@ int leggi_campi(Parametri * parametri)
       printf("\nWriting the 2D ASCII field file at z=%g\n", cutz[n]);
       clean_fields = fopen(nomefile_campi, "wb");
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       // create a buffer to optimize writing to output_file, here the buffer size is 1k
-      const int LEN = 1024;
+      const int LEN = FORCE_PRINTF_BUFFER_SIZE;
       char * buffer_out = new char[LEN];
       if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
         printf("Incorrect type or size of buffer for stream\n");
 #ifdef ENABLE_DEBUG
       else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
 #endif
 
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
@@ -356,7 +362,9 @@ int leggi_campi(Parametri * parametri)
       }
       fclose(clean_fields);
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       delete[] buffer_out;
+#endif
     }
   }
 
@@ -386,13 +394,15 @@ int leggi_campi(Parametri * parametri)
       printf("\nWriting the 2D ASCII field file at y=%g\n", cuty[n]);
       clean_fields = fopen(nomefile_campi, "wb");
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       // create a buffer to optimize writing to output_file, here the buffer size is 1k
-      const int LEN = 1024;
+      const int LEN = FORCE_PRINTF_BUFFER_SIZE;
       char * buffer_out = new char[LEN];
       if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
         printf("Incorrect type or size of buffer for stream\n");
 #ifdef ENABLE_DEBUG
       else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
 #endif
 
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
@@ -410,7 +420,9 @@ int leggi_campi(Parametri * parametri)
       }
       fclose(clean_fields);
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       delete[] buffer_out;
+#endif
     }
   }
 
@@ -440,13 +452,15 @@ int leggi_campi(Parametri * parametri)
       printf("\nWriting the 2D ASCII field file at x=%g\n", cutx[n]);
       clean_fields = fopen(nomefile_campi, "wb");
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       // create a buffer to optimize writing to output_file, here the buffer size is 1k
-      const int LEN = 1024;
+      const int LEN = FORCE_PRINTF_BUFFER_SIZE;
       char * buffer_out = new char[LEN];
       if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
         printf("Incorrect type or size of buffer for stream\n");
 #ifdef ENABLE_DEBUG
       else printf("FILE * now has a buffer of 1024 bytes\n");
+#endif
 #endif
 
       //output per gnuplot (x:y:valore) compatibile con programmino passe_par_tout togliendo i #
@@ -464,7 +478,9 @@ int leggi_campi(Parametri * parametri)
       }
       fclose(clean_fields);
 
+#if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       delete[] buffer_out;
+#endif
     }
   }
 
