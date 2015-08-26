@@ -3,7 +3,9 @@
 
 //#define ENABLE_DEBUG
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #define _CRT_SECURE_NO_WARNINGS
 #define _USE_MATH_DEFINES
 #define _SCL_SECURE_NO_WARNINGS
