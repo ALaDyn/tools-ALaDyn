@@ -10,9 +10,9 @@
 #define _USE_MATH_DEFINES
 #define _SCL_SECURE_NO_WARNINGS
 
-#define MAJOR_RELEASE  5
-#define MINOR_RELEASE  99
-#define BUGFIX_RELEASE 14
+#define MAJOR_RELEASE  6
+#define MINOR_RELEASE  0
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>

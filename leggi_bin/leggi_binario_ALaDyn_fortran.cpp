@@ -12,7 +12,7 @@ int main(const int argc, const char *argv[])
   std::string riga_persa, endianness, columns;
   std::ifstream file_dat, file_bin;
 
-  std::cout << "ALaDyn output reader v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
+  std::cout << std::endl << "ALaDyn output reader v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
 
   if (argc > 1) 
   {

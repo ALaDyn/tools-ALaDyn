@@ -203,7 +203,7 @@ int leggi_campi(Parametri * parametri)
 
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_GRID2D])
   {
-    printf("\nWriting the ASCII 2D field file\n");
+    printf("Writing the ASCII 2D field file\n");
     sprintf(nomefile_campi, "%s.txt", parametri->filebasename.c_str());
     clean_fields = std::fopen(nomefile_campi, "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
@@ -239,7 +239,7 @@ int leggi_campi(Parametri * parametri)
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_LINEOUT_X])
   {
     size_t myj;
-    printf("\nWriting 1D lineout\n");
+    printf("Writing 1D lineout along x\n");
     sprintf(nomefile_campi, "%s_lineout.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
 
@@ -274,7 +274,7 @@ int leggi_campi(Parametri * parametri)
   if (parametri->npz_ricampionati > 1 && parametri->p[OUT_LINEOUT_X])
   {
     size_t myj;
-    printf("\nWriting 1D lineout\n");
+    printf("Writing 1D lineout along x\n");
     sprintf(nomefile_campi, "%s_lineout.txt", parametri->filebasename.c_str());
     clean_fields = fopen(nomefile_campi, "w");
 
@@ -333,7 +333,7 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cutz.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cutz_%g.txt", parametri->filebasename.c_str(), cutz[n]);
-      printf("\nWriting the 2D ASCII field file at z=%g\n", cutz[n]);
+      printf("Writing the 2D ASCII field file at z=%g\n", cutz[n]);
       clean_fields = fopen(nomefile_campi, "wb");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
@@ -391,7 +391,7 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cuty.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cuty_%g.txt", parametri->filebasename.c_str(), cuty[n]);
-      printf("\nWriting the 2D ASCII field file at y=%g\n", cuty[n]);
+      printf("Writing the 2D ASCII field file at y=%g\n", cuty[n]);
       clean_fields = fopen(nomefile_campi, "wb");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
@@ -449,7 +449,7 @@ int leggi_campi(Parametri * parametri)
     for (size_t n = 0; n < cutx.size(); n++)
     {
       sprintf(nomefile_campi, "%s_cutx_%g.txt", parametri->filebasename.c_str(), cutx[n]);
-      printf("\nWriting the 2D ASCII field file at x=%g\n", cutx[n]);
+      printf("Writing the 2D ASCII field file at x=%g\n", cutx[n]);
       clean_fields = fopen(nomefile_campi, "wb");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
@@ -487,7 +487,7 @@ int leggi_campi(Parametri * parametri)
 
   if (parametri->p[OUT_VTK])
   {
-    printf("%lu\nWriting the vtk fields file\n\n", (unsigned long)fread_size);
+    printf("Writing the vtk fields file\n");
 
     float *x_coordinates, *y_coordinates, *z_coordinates;
     x_coordinates = new float[parametri->npx_ricampionati];
@@ -544,7 +544,7 @@ int leggi_campi(Parametri * parametri)
 
   if (parametri->p[OUT_VTK_NOSTRETCH])
   {
-    printf("%lu\nWriting the vtk file related to the unstretched part of the grid\n\n", (unsigned long)fread_size);
+    printf("Writing the vtk file related to the unstretched part of the grid\n");
 
     int inizio_punti_non_stretchati_x, inizio_punti_non_stretchati_y, inizio_punti_non_stretchati_z;
     int fine_punti_non_stretchati_x, fine_punti_non_stretchati_y, fine_punti_non_stretchati_z;
@@ -668,7 +668,7 @@ int leggi_campi(Parametri * parametri)
   {
     sprintf(nomefile_parametri, "%s.parameters", parametri->filebasename.c_str());
     parameters = fopen(nomefile_parametri, "w");
-    printf("\nWriting parameters to file\n");
+    printf("Writing parameters to file\n");
     fprintf(parameters, "ncpu_x=%u\n", parametri->ncpu_x);
     fprintf(parameters, "ncpu_y=%u\n", parametri->ncpu_y);
     fprintf(parameters, "ncpu_z=%u\n", parametri->ncpu_z);
