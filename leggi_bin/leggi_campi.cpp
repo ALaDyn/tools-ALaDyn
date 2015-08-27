@@ -229,6 +229,7 @@ int leggi_campi(Parametri * parametri)
       printf("grid[y] = {%llu/%llu}\r", j, parametri->npy_ricampionati);
     }
     fclose(clean_fields);
+    printf("\nASCII FILE COMPLETED\n");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
     delete[] buffer_out;
@@ -361,6 +362,7 @@ int leggi_campi(Parametri * parametri)
         printf("grid[y] = {%llu/%llu}\r", j, parametri->npy_ricampionati);
       }
       fclose(clean_fields);
+      printf("\nASCII FILE COMPLETED\n");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       delete[] buffer_out;
@@ -419,6 +421,7 @@ int leggi_campi(Parametri * parametri)
         printf("grid[z] = {%llu/%llu}\r", k, parametri->npz_ricampionati);
       }
       fclose(clean_fields);
+      printf("\nASCII FILE COMPLETED\n");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       delete[] buffer_out;
@@ -477,6 +480,7 @@ int leggi_campi(Parametri * parametri)
         printf("grid[z] = {%llu/%llu}\r", k, parametri->npz_ricampionati);
       }
       fclose(clean_fields);
+      printf("\nASCII FILE COMPLETED\n");
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
       delete[] buffer_out;
