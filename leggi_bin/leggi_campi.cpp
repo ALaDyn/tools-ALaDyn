@@ -61,9 +61,9 @@ int leggi_campi(Parametri * parametri)
       {
         for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
         {
-          if (parametri->aladyn_version == 1) fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-          fread_size += std::fread(header, sizeof(int), header_size, file_in);
-          if (parametri->aladyn_version == 1) fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += sizeof(int)*std::fread(header, sizeof(int), header_size, file_in);
+          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
@@ -77,9 +77,9 @@ int leggi_campi(Parametri * parametri)
           fflush(stdout);
 
           buffer = new float[header[0] * header[1] * header[2]];
-          if (parametri->aladyn_version == 1) fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-          fread_size += std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
-          if (parametri->aladyn_version == 1) fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += sizeof(float)*std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
+          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
@@ -89,7 +89,7 @@ int leggi_campi(Parametri * parametri)
                 field[k + (ipz * parametri->npz_ricampionati_per_cpu)]
                 /* */[j + (ipy * parametri->npy_ricampionati_per_cpu)]
           /*       */[i + (ipx * parametri->npx_ricampionati_per_cpu)] =
-            /*     */ buffer[i + j*header[0] + k*header[0]*header[1]];
+            /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
 
           delete[] buffer;
           buffer = NULL;
@@ -100,7 +100,7 @@ int leggi_campi(Parametri * parametri)
     // leggiamo ora le coordinate dei punti di griglia, presenti solo nelle versioni che possono prevedere griglia stretchata e che ancora non la scrivevano nel .dat
     // se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei parametri
 
-    fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
+    fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
     // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i dati non e' di alcun interesse
 
     if (!std::feof(file_in))
@@ -109,14 +109,14 @@ int leggi_campi(Parametri * parametri)
       x_coordinates = new float[parametri->npx_ricampionati];
       y_coordinates = new float[parametri->npy_ricampionati];
       z_coordinates = new float[parametri->npz_ricampionati];
-      fread_size += std::fread(x_coordinates, sizeof(float), parametri->npx_ricampionati, file_in);
-      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size += std::fread(y_coordinates, sizeof(float), parametri->npy_ricampionati, file_in);
-      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-      fread_size += std::fread(z_coordinates, sizeof(float), parametri->npz_ricampionati, file_in);
-      fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(float)*std::fread(x_coordinates, sizeof(float), parametri->npx_ricampionati, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(float)*std::fread(y_coordinates, sizeof(float), parametri->npy_ricampionati, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(float)*std::fread(z_coordinates, sizeof(float), parametri->npz_ricampionati, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
       if (parametri->p[SWAP])
       {
@@ -164,7 +164,7 @@ int leggi_campi(Parametri * parametri)
         {
           for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
           {
-            fread_size += std::fread(header, sizeof(int), header_size, file_in);
+            fread_size += sizeof(int)*std::fread(header, sizeof(int), header_size, file_in);
             if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
 #ifdef ENABLE_DEBUG
@@ -178,7 +178,7 @@ int leggi_campi(Parametri * parametri)
             fflush(stdout);
 
             buffer = new float[header[0] * header[1] * header[2]];
-            fread_size += std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
+            fread_size += sizeof(float)*std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
 
             if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
@@ -218,7 +218,7 @@ int leggi_campi(Parametri * parametri)
 #endif
 #endif
 
-    fprintf(clean_fields, "# %llu \n # %llu \n # %llu\n# %g  %g \n # %g  %g\n", parametri->npx_ricampionati ,
+    fprintf(clean_fields, "# %llu \n # %llu \n # %llu\n# %g  %g \n # %g  %g\n", parametri->npx_ricampionati,
       parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
     for (size_t j = 0; j < parametri->npy_ricampionati; j++)
     {
