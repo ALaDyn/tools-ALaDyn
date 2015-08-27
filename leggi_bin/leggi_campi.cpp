@@ -199,7 +199,7 @@ int leggi_campi(Parametri * parametri)
     }
   }
 
-  std::cout << std::endl << "END READING" << std::endl << std::flush;
+  std::cout << std::endl << "END READING: TOTAL " << fread_size / (1024 * 1024) << " MB READ" << std::endl << std::flush;
 
   if (parametri->npz_ricampionati == 1 && parametri->p[OUT_GRID2D])
   {
@@ -710,7 +710,6 @@ int leggi_campi(Parametri * parametri)
     fclose(parameters);
   }
 
-  printf("Total bytes read: %lu\n", (unsigned long)fread_size);
 
   return 0;
 
