@@ -10,10 +10,11 @@
 #include <string>
 #include <cstring>
 #include <cstdint>
+#include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-
+#define DEBUG
 
 int column_x, column_y, column_E;
 
@@ -26,7 +27,7 @@ bool sortAscendingByTwoColumns(double * riga1, double * riga2) {
 int main(int argc, const char* argv[]) {
   size_t ncolumns, nrows;
   size_t interpolation_x, interpolation_y;
-  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy;
+  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0;
 
   std::string filename;
   std::ifstream infile;
@@ -43,6 +44,7 @@ int main(int argc, const char* argv[]) {
   double ** pmatrix;
   double ** values;
 
+#ifndef DEBUG
   for (int i = 1; i < argc; i++) {
     /************************************************************************
     We will iterate over argv[] to get the parameters stored inside.
@@ -50,24 +52,32 @@ int main(int argc, const char* argv[]) {
     path of the program, which is stored in argv[0]
     ************************************************************************/
     if (std::string(argv[i]) == "-cx") {
-      column_x = boost::lexical_cast<int>(argv[++i]) - 1; // mind the -1 to port the index to C-style
+      column_x = boost::lexical_cast<int>(std::string(argv[++i])) - 1; // mind the -1 to port the index to C-style
     }
     else if (std::string(argv[i]) == "-cy") {
-      column_y = boost::lexical_cast<int>(argv[++i]) - 1; // mind the -1 to port the index to C-style
+      column_y = boost::lexical_cast<int>(std::string(argv[++i])) - 1; // mind the -1 to port the index to C-style
     }
     else if (std::string(argv[i]) == "-ce") {
-      column_E = boost::lexical_cast<int>(argv[++i]) - 1; // mind the -1 to port the index to C-style
+      column_E = boost::lexical_cast<int>(std::string(argv[++i])) - 1; // mind the -1 to port the index to C-style
     }
     else if (std::string(argv[i]) == "-nx") {
-      interpolation_x = boost::lexical_cast<size_t>(argv[++i]);
+      interpolation_x = boost::lexical_cast<size_t>(std::string(argv[++i]));
     }
     else if (std::string(argv[i]) == "-ny") {
-      interpolation_y = boost::lexical_cast<size_t>(argv[++i]);
+      interpolation_y = boost::lexical_cast<size_t>(std::string(argv[++i]));
     }
     else if (std::string(argv[i]) == "-file") {
       filename = argv[++i];
     }
   }
+#else
+  column_x = 0;
+  column_y = 2;
+  column_E = 5;
+  interpolation_x = 10;
+  interpolation_y = 10;
+  filename = "energy_scan_ion_A2-ion_2.txt";
+#endif
 
   infile.open(filename, std::ifstream::in);
   outfile.open(filename+"_int", std::ofstream::out);
@@ -107,11 +117,12 @@ int main(int argc, const char* argv[]) {
     }
     if (!found) unique_y_values.push_back(tokens[column_y]);
 
-    for (auto i : tokens) dtokens.push_back(boost::lexical_cast<double>(i));
+    //for (auto i : tokens) dtokens.push_back(boost::lexical_cast<double>(i));
+    for (auto i : tokens) dtokens.push_back(std::atof(i.c_str()));
     matrix.push_back(dtokens);
   }
-  for (auto i : unique_x_values) dunique_x_values.push_back(boost::lexical_cast<double>(unique_x_values));
-  for (auto i : unique_y_values) dunique_y_values.push_back(boost::lexical_cast<double>(unique_y_values));
+  for (auto i : unique_x_values) dunique_x_values.push_back(boost::lexical_cast<double>(i));
+  for (auto i : unique_y_values) dunique_y_values.push_back(boost::lexical_cast<double>(i));
 
 
   nrows = matrix.size();
@@ -146,10 +157,15 @@ int main(int argc, const char* argv[]) {
       E12 = values[(i - 1)*dunique_x_values.size() + j][2];
       E21 = values[i*dunique_x_values.size() + j - 1][2];
       E22 = values[i*dunique_x_values.size() + j][2];
-
+      k0 = 1.0 / ((x2-x1)*(y2-y1));
+      dx = (x2 - x1) / interpolation_x;
+      dy = (y2 - y1) / interpolation_y;
       for (size_t k = 0; k < interpolation_x; k++) {
         for (size_t l = 0; l < interpolation_y; l++) {
-
+          x = x1 + k*dx;
+          y = y1 + l*dy;
+          E = k0*(E11*(x2-x)*(y2-y)+E21*(x-x1)*(y2-y)+E12*(x2-x)*(y-y1)+E22*(x-x1)*(y-y1));
+          outfile << std::fixed << std::setprecision(4) << x << "\t" << y << "\t" << E << "\n";
         }
       }
     }
