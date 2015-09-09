@@ -26,9 +26,9 @@ bool sortAscendingByTwoColumns(double * riga1, double * riga2) {
 int main(int argc, const char* argv[]) {
   size_t ncolumns, nrows;
   size_t interpolation_x, interpolation_y;
-  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0;
+  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, gnuplot_cb_magnification=1.0;
 
-  std::string filename_in, filename_out, filename_gnuplot;
+  std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png;
   std::ifstream infile;
   std::ofstream outfile;
   std::string riga, xlabel = "", ylabel = "", cblabel = "", title = "";
@@ -45,7 +45,7 @@ int main(int argc, const char* argv[]) {
   double ** values;
 
   if (argc < 7) {
-    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt [-gnuplot]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt [-gnuplot] [-title] [-xlabel] [-ylabel] [-cblabel]" << std::endl;
     std::cerr << "Press a key to exit..." << std::endl;
     std::cin.get();
     exit(1);
@@ -74,8 +74,6 @@ int main(int argc, const char* argv[]) {
     }
     else if (std::string(argv[i]) == "-file") {
       filename_in = argv[++i];
-      filename_out = "int_" + filename_in;
-      filename_gnuplot = filename_out + ".plt";
     }
     else if (std::string(argv[i]) == "-gnuplot") {
       gnuplot = true;
@@ -96,7 +94,14 @@ int main(int argc, const char* argv[]) {
       gnuplot = true;
       cblabel = std::string(argv[++i]);
     }
+    else if (std::string(argv[i]) == "-cb_magn") {
+      gnuplot_cb_magnification = std::atof(argv[++i]);
+    }
   }
+
+  filename_out = "int" + column_E + '_' + filename_in;
+  filename_gnuplot_plt = "plot.plt";
+  filename_gnuplot_png = filename_out + ".png";
 
   infile.open(filename_in, std::ifstream::in);
   outfile.open(filename_out, std::ofstream::out);
@@ -193,8 +198,7 @@ int main(int argc, const char* argv[]) {
   if (gnuplot)
   {
     FILE*  outfile_gnuplot;
-    outfile_gnuplot = fopen(filename_gnuplot.c_str(), "w");
-
+    outfile_gnuplot = fopen(filename_gnuplot_plt.c_str(), "w");
     int Xres = 1280;
     int Yres = 720;
     int fontsize = 15;
@@ -212,9 +216,9 @@ int main(int argc, const char* argv[]) {
     fprintf(outfile_gnuplot, "set yrange[%f:%f]\n", dunique_y_values.front(), dunique_y_values.back());
     fprintf(outfile_gnuplot, "set palette rgbformulae 22, 13, 10\n");
     fprintf(outfile_gnuplot, "FILE_IN = \"%s\"\n", filename_out.c_str());
-    fprintf(outfile_gnuplot, "FILE_OUT = \"%s.png\"\n", filename_out.c_str());
+    fprintf(outfile_gnuplot, "FILE_OUT = \"%s\"\n", filename_gnuplot_png.c_str());
     fprintf(outfile_gnuplot, "set output FILE_OUT\n");
-    fprintf(outfile_gnuplot, "plot FILE_IN u 1:2:3 w image notitle\n");
+    fprintf(outfile_gnuplot, "plot FILE_IN u 1:2:($3*%f) w image notitle\n", gnuplot_cb_magnification);
 
     fclose(outfile_gnuplot);
   }
