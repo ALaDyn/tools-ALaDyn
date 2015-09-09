@@ -791,10 +791,10 @@ void Diag_data::decode_spec_v1_v2(std::ifstream &infile) {
 
       for (int ik = 0; ik < nbin; ik++) {
         if (versione == 2) {
-          outfile << energy << "\t" << spectrum[ik] << "\t" << selected_spectrum[ik] << std::endl;
+          outfile << energy << "\t" << spectrum[ik]*np_over_nmacro << "\t" << selected_spectrum[ik]*np_over_nmacro << std::endl;
         }
         else
-          outfile << energy << "\t" << spectrum[ik] << std::endl;
+          outfile << energy << "\t" << spectrum[ik]*np_over_nmacro << std::endl;
         energy += dE;
       }
 
@@ -871,7 +871,7 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
       outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
 
       for (int ik = 0; ik < nbin; ik++) {
-        outfile << energy << "\t" << spectrum[ik] << "\t" << selected_spectrum[ik] << std::endl;
+        outfile << energy << "\t" << spectrum[ik]*np_per_cell << "\t" << selected_spectrum[ik]*np_per_cell << std::endl;
         energy += dE;
       }
 
@@ -957,7 +957,7 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
 
       for (int ik = 0; ik < nbin; ik++) {
-        outfile << energy << "\t" << spectrum[ik] << "\t" << selected_spectrum_1[ik] << "\t" << selected_spectrum_2[ik] << std::endl;
+        outfile << energy << "\t" << spectrum[ik]*np_per_cell << "\t" << selected_spectrum_1[ik]*np_per_cell << "\t" << selected_spectrum_2[ik]*np_per_cell << std::endl;
         energy += dE;
       }
 
