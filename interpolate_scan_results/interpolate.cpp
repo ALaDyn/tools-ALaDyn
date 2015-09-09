@@ -31,7 +31,7 @@ int main(int argc, const char* argv[]) {
   std::string filename_in, filename_out, filename_gnuplot;
   std::ifstream infile;
   std::ofstream outfile;
-  std::string riga;
+  std::string riga, xlabel = "", ylabel = "", cblabel = "", title = "";
   std::vector<std::string> tokens;
   std::vector<double> dtokens;
   std::vector< std::vector<double> > matrix;
@@ -79,6 +79,22 @@ int main(int argc, const char* argv[]) {
     }
     else if (std::string(argv[i]) == "-gnuplot") {
       gnuplot = true;
+    }
+    else if (std::string(argv[i]) == "-title") {
+      gnuplot = true;
+      title = std::string(argv[++i]);
+    }
+    else if (std::string(argv[i]) == "-xlabel") {
+      gnuplot = true;
+      xlabel = std::string(argv[++i]);
+    }
+    else if (std::string(argv[i]) == "-ylabel") {
+      gnuplot = true;
+      ylabel = std::string(argv[++i]);
+    }
+    else if (std::string(argv[i]) == "-cblabel") {
+      gnuplot = true;
+      cblabel = std::string(argv[++i]);
     }
   }
 
@@ -187,10 +203,10 @@ int main(int argc, const char* argv[]) {
 
     fprintf(outfile_gnuplot, "#!/gnuplot\n");
     fprintf(outfile_gnuplot, "set terminal %s size %i,%i font \"%s,%i\"\n", image_type, Xres, Yres, fontname, fontsize);
-    fprintf(outfile_gnuplot, "set title 'bulk length 2.0 {/Symbol.ttf m}m'\n");
-    fprintf(outfile_gnuplot, "set xlabel 'Preplasma length ({/Symbol.ttf m}m)'\n");
-    fprintf(outfile_gnuplot, "set ylabel 'Ramp length ({/Symbol.ttf m}m)'\n");
-    fprintf(outfile_gnuplot, "set cblabel 'Max proton energy (MeV)'\n");
+    fprintf(outfile_gnuplot, "set title '%s'\n", title.c_str());
+    fprintf(outfile_gnuplot, "set xlabel '%s'\n", xlabel.c_str());
+    fprintf(outfile_gnuplot, "set ylabel '%s'\n", ylabel.c_str());
+    fprintf(outfile_gnuplot, "set cblabel '%s'\n", cblabel.c_str());
     fprintf(outfile_gnuplot, "set size ratio - 1\n");
     fprintf(outfile_gnuplot, "set xrange[%f:%f]\n", dunique_x_values.front(), dunique_x_values.back());
     fprintf(outfile_gnuplot, "set yrange[%f:%f]\n", dunique_y_values.front(), dunique_y_values.back());
