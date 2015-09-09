@@ -28,7 +28,7 @@ int main(int argc, const char* argv[]) {
   size_t interpolation_x, interpolation_y;
   double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0;
 
-  std::string filename_in, filename_out;
+  std::string filename_in, filename_out, filename_gnuplot;
   std::ifstream infile;
   std::ofstream outfile;
   std::string riga;
@@ -43,6 +43,13 @@ int main(int argc, const char* argv[]) {
   std::vector<double> dunique_x_values, dunique_y_values;
   double ** pmatrix;
   double ** values;
+
+  if (argc < 7) {
+    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt [-gnuplot]" << std::endl;
+    std::cerr << "Press a key to exit..." << std::endl;
+    std::cin.get();
+    exit(1);
+  }
 
   for (int i = 1; i < argc; i++) {
     /************************************************************************
@@ -68,6 +75,7 @@ int main(int argc, const char* argv[]) {
     else if (std::string(argv[i]) == "-file") {
       filename_in = argv[++i];
       filename_out = "int_" + filename_in;
+      filename_gnuplot = filename_out + ".plt";
     }
     else if (std::string(argv[i]) == "-gnuplot") {
       gnuplot = true;
@@ -79,12 +87,12 @@ int main(int argc, const char* argv[]) {
 
   if (!infile.is_open()) {
     std::cerr << "Unable to open input file " << filename_in << "!" << std::endl;
-    exit(4);
+    exit(2);
   }
 
   if (!outfile.is_open()) {
     std::cerr << "Unable to open output file " << filename_out << "!" << std::endl;
-    exit(5);
+    exit(3);
   }
 
 
@@ -97,7 +105,7 @@ int main(int argc, const char* argv[]) {
     if (!matrix.size()) ncolumns = tokens.size();
     if (ncolumns != tokens.size()) {
       std::cout << "Warning, row has an unexpected length" << std::endl;
-      exit(1);
+      exit(4);
     }
 
     found = false;
@@ -169,12 +177,10 @@ int main(int argc, const char* argv[]) {
   if (gnuplot)
   {
     FILE*  outfile_gnuplot;
-    outfile_gnuplot = fopen("plot.plt", "w");
+    outfile_gnuplot = fopen(filename_gnuplot.c_str(), "w");
 
-    int Xres = 1280; // fix, make it possible to define on command line
-    int Yres = 720; // fix, make it possible to define on command line
-                    //  int Emin = 0; // fix, read it from the infile
-                    //  int Emax = 60; // fix, read it from the infile
+    int Xres = 1280;
+    int Yres = 720;
     int fontsize = 15;
     char fontname[] = "";
     char image_type[] = "pngcairo";
@@ -189,7 +195,6 @@ int main(int argc, const char* argv[]) {
     fprintf(outfile_gnuplot, "set xrange[%f:%f]\n", dunique_x_values.front(), dunique_x_values.back());
     fprintf(outfile_gnuplot, "set yrange[%f:%f]\n", dunique_y_values.front(), dunique_y_values.back());
     fprintf(outfile_gnuplot, "set palette rgbformulae 22, 13, 10\n");
-    //fprintf(outfile_gnuplot, "set datafile missing '-1'\n");
     fprintf(outfile_gnuplot, "FILE_IN = \"%s\"\n", filename_out.c_str());
     fprintf(outfile_gnuplot, "FILE_OUT = \"%s.png\"\n", filename_out.c_str());
     fprintf(outfile_gnuplot, "set output FILE_OUT\n");
