@@ -28,7 +28,7 @@ int main(int argc, const char* argv[]) {
   size_t interpolation_x, interpolation_y;
   double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, gnuplot_cb_magnification=1.0;
 
-  std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png;
+  std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png, column_E_string;
   std::ifstream infile;
   std::ofstream outfile;
   std::string riga, xlabel = "", ylabel = "", cblabel = "", title = "";
@@ -64,7 +64,8 @@ int main(int argc, const char* argv[]) {
       column_y = boost::lexical_cast<int>(std::string(argv[++i])) - 1; // mind the -1 to port the index to C-style
     }
     else if (std::string(argv[i]) == "-ce") {
-      column_E = boost::lexical_cast<int>(std::string(argv[++i])) - 1; // mind the -1 to port the index to C-style
+      column_E_string = std::string(argv[++i]);
+      column_E = boost::lexical_cast<int>(column_E_string) - 1; // mind the -1 to port the index to C-style
     }
     else if (std::string(argv[i]) == "-nx") {
       interpolation_x = boost::lexical_cast<size_t>(std::string(argv[++i]));
@@ -95,13 +96,35 @@ int main(int argc, const char* argv[]) {
       cblabel = std::string(argv[++i]);
     }
     else if (std::string(argv[i]) == "-cb_magn") {
-      gnuplot_cb_magnification = std::atof(argv[++i]);
+      gnuplot_cb_magnification = boost::lexical_cast<double>(argv[++i]);
     }
   }
 
-  filename_out = "int" + column_E + '_' + filename_in;
+  filename_out = "int" + column_E_string + '_' + filename_in;
   filename_gnuplot_plt = "plot.plt";
   filename_gnuplot_png = filename_out + ".png";
+
+#ifdef ENABLE_DEBUG
+  int linecounter = 0;
+  std::cout << "column_x = " << column_x << std::endl;
+  std::cout << "column_y = " << column_y << std::endl;
+  std::cout << "column_E = " << column_E << ", column_E_string = " << column_E_string << std::endl;
+  std::cout << "interpolation_x = " << interpolation_x << std::endl;
+  std::cout << "interpolation_y = " << interpolation_y << std::endl;
+  std::cout << "filename_in = " << filename_in << std::endl;
+  std::cout << "filename_out = " << filename_out << std::endl;
+  std::cout << "filename_gnuplot_plt = " << filename_gnuplot_plt << std::endl;
+  std::cout << "filename_gnuplot_png = " << filename_gnuplot_png << std::endl;
+  std::cout << "gnuplot = " << gnuplot << std::endl;
+  std::cout << "title = " << title << std::endl;
+  std::cout << "xlabel = " << xlabel << std::endl;
+  std::cout << "ylabel = " << ylabel << std::endl;
+  std::cout << "cblabel = " << cblabel << std::endl;
+  std::cout << "gnuplot_cb_magnification = " << gnuplot_cb_magnification << std::endl;
+  std::cout << "Press a key to continue... " << std::endl;
+  std::cin.get();
+#endif
+
 
   infile.open(filename_in, std::ifstream::in);
   outfile.open(filename_out, std::ofstream::out);
@@ -121,8 +144,10 @@ int main(int argc, const char* argv[]) {
     riga.clear(), tokens.clear(), dtokens.clear();
     std::getline(infile, riga);
     if (infile.eof()) break;
-    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_off);
-    if (tokens[0][0] == '#') continue;
+    if (riga[0] == '#') continue;
+    boost::algorithm::trim(riga);
+    //boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_off);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
     if (!matrix.size()) ncolumns = tokens.size();
     if (ncolumns != tokens.size()) {
       std::cout << "Warning, row has an unexpected length" << std::endl;
@@ -141,12 +166,12 @@ int main(int argc, const char* argv[]) {
     }
     if (!found) unique_y_values.push_back(tokens[column_y]);
 
-    //for (auto i : tokens) dtokens.push_back(boost::lexical_cast<double>(i));
-    for (auto i : tokens) dtokens.push_back(std::atof(i.c_str()));
+    for (auto i : tokens) dtokens.push_back(boost::lexical_cast<double>(i));
     matrix.push_back(dtokens);
   }
   for (auto i : unique_x_values) dunique_x_values.push_back(boost::lexical_cast<double>(i));
   for (auto i : unique_y_values) dunique_y_values.push_back(boost::lexical_cast<double>(i));
+  infile.close();
 
 
   nrows = matrix.size();
@@ -195,6 +220,8 @@ int main(int argc, const char* argv[]) {
     }
   }
 
+  outfile.close();
+
   if (gnuplot)
   {
     FILE*  outfile_gnuplot;
@@ -223,8 +250,5 @@ int main(int argc, const char* argv[]) {
     fclose(outfile_gnuplot);
   }
 
-
-  infile.close();
-  outfile.close();
   return 0;
 }
