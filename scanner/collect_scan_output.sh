@@ -1,8 +1,23 @@
 #! /bin/bash
-SIM_HEADER="pre_"
 
-#PARTICLE_TYPE="A2-ion"
-PARTICLE_TYPE="Electron"
+module load compilers/gcc-4.9.0
+
+
+#per il seguente, copiarsi dal prepare_scan_input la riga che genera tutti i valori (in questo caso di bulk lengths scannerizzate)
+columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
+SIM_HEADER="ion_"
+
+#columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
+#SIM_HEADER="pre_"
+
+#columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
+#SIM_HEADER="15deg_"
+
+#columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
+#SIM_HEADER="ch2_"
+
+PARTICLE_TYPE="A2-ion"
+#PARTICLE_TYPE="Electron"
 EXP_FIT_SOFTWARE=$HOME/bin/exponential_fit
 SPEC_DECODER=$HOME/bin/leggi_diag
 
@@ -10,23 +25,25 @@ SPEC_DECODER=$HOME/bin/leggi_diag
 #serve per splittare i risultati collezionati dallo script su diversi files,
 # in funzione di un parametro, per produrre piu` plots
 SCANNER=$HOME/bin/scan-columns
-DO_SCAN=false
+BILINEAR_FILTER=$HOME/bin/interpolate
+X_INTERPOLATION=1024
+Y_INTERPOLATION=512
+GNUPLOT=`which gnuplot`
 
-#per il seguente, copiarsi dal prepare_scan_input la riga che genera tutti i valori (in questo caso di bulk lengths scannerizzate)
-columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
+#the following is the value used to split the collected files. It's usual to split along the bulk length
 column=4
 # 1:{PREPLASMA_LENGTH} 2:{DENSITY} 3:{RAMP_LENGTH} 4:{BULK_LENGTH} 5:{CONT_LENGTH} 
-# 6:{PROTON_MAX_ENERGY} 7:{PROTON_TOT_ENERGY} 8:{PROTON_AVE_ENERGY} 9:{PROTON_TOT_NUMBER}" 
-# 10:{FRONT_PROTON_AVE_ENERGY} 11:{FRONT_PROTON_TOT_NUMBER} 12:{REAR_PROTON_AVE_ENERGY} 13:{REAR_PROTON_TOT_NUMBER}
+# 6:{MAX_ENERGY} 7:{TOT_ENERGY} 8:{TOT_ENERGY_INTEGRATED_SPECTRUM} 9:{FRONT_TOT_ENERGY_INTEGRATED_SPECTRUM}
+#10:{REAR_TOT_ENERGY_INTEGRATED_SPECTRUM} 11:{AVE_ENERGY} 12:{TOT_NUMBER} 13:{FRONT_AVE_ENERGY}
+#14:{FRONT_TOT_NUMBER} 15:{REAR_AVE_ENERGY} 16:{REAR_TOT_NUMBER} 17:{DIAG_MAX_ENERGY} 18:{DIAG_TOT_ENERGY}"
 
 DIAG_STEP_TO_BE_READ=10
 SPEC_TIME_TO_BE_READ=100
 SPEC_VERSION=4
 DIAG_VERSION=3
-OUTPUT_FILE="energy_scan_${PARTICLE_TYPE}.txt"
-NPHYS_OVER_NMACRO=1
+OUTPUT_FILE="energy_scan_${SIM_HEADER}${PARTICLE_TYPE}.txt"
 
-SIMULATION_FOLDERS=($(find . -name "${SIM_HEADER}*" -type d))
+SIMULATION_FOLDERS=($(find . -mindepth 1 -maxdepth 1 -type d -name "${SIM_HEADER}*"))
 
 
 # DESCRIPTION OF DIAG COLUMNS
@@ -50,15 +67,15 @@ fi
 rm -f ${OUTPUT_FILE}
 touch ${OUTPUT_FILE}
 
-printf "#PreplasmaLength;Density;RampLength;BulkLength;ContLength;${PARTICLE_TYPE}MaxEnergy;${PARTICLE_TYPE}TotEnergy;${PARTICLE_TYPE}TotEnergy_IS;${PARTICLE_TYPE}FrontTotEnergy;${PARTICLE_TYPE}RearTotEnergy;${PARTICLE_TYPE}AveEnergy;${PARTICLE_TYPE}TotNumber;Front${PARTICLE_TYPE}AveEnergy;Front${PARTICLE_TYPE}TotNumber;Rear${PARTICLE_TYPE}AveEnergy;Rear${PARTICLE_TYPE}TotNumber\n" >> ${OUTPUT_FILE}
+printf "#PreplasmaLength;Density;RampLength;BulkLength;ContLength;${PARTICLE_TYPE}MaxEnergy;${PARTICLE_TYPE}TotEnergy;${PARTICLE_TYPE}TotEnergy_IS;${PARTICLE_TYPE}FrontTotEnergy;${PARTICLE_TYPE}RearTotEnergy;${PARTICLE_TYPE}AveEnergy;${PARTICLE_TYPE}TotNumber;Front${PARTICLE_TYPE}AveEnergy;Front${PARTICLE_TYPE}TotNumber;Rear${PARTICLE_TYPE}AveEnergy;Rear${PARTICLE_TYPE}TotNumber;DiagMaxEnergy;DiagTotEnergy\n" >> ${OUTPUT_FILE}
 
 for sim in "${SIMULATION_FOLDERS[@]}"
 do
- PREPLASMA_LENGTH=($(echo $sim | awk -F'_' '{print $2}'))
- RAMP_LENGTH=($(echo $sim | awk -F'_' '{print $6}'))
- DENSITY=($(echo $sim | awk -F'_' '{print $4}'))
- BULK_LENGTH=($(echo $sim | awk -F'_' '{print $8}'))
- CONT_LENGTH=($(echo $sim | awk -F'_' '{print $10}'))
+ PREPLASMA_LENGTH=($(echo $sim | awk -F'_' '{print $3}'))
+ RAMP_LENGTH=($(echo $sim | awk -F'_' '{print $7}'))
+ DENSITY=($(echo $sim | awk -F'_' '{print $5}'))
+ BULK_LENGTH=($(echo $sim | awk -F'_' '{print $9}'))
+ CONT_LENGTH=($(echo $sim | awk -F'_' '{print $11}'))
  cd $sim
 
  if [ -f "diag${DIAG_STEP_TO_BE_READ}.dat" ];
@@ -74,7 +91,7 @@ do
  if [ -f "spec${DIAG_STEP_TO_BE_READ}.dat" ];
  then
   ${SPEC_DECODER} spec${DIAG_STEP_TO_BE_READ}.dat v${SPEC_VERSION}
-  aveData=($( ${EXP_FIT_SOFTWARE} -nm ${NPHYS_OVER_NMACRO} -scan spec${DIAG_STEP_TO_BE_READ}.dat_${PARTICLE_TYPE}_${SPEC_TIME_TO_BE_READ}.* ))
+  aveData=($( ${EXP_FIT_SOFTWARE} -scan spec${DIAG_STEP_TO_BE_READ}.dat_${PARTICLE_TYPE}_${SPEC_TIME_TO_BE_READ}.* ))
  else
   aveData[0]="-1"
   aveData[1]="-1"
@@ -105,14 +122,14 @@ do
 
 done
 
-if [ ${DO_SCAN} ] 
-then
- for value in ${columns_values}
- do
-  $SCANNER -in energy_scan_${PARTICLE_TYPE}.txt -out energy_scan_${PARTICLE_TYPE}_$value.txt -select $column $value
- done
-else 
- echo "output on ${OUTPUT_FILE}"
-fi
-
+for value in ${columns_values}
+do
+ $SCANNER -in energy_scan_${SIM_HEADER}${PARTICLE_TYPE}.txt -out energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_$value.txt -select $column $value
+ ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 6 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol.ttf m}m" -xlabel "Preplasma length ({/Symbol.ttf m}m)" -ylabel "Ramp length ({/Symbol.ttf m}m)" -cblabel "Maximum proton energy (MeV)"
+ $GNUPLOT plot.plt
+ ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 15 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol.ttf m}m" -xlabel "Preplasma length ({/Symbol.ttf m}m)" -ylabel "Ramp length ({/Symbol.ttf m}m)" -cblabel "Average proton temperature (MeV)"
+ $GNUPLOT plot.plt
+ ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 18 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol.ttf m}m" -xlabel "Preplasma length ({/Symbol.ttf m}m)" -ylabel "Ramp length ({/Symbol.ttf m}m)" -cblabel "Total proton energy ({/Symbol.ttf m}J)" -cb_magn 1000000
+ $GNUPLOT plot.plt
+done
 
