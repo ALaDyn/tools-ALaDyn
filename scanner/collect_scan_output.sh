@@ -8,7 +8,7 @@ columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
 SIM_HEADER="ion_"
 
 #columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
-#SIM_HEADER="pre_"
+#SIM_HEADER="0deg_"
 
 #columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
 #SIM_HEADER="15deg_"
