@@ -16,7 +16,7 @@
 
 #define MAX(x,y) (x > y ? x : y)
 
-int column_x=0, column_y=0, column_E=0;
+int column_x = 0, column_y = 0, column_E = 0;
 
 
 bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& riga2) {
@@ -27,7 +27,7 @@ bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& 
 int main(int argc, const char* argv[]) {
   size_t ncolumns;
   size_t interpolation_x, interpolation_y;
-  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, gnuplot_cb_magnification = 1.0;
+  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, E_magn = 1.0;
   int column_max;
   std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png, column_E_string;
   std::ifstream infile;
@@ -95,7 +95,7 @@ int main(int argc, const char* argv[]) {
       cblabel = std::string(argv[++i]);
     }
     else if (std::string(argv[i]) == "-cb_magn") {
-      gnuplot_cb_magnification = boost::lexical_cast<double>(argv[++i]);
+      E_magn = boost::lexical_cast<double>(argv[++i]);
     }
   }
 
@@ -121,7 +121,7 @@ int main(int argc, const char* argv[]) {
   std::cout << "xlabel = " << xlabel << std::endl;
   std::cout << "ylabel = " << ylabel << std::endl;
   std::cout << "cblabel = " << cblabel << std::endl;
-  std::cout << "gnuplot_cb_magnification = " << gnuplot_cb_magnification << std::endl;
+  std::cout << "E_magn = " << E_magn << std::endl;
   std::cout << "Press a key to continue... " << std::endl;
   std::cin.get();
 #endif
@@ -180,7 +180,7 @@ int main(int argc, const char* argv[]) {
 
   riga.clear(), tokens.clear(), dtokens.clear();
 
-  std::sort(&matrix.front(), &matrix.front()+matrix.size(), &sortAscendingByTwoColumns);
+  std::sort(&matrix.front(), &matrix.front() + matrix.size(), &sortAscendingByTwoColumns);
 
   // manca il riempibuchi
 
@@ -202,7 +202,7 @@ int main(int argc, const char* argv[]) {
           x = x1 + k*dx;
           y = y1 + l*dy;
           E = k0*(E11*(x2 - x)*(y2 - y) + E21*(x - x1)*(y2 - y) + E12*(x2 - x)*(y - y1) + E22*(x - x1)*(y - y1));
-          outfile << std::fixed << std::setprecision(4) << x << "\t" << y << "\t" << E << "\n";
+          outfile << std::fixed << std::setprecision(4) << x << "\t" << y << "\t" << std::setprecision(6) << E * E_magn << "\n";
         }
       }
     }
@@ -233,7 +233,7 @@ int main(int argc, const char* argv[]) {
     fprintf(outfile_gnuplot, "FILE_IN = \"%s\"\n", filename_out.c_str());
     fprintf(outfile_gnuplot, "FILE_OUT = \"%s\"\n", filename_gnuplot_png.c_str());
     fprintf(outfile_gnuplot, "set output FILE_OUT\n");
-    fprintf(outfile_gnuplot, "plot FILE_IN u 1:2:($3*%f) w image notitle\n", gnuplot_cb_magnification);
+    fprintf(outfile_gnuplot, "plot FILE_IN u 1:2:3 w image notitle\n");
 
     fclose(outfile_gnuplot);
   }
