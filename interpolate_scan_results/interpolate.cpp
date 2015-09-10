@@ -14,20 +14,21 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#define MAX(x,y) (x > y ? x : y)
 
-int column_x, column_y, column_E;
+int column_x=0, column_y=0, column_E=0;
 
 
-bool sortAscendingByTwoColumns(double * riga1, double * riga2) {
+bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& riga2) {
   return ((riga1[column_x] < riga2[column_x]) || ((riga1[column_x] == riga2[column_x]) && (riga1[column_y] < riga2[column_y])));
 }
 
 
 int main(int argc, const char* argv[]) {
-  size_t ncolumns, nrows;
+  size_t ncolumns;
   size_t interpolation_x, interpolation_y;
-  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, gnuplot_cb_magnification=1.0;
-
+  double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, gnuplot_cb_magnification = 1.0;
+  int column_max;
   std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png, column_E_string;
   std::ifstream infile;
   std::ofstream outfile;
@@ -41,8 +42,6 @@ int main(int argc, const char* argv[]) {
   bool gnuplot = false;
   std::vector<std::string> unique_x_values, unique_y_values;
   std::vector<double> dunique_x_values, dunique_y_values;
-  double ** pmatrix;
-  double ** values;
 
   if (argc < 7) {
     std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt [-gnuplot] [-title] [-xlabel] [-ylabel] [-cblabel]" << std::endl;
@@ -103,6 +102,8 @@ int main(int argc, const char* argv[]) {
   filename_out = "int" + column_E_string + '_' + filename_in;
   filename_gnuplot_plt = "plot.plt";
   filename_gnuplot_png = filename_out + ".png";
+  column_max = MAX(column_x, column_y);
+  column_max = MAX(column_max, column_E);
 
 #ifdef ENABLE_DEBUG
   int linecounter = 0;
@@ -153,6 +154,10 @@ int main(int argc, const char* argv[]) {
       std::cout << "Warning, row has an unexpected length" << std::endl;
       exit(4);
     }
+    if (ncolumns < column_max) {
+      std::cout << "Warning, not enough columns in your file" << std::endl;
+      exit(5);
+    }
 
     found = false;
     for (auto i : unique_x_values) {
@@ -173,39 +178,22 @@ int main(int argc, const char* argv[]) {
   for (auto i : unique_y_values) dunique_y_values.push_back(boost::lexical_cast<double>(i));
   infile.close();
 
+  riga.clear(), tokens.clear(), dtokens.clear();
 
-  nrows = matrix.size();
-  pmatrix = new double*[nrows];
-  for (size_t i = 0; i < nrows; i++) pmatrix[i] = new double[ncolumns];
-
-  for (size_t i = 0; i < nrows; i++) {
-    for (size_t j = 0; j < ncolumns; j++) pmatrix[i][j] = matrix[i][j];
-  }
-  riga.clear(), tokens.clear(), dtokens.clear(), matrix.clear();
-
-  std::sort(pmatrix, pmatrix + nrows, &sortAscendingByTwoColumns);
-
-  values = new double*[nrows];
-  for (size_t i = 0; i < nrows; i++) values[i] = new double[3];
-  for (size_t i = 0; i < nrows; i++) {
-    values[i][0] = pmatrix[i][column_x];
-    values[i][1] = pmatrix[i][column_y];
-    values[i][2] = pmatrix[i][column_E];
-  }
+  std::sort(&matrix.front(), &matrix.front()+matrix.size(), &sortAscendingByTwoColumns);
 
   // manca il riempibuchi
 
-
   for (size_t i = 1; i < dunique_x_values.size(); i++) {
-    for (size_t j = 1; j < dunique_x_values.size(); j++) {
+    for (size_t j = 1; j < dunique_y_values.size(); j++) {
       x1 = dunique_x_values[i - 1];
       y1 = dunique_y_values[j - 1];
       x2 = dunique_x_values[i];
       y2 = dunique_y_values[j];
-      E11 = values[(i - 1)*dunique_x_values.size() + j - 1][2];
-      E12 = values[(i - 1)*dunique_x_values.size() + j][2];
-      E21 = values[i*dunique_x_values.size() + j - 1][2];
-      E22 = values[i*dunique_x_values.size() + j][2];
+      E11 = matrix[(j - 1)*dunique_x_values.size() + i - 1][column_E];
+      E12 = matrix[(j - 1)*dunique_x_values.size() + i][column_E];
+      E21 = matrix[j*dunique_x_values.size() + i - 1][column_E];
+      E22 = matrix[j*dunique_x_values.size() + i][column_E];
       k0 = 1.0 / ((x2 - x1)*(y2 - y1));
       dx = (x2 - x1) / interpolation_x;
       dy = (y2 - y1) / interpolation_y;
