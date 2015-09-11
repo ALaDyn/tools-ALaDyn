@@ -15,13 +15,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#define EPSILON    0.0001
 #define MAX(x,y)   (x > y ? x : y)
 
 int column_x = 0, column_y = 0, column_E = 0;
 
 bool checkEqual(double a, double b) {
-  return (fabs(a - b) < EPSILON);
+  return (fabs(a - b) < std::numeric_limits<double>::epsilon());
 }
 
 bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& riga2) {
@@ -190,9 +189,9 @@ int main(int argc, const char* argv[]) {
   dtokens.clear();
   dtokens.resize(3, 0);
 
-  std::sort(&dunique_x_values.front(), &dunique_x_values.front() + dunique_x_values.size());
-  std::sort(&dunique_y_values.front(), &dunique_y_values.front() + dunique_y_values.size());
-  std::sort(&matrix.front(), &matrix.front() + matrix.size(), &sortAscendingByTwoColumns);
+  std::sort(dunique_x_values.begin(), dunique_x_values.end());
+  std::sort(dunique_y_values.begin(), dunique_y_values.end());
+  std::sort(matrix.begin(), matrix.end(), &sortAscendingByTwoColumns);
 
 #ifdef ENABLE_DEBUG
   for (auto i : matrix) {
@@ -235,7 +234,7 @@ int main(int argc, const char* argv[]) {
     }
   }
 
-  std::sort(&results.front(), &results.front() + results.size(), &sortAscendingByTwoColumns);
+  std::sort(results.begin(), results.end(), &sortAscendingByTwoColumns);
   for (auto i : results) {
     for (auto j : i) outfile << std::fixed << std::setprecision(precision) << j << ' ';
     outfile << std::endl;
