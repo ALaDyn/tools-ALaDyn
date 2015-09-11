@@ -23,6 +23,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fix_nptot", "fix_nptot\fix_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logaritmic_fit", "logaritmic_fit\logaritmic_fit.vcxproj", "{FF6B91C8-904C-4B71-82D0-E3DA2B103088}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "interpolate_scan_results", "interpolate_scan_results\interpolate_scan_results.vcxproj", "{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -93,6 +95,14 @@ Global
 		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|Win32.Build.0 = Release|Win32
 		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|x64.ActiveCfg = Release|x64
 		{FF6B91C8-904C-4B71-82D0-E3DA2B103088}.Release|x64.Build.0 = Release|x64
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Debug|Win32.Build.0 = Debug|Win32
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Debug|x64.ActiveCfg = Debug|x64
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Debug|x64.Build.0 = Debug|x64
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Release|Win32.ActiveCfg = Release|Win32
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Release|Win32.Build.0 = Release|Win32
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Release|x64.ActiveCfg = Release|x64
+		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
