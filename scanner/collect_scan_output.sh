@@ -4,14 +4,14 @@ module load compilers/gcc-4.9.0
 
 
 #per il seguente, copiarsi dal prepare_scan_input la riga che genera tutti i valori (in questo caso di bulk lengths scannerizzate)
-columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
-SIM_HEADER="ion_"
+#columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
+#SIM_HEADER="ion_"
 
 #columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
 #SIM_HEADER="0deg_"
 
-#columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
-#SIM_HEADER="15deg_"
+columns_values=$(awk 'BEGIN{for(i=2.0;i<=6.0;i+=2.0)print i}')
+SIM_HEADER="15deg_"
 
 #columns_values=$(awk 'BEGIN{for(i=2.0;i<=10.0;i+=2.0)print i}')
 #SIM_HEADER="ch2_"
@@ -26,7 +26,7 @@ SPEC_DECODER=$HOME/bin/leggi_diag
 # in funzione di un parametro, per produrre piu` plots
 SCANNER=$HOME/bin/scan-columns
 BILINEAR_FILTER=$HOME/bin/interpolate
-X_INTERPOLATION=1024
+X_INTERPOLATION=512
 Y_INTERPOLATION=512
 GNUPLOT=`which gnuplot`
 
@@ -125,11 +125,11 @@ done
 for value in ${columns_values}
 do
  $SCANNER -in energy_scan_${SIM_HEADER}${PARTICLE_TYPE}.txt -out energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_$value.txt -select $column $value
- ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 6 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol.ttf m}m" -xlabel "Preplasma length ({/Symbol.ttf m}m)" -ylabel "Ramp length ({/Symbol.ttf m}m)" -cblabel "Maximum proton energy (MeV)"
+ ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 6 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol m}m" -xlabel "Preplasma length ({/Symbol m}m)" -ylabel "Ramp length ({/Symbol m}m)" -cblabel "Maximum proton energy (MeV)"
  $GNUPLOT plot.plt
- ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 15 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol.ttf m}m" -xlabel "Preplasma length ({/Symbol.ttf m}m)" -ylabel "Ramp length ({/Symbol.ttf m}m)" -cblabel "Average proton temperature (MeV)"
+ ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 15 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol m}m" -xlabel "Preplasma length ({/Symbol m}m)" -ylabel "Ramp length ({/Symbol m}m)" -cblabel "Average proton temperature (MeV)"
  $GNUPLOT plot.plt
- ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 18 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol.ttf m}m" -xlabel "Preplasma length ({/Symbol.ttf m}m)" -ylabel "Ramp length ({/Symbol.ttf m}m)" -cblabel "Total proton energy ({/Symbol.ttf m}J)" -cb_magn 1000000
+ ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 18 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt -gnuplot -title "bulk length ${value} {/Symbol m}m" -xlabel "Preplasma length ({/Symbol m}m)" -ylabel "Ramp length ({/Symbol m}m)" -cblabel "Total proton energy ({/Symbol m}J)" -cb_magn 1000000
  $GNUPLOT plot.plt
 done
 
