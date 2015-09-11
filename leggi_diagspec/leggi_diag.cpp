@@ -22,6 +22,9 @@ public:
   std::string nomefile;
   char tipofile;
 
+  bool btmax;
+  double tmax;
+
   int32_t mod_id, dmodel_id, LP_ord, der_ord;
   int32_t Z_i, A_i, Z1_i, A1_i, Z2_i, A2_i, iform, ibeam, str;
   double xmax, xmin, ymax, ymin;
@@ -85,6 +88,8 @@ public:
 Diag_data::Diag_data() {
   timesteps = NULL;
   charge_tot = NULL;
+  btmax = false;
+  tmax = 0.0;
   Etot = NULL;
   Emean = NULL;
   Emax = NULL;
@@ -536,6 +541,7 @@ void Diag_data::decode_diag_v1_v2(std::ifstream &infile) {
 
   for (int ik = 0; ik < nst; ik++)
   {
+    if (btmax && (timesteps[ik] > oDiag_data.tmax)) continue;
     outfile << timesteps[ik] << "\t" << Emean[0][ik] << "\t" << Emax[0][ik] << "\t" << Emean[1][ik] << "\t" << Emax[1][ik]
       << "\t" << Emean[2][ik] << "\t" << Emax[2][ik] << "\t" << px[0][ik] << "\t" << py[0][ik] << "\t" << pz[0][ik]
       << "\t" << Jz[0][ik] << "\t" << charge_tot[ik] << "\t" << Ex2[ik] << "\t" << Ey2[ik] << "\t" << Ez2[ik]
@@ -688,6 +694,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
 
   for (int i = 0; i < nst; i++)
   {
+    if (btmax && (timesteps[i] > oDiag_data.tmax)) continue;
     outfile << timesteps[i] << "\t" << Ex2[i]+Ey2[i]+Ez2[i]+Bx2[i]+By2[i]+Bz2[i];
     for (int j = 0; j < Nsp; j++) outfile << "\t" << Etot[j][i] << "\t" << Emax[j][i] << "\t" << Jz[j][i] << "\t" << px[j][i] << "\t" << py[j][i] << "\t" << pz[j][i] << "\t" << sigma_px[j][i] << "\t" << sigma_py[j][i] << "\t" << sigma_pz[j][i] << "\t" << mean_charge[j][i] << "\t" << charge_per_cell[j][i];
     outfile << std::endl;
@@ -715,6 +722,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
 
   for (int i = 0; i < nst; i++)
   {
+    if (btmax && (timesteps[i] > oDiag_data.tmax)) continue;
     outfile << timesteps[i] << "\t"
       << Ex2[i] << "\t" << Ey2[i] << "\t" << Ez2[i] << "\t" << Ex_max[i] << "\t" << Ey_max[i] << "\t" << Ez_max[i] << "\t" << Bx2[i] << "\t" << By2[i] << "\t" << Bz2[i] << "\t" << Bx_max[i] << "\t" << By_max[i] << "\t" << Bz_max[i] << "\t" << Ex2_on_solid_target[i] << "\t" << Ey2_on_solid_target[i] << "\t" << Ez2_on_solid_target[i] << "\t" << Bx2_on_solid_target[i] << "\t" << By2_on_solid_target[i] << "\t" << Bz2_on_solid_target[i]
       << std::endl;
@@ -968,7 +976,7 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
 
 int main(int argc, const char* argv[]) {
   if (argc < 3) {
-    std::cout << "Usage: ./leggi_diag filename v1/v2/v3/v4" << std::endl;
+    std::cout << "Usage: ./leggi_diag filename v1/v2/v3/v4 [-tmax tt.ttt] " << std::endl;
     exit(1);
   }
 
@@ -984,6 +992,10 @@ int main(int argc, const char* argv[]) {
   }
 
   oDiag_data.versione = boost::lexical_cast<int32_t>(argv[2][1]);
+  if ((argc == 5) && (std::string(argv[3]) == "-tmax")) {
+    oDiag_data.btmax = true;
+    oDiag_data.tmax = boost::lexical_cast<double>(argv[4]);
+  }
   oDiag_data.tipofile = argv[1][0];
   oDiag_data.nomefile = argv[1];
   if (oDiag_data.tipofile != 's' && oDiag_data.tipofile != 'd')  std::cout << "File non riconosciuto" << std::endl;
