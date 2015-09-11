@@ -17,7 +17,7 @@
 
 #define MAX(x,y)   (x > y ? x : y)
 
-int column_x = 0, column_y = 0, column_E = 0;
+size_t column_x = 0, column_y = 0, column_E = 0;
 
 bool checkEqual(double a, double b) {
   return (fabs(a - b) < std::numeric_limits<double>::epsilon());
@@ -27,12 +27,15 @@ bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& 
   return ((riga1[column_x] < riga2[column_x]) || ((checkEqual(riga1[column_x], riga2[column_x])) && (riga1[column_y] < riga2[column_y])));
 }
 
+bool sortAscendingByTwoColumnsResults(std::vector<double>& riga1, std::vector<double>& riga2) {
+  return ((riga1[0] < riga2[0]) || ((checkEqual(riga1[0], riga2[0])) && (riga1[1] < riga2[1])));
+}
+
 
 int main(int argc, const char* argv[]) {
-  size_t ncolumns, precision = 4;
+  size_t ncolumns, column_max, precision = 4;
   size_t interpolation_x, interpolation_y;
   double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, E_magn = 1.0;
-  int column_max;
   std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png, column_E_string;
   std::ifstream infile;
   std::ofstream outfile;
@@ -234,7 +237,8 @@ int main(int argc, const char* argv[]) {
     }
   }
 
-  std::sort(results.begin(), results.end(), &sortAscendingByTwoColumns);
+  std::sort(results.begin(), results.end(), &sortAscendingByTwoColumnsResults);
+
   for (auto i : results) {
     for (auto j : i) outfile << std::fixed << std::setprecision(precision) << j << ' ';
     outfile << std::endl;
