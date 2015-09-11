@@ -15,22 +15,22 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
-#define EPSILON 0.0001
-#define MAX(x,y) (x > y ? x : y)
+#define EPSILON    0.0001
+#define MAX(x,y)   (x > y ? x : y)
 
 int column_x = 0, column_y = 0, column_E = 0;
 
 bool checkEqual(double a, double b) {
-  return (fabs(a-b) < EPSILON);
+  return (fabs(a - b) < EPSILON);
 }
 
 bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& riga2) {
-  return ((riga1[column_x] < riga2[column_x]) || ((checkEqual(riga1[column_x],riga2[column_x])) && (riga1[column_y] < riga2[column_y])));
+  return ((riga1[column_x] < riga2[column_x]) || ((checkEqual(riga1[column_x], riga2[column_x])) && (riga1[column_y] < riga2[column_y])));
 }
 
 
 int main(int argc, const char* argv[]) {
-  size_t ncolumns;
+  size_t ncolumns, precision = 4;
   size_t interpolation_x, interpolation_y;
   double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, E_magn = 1.0;
   int column_max;
@@ -49,7 +49,7 @@ int main(int argc, const char* argv[]) {
   std::vector<double> dunique_x_values, dunique_y_values;
 
   if (argc < 7) {
-    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt [-gnuplot] [-title] [-xlabel] [-ylabel] [-cblabel]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt\nOptional: [-gnuplot] [-title] [-xlabel] [-ylabel] [-cblabel] [-cb_magn] [-precision]" << std::endl;
     std::cerr << "Press a key to exit..." << std::endl;
     std::cin.get();
     exit(1);
@@ -79,6 +79,9 @@ int main(int argc, const char* argv[]) {
     }
     else if (std::string(argv[i]) == "-file") {
       filename_in = argv[++i];
+    }
+    else if (std::string(argv[i]) == "-precision") {
+      precision = boost::lexical_cast<size_t>(argv[++i]);
     }
     else if (std::string(argv[i]) == "-gnuplot") {
       gnuplot = true;
@@ -185,7 +188,7 @@ int main(int argc, const char* argv[]) {
 
   riga.clear(), tokens.clear();
   dtokens.clear();
-  dtokens.resize(3,0);
+  dtokens.resize(3, 0);
 
   std::sort(&dunique_x_values.front(), &dunique_x_values.front() + dunique_x_values.size());
   std::sort(&dunique_y_values.front(), &dunique_y_values.front() + dunique_y_values.size());
@@ -193,12 +196,12 @@ int main(int argc, const char* argv[]) {
 
 #ifdef ENABLE_DEBUG
   for (auto i : matrix) {
-   for (auto j:i) std::cout << j << ' ';
-   std::cout << std::endl;
+    for (auto j : i) std::cout << j << ' ';
+    std::cout << std::endl;
   }
-  for (auto i:dunique_x_values) std::cout << i << ' ';
+  for (auto i : dunique_x_values) std::cout << i << ' ';
   std::cout << std::endl;
-  for (auto i:dunique_y_values) std::cout << i << ' ';
+  for (auto i : dunique_y_values) std::cout << i << ' ';
   std::cout << std::endl;
 #endif
 
@@ -225,17 +228,17 @@ int main(int argc, const char* argv[]) {
           E = k0*(E11*(x2 - x)*(y2 - y) + E21*(x - x1)*(y2 - y) + E12*(x2 - x)*(y - y1) + E22*(x - x1)*(y - y1));
           dtokens[0] = x;
           dtokens[1] = y;
-          dtokens[2] = E;
+          dtokens[2] = E*E_magn;
           results.push_back(dtokens);
         }
       }
     }
   }
-  
+
   std::sort(&results.front(), &results.front() + results.size(), &sortAscendingByTwoColumns);
   for (auto i : results) {
-   for (auto j : i) outfile << std::fixed << std::setprecision(6) << j << ' ';
-   outfile << std::endl;
+    for (auto j : i) outfile << std::fixed << std::setprecision(precision) << j << ' ';
+    outfile << std::endl;
   }
   outfile.close();
 
