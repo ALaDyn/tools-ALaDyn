@@ -541,7 +541,7 @@ void Diag_data::decode_diag_v1_v2(std::ifstream &infile) {
 
   for (int ik = 0; ik < nst; ik++)
   {
-    if (btmax && (timesteps[ik] > oDiag_data.tmax)) continue;
+    if (btmax && (timesteps[ik] > tmax)) continue;
     outfile << timesteps[ik] << "\t" << Emean[0][ik] << "\t" << Emax[0][ik] << "\t" << Emean[1][ik] << "\t" << Emax[1][ik]
       << "\t" << Emean[2][ik] << "\t" << Emax[2][ik] << "\t" << px[0][ik] << "\t" << py[0][ik] << "\t" << pz[0][ik]
       << "\t" << Jz[0][ik] << "\t" << charge_tot[ik] << "\t" << Ex2[ik] << "\t" << Ey2[ik] << "\t" << Ez2[ik]
@@ -694,7 +694,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
 
   for (int i = 0; i < nst; i++)
   {
-    if (btmax && (timesteps[i] > oDiag_data.tmax)) continue;
+    if (btmax && (timesteps[i] > tmax)) continue;
     outfile << timesteps[i] << "\t" << Ex2[i]+Ey2[i]+Ez2[i]+Bx2[i]+By2[i]+Bz2[i];
     for (int j = 0; j < Nsp; j++) outfile << "\t" << Etot[j][i] << "\t" << Emax[j][i] << "\t" << Jz[j][i] << "\t" << px[j][i] << "\t" << py[j][i] << "\t" << pz[j][i] << "\t" << sigma_px[j][i] << "\t" << sigma_py[j][i] << "\t" << sigma_pz[j][i] << "\t" << mean_charge[j][i] << "\t" << charge_per_cell[j][i];
     outfile << std::endl;
@@ -722,7 +722,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
 
   for (int i = 0; i < nst; i++)
   {
-    if (btmax && (timesteps[i] > oDiag_data.tmax)) continue;
+    if (btmax && (timesteps[i] > tmax)) continue;
     outfile << timesteps[i] << "\t"
       << Ex2[i] << "\t" << Ey2[i] << "\t" << Ez2[i] << "\t" << Ex_max[i] << "\t" << Ey_max[i] << "\t" << Ez_max[i] << "\t" << Bx2[i] << "\t" << By2[i] << "\t" << Bz2[i] << "\t" << Bx_max[i] << "\t" << By_max[i] << "\t" << Bz_max[i] << "\t" << Ex2_on_solid_target[i] << "\t" << Ey2_on_solid_target[i] << "\t" << Ez2_on_solid_target[i] << "\t" << Bx2_on_solid_target[i] << "\t" << By2_on_solid_target[i] << "\t" << Bz2_on_solid_target[i]
       << std::endl;
