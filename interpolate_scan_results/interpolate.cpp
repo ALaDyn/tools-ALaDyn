@@ -191,6 +191,7 @@ int main(int argc, const char* argv[]) {
   std::sort(&dunique_y_values.front(), &dunique_y_values.front() + dunique_y_values.size());
   std::sort(&matrix.front(), &matrix.front() + matrix.size(), &sortAscendingByTwoColumns);
 
+#ifdef ENABLE_DEBUG
   for (auto i : matrix) {
    for (auto j:i) std::cout << j << ' ';
    std::cout << std::endl;
@@ -199,6 +200,8 @@ int main(int argc, const char* argv[]) {
   std::cout << std::endl;
   for (auto i:dunique_y_values) std::cout << i << ' ';
   std::cout << std::endl;
+#endif
+
 
   // manca il riempibuchi
 
@@ -212,7 +215,6 @@ int main(int argc, const char* argv[]) {
       E12 = matrix[(i - 1)*dunique_y_values.size() + j][column_E];
       E21 = matrix[i*dunique_y_values.size() + j - 1][column_E];
       E22 = matrix[i*dunique_y_values.size() + j][column_E];
-      std::cout << i << ',' << j << ": " << E11 << ' ' << E12 << ' ' << E21 << ' ' << E22 << std::endl;
       k0 = 1.0 / ((x2 - x1)*(y2 - y1));
       dx = (x2 - x1) / interpolation_x;
       dy = (y2 - y1) / interpolation_y;
@@ -225,22 +227,11 @@ int main(int argc, const char* argv[]) {
           dtokens[1] = y;
           dtokens[2] = E;
           results.push_back(dtokens);
-          //outfile << std::fixed << std::setprecision(4) << x << "\t" << y << "\t" << std::setprecision(6) << E * E_magn << "\n";
         }
       }
     }
   }
   
-/*  x1 = *(dunique_x_values.end()-2);
-  y1 = *(dunique_y_values.end()-2);
-  x2 = *(dunique_x_values.end()-1);
-  y2 = *(dunique_y_values.end()-1);
-  E11 = matrix[(dunique_x_values.size()-2)*dunique_y_values.size() + (dunique_y_values.size()-2)][column_E];
-  E12 = matrix[(dunique_x_values.size()-2)*dunique_y_values.size() + (dunique_y_values.size()-1)][column_E];
-  E21 = matrix[(dunique_x_values.size()-1)*dunique_y_values.size() + (dunique_y_values.size()-2)][column_E];
-  E22 = matrix[(dunique_x_values.size()-1)*dunique_y_values.size() + (dunique_y_values.size()-1)][column_E];
-*/
-
   std::sort(&results.front(), &results.front() + results.size(), &sortAscendingByTwoColumns);
   for (auto i : results) {
    for (auto j : i) outfile << std::fixed << std::setprecision(6) << j << ' ';
@@ -278,3 +269,6 @@ int main(int argc, const char* argv[]) {
 
   return 0;
 }
+
+
+
