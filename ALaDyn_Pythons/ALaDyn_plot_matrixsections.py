@@ -19,6 +19,7 @@ from ALaDyn_plot_utilities_1 import *
 from ALaDyn_plot_utilities_density import *
 from ALaDyn_plot_utilities_Efield import *
 from ALaDyn_plot_utilities_Bfield import *
+from ALaDyn_plot_utilities_ionization import *
 from ALaDyn_plot_utilities_axes import *
 
 
@@ -117,7 +118,7 @@ if __name__ == '__main__':
 											
 		if output_exists(path,'Ionization',i) == True:
 			print 'Ionization_rate --- frame >>> ',i
-			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Elpout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			##K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
 			np.savetxt( os.path.join(path,'data','Ionization',('ionization_rate'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
