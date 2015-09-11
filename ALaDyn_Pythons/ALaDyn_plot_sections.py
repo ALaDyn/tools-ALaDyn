@@ -19,6 +19,7 @@ from ALaDyn_plot_utilities_1 import *
 from ALaDyn_plot_utilities_density import *
 from ALaDyn_plot_utilities_Efield import *
 from ALaDyn_plot_utilities_Bfield import *
+from ALaDyn_plot_utilities_ionization import *
 from ALaDyn_plot_utilities_axes import *
 
 
@@ -43,29 +44,29 @@ if(len(sys.argv)<2):
 	exit(0)
 
 if sys.argv[1] == -1:
-	frame_begin		  = 0
-	frame_end         = last_output(os.getcwd())
-	magnification_fig = 3.0
-	rho_min 		  = 0.0001
-	rho_max 		  = 20.
-	isolines		  = 30
-	celltocut		  = 0
-	sliceposition_x	  = 0
-	sliceposition_y	  = 0
-	sliceposition_z	  = 0
-	savedata          = True 
+	frame_begin		     = 0
+	frame_end            = last_output(os.getcwd())
+	magnification_fig    = 3.0
+	rho_min 		     = 0.0001
+	rho_max 		     = 20.
+	isolines		     = 30
+	celltocut		     = 0
+	sliceposition_x	     = 0
+	sliceposition_y	     = 0
+	sliceposition_z	     = 0
+	savedata             = True 
 else:
-	frame_begin 		= int(		sys.argv[1])	
-	frame_end			= int(		sys.argv[2])
-	magnification_fig 	= float(	sys.argv[3])
-	rho_min 		  	= float(	sys.argv[4])
-	rho_max 		  	= float(	sys.argv[5])
-	isolines			= int(		sys.argv[6])
-	celltocut			= int(		sys.argv[7])
-	sliceposition_x		= int(		sys.argv[8])
-	sliceposition_y		= int(		sys.argv[9])
-	sliceposition_z		= int(		sys.argv[10])
-	savedata            = sys.argv[11]
+	frame_begin 		 = int(		sys.argv[1])	
+	frame_end			 = int(		sys.argv[2])
+	magnification_fig 	 = float(	sys.argv[3])
+	rho_min 		  	 = float(	sys.argv[4])
+	rho_max 		  	 = float(	sys.argv[5])
+	isolines			 = int(		sys.argv[6])
+	celltocut			 = int(		sys.argv[7])
+	sliceposition_x		 = int(		sys.argv[8])
+	sliceposition_y		 = int(		sys.argv[9])
+	sliceposition_z		 = int(		sys.argv[10])
+	savedata             = sys.argv[11]
 ### --- ###
 
 
@@ -92,6 +93,10 @@ if __name__ == '__main__':
 		if output_exists(path,'rho',i) == True:
 			print 'rho --- frame >>> ',i
 			plot_density_sections(path,i,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata)
+
+		if output_exists(path,'Ionization',i) == True:
+			print 'Ionization --- frame >>> ',i
+			plot_ionization_profile(path,i,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata)
 
 		if output_exists(path,'E',i) == True:
 			print 'E --- frame >>> ',i

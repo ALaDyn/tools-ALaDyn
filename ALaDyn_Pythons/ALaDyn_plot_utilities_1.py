@@ -37,14 +37,21 @@ def	generate_folder_output_structure(path,savedata):
 	directory_rho = os.path.join(directory,'rho')
 	directory_E   = os.path.join(directory,'E_field')
 	directory_B   = os.path.join(directory,'B_field')
-
+					###---###
+	directory_Ionization   = os.path.join(directory,'Ionization')
+					###---###
+					
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
 	if not os.path.exists( directory_E ):
 		os.makedirs(directory_E)
 	if not os.path.exists( directory_B ):
 		os.makedirs(directory_B)
-
+		
+					###---###
+	if not os.path.exists( directory_Ionization ):
+		os.makedirs(directory_Ionization)
+					###---###
 
 	if (savedata == 'True'):
 		directory = os.path.join(path,'data')
@@ -55,7 +62,10 @@ def	generate_folder_output_structure(path,savedata):
 		directory_E   = os.path.join(directory,'E_field')
 		directory_B   = os.path.join(directory,'B_field')
 		directory_moving_window = os.path.join(directory,'Moving_window_axes')
-		
+						###---###
+		directory_Ionization = os.path.join(directory,'Ionization')
+						###---###
+										
 		if not os.path.exists( directory_rho ):
 			os.makedirs(directory_rho)
 		if not os.path.exists( directory_E ):
@@ -64,6 +74,8 @@ def	generate_folder_output_structure(path,savedata):
 			os.makedirs(directory_B)
 		if not os.path.exists( directory_moving_window ):
 			os.makedirs( directory_moving_window )
+		if not os.path.exists( directory_Ionization ):
+			os.makedirs( directory_Ionization )
 
 
 
@@ -91,6 +103,14 @@ def output_exists(path,quantity,frame):
 			return True
 		else:
 			return False
+			
+			###---###
+	if quantity == 'Ionization':
+		if os.path.isfile(os.path.join(path,'Elpout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
+			###---###	
 	
 	if quantity == 'E':
 		if os.path.isfile(os.path.join(path,'Exfout'+('%2.2i'%frame)+'.bin')) == True \
