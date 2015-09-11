@@ -10,17 +10,22 @@
 #include <string>
 #include <cstring>
 #include <cstdint>
+#include <cmath>
 #include <iomanip>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#define EPSILON 0.0001
 #define MAX(x,y) (x > y ? x : y)
 
 int column_x = 0, column_y = 0, column_E = 0;
 
+bool checkEqual(double a, double b) {
+  return (fabs(a-b) < EPSILON);
+}
 
 bool sortAscendingByTwoColumns(std::vector<double>& riga1, std::vector<double>& riga2) {
-  return ((riga1[column_x] < riga2[column_x]) || ((riga1[column_x] == riga2[column_x]) && (riga1[column_y] < riga2[column_y])));
+  return ((riga1[column_x] < riga2[column_x]) || ((checkEqual(riga1[column_x],riga2[column_x])) && (riga1[column_y] < riga2[column_y])));
 }
 
 
@@ -36,7 +41,7 @@ int main(int argc, const char* argv[]) {
   std::vector<std::string> tokens;
   std::vector<double> dtokens;
   std::vector< std::vector<double> > matrix;
-  std::vector< std::vector< std::vector<double> > > bigblock;
+  std::vector< std::vector<double> > results;
 
   bool found;
   bool gnuplot = false;
@@ -178,9 +183,22 @@ int main(int argc, const char* argv[]) {
   for (auto i : unique_y_values) dunique_y_values.push_back(boost::lexical_cast<double>(i));
   infile.close();
 
-  riga.clear(), tokens.clear(), dtokens.clear();
+  riga.clear(), tokens.clear();
+  dtokens.clear();
+  dtokens.resize(3,0);
 
+  std::sort(&dunique_x_values.front(), &dunique_x_values.front() + dunique_x_values.size());
+  std::sort(&dunique_y_values.front(), &dunique_y_values.front() + dunique_y_values.size());
   std::sort(&matrix.front(), &matrix.front() + matrix.size(), &sortAscendingByTwoColumns);
+
+  for (auto i : matrix) {
+   for (auto j:i) std::cout << j << ' ';
+   std::cout << std::endl;
+  }
+  for (auto i:dunique_x_values) std::cout << i << ' ';
+  std::cout << std::endl;
+  for (auto i:dunique_y_values) std::cout << i << ' ';
+  std::cout << std::endl;
 
   // manca il riempibuchi
 
@@ -190,24 +208,44 @@ int main(int argc, const char* argv[]) {
       y1 = dunique_y_values[j - 1];
       x2 = dunique_x_values[i];
       y2 = dunique_y_values[j];
-      E11 = matrix[(j - 1)*dunique_x_values.size() + i - 1][column_E];
-      E12 = matrix[(j - 1)*dunique_x_values.size() + i][column_E];
-      E21 = matrix[j*dunique_x_values.size() + i - 1][column_E];
-      E22 = matrix[j*dunique_x_values.size() + i][column_E];
+      E11 = matrix[(i - 1)*dunique_y_values.size() + j - 1][column_E];
+      E12 = matrix[(i - 1)*dunique_y_values.size() + j][column_E];
+      E21 = matrix[i*dunique_y_values.size() + j - 1][column_E];
+      E22 = matrix[i*dunique_y_values.size() + j][column_E];
+      std::cout << i << ',' << j << ": " << E11 << ' ' << E12 << ' ' << E21 << ' ' << E22 << std::endl;
       k0 = 1.0 / ((x2 - x1)*(y2 - y1));
       dx = (x2 - x1) / interpolation_x;
       dy = (y2 - y1) / interpolation_y;
-      for (size_t k = 0; k <= interpolation_x; k++) {
-        for (size_t l = 0; l <= interpolation_y; l++) {
+      for (size_t k = 0; k < interpolation_x; k++) {
+        for (size_t l = 0; l < interpolation_y; l++) {
           x = x1 + k*dx;
           y = y1 + l*dy;
           E = k0*(E11*(x2 - x)*(y2 - y) + E21*(x - x1)*(y2 - y) + E12*(x2 - x)*(y - y1) + E22*(x - x1)*(y - y1));
-          outfile << std::fixed << std::setprecision(4) << x << "\t" << y << "\t" << std::setprecision(6) << E * E_magn << "\n";
+          dtokens[0] = x;
+          dtokens[1] = y;
+          dtokens[2] = E;
+          results.push_back(dtokens);
+          //outfile << std::fixed << std::setprecision(4) << x << "\t" << y << "\t" << std::setprecision(6) << E * E_magn << "\n";
         }
       }
     }
   }
+  
+/*  x1 = *(dunique_x_values.end()-2);
+  y1 = *(dunique_y_values.end()-2);
+  x2 = *(dunique_x_values.end()-1);
+  y2 = *(dunique_y_values.end()-1);
+  E11 = matrix[(dunique_x_values.size()-2)*dunique_y_values.size() + (dunique_y_values.size()-2)][column_E];
+  E12 = matrix[(dunique_x_values.size()-2)*dunique_y_values.size() + (dunique_y_values.size()-1)][column_E];
+  E21 = matrix[(dunique_x_values.size()-1)*dunique_y_values.size() + (dunique_y_values.size()-2)][column_E];
+  E22 = matrix[(dunique_x_values.size()-1)*dunique_y_values.size() + (dunique_y_values.size()-1)][column_E];
+*/
 
+  std::sort(&results.front(), &results.front() + results.size(), &sortAscendingByTwoColumns);
+  for (auto i : results) {
+   for (auto j : i) outfile << std::fixed << std::setprecision(6) << j << ' ';
+   outfile << std::endl;
+  }
   outfile.close();
 
   if (gnuplot)
