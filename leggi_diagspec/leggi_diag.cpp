@@ -22,6 +22,10 @@ public:
   std::string nomefile;
   char tipofile;
 
+  bool multifile;
+  int32_t nfl, nfl_counter;
+  int32_t nstot;
+
   bool btmax;
   double tmax;
 
@@ -70,7 +74,8 @@ public:
   float * Bz_max;
 
   void allocate_arrays();
-
+  void deallocate_arrays();
+  void start(std::ifstream &);
   void print_debug_v1_v2();
   void print_debug_v3();
   void print_debug_v4();
@@ -86,40 +91,50 @@ public:
 };
 
 Diag_data::Diag_data() {
-  timesteps = NULL;
-  charge_tot = NULL;
+  timesteps = nullptr;
+  charge_tot = nullptr;
+  multifile = false;
+  nstot = 0;
+  nfl = 1;
+  nfl_counter = 0;
   btmax = false;
   tmax = 0.0;
-  Etot = NULL;
-  Emean = NULL;
-  Emax = NULL;
-  px = NULL;
-  py = NULL;
-  pz = NULL;
-  sigma_px = NULL;
-  sigma_py = NULL;
-  sigma_pz = NULL;
-  Jz = NULL;
-  mean_charge = NULL;
-  charge_per_cell = NULL;
-  Ex2 = NULL;
-  Ey2 = NULL;
-  Ez2 = NULL;
-  Bx2 = NULL;
-  By2 = NULL;
-  Bz2 = NULL;
-  Ex2_on_solid_target = NULL;
-  Ey2_on_solid_target = NULL;
-  Ez2_on_solid_target = NULL;
-  Bx2_on_solid_target = NULL;
-  By2_on_solid_target = NULL;
-  Bz2_on_solid_target = NULL;
-  Ex_max = NULL;
-  Ey_max = NULL;
-  Ez_max = NULL;
-  Bx_max = NULL;
-  By_max = NULL;
-  Bz_max = NULL;
+  Etot = nullptr;
+  Emean = nullptr;
+  Emax = nullptr;
+  px = nullptr;
+  py = nullptr;
+  pz = nullptr;
+  sigma_px = nullptr;
+  sigma_py = nullptr;
+  sigma_pz = nullptr;
+  Jz = nullptr;
+  mean_charge = nullptr;
+  charge_per_cell = nullptr;
+  Ex2 = nullptr;
+  Ey2 = nullptr;
+  Ez2 = nullptr;
+  Bx2 = nullptr;
+  By2 = nullptr;
+  Bz2 = nullptr;
+  Ex2_on_solid_target = nullptr;
+  Ey2_on_solid_target = nullptr;
+  Ez2_on_solid_target = nullptr;
+  Bx2_on_solid_target = nullptr;
+  By2_on_solid_target = nullptr;
+  Bz2_on_solid_target = nullptr;
+  Ex_max = nullptr;
+  Ey_max = nullptr;
+  Ez_max = nullptr;
+  Bx_max = nullptr;
+  By_max = nullptr;
+  Bz_max = nullptr;
+}
+
+void Diag_data::start(std::ifstream &infile) {
+  if (versione < 3) read_header_v1_v2(infile);
+  else if (versione == 3) read_header_v3(infile);
+  else read_header_v4(infile);
 }
 
 void Diag_data::allocate_arrays() {
@@ -172,6 +187,57 @@ void Diag_data::allocate_arrays() {
   Bz_max = new float[nst];
 }
 
+void Diag_data::deallocate_arrays() {
+  delete[] timesteps; timesteps = nullptr;
+
+  for (int32_t i = 0; i < Nsp; i++) {
+    delete[] Etot[i]; Etot[i] = nullptr;
+    delete[] Emean[i]; Emean[i] = nullptr;
+    delete[] Emax[i]; Emax[i] = nullptr;
+    delete[] px[i]; px[i] = nullptr;
+    delete[] py[i]; py[i] = nullptr;
+    delete[] pz[i]; pz[i] = nullptr;
+    delete[] sigma_px[i]; sigma_px[i] = nullptr;
+    delete[] sigma_py[i]; sigma_py[i] = nullptr;
+    delete[] sigma_pz[i]; sigma_pz[i] = nullptr;
+    delete[] Jz[i]; Jz[i] = nullptr;
+    delete[] mean_charge[i]; mean_charge[i] = nullptr;
+    delete[] charge_per_cell[i]; charge_per_cell[i] = nullptr;
+  }
+  delete[] Etot; Etot = nullptr;
+  delete[] Emean; Emean = nullptr;
+  delete[] Emax; Emax = nullptr;
+  delete[] px; px = nullptr;
+  delete[] py; py = nullptr;
+  delete[] pz; pz = nullptr;
+  delete[] sigma_px; sigma_px = nullptr;
+  delete[] sigma_py; sigma_py = nullptr;
+  delete[] sigma_pz; sigma_pz = nullptr;
+  delete[] Jz; Jz = nullptr;
+  delete[] mean_charge; mean_charge = nullptr;
+  delete[] charge_per_cell; charge_per_cell = nullptr;
+
+  delete[] charge_tot; charge_tot = nullptr;
+  delete[] Ex2; Ex2 = nullptr;
+  delete[] Ey2; Ey2 = nullptr;
+  delete[] Ez2; Ez2 = nullptr;
+  delete[] Bx2; Bx2 = nullptr;
+  delete[] By2; By2 = nullptr;
+  delete[] Bz2; Bz2 = nullptr;
+  delete[] Ex2_on_solid_target; Ex2_on_solid_target = nullptr;
+  delete[] Ey2_on_solid_target; Ey2_on_solid_target = nullptr;
+  delete[] Ez2_on_solid_target; Ez2_on_solid_target = nullptr;
+  delete[] Bx2_on_solid_target; Bx2_on_solid_target = nullptr;
+  delete[] By2_on_solid_target; By2_on_solid_target = nullptr;
+  delete[] Bz2_on_solid_target; Bz2_on_solid_target = nullptr;
+  delete[] Ex_max; Ex_max = nullptr;
+  delete[] Ey_max; Ey_max = nullptr;
+  delete[] Ez_max; Ez_max = nullptr;
+  delete[] Bx_max; Bx_max = nullptr;
+  delete[] By_max; By_max = nullptr;
+  delete[] Bz_max; Bz_max = nullptr;
+}
+
 void Diag_data::print_debug_v1_v2() {
   std::cout << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
   std::cout << Z_i << "\t" << A_i << "\t" << iform << "\t" << ibeam << std::endl;
@@ -217,11 +283,17 @@ void Diag_data::read_header_v1_v2(std::ifstream &infile) {
 
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-  if (tokens[0][0] == 'n') {
-    std::getline(infile, riga);
-    std::getline(infile, riga);
-    std::getline(infile, riga);
-    std::getline(infile, riga);
+  if (tokens[0] == "nfl") {
+    multifile = true;
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    nfl = boost::lexical_cast<int32_t>(tokens[0]);
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    nstot = boost::lexical_cast<int32_t>(tokens[0]);
+    riga.clear(), std::getline(infile, riga);
   }
 
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
@@ -304,13 +376,31 @@ void Diag_data::read_header_v1_v2(std::ifstream &infile) {
   sp_step = boost::lexical_cast<int32_t>(tokens[2]);
   nvar = boost::lexical_cast<int32_t>(tokens[3]);
   npvar = boost::lexical_cast<int32_t>(tokens[4]);
+
+  allocate_arrays();
+  if (tipofile == 'd') decode_diag_v1_v2(infile);
+  if (tipofile == 's') decode_spec_v1_v2(infile);
 }
 
 void Diag_data::read_header_v3(std::ifstream &infile) {
   std::string riga;
   std::vector<std::string> tokens;
 
-  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  if (tokens[0] == "nfl") {
+    multifile = true;
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    nfl = boost::lexical_cast<int32_t>(tokens[0]);
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    nstot = boost::lexical_cast<int32_t>(tokens[0]);
+    riga.clear(), std::getline(infile, riga);
+  }
+
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
   mod_id = boost::lexical_cast<int32_t>(tokens[0]);
@@ -392,13 +482,31 @@ void Diag_data::read_header_v3(std::ifstream &infile) {
   nst = boost::lexical_cast<int32_t>(tokens[1]);
   nvar = boost::lexical_cast<int32_t>(tokens[2]);
   npvar = boost::lexical_cast<int32_t>(tokens[3]);
+
+  allocate_arrays();
+  if (tipofile == 'd') decode_diag_v3(infile);
+  if (tipofile == 's') decode_spec_v3(infile);
 }
 
 void Diag_data::read_header_v4(std::ifstream &infile) {
   std::string riga;
   std::vector<std::string> tokens;
 
-  riga.clear(), std::getline(infile, riga);
+  riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+  boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+  if (tokens[0] == "nfl") {
+    multifile = true;
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    nfl = boost::lexical_cast<int32_t>(tokens[0]);
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    nstot = boost::lexical_cast<int32_t>(tokens[0]);
+    riga.clear(), std::getline(infile, riga);
+  }
+
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
   mod_id = boost::lexical_cast<int32_t>(tokens[0]);
@@ -480,6 +588,10 @@ void Diag_data::read_header_v4(std::ifstream &infile) {
   nst = boost::lexical_cast<int32_t>(tokens[1]);
   nvar = boost::lexical_cast<int32_t>(tokens[2]);
   npvar = boost::lexical_cast<int32_t>(tokens[3]);
+
+  allocate_arrays();
+  if (tipofile == 'd') decode_diag_v4(infile);
+  if (tipofile == 's') decode_spec_v4(infile);
 }
 
 void Diag_data::decode_diag_v1_v2(std::ifstream &infile) {
@@ -525,7 +637,9 @@ void Diag_data::decode_diag_v1_v2(std::ifstream &infile) {
   std::ostringstream nomefile_out;
   nomefile_out << std::string(nomefile) << ".txt";
   std::ofstream outfile;
-  outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+  outfile.open(nomefile_out.str().c_str(), std::ofstream::out | std::ofstream::app);
+
+  if (multifile)  outfile << "# " << nfl << "\t" << nstot << std::endl;
 
   outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
 
@@ -549,7 +663,8 @@ void Diag_data::decode_diag_v1_v2(std::ifstream &infile) {
   }
 
   outfile.close();
-
+  deallocate_arrays();
+  if (multifile && (++nfl_counter < nfl)) read_header_v1_v2(infile);
 }
 
 void Diag_data::decode_diag_v3(std::ifstream &infile) {
@@ -676,7 +791,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   std::ostringstream nomefile_out;
   nomefile_out << std::string(nomefile) << ".particles.txt";
   std::ofstream outfile;
-  outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+  outfile.open(nomefile_out.str().c_str(), std::ofstream::out | std::ofstream::app);
 
   outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
 
@@ -695,7 +810,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   for (int i = 0; i < nst; i++)
   {
     if (btmax && (timesteps[i] > tmax)) continue;
-    outfile << timesteps[i] << "\t" << Ex2[i]+Ey2[i]+Ez2[i]+Bx2[i]+By2[i]+Bz2[i];
+    outfile << timesteps[i] << "\t" << Ex2[i] + Ey2[i] + Ez2[i] + Bx2[i] + By2[i] + Bz2[i];
     for (int j = 0; j < Nsp; j++) outfile << "\t" << Etot[j][i] << "\t" << Emax[j][i] << "\t" << Jz[j][i] << "\t" << px[j][i] << "\t" << py[j][i] << "\t" << pz[j][i] << "\t" << sigma_px[j][i] << "\t" << sigma_py[j][i] << "\t" << sigma_pz[j][i] << "\t" << mean_charge[j][i] << "\t" << charge_per_cell[j][i];
     outfile << std::endl;
   }
@@ -705,7 +820,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   nomefile_out.str("\0");
   nomefile_out.seekp(0, std::ios::beg);
   nomefile_out << std::string(nomefile) << ".fields.txt";
-  outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+  outfile.open(nomefile_out.str().c_str(), std::ofstream::out | std::ofstream::app);
 
   outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
 
@@ -729,7 +844,8 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   }
 
   outfile.close();
-
+  deallocate_arrays();
+  if (multifile && (++nfl_counter < nfl)) read_header_v3(infile);
 }
 
 
@@ -783,7 +899,7 @@ void Diag_data::decode_spec_v1_v2(std::ifstream &infile) {
       nomefile_out.seekp(0, std::ios::beg);
       nomefile_out << std::string(nomefile) << "_" << tipo << "_" << time << ".txt";
       std::ofstream outfile;
-      outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+      outfile.open(nomefile_out.str().c_str(), std::ofstream::out | std::ofstream::app);
 
 
       outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
@@ -799,16 +915,17 @@ void Diag_data::decode_spec_v1_v2(std::ifstream &infile) {
 
       for (int ik = 0; ik < nbin; ik++) {
         if (versione == 2) {
-          outfile << energy << "\t" << spectrum[ik]*np_over_nmacro << "\t" << selected_spectrum[ik]*np_over_nmacro << std::endl;
+          outfile << energy << "\t" << spectrum[ik] * np_over_nmacro << "\t" << selected_spectrum[ik] * np_over_nmacro << std::endl;
         }
         else
-          outfile << energy << "\t" << spectrum[ik]*np_over_nmacro << std::endl;
+          outfile << energy << "\t" << spectrum[ik] * np_over_nmacro << std::endl;
         energy += dE;
       }
 
       outfile.close();
     }
   }
+  deallocate_arrays();
 }
 
 void Diag_data::decode_spec_v3(std::ifstream &infile) {
@@ -864,7 +981,7 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
       nomefile_out.seekp(0, std::ios::beg);
       nomefile_out << std::string(nomefile) << "_" << tipo[i] << "_" << time << ".txt";
       std::ofstream outfile;
-      outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+      outfile.open(nomefile_out.str().c_str(), std::ofstream::out | std::ofstream::app);
 
 
       outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
@@ -879,13 +996,14 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
       outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
 
       for (int ik = 0; ik < nbin; ik++) {
-        outfile << energy << "\t" << spectrum[ik]*np_per_cell << "\t" << selected_spectrum[ik]*np_per_cell << std::endl;
+        outfile << energy << "\t" << spectrum[ik] * np_per_cell << "\t" << selected_spectrum[ik] * np_per_cell << std::endl;
         energy += dE;
       }
 
       outfile.close();
     }
   }
+  deallocate_arrays();
 }
 
 void Diag_data::decode_spec_v4(std::ifstream &infile) {
@@ -950,7 +1068,7 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       nomefile_out.seekp(0, std::ios::beg);
       nomefile_out << std::string(nomefile) << "_" << tipo[i] << "_" << time << ".txt";
       std::ofstream outfile;
-      outfile.open(nomefile_out.str().c_str(), std::ifstream::out);
+      outfile.open(nomefile_out.str().c_str(), std::ofstream::out | std::ofstream::app);
 
 
       outfile << "# " << mod_id << "\t" << dmodel_id << "\t" << LP_ord << "\t" << der_ord << std::endl;
@@ -965,13 +1083,14 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       outfile << "# " << iter << "\t" << nst << "\t" << nvar << "\t" << npvar << std::endl;
 
       for (int ik = 0; ik < nbin; ik++) {
-        outfile << energy << "\t" << spectrum[ik]*np_per_cell << "\t" << selected_spectrum_1[ik]*np_per_cell << "\t" << selected_spectrum_2[ik]*np_per_cell << std::endl;
+        outfile << energy << "\t" << spectrum[ik] * np_per_cell << "\t" << selected_spectrum_1[ik] * np_per_cell << "\t" << selected_spectrum_2[ik] * np_per_cell << std::endl;
         energy += dE;
       }
 
       outfile.close();
     }
   }
+  deallocate_arrays();
 }
 
 int main(int argc, const char* argv[]) {
@@ -983,7 +1102,6 @@ int main(int argc, const char* argv[]) {
   Diag_data oDiag_data;
 
   std::ifstream infile;
-  std::ostringstream nomefile_out;
 
   infile.open(argv[1], std::ifstream::in);
   if (infile.fail()) {
@@ -1000,26 +1118,7 @@ int main(int argc, const char* argv[]) {
   oDiag_data.nomefile = argv[1];
   if (oDiag_data.tipofile != 's' && oDiag_data.tipofile != 'd')  std::cout << "File non riconosciuto" << std::endl;
 
-  if (oDiag_data.versione < 3) oDiag_data.read_header_v1_v2(infile);
-  else if (oDiag_data.versione == 3) oDiag_data.read_header_v3(infile);
-  else oDiag_data.read_header_v4(infile);
-
-  oDiag_data.allocate_arrays();
-
-  if (oDiag_data.tipofile == 'd')
-  {
-    if (oDiag_data.versione < 3) oDiag_data.decode_diag_v1_v2(infile);
-    else if (oDiag_data.versione == 3) oDiag_data.decode_diag_v3(infile);
-    else oDiag_data.decode_diag_v4(infile);
-  }
-
-
-  if (oDiag_data.tipofile == 's')
-  {
-    if (oDiag_data.versione < 3) oDiag_data.decode_spec_v1_v2(infile);
-    else if (oDiag_data.versione == 3) oDiag_data.decode_spec_v3(infile);
-    else oDiag_data.decode_spec_v4(infile);
-  }
+  oDiag_data.start(infile);
 
   infile.close();
 
