@@ -21,9 +21,10 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 ### --- ### shell inputs
 if(len(sys.argv)<2):
 	print 'Input  [1]: bch (n_bunch/n_0)'
-	print 'Input  [2]: sx    [cm]'
-	print 'Input  [3]: sy,sz [cm]'
-	print 'Input  [4]: n_0   [cm^-3]'
+	print 'Input  [2]: Lorentz-gamma'
+	print 'Input  [3]: sx    [cm]'
+	print 'Input  [4]: sy,sz [cm]'
+	print 'Input  [5]: n_0   [cm^-3]'
 	exit(0)
 
 try:
@@ -38,9 +39,10 @@ if switch == -1:
 	n0 		= 0.01*1e18	 #[cm-3]
 else:
 	bch	= float(	sys.argv[1])
-	sx	= float(	sys.argv[2])
-	sy	= float(	sys.argv[3])
-	n0 	= float(	sys.argv[4])
+	gamma = float(  sys.argv[2])
+	sx	= float(	sys.argv[3])
+	sy	= float(	sys.argv[4])
+	n0 	= float(	sys.argv[5])
 ### --- ###
 
 
@@ -62,13 +64,16 @@ kp				= wp/c_cgs
 lp				= 2.*np.pi/kp
 Qtilde			= bch * volume_N3 * kp**3	# reduced charge
 total_Charge	= (bch*n0) * volume_N3 * e / 1e-12 	#total charge in [pC]
+betatron_l		= np.sqrt(3.*gamma/2./np.pi)*lp
 # - #
 
 #print 'Qtilde >>>',Qtilde
 print('\n')
-print('lambda_p: %e [um] - omega_p: %e [Hz]' % (lp*1e4,wp) )
-print('total bunch Charge: %i [pC]' % (total_Charge) )
-print('Qtilde - normalized charge: %5.3e' % (Qtilde) )
+print('lambda_p: %6.f  [um]' % (lp*1e4) )
+print('omega_p:  %5.2e [Hz]' % (wp) )
+print('total bunch Charge: %5.2f [pC]' % (total_Charge) )
+print('Qtilde - normalized charge: %5.3f' % (Qtilde) )
+print('Betatron Oscillation Wavelength: %6.f [um]' % (betatron_l*1e4) )
 print('\n')
 
 

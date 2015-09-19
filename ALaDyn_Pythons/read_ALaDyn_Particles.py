@@ -2,7 +2,7 @@
 ######################################################################
 # Name:         read_ALaDyn_Particles.py
 # Author:       C Gatti and A Marocchino      
-# Date:            2014-06-11
+# Date:         2014-06-11
 # Purpose:      reads dued binary from output
 # Source:       python
 #####################################################################
@@ -40,6 +40,7 @@ Px=[]
 Py=[]
 Pz=[]
 W=[]
+Q=[]
 counter=0
 while True:
     try:
@@ -52,7 +53,7 @@ while True:
     vars=[]
     try:
         for i in range(0,Np[0]):
-            vars=struct.unpack('fffffff', f.read(4*7))
+            vars=struct.unpack('ffffffff', f.read(4*8))
             X.append(vars[0])
             Y.append(vars[1])
             Z.append(vars[2])
@@ -60,6 +61,7 @@ while True:
             Py.append(vars[4])
             Pz.append(vars[5])
             W.append(vars[6])
+            Q.append(vars[7])
     except:
             pass    
    #     pass
