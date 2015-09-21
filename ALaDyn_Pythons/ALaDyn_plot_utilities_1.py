@@ -38,7 +38,7 @@ def	generate_folder_output_structure(path,savedata):
 	directory_E   = os.path.join(directory,'E_field')
 	directory_B   = os.path.join(directory,'B_field')
 					###---###
-	directory_Ionization   = os.path.join(directory,'Ionization')
+	directory_ionization   = os.path.join(directory,'ionization')
 					###---###
 					
 	if not os.path.exists( directory_rho ):
@@ -49,8 +49,8 @@ def	generate_folder_output_structure(path,savedata):
 		os.makedirs(directory_B)
 		
 					###---###
-	if not os.path.exists( directory_Ionization ):
-		os.makedirs(directory_Ionization)
+	if not os.path.exists( directory_ionization ):
+		os.makedirs(directory_ionization)
 					###---###
 
 	if (savedata == 'True'):
@@ -63,7 +63,7 @@ def	generate_folder_output_structure(path,savedata):
 		directory_B   = os.path.join(directory,'B_field')
 		directory_moving_window = os.path.join(directory,'Moving_window_axes')
 						###---###
-		directory_Ionization = os.path.join(directory,'Ionization')
+		directory_ionization = os.path.join(directory,'Ionization')
 						###---###
 										
 		if not os.path.exists( directory_rho ):
@@ -74,8 +74,8 @@ def	generate_folder_output_structure(path,savedata):
 			os.makedirs(directory_B)
 		if not os.path.exists( directory_moving_window ):
 			os.makedirs( directory_moving_window )
-		if not os.path.exists( directory_Ionization ):
-			os.makedirs( directory_Ionization )
+		if not os.path.exists( directory_ionization ):
+			os.makedirs( directory_ionization )
 
 
 
