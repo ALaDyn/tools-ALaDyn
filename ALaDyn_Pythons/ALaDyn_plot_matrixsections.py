@@ -91,9 +91,17 @@ if __name__ == '__main__':
 			Ezb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Ezbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Ezf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path,'Ezfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			np.savetxt( os.path.join(path,'data','E_field',('Ex_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Exb.transpose()+Exf.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path,'data','E_field',('Ey_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Eyb.transpose()+Eyf.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path,'data','E_field',('Ez_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Ezb.transpose()+Ezf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ex_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Exb.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ey_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Eyb.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ez_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Ezb.transpose(),fmt='%15.14e')
+
+			np.savetxt( os.path.join(path,'data','E_field',('Ex_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Exf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ey_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Eyf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ez_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Ezf.transpose(),fmt='%15.14e')
+
+			np.savetxt( os.path.join(path,'data','E_field',('Ex_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Exb.transpose()+Exf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ey_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Eyb.transpose()+Eyf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path,'data','E_field',('Ez_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Ezb.transpose()+Ezf.transpose(),fmt='%15.14e')
 
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
