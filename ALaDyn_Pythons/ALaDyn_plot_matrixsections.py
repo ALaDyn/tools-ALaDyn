@@ -75,6 +75,10 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
+		if output_exists(path,'ionization',i) == True:
+			print 'ionization rate --- frame >>> ',i
+			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+			np.savetxt( os.path.join(path,'data','ionization',('ionization_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
 
 		if output_exists(path,'E',i) == True:
 			print 'E --- frame >>> ',i
@@ -116,15 +120,6 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 											###---ionization_output_test---###
 											
-		if output_exists(path,'Ionization',i) == True:
-			print 'Ionization_rate --- frame >>> ',i
-			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
-			##K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
-
-			np.savetxt( os.path.join(path,'data','Ionization',('ionization_rate'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
-			np.savetxt( os.path.join(path,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
-			np.savetxt( os.path.join(path,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
 											###-----------------------------###
 

@@ -105,11 +105,13 @@ def output_exists(path,quantity,frame):
 			return False
 			
 			###---###
-	if quantity == 'Ionization':
-		if os.path.isfile(os.path.join(path,'Elpout'+('%2.2i'%frame)+'.bin')) == True:
+
+	if quantity == 'ionization':
+		if os.path.isfile(os.path.join(path,'H1dnout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:
 			return False
+
 			###---###	
 	
 	if quantity == 'E':
