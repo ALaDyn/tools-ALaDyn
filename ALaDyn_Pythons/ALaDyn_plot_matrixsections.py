@@ -118,38 +118,6 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
 			np.savetxt( os.path.join(path,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
-											###---ionization_output_test---###
-											
-
-											###-----------------------------###
-
-
-
-# 		
-# 		
-# 			
-# 		if output_exists(path,'Moving_window_axes',i) == True:
-# 			print 'Moving window axes --- frame >>> ',i
-# 			if savedata == 'True':
-#  				print 'Moving Window Coordinates data --- frame >>> ',i		
-#  				save_moving_window_coordinates(path,i)
-
-			
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

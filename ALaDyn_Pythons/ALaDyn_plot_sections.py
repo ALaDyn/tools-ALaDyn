@@ -94,8 +94,8 @@ if __name__ == '__main__':
 			print 'rho --- frame >>> ',i
 			plot_density_sections(path,i,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata)
 
-		if output_exists(path,'Ionization',i) == True:
-			print 'Ionization --- frame >>> ',i
+		if output_exists(path,'ionization',i) == True:
+			print 'ionization --- frame >>> ',i
 			plot_ionization_profile(path,i,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata)
 
 		if output_exists(path,'E',i) == True:

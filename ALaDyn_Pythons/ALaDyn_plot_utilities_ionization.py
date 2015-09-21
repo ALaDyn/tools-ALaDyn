@@ -225,7 +225,7 @@ def plot_ionization_profile(path,frame,min_ionization_rate,max_ionzation_rate,is
 		x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;		
 		
 	
-		np.savetxt( os.path.join(path,'data','Ionization',('ionization_profile_'+('%2.2i'%frame)+'.dat')),ionization_map[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'data','ionization',('ionization_profile_'+('%2.2i'%frame)+'.dat')),ionization_map[:,:,z2].T,fmt='%15.14e')
 
 # 		np.savetxt( 'rho_section_'+('%2.2i'%frame)+'.dat' ,rho[:,:,z2].T,fmt='%15.14e')
 # 		np.savetxt( 'rho_b_section_'+('%2.2i'%frame)+'.dat' ,rho_b[:,:,z2].T,fmt='%15.14e')

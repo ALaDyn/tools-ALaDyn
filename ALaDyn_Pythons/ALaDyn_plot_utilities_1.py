@@ -63,7 +63,7 @@ def	generate_folder_output_structure(path,savedata):
 		directory_B   = os.path.join(directory,'B_field')
 		directory_moving_window = os.path.join(directory,'Moving_window_axes')
 						###---###
-		directory_ionization = os.path.join(directory,'Ionization')
+		directory_ionization = os.path.join(directory,'ionization')
 						###---###
 										
 		if not os.path.exists( directory_rho ):
