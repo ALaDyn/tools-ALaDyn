@@ -291,15 +291,12 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 	  npx_ricampionati = intpar[3];
 	  npx_per_cpu = npx / ncpu_x;
 	  fattore_ricampionamento = npx / npx_ricampionati;
-
 	  npy_ricampionati = intpar[4];
 	  npy_per_cpu = intpar[5];
 	  npy = npy_ricampionati * fattore_ricampionamento;
-
 	  npz_ricampionati = intpar[6];
 	  npz_per_cpu = intpar[7];
 	  npz = npz_ricampionati * fattore_ricampionamento;
-
 	  npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
 	  npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
 	  npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
@@ -2204,7 +2201,6 @@ void Parametri::parse_command_line(const int cl_argc, const char ** cl_argv)
       p_b[OUT_LINEOUT_X] = false;
     }
   }
-  fileParametri.close();
 }
 
 
