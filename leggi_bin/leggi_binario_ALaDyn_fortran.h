@@ -219,7 +219,8 @@ struct Parametri
   float dimmi_dimE();
   float dimmi_dim(int);
   int dimmi_nbin(int);
-  void parse_command_line(const int, const char **);
+  void check_forced_version(const int, const char **);
+  void parse_command_line();
   void leggi_file_dat(std::ifstream &);
   void debug_read_parameters();
   void chiedi_endian_file();

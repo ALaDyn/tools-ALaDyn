@@ -48,7 +48,6 @@ int main(const int argc, const char *argv[])
   }
   else parametri.filebasename = std::string(argv[1]);
 
-  parametri.parse_command_line(argc, argv);
 
   nomefile_bin << parametri.filebasename << ".bin";
   nomefile_dat << parametri.filebasename << ".dat";
@@ -72,8 +71,7 @@ int main(const int argc, const char *argv[])
   else std::cout << "Input file is " << parametri.filebasename << ".bin" << std::endl;
   parametri.check_filename(parametri.filebasename.c_str());
   file_bin.close();
-
-
+  parametri.check_forced_version(argc, argv);
 
   /* Controllo file ascii */
   file_dat.open(nomefile_dat.str().c_str());
@@ -111,6 +109,11 @@ int main(const int argc, const char *argv[])
 #ifdef ENABLE_DEBUG
   if (parametri.p[SWAP]) std::cout << "Swap is enabled" << std::endl;
   else std::cout << "Swap is disabled" << std::endl;
+#endif
+
+  parametri.parse_command_line();
+
+#ifdef ENABLE_DEBUG
   for (int i = 0; i < NPARAMETRI; i++) std::cout << "p[" << i << "] = " << parametri.p[i] << std::endl;
 #endif
 

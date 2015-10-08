@@ -886,16 +886,41 @@ void Parametri::check_filename(const char *nomefile)
   }
 }
 
-void Parametri::parse_command_line(const int cl_argc, const char ** cl_argv)
+
+void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
+{
+	argc = cl_argc;
+	argv = new std::string[argc];
+	for (int i = 0; i < argc; i++) argv[i] = std::string(cl_argv[i]);
+
+	for (int i = 2; i < argc; i++) {
+		if (argv[i] == "-force_v1") {
+			std::cout << "Forced using routines for aladyn v1" << std::endl;
+			aladyn_version = 1;
+			fixed_aladyn_version = true;
+		}
+		else if (argv[i] == "-force_v2") {
+			std::cout << "Forced using routines for aladyn v2" << std::endl;
+			aladyn_version = 2;
+			fixed_aladyn_version = true;
+		}
+		else if (argv[i] == "-force_v3") {
+			std::cout << "Forced using routines for aladyn v3" << std::endl;
+			aladyn_version = 3;
+			fixed_aladyn_version = true;
+		}
+	}
+}
+
+
+
+
+void Parametri::parse_command_line()
 {
   std::ifstream fileParametri;
   std::string nomefile;
   bool usa_file_parametri = false;
   bool failed_opening_file;
-
-  argc = cl_argc;
-  argv = new std::string[argc];
-  for (int i = 0; i < argc; i++) argv[i] = std::string(cl_argv[i]);
 
   for (int i = 2; i < argc; i++)
     /************************************************************************
@@ -939,24 +964,6 @@ void Parametri::parse_command_line(const int cl_argc, const char ** cl_argv)
       p[SWAP] = 0;
       p_b[SWAP] = false;
     }
-	else if (argv[i] == "-force_v1")
-	{
-		std::cout << "Forced using routines for aladyn v1" << std::endl;
-		aladyn_version = 1;
-		fixed_aladyn_version = true;
-	}
-	else if (argv[i] == "-force_v2")
-	{
-		std::cout << "Forced using routines for aladyn v2" << std::endl;
-		aladyn_version = 2;
-		fixed_aladyn_version = true;
-	}
-	else if (argv[i] == "-force_v3")
-    {
-      std::cout << "Forced using routines for aladyn v3" << std::endl;
-      aladyn_version = 3;
-	  fixed_aladyn_version = true;
-	}
     else if (argv[i] == "-stop")
     {
       last_cpu = atoi(argv[i + 1].c_str());
