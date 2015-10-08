@@ -290,7 +290,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 	  npx = intpar[2];
 	  npx_ricampionati = intpar[3];
 	  npx_per_cpu = npx / ncpu_x;
-	  fattore_ricampionamento = npx / npx_ricampionati;
+	  fattore_ricampionamento = (int) (npx / npx_ricampionati);
 	  npy_ricampionati = intpar[4];
 	  npy_per_cpu = intpar[5];
 	  npy = npy_ricampionati * fattore_ricampionamento;
