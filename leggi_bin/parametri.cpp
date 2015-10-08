@@ -271,8 +271,54 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   if (aladyn_version == -1) aladyn_version = 2;
   if (aladyn_version == -2) aladyn_version = 3;
 
+  if (aladyn_version < 3) {
+	  /*
+	  int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
+	  model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
+	  LPf_ord,der_ord,ns_ind,i_end/)
+	  --------------------
+	  real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+	  n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+	  gam0,nb_over_np,b_charge,vbeam/)
+	  */
+	  ncpu_y = intpar[0];
+	  ncpu_z = intpar[1];
+	  ncpu_x = 1;
+	  ncpu = ncpu_x * ncpu_y * ncpu_z;
+	  npx = intpar[2];
+	  npx_ricampionati = intpar[3];
+	  npx_per_cpu = npx / ncpu_x;
+	  fattore_ricampionamento = npx / npx_ricampionati;
 
-  if (aladyn_version < 4) {
+	  npy_ricampionati = intpar[4];
+	  npy_per_cpu = intpar[5];
+	  npy = npy_ricampionati * fattore_ricampionamento;
+
+	  npz_ricampionati = intpar[6];
+	  npz_per_cpu = intpar[7];
+	  npz = npz_ricampionati * fattore_ricampionamento;
+
+	  npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+	  npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
+	  npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
+
+	  nptot = (long long int) intpar[16];
+	  ndv = intpar[17];
+	  endianness = intpar[19];
+
+	  tnow = realpar[0];
+	  xmin = realpar[1];
+	  xmax = realpar[2];
+	  ymin = realpar[3];
+	  ymax = realpar[4];
+	  zmin = realpar[5];
+	  zmax = realpar[6];
+
+	  if (file_griglia && aladyn_version == 1) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
+	  else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+  }
+
+  if (aladyn_version == 3) {
     /*
     int_par(1:20) = (/npe_loc,npe_zloc,npe_xloc,&
     nx1,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
@@ -312,8 +358,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    if (file_griglia && aladyn_version == 1) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
-    else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+    header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
   else if (aladyn_version == 4) {
     /*
