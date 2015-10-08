@@ -23,6 +23,7 @@ Parametri::Parametri()
   fattore_ricampionamento = 0;
   endianness = 0;
   aladyn_version = 1;
+  fixed_aladyn_version = false;
   multifile = false;
   stretched_grid = true;
   stretched_along_x = 1;
@@ -265,11 +266,12 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     }
   }
 
-
-  aladyn_version = intpar[18];
-  // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
-  if (aladyn_version == -1) aladyn_version = 2;
-  if (aladyn_version == -2) aladyn_version = 3;
+  if (!fixed_aladyn_version) {
+	  aladyn_version = intpar[18];
+	  // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
+	  if (aladyn_version == -1) aladyn_version = 2;
+	  if (aladyn_version == -2) aladyn_version = 3;
+  }
 
   if (aladyn_version < 3) {
 	  /*
@@ -317,8 +319,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 	  if (file_griglia && aladyn_version == 1) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
 	  else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
-
-  if (aladyn_version == 3) {
+  else if (aladyn_version == 3) {
     /*
     int_par(1:20) = (/npe_loc,npe_zloc,npe_xloc,&
     nx1,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
@@ -941,16 +942,24 @@ void Parametri::parse_command_line(const int cl_argc, const char ** cl_argv)
       p[SWAP] = 0;
       p_b[SWAP] = false;
     }
-    else if (argv[i] == "-force_v2")
-    {
-      std::cout << "Forced using routines for aladyn v2" << std::endl;
-      aladyn_version = 2;
-    }
-    else if (argv[i] == "-force_v3")
+	else if (argv[i] == "-force_v1")
+	{
+		std::cout << "Forced using routines for aladyn v1" << std::endl;
+		aladyn_version = 1;
+		fixed_aladyn_version = true;
+	}
+	else if (argv[i] == "-force_v2")
+	{
+		std::cout << "Forced using routines for aladyn v2" << std::endl;
+		aladyn_version = 2;
+		fixed_aladyn_version = true;
+	}
+	else if (argv[i] == "-force_v3")
     {
       std::cout << "Forced using routines for aladyn v3" << std::endl;
       aladyn_version = 3;
-    }
+	  fixed_aladyn_version = true;
+	}
     else if (argv[i] == "-stop")
     {
       last_cpu = atoi(argv[i + 1].c_str());

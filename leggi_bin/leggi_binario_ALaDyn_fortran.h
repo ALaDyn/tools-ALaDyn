@@ -168,6 +168,7 @@ struct Parametri
   size_t nptot;
   int endianness;
   int aladyn_version;
+  bool fixed_aladyn_version;
   bool multifile;
   bool stretched_grid;  //nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
   int stretched_along_x;
