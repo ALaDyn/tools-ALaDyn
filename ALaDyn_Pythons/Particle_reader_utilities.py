@@ -24,7 +24,8 @@ def read_particle_phasespace(file_name):
 	Px=[]
 	Py=[]
 	Pz=[]
-	W=[] 
+	W=[]
+	Q=[]
 
 	while True:
 		try:
@@ -34,15 +35,17 @@ def read_particle_phasespace(file_name):
 			break
 		vars=[]
 		try:
-			for i in range(0,Np[0]):
-				vars=struct.unpack('fffffff', f.read(4*7))
-				X.append(vars[0])
-				Y.append(vars[1])
-				Z.append(vars[2])
-				Px.append(vars[3])
-				Py.append(vars[4])
-				Pz.append(vars[5])
-				W.append(vars[6])
+			pass
+ 			for i in range(0,Np[0]):
+ 				vars=struct.unpack('ffffffff', f.read(4*8))
+ 				X.append(vars[0])
+ 				Y.append(vars[1])
+ 				Z.append(vars[2])
+ 				Px.append(vars[3])
+ 				Py.append(vars[4])
+ 				Pz.append(vars[5])
+ 				W.append(vars[6])
+ 				Q.append(vars[7])
 		except:
 			pass
 	f.close()
