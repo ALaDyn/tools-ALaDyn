@@ -904,12 +904,17 @@ void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
 			aladyn_version = 2;
 			fixed_aladyn_version = true;
 		}
-		else if (argv[i] == "-force_v3") {
-			std::cout << "Forced using routines for aladyn v3" << std::endl;
-			aladyn_version = 3;
-			fixed_aladyn_version = true;
-		}
-	}
+    else if (argv[i] == "-force_v3") {
+      std::cout << "Forced using routines for aladyn v3" << std::endl;
+      aladyn_version = 3;
+      fixed_aladyn_version = true;
+    }
+    else if (argv[i] == "-force_v4") {
+      std::cout << "Forced using routines for aladyn v3" << std::endl;
+      aladyn_version = 4;
+      fixed_aladyn_version = true;
+    }
+  }
 }
 
 
