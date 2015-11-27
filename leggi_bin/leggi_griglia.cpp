@@ -1,9 +1,8 @@
-#ifndef __LEGGI_CAMPI_C
-#define __LEGGI_CAMPI_C
-#include "leggi_binario_ALaDyn_fortran.h"
+
+#include "leggi_griglia.h"
 
 
-int leggi_campi(Parametri * parametri)
+int leggi_griglia(Parametri * parametri)
 {
   std::ostringstream nomefile_bin;
   float taglio;
@@ -718,6 +717,4 @@ int leggi_campi(Parametri * parametri)
   return 0;
 
 }
-
-#endif
 

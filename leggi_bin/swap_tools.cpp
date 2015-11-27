@@ -1,7 +1,5 @@
-#ifndef __SWAP_TOOLS_C
-#define __SWAP_TOOLS_C
 
-#include "leggi_binario_ALaDyn_fortran.h"
+#include "swap_tools.h"
 
 
 int is_big_endian()
@@ -152,6 +150,3 @@ void swap_endian_f(float*** in_f, size_t size_x, size_t size_y, size_t size_z)
 }
 
 
-
-
-#endif

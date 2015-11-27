@@ -1,8 +1,6 @@
-#ifndef __BINNING_C
-#define __BINNING_C
 
 #include "leggi_binario_ALaDyn_fortran.h"
-
+#include "swap_tools.h"
 
 
 /* costruttore default - inizializza a zero per ora. Siccome tutto e' inizializzato a zero
@@ -910,7 +908,7 @@ void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
       fixed_aladyn_version = true;
     }
     else if (argv[i] == "-force_v4") {
-      std::cout << "Forced using routines for aladyn v3" << std::endl;
+      std::cout << "Forced using routines for aladyn v4" << std::endl;
       aladyn_version = 4;
       fixed_aladyn_version = true;
     }
@@ -2853,6 +2851,3 @@ void Parametri::organizza_minimi_massimi()
   massimi[13] = chmax;
 }
 
-
-
-#endif

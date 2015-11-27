@@ -1,35 +1,5 @@
-#ifndef __LEGGI_PARTICELLE_C
-#define __LEGGI_PARTICELLE_C
 
-#include "leggi_binario_ALaDyn_fortran.h"
-
-#define MAX_NUM_OF_PARTICLES_PER_SHOT 10000000      // in realta' il numero massimo che viene caricato in memoria e' il doppio di questo -1
-
-
-class Particella_v1 {
-  double x, y, z;
-  double px, py, pz;
-};
-class Particella_v2 {
-  double x, y, z;
-  double px, py, pz;
-  double weight;
-};
-class Particella_v3 {
-  double x, y, z;
-  double px, py, pz;
-  float weight;
-  int charge;
-};
-union Particella_vX {
-  Particella_v1 particella_v1;
-  Particella_v2 particella_v2;
-  Particella_v3 particella_v3;
-};
-union double_as_two_float {
-  double d;
-  float f[2]; //f[0] = peso, f[1] = carica
-};
+#include "leggi_particelle.h"
 
 
 int leggi_particelle(Parametri * parametri)
@@ -1162,5 +1132,3 @@ int leggi_particelle(Parametri * parametri)
   return 0;
 }
 
-
-#endif

@@ -24,9 +24,6 @@
     <ClCompile Include="leggi_binario_ALaDyn_fortran.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="leggi_campi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="leggi_particelle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,10 +33,37 @@
     <ClCompile Include="swap_tools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="leggi_griglia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scrittura.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="leggi_binario_ALaDyn_fortran.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="filtro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="binnaggio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scrittura.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="swap_tools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="leggi_particelle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="leggi_griglia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

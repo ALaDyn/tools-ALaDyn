@@ -1,6 +1,5 @@
-# ifndef __FILTRO_CPP
-# define __FILTRO_CPP
-# include "leggi_binario_ALaDyn_fortran.h"
+
+#include "filtro.h"
 
 /*
 _Filtro
@@ -474,5 +473,3 @@ void _Filtro::individua_filtro(char *b, float v, float *& V)
 
 unsigned int _Filtro::maschera_interna = 0;
 
-
-# endif

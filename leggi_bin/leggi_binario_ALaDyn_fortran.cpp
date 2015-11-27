@@ -1,6 +1,7 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
-
+#include "leggi_particelle.h"
+#include "leggi_griglia.h"
 
 
 int main(const int argc, const char *argv[])
@@ -171,7 +172,7 @@ int main(const int argc, const char *argv[])
 #endif
 
 
-  if (parametri.file_griglia)         leggi_campi(&parametri);
+  if (parametri.file_griglia)         leggi_griglia(&parametri);
   else if (parametri.file_spaziofasi) leggi_particelle(&parametri);
   else printf("Unuseful file\n");
   fflush(stdout);

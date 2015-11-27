@@ -67,15 +67,32 @@
     <ClCompile Include="binnaggio.cpp" />
     <ClCompile Include="filtro.cpp" />
     <ClCompile Include="leggi_binario_ALaDyn_fortran.cpp" />
-    <ClCompile Include="leggi_campi.cpp" />
+    <ClCompile Include="leggi_griglia.cpp" />
     <ClCompile Include="leggi_particelle.cpp" />
     <ClCompile Include="parametri.cpp" />
+    <ClCompile Include="scrittura.cpp" />
     <ClCompile Include="swap_tools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="binnaggio.h" />
+    <ClInclude Include="filtro.h" />
     <ClInclude Include="leggi_binario_ALaDyn_fortran.h" />
+    <ClInclude Include="leggi_griglia.h" />
+    <ClInclude Include="leggi_particelle.h" />
+    <ClInclude Include="scrittura.h" />
+    <ClInclude Include="swap_tools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\boost.1.59.0.0\build\native\boost.targets" Condition="Exists('..\packages\boost.1.59.0.0\build\native\boost.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Questo progetto fa riferimento a uno o più pacchetti NuGet che non sono presenti in questo computer. Usare lo strumento di ripristino dei pacchetti NuGet per scaricarli. Per altre informazioni, vedere http://go.microsoft.com/fwlink/?LinkID=322105. Il file mancante è {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\boost.1.59.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.59.0.0\build\native\boost.targets'))" />
+  </Target>
 </Project>
