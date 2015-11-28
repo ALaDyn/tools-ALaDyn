@@ -60,9 +60,9 @@ int leggi_griglia(Parametri * parametri)
       {
         for (unsigned int ipy = 0; ipy < parametri->ncpu_y; ipy++)
         {
-          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          if (parametri->aladyn_version == 1 || parametri->aladyn_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
           fread_size += sizeof(int)*std::fread(header, sizeof(int), header_size, file_in);
-          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          if (parametri->aladyn_version == 1 || parametri->aladyn_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
@@ -76,9 +76,9 @@ int leggi_griglia(Parametri * parametri)
           fflush(stdout);
 
           buffer = new float[header[0] * header[1] * header[2]];
-          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          if (parametri->aladyn_version == 1 || parametri->aladyn_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
           fread_size += sizeof(float)*std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
-          if (parametri->aladyn_version == 1) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          if (parametri->aladyn_version == 1 || parametri->aladyn_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
           if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
 
