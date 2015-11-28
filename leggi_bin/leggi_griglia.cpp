@@ -66,12 +66,11 @@ int leggi_griglia(Parametri * parametri)
 
           if (parametri->p[SWAP]) swap_endian_i(header, header_size);
 
-#ifdef ENABLE_DEBUG
           if (header[0] != parametri->npx_ricampionati_per_cpu ||
             header[1] != parametri->npy_ricampionati_per_cpu ||
             header[2] != parametri->npz_ricampionati_per_cpu)
             std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
-#endif
+
           printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
           fflush(stdout);
 
@@ -80,7 +79,7 @@ int leggi_griglia(Parametri * parametri)
           fread_size += sizeof(float)*std::fread(buffer, sizeof(float), header[0] * header[1] * header[2], file_in);
           if (parametri->aladyn_version == 1 || parametri->aladyn_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
-          if (parametri->p[SWAP]) swap_endian_f(buffer, parametri->npx_ricampionati_per_cpu*parametri->npy_ricampionati_per_cpu*parametri->npz_ricampionati_per_cpu);
+          if (parametri->p[SWAP]) swap_endian_f(buffer, header[0] * header[1] * header[2]);
 
           for (size_t k = 0; k < header[2]; k++)
             for (size_t j = 0; j < header[1]; j++)

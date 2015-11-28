@@ -265,54 +265,54 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
 
   if (!fixed_aladyn_version) {
-	  aladyn_version = intpar[18];
-	  // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
-	  if (aladyn_version == -1) aladyn_version = 2;
-	  if (aladyn_version == -2) aladyn_version = 3;
+    aladyn_version = intpar[18];
+    // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
+    if (aladyn_version == -1) aladyn_version = 2;
+    if (aladyn_version == -2) aladyn_version = 3;
   }
 
   if (aladyn_version == 1) {
-	  /*
-	  int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
-	  model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
-	  LPf_ord,der_ord,ns_ind,i_end/)
-	  --------------------
-	  real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-	  n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-	  gam0,nb_over_np,b_charge,vbeam/)
-	  */
-	  ncpu_y = intpar[0];
-	  ncpu_z = intpar[1];
-	  ncpu_x = 1;
-	  ncpu = ncpu_x * ncpu_y * ncpu_z;
-	  npx = intpar[2];
-	  npx_ricampionati = intpar[3];
-	  npx_per_cpu = npx / ncpu_x;
-	  fattore_ricampionamento = (int) (npx / npx_ricampionati);
-	  npy_ricampionati = intpar[4];
-	  npy_per_cpu = intpar[5];
-	  npy = npy_ricampionati * fattore_ricampionamento;
-	  npz_ricampionati = intpar[6];
-	  npz_per_cpu = intpar[7];
-	  npz = npz_ricampionati * fattore_ricampionamento;
-	  npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-	  npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
-	  npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
+    /*
+    int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
+    model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
+    LPf_ord,der_ord,ns_ind,i_end/)
+    --------------------
+    real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+    n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+    gam0,nb_over_np,b_charge,vbeam/)
+    */
+    ncpu_y = intpar[0];
+    ncpu_z = intpar[1];
+    ncpu_x = 1;
+    ncpu = ncpu_x * ncpu_y * ncpu_z;
+    npx = intpar[2];
+    npx_ricampionati = intpar[3];
+    npx_per_cpu = npx / ncpu_x;
+    fattore_ricampionamento = (int)(npx / npx_ricampionati);
+    npy_ricampionati = intpar[4];
+    npy_per_cpu = intpar[5];
+    npy = npy_ricampionati * fattore_ricampionamento;
+    npz_ricampionati = intpar[6];
+    npz_per_cpu = intpar[7];
+    npz = npz_ricampionati * fattore_ricampionamento;
+    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+    npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
+    npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
 
-	  nptot = (long long int) intpar[16];
-	  ndv = intpar[17];
-	  endianness = intpar[19];
+    nptot = (long long int) intpar[16];
+    ndv = intpar[17];
+    endianness = intpar[19];
 
-	  tnow = realpar[0];
-	  xmin = realpar[1];
-	  xmax = realpar[2];
-	  ymin = realpar[3];
-	  ymax = realpar[4];
-	  zmin = realpar[5];
-	  zmax = realpar[6];
+    tnow = realpar[0];
+    xmin = realpar[1];
+    xmax = realpar[2];
+    ymin = realpar[3];
+    ymax = realpar[4];
+    zmin = realpar[5];
+    zmax = realpar[6];
 
-	  if (file_griglia) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
-	  else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+    if (file_griglia) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
+    else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
   else if (aladyn_version == 2) {
     /*
@@ -330,18 +330,25 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ncpu_x = intpar[2];
     ncpu = ncpu_x * ncpu_y * ncpu_z;
     npx_ricampionati = intpar[3];
-    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+
     npy_ricampionati = intpar[4];
-    npy_ricampionati_per_cpu = intpar[5];
+    npy_per_cpu = intpar[5];
+    
     npz_ricampionati = intpar[6];
-    npz_ricampionati_per_cpu = intpar[7];
+    npz_per_cpu = intpar[7];
+
     fattore_ricampionamento = intpar[8];
+    
+    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+    npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
+    npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
+
     npx = npx_ricampionati * fattore_ricampionamento;
     npy = npy_ricampionati * fattore_ricampionamento;
     npz = npz_ricampionati * fattore_ricampionamento;
+
     npx_per_cpu = npx / ncpu_x;
-    npy_per_cpu = npy / ncpu_y;
-    npz_per_cpu = npz / ncpu_z;
+    
     nptot = (long long int) intpar[16];
     ndv = intpar[17];
     endianness = intpar[19];
@@ -354,7 +361,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    
+
     if (file_griglia) header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams*sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
     else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
@@ -530,7 +537,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
   endian_file = (endianness - 1);
 
-}
+  }
 
 
 
@@ -927,21 +934,21 @@ void Parametri::check_filename(const char *nomefile)
 
 void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
 {
-	argc = cl_argc;
-	argv = new std::string[argc];
-	for (int i = 0; i < argc; i++) argv[i] = std::string(cl_argv[i]);
+  argc = cl_argc;
+  argv = new std::string[argc];
+  for (int i = 0; i < argc; i++) argv[i] = std::string(cl_argv[i]);
 
-	for (int i = 2; i < argc; i++) {
-		if (argv[i] == "-force_v1") {
-			std::cout << "Forced using routines for aladyn v1" << std::endl;
-			aladyn_version = 1;
-			fixed_aladyn_version = true;
-		}
-		else if (argv[i] == "-force_v2") {
-			std::cout << "Forced using routines for aladyn v2" << std::endl;
-			aladyn_version = 2;
-			fixed_aladyn_version = true;
-		}
+  for (int i = 2; i < argc; i++) {
+    if (argv[i] == "-force_v1") {
+      std::cout << "Forced using routines for aladyn v1" << std::endl;
+      aladyn_version = 1;
+      fixed_aladyn_version = true;
+    }
+    else if (argv[i] == "-force_v2") {
+      std::cout << "Forced using routines for aladyn v2" << std::endl;
+      aladyn_version = 2;
+      fixed_aladyn_version = true;
+    }
     else if (argv[i] == "-force_v3") {
       std::cout << "Forced using routines for aladyn v3" << std::endl;
       aladyn_version = 3;
