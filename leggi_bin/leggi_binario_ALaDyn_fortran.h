@@ -12,7 +12,7 @@
 
 #define MAJOR_RELEASE  6
 #define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 0
+#define BUGFIX_RELEASE 1
 
 #include <iostream>
 #include <vector>
@@ -121,45 +121,6 @@ per i dump dei dati su griglia qui invece memorizziamo quanti sono i punti (rica
 #define ALTRI_PARAMETRI           8                   // gamma, theta, thetaT, E, ty, tz, w, ch
 
 #define FORCE_PRINTF_BUFFER_SIZE  1024
-
-// definizione numero filtri "abilitati"
-# ifndef NUM_FILTRI
-# define NUM_FILTRI               26
-# endif
-
-# define __0X00                   0x1
-# define __0X01                   0x2
-# define __0X02                   0x4
-# define __0X03                   0x8
-# define __0X04                   0x10
-# define __0X05                   0x20
-# define __0X06                   0x40
-# define __0X07                   0x80
-# define __0X08                   0x100
-# define __0X09                   0x200
-# define __0X10                   0x400
-# define __0X11                   0x800
-# define __0X12                   0x1000
-# define __0X13                   0x2000
-# define __0X14                   0x4000
-# define __0X15                   0x8000
-# define __0X16                   0x10000
-# define __0X17                   0x20000
-# define __0X18                   0x40000
-# define __0X19                   0x80000
-# define __0X20                   0x100000
-# define __0X21                   0x200000
-# define __0X22                   0x400000
-# define __0X23                   0x800000
-# define __0X24                   0x1000000
-# define __0X25                   0x2000000
-// fine filtri in uso, i prossimi sono codici liberi
-# define __0X26                   0x4000000
-# define __0X27                   0x8000000
-# define __0X28                   0x10000000
-# define __0X29                   0x20000000
-# define __0X30                   0x40000000
-# define __0X31                   0x80000000
 
 
 struct Parametri
