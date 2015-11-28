@@ -78,7 +78,7 @@ int main(const int argc, const char *argv[])
   file_dat.open(nomefile_dat.str().c_str());
   if (file_dat.fail())
   {
-    parametri.aladyn_version = 1;
+    parametri.file_version = 1;
     std::cout << "Unable to find " << parametri.filebasename << ".dat, using routines for aladyn v1" << std::endl;
 
     if (parametri.p_b[SWAP]) parametri.chiedi_endian_file();

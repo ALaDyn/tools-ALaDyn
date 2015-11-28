@@ -325,7 +325,7 @@ int leggi_particelle(Parametri * parametri)
       /*skip header*/
       std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
 
-      if (parametri->aladyn_version == 1)
+      if (parametri->file_version == 1)
       {
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
@@ -394,7 +394,7 @@ int leggi_particelle(Parametri * parametri)
           particelle = new float[npart_loc*parametri->ndv];
           //  particelle=(float*)malloc(npart_loc*ndv*sizeof(float));
           //  printf("Reading file %s.bin \n",parametri->filebasename);
-          if (parametri->aladyn_version == 1)
+          if (parametri->file_version == 1)
           {
             fread_size = std::fread(buffshort, sizeof(short), 2, file_in);
             fread_size = std::fread(particelle, sizeof(float), npart_loc*parametri->ndv, file_in);
@@ -427,7 +427,7 @@ int leggi_particelle(Parametri * parametri)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+            if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
             {
               x = *(particelle + i*parametri->ndv);
               y = *(particelle + i*parametri->ndv + 1);
@@ -443,12 +443,12 @@ int leggi_particelle(Parametri * parametri)
                 w = *(particelle + i*parametri->ndv + 6);
               else
                 w = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+              if (parametri->file_version == 3 && !parametri->overwrite_charge)
                 ch = *(particelle + i*parametri->ndv + 7);
               else
                 ch = parametri->overwrite_charge_value;
             }
-            else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+            else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
             {
               x = *(particelle + i*parametri->ndv);
               y = *(particelle + i*parametri->ndv + 1);
@@ -463,7 +463,7 @@ int leggi_particelle(Parametri * parametri)
                 w = *(particelle + i*parametri->ndv + 4);
               else
                 w = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+              if (parametri->file_version == 3 && !parametri->overwrite_charge)
                 ch = *(particelle + i*parametri->ndv + 5);
               else
                 ch = parametri->overwrite_charge_value;
@@ -493,7 +493,7 @@ int leggi_particelle(Parametri * parametri)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+            if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
             {
               x = *(particelle + i*parametri->ndv);
               y = *(particelle + i*parametri->ndv + 1);
@@ -505,7 +505,7 @@ int leggi_particelle(Parametri * parametri)
                 w = *(particelle + i*parametri->ndv + 6);
               else
                 w = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+              if (parametri->file_version == 3 && !parametri->overwrite_charge)
                 ch = *(particelle + i*parametri->ndv + 7);
               else
                 ch = parametri->overwrite_charge_value;
@@ -552,7 +552,7 @@ int leggi_particelle(Parametri * parametri)
               if (ch < estremi_min[13]) estremi_min[13] = ch;
               if (ch > estremi_max[13]) estremi_max[13] = ch;
             }
-            else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+            else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
             {
               x = *(particelle + i*parametri->ndv);
               y = *(particelle + i*parametri->ndv + 1);
@@ -562,7 +562,7 @@ int leggi_particelle(Parametri * parametri)
                 w = *(particelle + i*parametri->ndv + 4);
               else
                 w = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+              if (parametri->file_version == 3 && !parametri->overwrite_charge)
                 ch = *(particelle + i*parametri->ndv + 5);
               else
                 ch = parametri->overwrite_charge_value;
@@ -630,7 +630,7 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_PROPAGA])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -644,7 +644,7 @@ int leggi_particelle(Parametri * parametri)
                 w = particelle[i*parametri->ndv + 6];
               else
                 w = parametri->overwrite_weight_value;
-              //if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+              //if (parametri->file_version == 3 && !parametri->overwrite_charge)
               //  ch = particelle[i*parametri->ndv + 7];
               //else
               //  ch = parametri->overwrite_charge_value;
@@ -655,7 +655,7 @@ int leggi_particelle(Parametri * parametri)
               }
             }
           }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -667,7 +667,7 @@ int leggi_particelle(Parametri * parametri)
                 w = particelle[i*parametri->ndv + 4];
               else
                 w = parametri->overwrite_weight_value;
-              //if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+              //if (parametri->file_version == 3 && !parametri->overwrite_charge)
               //  ch = particelle[i*parametri->ndv + 5];
               //else
               //  ch = parametri->overwrite_charge_value;
@@ -684,7 +684,7 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_XYZE])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -699,7 +699,7 @@ int leggi_particelle(Parametri * parametri)
               if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e %e\n", x, y, z, E);
             }
           }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -718,7 +718,7 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_CSV])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -730,12 +730,12 @@ int leggi_particelle(Parametri * parametri)
               pz = particelle[i*parametri->ndv + 5];
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 6];
               else w = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 7];
+              if (parametri->file_version == 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 7];
               else ch = parametri->overwrite_charge_value;
               if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
             }
           }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -745,7 +745,7 @@ int leggi_particelle(Parametri * parametri)
               pz = particelle[i*parametri->ndv + 3];
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 4];
               else w = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 5];
+              if (parametri->file_version == 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 5];
               else ch = parametri->overwrite_charge_value;
               if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, 0, %e, %e, 0, %e, %e, %e\n", x, z, px, pz, w, ch);
             }
@@ -756,7 +756,7 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_CLEAN_BINARY])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -768,13 +768,13 @@ int leggi_particelle(Parametri * parametri)
               array_supporto8[5] = particelle[i*parametri->ndv + 5];
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto8[6] = particelle[i*parametri->ndv + 6];
               else array_supporto8[6] = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 7];
+              if (parametri->file_version == 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 7];
               else array_supporto8[7] = parametri->overwrite_charge_value;
 
               if (i % parametri->subsample == 0) fwrite((void*)(array_supporto8), sizeof(float), 8, binary_clean);
             }
           }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -784,7 +784,7 @@ int leggi_particelle(Parametri * parametri)
               array_supporto6[3] = particelle[i*parametri->ndv + 3];
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto6[4] = particelle[i*parametri->ndv + 4];
               else array_supporto6[4] = parametri->overwrite_weight_value;
-              if (parametri->aladyn_version == 3 && !parametri->overwrite_charge) array_supporto6[5] = particelle[i*parametri->ndv + 5];
+              if (parametri->file_version == 3 && !parametri->overwrite_charge) array_supporto6[5] = particelle[i*parametri->ndv + 5];
               else array_supporto6[5] = parametri->overwrite_charge_value;
 
               if (i % parametri->subsample == 0) fwrite((void*)(array_supporto6), sizeof(float), 6, binary_clean);
@@ -801,10 +801,10 @@ int leggi_particelle(Parametri * parametri)
           }
           int weight_index, charge_index;
 
-          if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->aladyn_version < 3) || (parametri->ndv == 6 && parametri->aladyn_version == 3))
+          if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version == 3))
           {
             weight_index = 4;
-            if (parametri->aladyn_version == 3) charge_index = 5;
+            if (parametri->file_version == 3) charge_index = 5;
             else charge_index = 0;
             // scrittura coordinate x, y, z
             fseeko(binary_vtk, contatori[0] + particelle_accumulate*sizeof(float) * 3, SEEK_SET);
@@ -823,10 +823,10 @@ int leggi_particelle(Parametri * parametri)
             }
           }
 
-          else if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->aladyn_version < 3) || (parametri->ndv == 8 && parametri->aladyn_version == 3))
+          else if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version == 3))
           {
             weight_index = 6;
-            if (parametri->aladyn_version == 3) charge_index = 7;
+            if (parametri->file_version == 3) charge_index = 7;
             else charge_index = 0;
             // scrittura coordinate x, y, z
             fseeko(binary_vtk, contatori[0] + particelle_accumulate*sizeof(float) * 3, SEEK_SET);
@@ -857,14 +857,14 @@ int leggi_particelle(Parametri * parametri)
               fwrite((void*)(&(parametri->overwrite_weight_value)), sizeof(float), 1, binary_vtk);
           }
 
-          if (parametri->aladyn_version == 3 && !parametri->overwrite_charge)
+          if (parametri->file_version == 3 && !parametri->overwrite_charge)
           {
             // scrittura pesi
             fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3 + contatori[2] + particelle_accumulate*sizeof(float), SEEK_SET);
             for (unsigned int i = charge_index; i < val[0]; i += parametri->ndv)
               fwrite((void*)(particelle + i), sizeof(float), 1, binary_vtk);
           }
-          else if (parametri->aladyn_version == 3 && parametri->overwrite_charge)
+          else if (parametri->file_version == 3 && parametri->overwrite_charge)
           {
             // scrittura pesi sovrascritti da linea comando
             fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3 + contatori[2] + particelle_accumulate*sizeof(float), SEEK_SET);

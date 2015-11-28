@@ -20,7 +20,7 @@ Parametri::Parametri()
   npx_ricampionati = npy_ricampionati = npz_ricampionati = npx_ricampionati_per_cpu = npy_ricampionati_per_cpu = npz_ricampionati_per_cpu = 0;
   fattore_ricampionamento = 0;
   endianness = 0;
-  aladyn_version = 1;
+  file_version = 1;
   fixed_aladyn_version = false;
   multifile = false;
   stretched_grid = true;
@@ -206,7 +206,7 @@ void Parametri::leggi_parametri_da_file_bin(const char * filename)
   npz_ricampionati_per_cpu = intpar[7];
   nptot = (long long int) intpar[16];
   ndv = intpar[17];
-  aladyn_version = intpar[18];
+  file_version = intpar[18];
   endianness = intpar[19];
   tnow = realpar[0];  //tempo dell'output
   xmin = realpar[1];  //estremi della griglia
@@ -265,44 +265,49 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
 
   if (!fixed_aladyn_version) {
-    aladyn_version = intpar[18];
+    file_version = intpar[18];
     // compatibility fixes (sometimes aladyn versions were defined as negatives with this convention)
-    if (aladyn_version == -1) aladyn_version = 2;
-    if (aladyn_version == -2) aladyn_version = 3;
+    if (file_version == -1) file_version = 2;
+    if (file_version == -2) file_version = 3;
   }
 
-  if (aladyn_version == 1) {
-    /*
-    int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
-    model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
-    LPf_ord,der_ord,ns_ind,i_end/)
-    --------------------
-    real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-    n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-    gam0,nb_over_np,b_charge,vbeam/)
-    */
-    ncpu_y = intpar[0];
-    ncpu_z = intpar[1];
-    ncpu_x = 1;
-    ncpu = ncpu_x * ncpu_y * ncpu_z;
-    npx = intpar[2];
-    npx_ricampionati = intpar[3];
-    npx_per_cpu = npx / ncpu_x;
-    fattore_ricampionamento = (int)(npx / npx_ricampionati);
-    npy_ricampionati = intpar[4];
-    npy_per_cpu = intpar[5];
-    npy = npy_ricampionati * fattore_ricampionamento;
-    npz_ricampionati = intpar[6];
-    npz_per_cpu = intpar[7];
-    npz = npz_ricampionati * fattore_ricampionamento;
-    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-    npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
-    npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
+  if (file_version == 1) {
+    if (file_griglia) {
+      /*
+      int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
+      model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
+      LPf_ord,der_ord,ns_ind,i_end/)
 
-    nptot = (long long int) intpar[16];
-    ndv = intpar[17];
+      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+      gam0,nb_over_np,b_charge,vbeam/)
+      */
+      ncpu_y = intpar[0];
+      ncpu_z = intpar[1];
+      ncpu_x = 1;
+      ncpu = ncpu_x * ncpu_y * ncpu_z;
+      npx = intpar[2];
+      npx_ricampionati = intpar[3];
+      npx_per_cpu = npx / ncpu_x;
+      fattore_ricampionamento = (int)(npx / npx_ricampionati);
+      npy_ricampionati = intpar[4];
+      npy_per_cpu = intpar[5];
+      npy = npy_ricampionati * fattore_ricampionamento;
+      npz_ricampionati = intpar[6];
+      npz_per_cpu = intpar[7];
+      npz = npz_ricampionati * fattore_ricampionamento;
+      npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+      npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
+      npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
+    }
+    else {
+      nptot = (long long int) intpar[16];
+      ndv = intpar[17];
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+    }
+
     endianness = intpar[19];
-
     tnow = realpar[0];
     xmin = realpar[1];
     xmax = realpar[2];
@@ -310,49 +315,46 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ymax = realpar[4];
     zmin = realpar[5];
     zmax = realpar[6];
-
-    if (file_griglia) header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
-    else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
-  else if (aladyn_version == 2) {
-    /*
-    real_par(1:20) = (/ tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0_x, w0_y, &
-    n_over_nc, a0, lam0, E0, ompe, targ_in, targ_end, &
-    gam0, nb_over_np, b_charge, vbeam / )
+  else if (file_version == 2) {
+    if (file_griglia) {
+      /*
+      real_par(1:20) = (/ tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0_x, w0_y, &
+      n_over_nc, a0, lam0, E0, ompe, targ_in, targ_end, &
+      gam0, nb_over_np, b_charge, vbeam / )
+  
+      int_par(1:20) = (/ npe_yloc, npe_zloc, npe_xloc, &
+      nx1, ny1, loc_nyc_max, nz1, loc_nzc_max, jump, iby, iform, &
+      model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
+      LPf_ord, der_ord, ns_ind, i_end / )
+      */
+      ncpu_y = intpar[0];
+      ncpu_z = intpar[1];
+      ncpu_x = intpar[2];
+      ncpu = ncpu_x * ncpu_y * ncpu_z;
+      npx_ricampionati = intpar[3];
+      npy_ricampionati = intpar[4];
+      npy_per_cpu = intpar[5];
+      npz_ricampionati = intpar[6];
+      npz_per_cpu = intpar[7];
+      fattore_ricampionamento = intpar[8];
+      npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+      npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
+      npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
+      npx = npx_ricampionati * fattore_ricampionamento;
+      npy = npy_ricampionati * fattore_ricampionamento;
+      npz = npz_ricampionati * fattore_ricampionamento;
+      npx_per_cpu = npx / ncpu_x;
+      header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams*sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
+    }
 
-    int_par(1:20) = (/ npe_yloc, npe_zloc, npe_xloc, &
-    nx1, ny1, loc_nyc_max, nz1, loc_nzc_max, jump, iby, iform, &
-    model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
-    LPf_ord, der_ord, ns_ind, i_end / )
-    */
-    ncpu_y = intpar[0];
-    ncpu_z = intpar[1];
-    ncpu_x = intpar[2];
-    ncpu = ncpu_x * ncpu_y * ncpu_z;
-    npx_ricampionati = intpar[3];
+    else {
+      nptot = (long long int) intpar[16];
+      ndv = intpar[17];
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+    }
 
-    npy_ricampionati = intpar[4];
-    npy_per_cpu = intpar[5];
-    
-    npz_ricampionati = intpar[6];
-    npz_per_cpu = intpar[7];
-
-    fattore_ricampionamento = intpar[8];
-    
-    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-    npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
-    npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
-
-    npx = npx_ricampionati * fattore_ricampionamento;
-    npy = npy_ricampionati * fattore_ricampionamento;
-    npz = npz_ricampionati * fattore_ricampionamento;
-
-    npx_per_cpu = npx / ncpu_x;
-    
-    nptot = (long long int) intpar[16];
-    ndv = intpar[17];
     endianness = intpar[19];
-
     tnow = realpar[0];
     xmin = realpar[1];
     xmax = realpar[2];
@@ -360,85 +362,91 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ymax = realpar[4];
     zmin = realpar[5];
     zmax = realpar[6];
-
-
-    if (file_griglia) header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams*sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
-    else header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
   }
-  else if (aladyn_version == 3) {
-    /*
-    int_par(1:20) = (/npe_loc,npe_zloc,npe_xloc,&
-    nx1,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
-    model_id,dmodel_id,nsp,curr_ndim,mp_per_cell(1),&
-    LPf_ord,der_ord,aladyn_version,i_end/)
-    --------------------
-    real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-    n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-    gam0,nb_over_np,b_charge,vbeam/)
-   */
-    ncpu_y = intpar[0];
-    ncpu_z = intpar[1];
-    ncpu_x = intpar[2];
-    ncpu = ncpu_x * ncpu_y * ncpu_z;
-    npx_ricampionati = intpar[3];
-    npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-    npy_ricampionati = intpar[4];
-    npy_ricampionati_per_cpu = intpar[5];
-    npz_ricampionati = intpar[6];
-    npz_ricampionati_per_cpu = intpar[7];
-    fattore_ricampionamento = intpar[8];
-    npx = npx_ricampionati * fattore_ricampionamento;
-    npy = npy_ricampionati * fattore_ricampionamento;
-    npz = npz_ricampionati * fattore_ricampionamento;
-    npx_per_cpu = npx / ncpu_x;
-    npy_per_cpu = npy / ncpu_y;
-    npz_per_cpu = npz / ncpu_z;
-    nptot = (long long int) intpar[16];
-    ndv = intpar[17];
-    endianness = intpar[19];
-
-    tnow = realpar[0];
-    xmin = realpar[1];
-    xmax = realpar[2];
-    ymin = realpar[3];
-    ymax = realpar[4];
-    zmin = realpar[5];
-    zmax = realpar[6];
+  else if (file_version == 3) {
+    if (file_griglia) {
+      /*
+      int_par(1:20) = (/npe_loc,npe_zloc,npe_xloc,&
+      nx1,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
+      model_id,dmodel_id,nsp,curr_ndim,mp_per_cell(1),&
+      LPf_ord,der_ord,file_version,i_end/)
+      --------------------
+      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+      gam0,nb_over_np,b_charge,vbeam/)
+      */
+      ncpu_y = intpar[0];
+      ncpu_z = intpar[1];
+      ncpu_x = intpar[2];
+      ncpu = ncpu_x * ncpu_y * ncpu_z;
+      npx_ricampionati = intpar[3];
+      npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
+      npy_ricampionati = intpar[4];
+      npy_ricampionati_per_cpu = intpar[5];
+      npz_ricampionati = intpar[6];
+      npz_ricampionati_per_cpu = intpar[7];
+      fattore_ricampionamento = intpar[8];
+      npx = npx_ricampionati * fattore_ricampionamento;
+      npy = npy_ricampionati * fattore_ricampionamento;
+      npz = npz_ricampionati * fattore_ricampionamento;
+      npx_per_cpu = npx / ncpu_x;
+      npy_per_cpu = npy / ncpu_y;
+      npz_per_cpu = npz / ncpu_z;
+    }
+    else {
+      nptot = (long long int) intpar[16];
+      ndv = intpar[17];
+    }
 
     header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
-  }
-  else if (aladyn_version == 4) {
-    /*
-    int_par(1:20) = (/ npe_loc, npe_zloc, npe_xloc, nx1, ny1, nz1, &
-    jump, ibx, iby, iform, pid, &
-    model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
-    nptot, ndv, aladyn_version, i_end / )
-    --------------------
-    real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-    n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-    gam0,nb_over_np,b_charge,vbeam/)
-    */
+    endianness = intpar[19];
+    tnow = realpar[0];
+    xmin = realpar[1];
+    xmax = realpar[2];
+    ymin = realpar[3];
+    ymax = realpar[4];
+    zmin = realpar[5];
+    zmax = realpar[6];
 
-    /*npe_xloc*/ ncpu_x = intpar[2];
-    /*npe_loc*/  ncpu_y = intpar[0];
-    /*npe_zloc*/ ncpu_z = intpar[1];
-    /**/         ncpu = ncpu_x * ncpu_y * ncpu_z;
-    /*nx1*/      npx_per_cpu = intpar[3];
-    /*jump*/     fattore_ricampionamento = intpar[6];
-    /**/         npx_ricampionati_per_cpu = npx_per_cpu / fattore_ricampionamento;
-    /*ny1*/      npy_per_cpu = intpar[4];
-    /**/         npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
-    /*nz1*/      npz_per_cpu = intpar[5];
-    /**/         npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
-    /**/         npx = npx_per_cpu * ncpu_x;
-    /**/         npy = npy_per_cpu * ncpu_y;
-    /**/         npz = npz_per_cpu * ncpu_z;
-    /**/         npx_ricampionati = npx_ricampionati_per_cpu * ncpu_x;
-    /**/         npy_ricampionati = npy_ricampionati_per_cpu * ncpu_y;
-    /**/         npz_ricampionati = npz_ricampionati_per_cpu * ncpu_z;
-    /*nptot*/    nptot = (long long int) intpar[16];
-    /*ndv*/      ndv = intpar[17];
-    /*i_end*/    endianness = intpar[19];
+  }
+  else if (file_version == 4) {
+    if (file_griglia) {
+
+      /*
+      int_par(1:20) = (/ npe_loc, npe_zloc, npe_xloc, nx1, ny1, nz1, &
+      jump, ibx, iby, iform, pid, &
+      model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
+      nptot, ndv, file_version, i_end / )
+      --------------------
+      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+      gam0,nb_over_np,b_charge,vbeam/)
+      */
+
+      /*npe_xloc*/ ncpu_x = intpar[2];
+      /*npe_loc*/  ncpu_y = intpar[0];
+      /*npe_zloc*/ ncpu_z = intpar[1];
+      /**/         ncpu = ncpu_x * ncpu_y * ncpu_z;
+      /*nx1*/      npx_per_cpu = intpar[3];
+      /*jump*/     fattore_ricampionamento = intpar[6];
+      /**/         npx_ricampionati_per_cpu = npx_per_cpu / fattore_ricampionamento;
+      /*ny1*/      npy_per_cpu = intpar[4];
+      /**/         npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
+      /*nz1*/      npz_per_cpu = intpar[5];
+      /**/         npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
+      /**/         npx = npx_per_cpu * ncpu_x;
+      /**/         npy = npy_per_cpu * ncpu_y;
+      /**/         npz = npz_per_cpu * ncpu_z;
+      /**/         npx_ricampionati = npx_ricampionati_per_cpu * ncpu_x;
+      /**/         npy_ricampionati = npy_ricampionati_per_cpu * ncpu_y;
+      /**/         npz_ricampionati = npz_ricampionati_per_cpu * ncpu_z;
+    }
+    else {
+      nptot = (long long int) intpar[16];
+      ndv = intpar[17];
+    }
+
+    endianness = intpar[19];
 
     tnow = realpar[0];
     xmin = realpar[1];
@@ -456,7 +464,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 
 
   if (file_spaziofasi) {
-    if (aladyn_version < 3)
+    if (file_version < 3)
     {
       if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
       else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
@@ -488,7 +496,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     p_b[NCOLONNE] = false;
     p_b[WEIGHT] = false;
 
-    if (aladyn_version > 2) {
+    if (file_version > 2) {
       std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga dei float
       std::getline(file_dat, riga_persa); // per togliere la riga vuota che separa la griglia dai parametri
 
@@ -584,9 +592,9 @@ void Parametri::debug_read_parameters()
 void Parametri::chiedi_numero_colonne()
 {
   int ncolonne;
-  std::cout << "Quale versione di ALaDyn e` stata usata per generare il file? (1|2|3|4): ";
-  std::cin >> aladyn_version;
-  if (aladyn_version < 3)
+  std::cout << "Quale versione di file e` data in pasto al parser? (1|2|3|4): ";
+  std::cin >> file_version;
+  if (file_version < 3)
   {
     std::cout << "Il file contiene 4, 5, 6 o 7 colonne? ";
     std::cin >> ncolonne;
@@ -940,23 +948,23 @@ void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
 
   for (int i = 2; i < argc; i++) {
     if (argv[i] == "-force_v1") {
-      std::cout << "Forced using routines for aladyn v1" << std::endl;
-      aladyn_version = 1;
+      std::cout << "Forced using routines for file v1" << std::endl;
+      file_version = 1;
       fixed_aladyn_version = true;
     }
     else if (argv[i] == "-force_v2") {
-      std::cout << "Forced using routines for aladyn v2" << std::endl;
-      aladyn_version = 2;
+      std::cout << "Forced using routines for file v2" << std::endl;
+      file_version = 2;
       fixed_aladyn_version = true;
     }
     else if (argv[i] == "-force_v3") {
-      std::cout << "Forced using routines for aladyn v3" << std::endl;
-      aladyn_version = 3;
+      std::cout << "Forced using routines for file v3" << std::endl;
+      file_version = 3;
       fixed_aladyn_version = true;
     }
     else if (argv[i] == "-force_v4") {
-      std::cout << "Forced using routines for aladyn v4" << std::endl;
-      aladyn_version = 4;
+      std::cout << "Forced using routines for file v4" << std::endl;
+      file_version = 4;
       fixed_aladyn_version = true;
     }
   }
@@ -1604,7 +1612,7 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_chspec")
     {
-      if (aladyn_version == 3)
+      if (file_version == 3)
       {
         fai_plot_chspec = 1;
       }
@@ -2762,7 +2770,7 @@ bool Parametri::check_parametri()
       else
       {
         printf("Attenzione: non capisco se la griglia e' 2D o 3D\n");
-        if (aladyn_version < 2) printf("Con i files privi di .dat e' necessario specificare -ncol su riga di comando in modalita' batch\n");
+        if (file_version < 2) printf("Con i files privi di .dat e' necessario specificare -ncol su riga di comando in modalita' batch\n");
         test = false;
       }
     }

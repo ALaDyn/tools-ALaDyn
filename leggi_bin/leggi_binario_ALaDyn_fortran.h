@@ -12,7 +12,7 @@
 
 #define MAJOR_RELEASE  6
 #define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 6
+#define BUGFIX_RELEASE 7
 
 #include <iostream>
 #include <vector>
@@ -135,7 +135,7 @@ struct Parametri
   size_t header_size_bytes;
   size_t nptot;
   int endianness;
-  int aladyn_version;
+  unsigned int file_version;
   bool fixed_aladyn_version;
   bool multifile;
   bool stretched_grid;  //nb: il programma al momento ragiona che se trova una griglia da qualche parte (nel dat o in fondo al bin), allora la assume stretchata anche se magari non lo e'
