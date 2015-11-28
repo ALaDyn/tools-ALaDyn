@@ -447,8 +447,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 #endif
 
 
-  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
-  {
+  if (file_spaziofasi) {
     if (aladyn_version < 3)
     {
       if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
@@ -474,16 +473,14 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       }
     }
   }
-  else
-  {
+  else {
     if (npz == 1) zmin = 0.0, zmax = 1.0;
     p[WEIGHT] = 0;
     p[NCOLONNE] = (int)npz;
     p_b[NCOLONNE] = false;
     p_b[WEIGHT] = false;
 
-    if (aladyn_version > 1)
-    {
+    if (aladyn_version > 2) {
       std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga dei float
       std::getline(file_dat, riga_persa); // per togliere la riga vuota che separa la griglia dai parametri
 
@@ -504,8 +501,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
         zcoord.push_back(coord);
       }
     }
-    else      // mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
-    {
+    else {     // mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
       float dx, dy, dz;
       if (npx_ricampionati > 1) dx = (xmax - xmin) / (npx_ricampionati - 1);
       else dx = (xmax - xmin);
@@ -580,7 +576,7 @@ void Parametri::debug_read_parameters()
 void Parametri::chiedi_numero_colonne()
 {
   int ncolonne;
-  std::cout << "Quale versione di ALaDyn e` stata usata per generare il file? (1|2|3): ";
+  std::cout << "Quale versione di ALaDyn e` stata usata per generare il file? (1|2|3|4): ";
   std::cin >> aladyn_version;
   if (aladyn_version < 3)
   {
