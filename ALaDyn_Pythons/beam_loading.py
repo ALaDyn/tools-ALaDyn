@@ -1,9 +1,9 @@
 #!/usr/bin/python
 ######################################################################
-# Name:         PWFA_bunch_values
+# Name:         beam_loading
 # Author:       A. Marocchino
-# Date:			24-11-2015
-# Purpose:      matching condition for PWFA
+# Date:			2015 12 18
+# Purpose:      beam loading condition for PWFA
 # Source:       python
 #####################################################################
 
@@ -14,9 +14,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as plt
 import pylab as pyl
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from blessings import Terminal
 from termcolor import colored
-from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 #from mpl_toolkits.mplot3d import Axes3D
 # - #
 home_path = os.path.expanduser('~')
@@ -26,26 +26,32 @@ from plasma_basic_parameters import *
 
 ### --- ### shell inputs
 if(len(sys.argv)<2):
-	print 'Input  [1]: n_0: plasma background density (cm-3)'
-	print 'Input  [2]: Lorentz-gamma'
-	print 'Input  [3]: normalized transverse emittance [mm-mrad]'
-	exit(0)
+    print 'Input  [1]: n_0: plasma background density (cm-3)'
+    print 'Input  [2]: sigma_x,y driver bunch [um]'
+    print 'Input  [3]: driver-alpha'
+    print 'Input  [4]: desired E-field within bunch [GV/m]'
+    exit(0)
 
 
 #--- read input ---#
-n0 	  = float(	sys.argv[1])
-gamma = float(  sys.argv[2])
-epsn  = float(  sys.argv[3])
+n0 	    = float( sys.argv[1])
+sigma_x = float( sys.argv[2])
+alpha   = float( sys.argv[3])
+Ein     = float( sys.argv[4])
 ### --- ###
 
 #- -#
 n0_m3=n0*1e6
-epsn_mmmrad = epsn*1e-6
-
+sigma_x_m = sigma_x*1e-6
+Ein_GVm = Ein*1e9
 
 k0 = electron_plasma_wavenumber(n0_m3)
-sigma_matching = np.sqrt(np.sqrt(2./gamma)) * np.sqrt(epsn_mmmrad/k0)
+E0 = electron_mass*c/electron_charge * electron_plasma_frequency(n0_m3)
+Rb = 2.*np.sqrt(alpha)*sigma_x_m
+
+Qw = 0.047*np.sqrt(1e16*1e6/n0_m3)*(k0*Rb)**4 * (E0/Ein_GVm)
+
 
 print('\n')
-print colored('matched sigma: %8.4f [um]' % (sigma_matching*1e6), 'cyan')
+print colored('matched charge: %8.4f [pC]' % (Qw*1e3) , 'cyan')
 print('\n')
