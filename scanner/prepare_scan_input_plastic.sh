@@ -15,17 +15,17 @@ JOBFILE=galileo-64.cmd
 INPUTFILE=input.nml
 
 
-preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
-#preplasmas=0.0
+#preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
+preplasmas=0.0
 
 #densities=$(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}')
 densities=1.0
 
 #ramps=$(awk 'BEGIN{for(i=0.25;i<=0.75;i+=0.25)print i}')
-ramps=0.75
+ramps=0.0
 
-centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
-#centrals=2.4
+#centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
+centrals=2.4
 
 contams=0.0
 
@@ -50,7 +50,7 @@ cp ../${JOBFILE} .
 
 ALADYN_VERSION=3
 NCPU=64
-CREA_FILE_DUMP=0
+CREA_FILE_DUMP=1
 
 
 ##### nx, ny,nz
@@ -126,12 +126,15 @@ NUMERO_SPECIE_SECONDARIO=1
 ##NB: per i seguenti valori di solito si usa ionizzazione 9 e peso 27 (alluminio)
 NUMERO_IONIZZAZIONE_Z1=4
 NUMERO_ATOMICO_SPECIE_1=6
+NUMERO_MASSA_SPECIE_1="12.0"
 NUMERO_IONIZZAZIONE_Z1_MAX=4
 NUMERO_IONIZZAZIONE_Z2=1
 NUMERO_ATOMICO_SPECIE_2=1
+NUMERO_MASSA_SPECIE_2="1.0"
 NUMERO_IONIZZAZIONE_Z2_MAX=1
 
 IONIZZAZIONE_ATTIVA=0
+IONIZZAZIONE_MODELLO=1
 
 TEMP_INIZIALE_PLASMA_1=0.0003
 TEMP_INIZIALE_PLASMA_2=0.0
@@ -262,11 +265,14 @@ nsp=${NUMERO_SPECIE}
 nsb=${NUMERO_SPECIE_SECONDARIO}
 Z1_ion=${NUMERO_IONIZZAZIONE_Z1}
 A1_ion=${NUMERO_ATOMICO_SPECIE_1}
+M1_ion=${NUMERO_MASSA_SPECIE_1}
 Z1_max=${NUMERO_IONIZZAZIONE_Z1_MAX}
 Z2_ion=${NUMERO_IONIZZAZIONE_Z2}
 A2_ion=${NUMERO_ATOMICO_SPECIE_2}
+M2_ion=${NUMERO_MASSA_SPECIE_2}
 Z2_max=${NUMERO_IONIZZAZIONE_Z2_MAX}
-zmod=${IONIZZAZIONE_ATTIVA}
+ionz_lev=${IONIZZAZIONE_ATTIVA}
+ionz_model=${IONIZZAZIONE_MODELLO}
 
 t0_pl_1=${TEMP_INIZIALE_PLASMA_1}
 t0_pl_2=${TEMP_INIZIALE_PLASMA_2}
@@ -344,11 +350,6 @@ npe_yz=${NCPU}
  touch ${INPUTFILE}
 
 
- printf '&VERSION\n' >> ${INPUTFILE}
- printf ' aladyn_version = %s,\n' "${ALADYN_VERSION}">> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
-
  printf '&GRID\n' >> ${INPUTFILE}
  printf ' nx = %s,\n' "$nx" >> ${INPUTFILE}
  printf ' ny = %s,\n' "$ny" >> ${INPUTFILE}
@@ -356,6 +357,7 @@ npe_yz=${NCPU}
  printf ' ny_targ = %s,\n' "${ny_targ}" >> ${INPUTFILE}
  printf ' k0 = %s,\n' "$k0" >> ${INPUTFILE}
  printf ' yx_rat = %s,\n' "${yx_rat}" >> ${INPUTFILE}
+ printf ' zx_rat = %s\n' "${yx_rat}" >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
 
@@ -369,16 +371,27 @@ npe_yz=${NCPU}
  printf ' ibx = %s,\n' "$ibx" >> ${INPUTFILE}
  printf ' iby = %s,\n' "$iby" >> ${INPUTFILE}
  printf ' ibz = %s,\n' "$ibz" >> ${INPUTFILE}
- printf ' ibeam = %s,\n' "$ibeam" >> ${INPUTFILE}
+ printf ' ibeam = %s\n' "$ibeam" >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
+
+ printf '&TARGET_DESCRIPTION\n' >> ${INPUTFILE}
  printf ' nsp = %s,\n' "$nsp" >> ${INPUTFILE}
  printf ' nsb = %s,\n' "$nsb" >> ${INPUTFILE}
- printf ' Z1_ion = %s,\n' "${Z1_ion}" >> ${INPUTFILE}
- printf ' A1_ion = %s,\n' "${A1_ion}" >> ${INPUTFILE}
- printf ' Z1_max = %s,\n' "${Z1_max}" >> ${INPUTFILE}
- printf ' Z2_ion = %s,\n' "${Z2_ion}" >> ${INPUTFILE}
- printf ' A2_ion = %s,\n' "${A2_ion}" >> ${INPUTFILE}
- printf ' Z2_max = %s,\n' "${Z2_max}" >> ${INPUTFILE}
- printf ' zmod = %s,\n' "$zmod" >> ${INPUTFILE}
+ printf ' ionz_lev = %s,\n' "${ionz_lev}" >> ${INPUTFILE}
+ printf ' ionz_model = %s,\n' "${ionz_model}" >> ${INPUTFILE}
+ printf ' ion_min(1) = %s,\n' "${Z1_ion}" >> ${INPUTFILE}
+ printf ' ion_min(2) = %s,\n' "${Z2_ion}" >> ${INPUTFILE}
+ printf ' ion_min(3) = 1,\n' >> ${INPUTFILE}
+ printf ' ion_max(1) = %s,\n' "${Z1_max}" >> ${INPUTFILE}
+ printf ' ion_max(2) = %s,\n' "${Z2_max}" >> ${INPUTFILE}
+ printf ' ion_max(3) = 1,\n' >> ${INPUTFILE}
+ printf ' atomic_number(1) = %s,\n' "${A1_ion}" >> ${INPUTFILE}
+ printf ' atomic_number(2) = %s,\n' "${A2_ion}" >> ${INPUTFILE}
+ printf ' atomic_number(3) = 1,\n' >> ${INPUTFILE}
+ printf ' mass_number(1) = %s,\n' "${M1_ion}" >> ${INPUTFILE}
+ printf ' mass_number(2) = %s,\n' "${M2_ion}" >> ${INPUTFILE}
+ printf ' mass_number(3) = 1.0,\n' >> ${INPUTFILE}
  printf ' t0_pl(1) = %s,\n' "${t0_pl_1}" >> ${INPUTFILE}
  printf ' t0_pl(2) = %s,\n' "${t0_pl_2}" >> ${INPUTFILE}
  printf ' t0_pl(3) = %s,\n' "${t0_pl_3}" >> ${INPUTFILE}
@@ -395,12 +408,6 @@ npe_yz=${NCPU}
  printf ' np_per_yc(4) = %s,\n' "${np_per_yc_4}" >> ${INPUTFILE}
  printf ' np_per_yc(5) = %s,\n' "${np_per_yc_5}" >> ${INPUTFILE}
  printf ' np_per_yc(6) = %s,\n' "${np_per_yc_6}" >> ${INPUTFILE}
- printf ' t0_lp = %s,\n' "$t0_lp" >> ${INPUTFILE}
- printf ' xc_lp = %s,\n' "$xc_lp" >> ${INPUTFILE}
- printf ' w0_x = %s,\n' "$w0_x" >> ${INPUTFILE}
- printf ' w0_y = %s,\n' "$w0_y" >> ${INPUTFILE}
- printf ' a0 = %s,\n' "$a0" >> ${INPUTFILE}
- printf ' lam0 = %s,\n' "$lam0" >> ${INPUTFILE}
  printf ' lpx(1) = %s,\n' "$lpx_1" >> ${INPUTFILE}
  printf ' lpx(2) = %s,\n' "$lpx_2" >> ${INPUTFILE}
  printf ' lpx(3) = %s,\n' "$lpx_3" >> ${INPUTFILE}
@@ -412,11 +419,25 @@ npe_yz=${NCPU}
  printf ' lpy(2) = %s,\n' "$lpy_2" >> ${INPUTFILE}
  printf ' n_over_nc = %s,\n' "${n_over_nc}" >> ${INPUTFILE}
  printf ' n1_over_n = %s,\n' "${n1_over_n}" >> ${INPUTFILE}
- printf ' n2_over_n = %s,\n' "${n2_over_n}" >> ${INPUTFILE}
+ printf ' n2_over_n = %s\n' "${n2_over_n}" >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
+
+ printf '&LASER\n' >> ${INPUTFILE}
+ printf ' t0_lp = %s,\n' "$t0_lp" >> ${INPUTFILE}
+ printf ' xc_lp = %s,\n' "$xc_lp" >> ${INPUTFILE}
+ printf ' w0_x = %s,\n' "$w0_x" >> ${INPUTFILE}
+ printf ' w0_y = %s,\n' "$w0_y" >> ${INPUTFILE}
+ printf ' a0 = %s,\n' "$a0" >> ${INPUTFILE}
+ printf ' lam0 = %s\n' "$lam0" >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
+
+ printf '&MOVING_WINDOW\n' >> ${INPUTFILE}
  printf ' w_sh = %s,\n' "${w_sh}" >> ${INPUTFILE}
  printf ' wi_time = %s,\n' "${wi_time}" >> ${INPUTFILE}
  printf ' wf_time = %s,\n' "${wf_time}" >> ${INPUTFILE}
- printf ' w_speed = %s,\n' "${w_speed}" >> ${INPUTFILE}
+ printf ' w_speed = %s\n' "${w_speed}" >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
 
@@ -436,12 +457,18 @@ npe_yz=${NCPU}
  printf ' cfl = %s,\n' "$cfl" >> ${INPUTFILE}
  printf ' new_sim = %s,\n' "${new_sim}" >> ${INPUTFILE}
  printf ' id_new = %s,\n' "${id_new}" >> ${INPUTFILE}
- printf ' dump = %s,\n' "$dump" >> ${INPUTFILE}
- printf ' npe_yz = %s,\n' "${npe_yz}" >> ${INPUTFILE}
+ printf ' dump = %s\n' "$dump" >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
 
-#qsub $JOBFILE
+ printf '&MPIPARAMS\n' >> ${INPUTFILE}
+ printf ' nprocx = 1,\n' >> ${INPUTFILE}
+ printf ' nprocx = %s,\n' "${npe_yz}" >> ${INPUTFILE}
+ printf ' nprocz = 1\n' >> ${INPUTFILE}
+ printf '/' >> ${INPUTFILE}
+ printf '\n\n' >> ${INPUTFILE}
+
+#bsub < $JOBFILE
 
 cd ..
 
