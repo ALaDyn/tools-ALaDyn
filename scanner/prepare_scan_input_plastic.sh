@@ -48,7 +48,6 @@ mkdir pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
 cd pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
 cp ../${JOBFILE} .
 
-ALADYN_VERSION=3
 NCPU=64
 CREA_FILE_DUMP=1
 
