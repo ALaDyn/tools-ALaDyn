@@ -36,7 +36,7 @@ int main(int argc, const char* argv[]) {
   size_t ncolumns, column_max, precision = 4;
   size_t interpolation_x, interpolation_y;
   double x1, y1, x2, y2, E11, E12, E21, E22, x, y, E, dx, dy, k0, E_magn = 1.0;
-  std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png, column_E_string;
+  std::string filename_in, filename_out, filename_gnuplot_plt, filename_gnuplot_png, filename_gnuplot_pdf, column_E_string;
   std::ifstream infile;
   std::ofstream outfile;
   std::string riga, xlabel = "", ylabel = "", cblabel = "", title = "";
@@ -47,11 +47,12 @@ int main(int argc, const char* argv[]) {
 
   bool found;
   bool gnuplot = false;
+  bool do_pdf = false;
   std::vector<std::string> unique_x_values, unique_y_values;
   std::vector<double> dunique_x_values, dunique_y_values;
 
   if (argc < 7) {
-    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt\nOptional: [-gnuplot] [-title] [-xlabel] [-ylabel] [-cblabel] [-cb_magn] [-precision]" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " -cx N -cy M -ce L -nx A -ny B -file filename.txt\nOptional: [-gnuplot] [-title] [-xlabel] [-ylabel] [-cblabel] [-cb_magn] [-precision] [-pdf]" << std::endl;
     std::cerr << "Press a key to exit..." << std::endl;
     std::cin.get();
     exit(1);
@@ -88,6 +89,9 @@ int main(int argc, const char* argv[]) {
     else if (std::string(argv[i]) == "-gnuplot") {
       gnuplot = true;
     }
+    else if (std::string(argv[i]) == "-pdf") {
+      do_pdf = true;
+    }
     else if (std::string(argv[i]) == "-title") {
       gnuplot = true;
       title = std::string(argv[++i]);
@@ -112,6 +116,7 @@ int main(int argc, const char* argv[]) {
   filename_out = "int" + column_E_string + '_' + filename_in;
   filename_gnuplot_plt = "plot.plt";
   filename_gnuplot_png = filename_out + ".png";
+  filename_gnuplot_pdf = filename_out + ".pdf";
   column_max = MAX(column_x, column_y);
   column_max = MAX(column_max, column_E);
 
@@ -157,7 +162,6 @@ int main(int argc, const char* argv[]) {
     if (infile.eof()) break;
     if (riga[0] == '#') continue;
     boost::algorithm::trim(riga);
-    //boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_off);
     boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
     if (!matrix.size()) ncolumns = tokens.size();
     if (ncolumns != tokens.size()) {
@@ -208,7 +212,6 @@ int main(int argc, const char* argv[]) {
 #endif
 
 
-  // manca il riempibuchi
 
   for (size_t i = 1; i < dunique_x_values.size(); i++) {
     for (size_t j = 1; j < dunique_y_values.size(); j++) {
@@ -254,6 +257,8 @@ int main(int argc, const char* argv[]) {
     int fontsize = 15;
     char fontname[] = "";
     char image_type[] = "pngcairo";
+    if (do_pdf) image_type[1] = 'd';
+    if (do_pdf) image_type[2] = 'f';
 
     fprintf(outfile_gnuplot, "#!/gnuplot\n");
     fprintf(outfile_gnuplot, "set terminal %s size %i,%i font \"%s,%i\"\n", image_type, Xres, Yres, fontname, fontsize);
@@ -261,12 +266,13 @@ int main(int argc, const char* argv[]) {
     fprintf(outfile_gnuplot, "set xlabel '%s'\n", xlabel.c_str());
     fprintf(outfile_gnuplot, "set ylabel '%s'\n", ylabel.c_str());
     fprintf(outfile_gnuplot, "set cblabel '%s'\n", cblabel.c_str());
-    fprintf(outfile_gnuplot, "set size ratio - 1\n");
+    fprintf(outfile_gnuplot, "set size ratio -1\n");
     fprintf(outfile_gnuplot, "set xrange[%f:%f]\n", dunique_x_values.front(), dunique_x_values.back());
     fprintf(outfile_gnuplot, "set yrange[%f:%f]\n", dunique_y_values.front(), dunique_y_values.back());
     fprintf(outfile_gnuplot, "set palette rgbformulae 22, 13, 10\n");
     fprintf(outfile_gnuplot, "FILE_IN = \"%s\"\n", filename_out.c_str());
-    fprintf(outfile_gnuplot, "FILE_OUT = \"%s\"\n", filename_gnuplot_png.c_str());
+    if (do_pdf) fprintf(outfile_gnuplot, "FILE_OUT = \"%s\"\n", filename_gnuplot_pdf.c_str());
+    else fprintf(outfile_gnuplot, "FILE_OUT = \"%s\"\n", filename_gnuplot_png.c_str());
     fprintf(outfile_gnuplot, "set output FILE_OUT\n");
     fprintf(outfile_gnuplot, "plot FILE_IN u 1:2:3 w image notitle\n");
 
