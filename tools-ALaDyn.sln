@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leggi_partdist", "leggi_par
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InGenUO", "InGenUO\InGenUO.vcxproj", "{3E6E099B-E7C9-4A82-934D-94A43ECAAE78}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "analizza_bin", "analizza_bin\analizza_bin.vcxproj", "{4747B151-A637-4E6F-8EE3-59F1081C35A0}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "combina_vtk", "combina_vtk\combina_vtk.vcxproj", "{5BF0F6EA-43A4-439E-B606-41A625CBEBEE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exponential_fit", "exponential_fit\exponential_fit.vcxproj", "{C828CCD7-65D4-4F2C-A395-F018D9DADBBC}"
@@ -24,6 +22,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logaritmic_fit", "logaritmic_fit\logaritmic_fit.vcxproj", "{FF6B91C8-904C-4B71-82D0-E3DA2B103088}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "interpolate_scan_results", "interpolate_scan_results\interpolate_scan_results.vcxproj", "{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "analizza_binario", "analizza_binario\analizza_binario.vcxproj", "{4747B151-A637-4E6F-8EE3-59F1081C35A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,6 @@ Global
 		{3E6E099B-E7C9-4A82-934D-94A43ECAAE78}.Debug|x64.Build.0 = Debug|x64
 		{3E6E099B-E7C9-4A82-934D-94A43ECAAE78}.Release|x64.ActiveCfg = Release|x64
 		{3E6E099B-E7C9-4A82-934D-94A43ECAAE78}.Release|x64.Build.0 = Release|x64
-		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Debug|x64.ActiveCfg = Debug|x64
-		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Debug|x64.Build.0 = Debug|x64
-		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Release|x64.ActiveCfg = Release|x64
-		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Release|x64.Build.0 = Release|x64
 		{5BF0F6EA-43A4-439E-B606-41A625CBEBEE}.Debug|x64.ActiveCfg = Debug|x64
 		{5BF0F6EA-43A4-439E-B606-41A625CBEBEE}.Debug|x64.Build.0 = Debug|x64
 		{5BF0F6EA-43A4-439E-B606-41A625CBEBEE}.Release|x64.ActiveCfg = Release|x64
@@ -75,6 +71,10 @@ Global
 		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Debug|x64.Build.0 = Debug|x64
 		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Release|x64.ActiveCfg = Release|x64
 		{C9552783-0FE5-4FAA-B4D3-9AD83BB755BF}.Release|x64.Build.0 = Release|x64
+		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Debug|x64.ActiveCfg = Debug|x64
+		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Debug|x64.Build.0 = Debug|x64
+		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Release|x64.ActiveCfg = Release|x64
+		{4747B151-A637-4E6F-8EE3-59F1081C35A0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

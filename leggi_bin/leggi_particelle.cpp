@@ -264,13 +264,13 @@ int leggi_particelle(Parametri * parametri)
     contatori[0] += fprintf(binary_vtk, "titolo nostro\n");
     contatori[0] += fprintf(binary_vtk, "BINARY\n");
     contatori[0] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
-    contatori[0] += fprintf(binary_vtk, "POINTS %llu float\n", parametri->nptot);
+    contatori[0] += fprintf(binary_vtk, "POINTS %llu float\n", (unsigned long long int) parametri->nptot);
 
     fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3, SEEK_SET);
 
     //Scrittura secondo Header VTK e memorizzazione sua dimensione in contatori[1]
     //contatori[1] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
-    contatori[1] += fprintf(binary_vtk, "POINT_DATA %llu\n", parametri->nptot);
+    contatori[1] += fprintf(binary_vtk, "POINT_DATA %llu\n", (unsigned long long int) parametri->nptot);
     //contatori[1] += fprintf(binary_vtk, "POINTS %i float\n", parametri->nptot);
     contatori[1] += fprintf(binary_vtk, "VECTORS p float\n");
     //contatori[1] += fprintf(binary_vtk, "LOOKUP_TABLE default\n");
@@ -369,14 +369,14 @@ int leggi_particelle(Parametri * parametri)
       rewind(file_in);
       num_of_floats_in_file = (dim_file_in_bytes / sizeof(float));
       num_of_particles_in_file = (int)(num_of_floats_in_file / parametri->ndv);
-      printf("Il file %s_%.3i.bin contiene %llu particelle\n", parametri->filebasename.c_str(), indice_multifile, num_of_particles_in_file);
+      printf("Il file %s_%.3i.bin contiene %llu particelle\n", parametri->filebasename.c_str(), indice_multifile, (unsigned long long int) num_of_particles_in_file);
       fflush(stdout);
       num_of_passes = (int)((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) + 1;
       num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
       dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
       if (dimensione_array_particelle > parametri->nptot)
       {
-        printf("Read a npart=%llu, non valid. Exiting!", dimensione_array_particelle);
+        printf("Read a npart=%llu, non valid. Exiting!", (unsigned long long int) dimensione_array_particelle);
         break;
       }
       val[0] = (unsigned int)dimensione_array_particelle;
@@ -388,7 +388,7 @@ int leggi_particelle(Parametri * parametri)
       fflush(stdout);
       for (size_t h = 0; h < num_of_passes; h++)
       {
-        if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %llu of %llu\n", h + 1, num_of_passes);
+        if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %llu of %llu\n", (unsigned long long int) (h + 1), (unsigned long long int) num_of_passes);
         if (!parametri->multifile)
         {
           particelle = new float[npart_loc*parametri->ndv];
@@ -910,12 +910,12 @@ int leggi_particelle(Parametri * parametri)
     fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
     fprintf(parameters, "ncpu_y=%i\n", parametri->ncpu_y);
     fprintf(parameters, "ncpu_z=%i\n", parametri->ncpu_z);
-    fprintf(parameters, "npx_ricampionati=%llu\n", parametri->npx_ricampionati);
-    fprintf(parameters, "npy_ricampionati=%llu\n", parametri->npy_ricampionati);
-    fprintf(parameters, "npz_ricampionati=%llu\n", parametri->npz_ricampionati);
-    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", parametri->npx_ricampionati_per_cpu);
-    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", parametri->npy_ricampionati_per_cpu);
-    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", parametri->npz_ricampionati_per_cpu);
+    fprintf(parameters, "npx_ricampionati=%llu\n", (unsigned long long int) parametri->npx_ricampionati);
+    fprintf(parameters, "npy_ricampionati=%llu\n", (unsigned long long int) parametri->npy_ricampionati);
+    fprintf(parameters, "npz_ricampionati=%llu\n", (unsigned long long int) parametri->npz_ricampionati);
+    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npx_ricampionati_per_cpu);
+    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npy_ricampionati_per_cpu);
+    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npz_ricampionati_per_cpu);
     fprintf(parameters, "tnow=%f\n", parametri->tnow);
     fprintf(parameters, "xmin=%f\n", parametri->xmin);
     fprintf(parameters, "xmax=%f\n", parametri->xmax);

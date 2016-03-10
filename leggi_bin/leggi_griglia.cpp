@@ -36,7 +36,7 @@ int leggi_griglia(Parametri * parametri)
       allocated_size += (parametri->npx_ricampionati)*sizeof(float);
     }
 #ifdef ENABLE_DEBUG
-    printf("Allocated %llu bytes for fields\r", allocated_size);
+    printf("Allocated %llu bytes for fields\r", (unsigned long long int) allocated_size);
 #endif
   }
   x_lineout = new float[parametri->npx_ricampionati];
@@ -71,7 +71,7 @@ int leggi_griglia(Parametri * parametri)
             header[2] != parametri->npz_ricampionati_per_cpu)
             std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 
-          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
+          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) parametri->npx_ricampionati_per_cpu, header[1], (unsigned long long int) parametri->npy_ricampionati_per_cpu, header[2], (unsigned long long int) parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
           fflush(stdout);
 
           buffer = new float[header[0] * header[1] * header[2]];
@@ -172,7 +172,7 @@ int leggi_griglia(Parametri * parametri)
               std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 #endif
 
-            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", indice_multifile, header[0], parametri->npx_ricampionati_per_cpu, header[1], parametri->npy_ricampionati_per_cpu, header[2], parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
+            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", indice_multifile, header[0], (unsigned long long int) parametri->npx_ricampionati_per_cpu, header[1], (unsigned long long int) parametri->npy_ricampionati_per_cpu, header[2], (unsigned long long int) parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
             fflush(stdout);
 
             buffer = new float[header[0] * header[1] * header[2]];
@@ -216,15 +216,15 @@ int leggi_griglia(Parametri * parametri)
 #endif
 #endif
 
-    fprintf(clean_fields, "# %llu \n # %llu \n # %llu\n# %g  %g \n # %g  %g\n", parametri->npx_ricampionati,
-      parametri->npy_ricampionati, parametri->npz_ricampionati, parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
+    fprintf(clean_fields, "# %llu \n # %llu \n # %llu\n# %g  %g \n # %g  %g\n", (unsigned long long int) parametri->npx_ricampionati,
+      (unsigned long long int) parametri->npy_ricampionati, (unsigned long long int) parametri->npz_ricampionati, parametri->xmin, parametri->ymin, parametri->xmax, parametri->ymax);
     for (size_t j = 0; j < parametri->npy_ricampionati; j++)
     {
       for (size_t i = 0; i < parametri->npx_ricampionati; i++)
       {
         fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[0][j][i]);
       }
-      printf("grid[y] = {%llu/%llu}\r", j, parametri->npy_ricampionati);
+      printf("grid[y] = {%llu/%llu}\r", (unsigned long long int) j, (unsigned long long int) parametri->npy_ricampionati);
     }
     fclose(clean_fields);
     printf("\nASCII FILE COMPLETED\n");
@@ -357,7 +357,7 @@ int leggi_griglia(Parametri * parametri)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->ycoord[j], field[k][j][i]);
         }
-        printf("grid[y] = {%llu/%llu}\r", j, parametri->npy_ricampionati);
+        printf("grid[y] = {%llu/%llu}\r", (unsigned long long int) j, (unsigned long long int) parametri->npy_ricampionati);
       }
       fclose(clean_fields);
       printf("\nASCII FILE COMPLETED\n");
@@ -416,7 +416,7 @@ int leggi_griglia(Parametri * parametri)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->xcoord[i], parametri->zcoord[k], field[k][j][i]);
         }
-        printf("grid[z] = {%llu/%llu}\r", k, parametri->npz_ricampionati);
+        printf("grid[z] = {%llu/%llu}\r", (unsigned long long int) k, (unsigned long long int) parametri->npz_ricampionati);
       }
       fclose(clean_fields);
       printf("\nASCII FILE COMPLETED\n");
@@ -475,7 +475,7 @@ int leggi_griglia(Parametri * parametri)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", parametri->ycoord[j], parametri->zcoord[k], field[k][j][i]);
         }
-        printf("grid[z] = {%llu/%llu}\r", k, parametri->npz_ricampionati);
+        printf("grid[z] = {%llu/%llu}\r", (unsigned long long int) k, (unsigned long long int) parametri->npz_ricampionati);
       }
       fclose(clean_fields);
       printf("\nASCII FILE COMPLETED\n");
@@ -674,12 +674,12 @@ int leggi_griglia(Parametri * parametri)
     fprintf(parameters, "ncpu_x=%u\n", parametri->ncpu_x);
     fprintf(parameters, "ncpu_y=%u\n", parametri->ncpu_y);
     fprintf(parameters, "ncpu_z=%u\n", parametri->ncpu_z);
-    fprintf(parameters, "npx_ricampionati=%llu\n", parametri->npx_ricampionati);
-    fprintf(parameters, "npy_ricampionati=%llu\n", parametri->npy_ricampionati);
-    fprintf(parameters, "npz_ricampionati=%llu\n", parametri->npz_ricampionati);
-    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", parametri->npx_ricampionati_per_cpu);
-    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", parametri->npy_ricampionati_per_cpu);
-    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", parametri->npz_ricampionati_per_cpu);
+    fprintf(parameters, "npx_ricampionati=%llu\n", (unsigned long long int) parametri->npx_ricampionati);
+    fprintf(parameters, "npy_ricampionati=%llu\n", (unsigned long long int) parametri->npy_ricampionati);
+    fprintf(parameters, "npz_ricampionati=%llu\n", (unsigned long long int) parametri->npz_ricampionati);
+    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npx_ricampionati_per_cpu);
+    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npy_ricampionati_per_cpu);
+    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npz_ricampionati_per_cpu);
     fprintf(parameters, "tnow=%f\n", parametri->tnow);
     fprintf(parameters, "xmin=%f\n", parametri->xmin);
     fprintf(parameters, "xmax=%f\n", parametri->xmax);
