@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = leggi_partdist.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

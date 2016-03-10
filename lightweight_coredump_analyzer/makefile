@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = lightweight_coredump_analyzer.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

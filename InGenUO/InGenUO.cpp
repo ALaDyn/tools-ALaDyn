@@ -375,7 +375,6 @@ std::string cartella(std::string prefisso)
   }
 #else
   ris = mkdir(path, S_IRWXU);
-  free(curr_dir);
 #endif
   free(path);
   return std::string(path);

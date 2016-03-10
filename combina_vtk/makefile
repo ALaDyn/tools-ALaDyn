@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = combina_vtk.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

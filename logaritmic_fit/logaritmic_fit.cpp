@@ -36,6 +36,7 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -121,7 +122,7 @@ int main(int argc, char* argv[])
   char * pch;
   char * str = new char[righe[0].length() + 1];
   std::strcpy(str, righe[0].c_str());
-  pch = strtok(str, " \t");
+  pch = std::strtok(str, " \t");
   if (pch != NULL) contacolonne++;
   while (pch != NULL) {
     pch = strtok(NULL, " \t");

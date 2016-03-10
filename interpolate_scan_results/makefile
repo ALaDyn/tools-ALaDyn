@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = interpolate_scan_results.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

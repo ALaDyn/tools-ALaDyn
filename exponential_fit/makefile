@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = exponential_fit.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

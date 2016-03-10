@@ -1,9 +1,9 @@
 
-FILES = analizza_binario.cpp
+FILES = InGenUO.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 
-OPT = -std=c++11
+OPT = -std=c++11 -I.
 
 
 all: $(EXES)

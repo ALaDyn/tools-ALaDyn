@@ -1,6 +1,15 @@
 
 TOOLS := analizza_binario \
-leggi_bin
+combina_vtk \
+exponential_fit \
+fix_nptot \
+InGenUO \
+interpolate_scan_results \
+leggi_bin \
+leggi_diagspec \
+leggi_partdist \
+lightweight_coredump_analyzer \
+logaritmic_fit
 
 
 all:
@@ -13,3 +22,5 @@ clean:
 	$(MAKE) -C $$i clean ;\
 	done
 
+cleanall: clean
+	

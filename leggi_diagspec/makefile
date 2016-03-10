@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = leggi_diagspec.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

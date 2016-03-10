@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = fix_nptot.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

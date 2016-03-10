@@ -1,5 +1,5 @@
 
-FILES = analizza_binario.cpp
+FILES = logaritmic_fit.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 

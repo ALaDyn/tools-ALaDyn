@@ -19,6 +19,12 @@
 #define ftello ftello64
 #endif
 
+#if defined (__CYGWIN__)
+#define fseeko fseek
+#define ftello ftell
+#endif
+
+
 #define NUMERO_PARAMETRI_FILE_DAT	20
 #define ALADYN_VERSION 3
 
