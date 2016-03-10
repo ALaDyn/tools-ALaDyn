@@ -1,9 +1,15 @@
 
-subsystem:
-#	$(MAKE) -s -C leggi_bin
-	$(MAKE) -C leggi_bin
+TOOLS := analizza_binario \
+leggi_bin
+
+
+all:
+	@for i in $(TOOLS) ; do \
+	$(MAKE) -C $$i ;\
+	done
 
 clean:
-#	$(MAKE) -s -C leggi_bin clean
-	$(MAKE) -C leggi_bin clean
+	@for i in $(TOOLS) ; do \
+	$(MAKE) -C $$i clean ;\
+	done
 
