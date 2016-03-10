@@ -1,4 +1,3 @@
-COMPILER = g++
 EXE      = leggi_bin.exe
 OPT      = -std=c++11
 
@@ -17,37 +16,37 @@ CINECA:	$(EXE)
 
 
 $(EXE): $(OBJECTS)
-	$(COMPILER) $(OPT) -o $(EXE) $(OBJECTS)
+	$(CXX) $(OPT) -o $(EXE) $(OBJECTS)
 
 
 parametri.o: parametri.cpp leggi_binario_ALaDyn_fortran.h
-	$(COMPILER) $(OPT) -c parametri.cpp
+	$(CXX) $(OPT) -c parametri.cpp
 
 binnaggio.o: binnaggio.cpp binnaggio.h parametri.o leggi_binario_ALaDyn_fortran.h
-	$(COMPILER) $(OPT) -c binnaggio.cpp
+	$(CXX) $(OPT) -c binnaggio.cpp
 
 filtro.o: filtro.cpp filtro.h parametri.o leggi_binario_ALaDyn_fortran.h
-	$(COMPILER) $(OPT) -c filtro.cpp
+	$(CXX) $(OPT) -c filtro.cpp
 
 scrittura.o: scrittura.cpp scrittura.h parametri.o leggi_binario_ALaDyn_fortran.h
-	$(COMPILER) $(OPT) -c scrittura.cpp
+	$(CXX) $(OPT) -c scrittura.cpp
 
 swap_tools.o: swap_tools.cpp swap_tools.h leggi_binario_ALaDyn_fortran.h
-	$(COMPILER) $(OPT) -c swap_tools.cpp
+	$(CXX) $(OPT) -c swap_tools.cpp
 
 leggi_griglia.o: leggi_griglia.cpp leggi_griglia.h leggi_binario_ALaDyn_fortran.h swap_tools.o parametri.o
-	$(COMPILER) $(OPT) -c leggi_griglia.cpp
+	$(CXX) $(OPT) -c leggi_griglia.cpp
 
 leggi_particelle.o: leggi_particelle.cpp leggi_particelle.h leggi_binario_ALaDyn_fortran.h swap_tools.o parametri.o binnaggio.o filtro.o scrittura.o
-	$(COMPILER) $(OPT) -c leggi_particelle.cpp
+	$(CXX) $(OPT) -c leggi_particelle.cpp
 
 leggi_binario_ALaDyn_fortran.o: leggi_binario_ALaDyn_fortran.cpp leggi_binario_ALaDyn_fortran.h leggi_particelle.o leggi_griglia.o parametri.o
-	$(COMPILER) $(OPT) -c leggi_binario_ALaDyn_fortran.cpp
+	$(CXX) $(OPT) -c leggi_binario_ALaDyn_fortran.cpp
 
 clean:
 	rm -f $(OBJECTS)
 
-cleanall:
-	rm -f $(OBJECTS) $(EXE) *~ .*~ 
+cleanall: clean
+	rm -f $(EXE) *~ .*~ 
 
 
