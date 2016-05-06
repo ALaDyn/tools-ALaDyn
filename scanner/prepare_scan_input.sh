@@ -2,17 +2,28 @@
 
 if [ $# != 5 ]
 then
- echo "In input devono esser passati:"
- echo "\$1 : new o restart ('0' oppure '1')"
- echo "\$2 : id file iniziale (tipo '4' per partire con *out04.*, ad esempio)"
- echo "\$3 : t_finale (tipo '10.0')"
- echo "\$4 : numero output completi (tipo '2')"
- echo "\$5 : numero output ridotti (tipo '20')"
+ echo "Usage: please give 5 arguments to the script:"
+ echo "\$1 : put 0 for new simulations, 1 for restarts"
+ echo "\$2 : initial sim id (e.g. put '4' if you want the output to reload from *out04.*)"
+ echo "\$3 : tmax (e.g. 100.0)"
+ echo "\$4 : number of time the program will dump outputs"
+ echo "\$5 : number of diagnostic outputs produced during the simulation"
  exit
 fi
 
-JOBFILE=galileo-64.cmd
-INPUTFILE=input.nml
+#MATERIAL="CH2"
+#MATERIAL="CD2"
+MATERIAL="AL"
+
+HPC="cnaf"
+#HPC="galileo"
+#HPC="fermi"
+JOBFILE=job.cmd
+
+#use true to really submit jobs
+PRODUCTION=false
+#PRODUCTION=true
+
 
 
 #preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
@@ -30,6 +41,20 @@ centrals=2.4
 #contams=$(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}')
 contams=0.08
 
+#does not work for now!!
+#angles=$(awk 'BEGIN{for(i=0.0;i<=60.0;i+=15.0)print i}')
+angles=0.0
+
+
+
+
+
+
+
+
+###############################
+## do not touch from here :) ##
+###############################
 
 
 for pre in $preplasmas
@@ -42,12 +67,21 @@ for central in $centrals
 do
 for contam in $contams
 do
+for angle in $angles
+do
 
-echo "pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}" >> sim_da_fare.txt
+echo "${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}" >> sim_da_fare.txt
+INPUTFILE=input.nml
 
-mkdir pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
-cd pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+if [ "$1" = "0" ] ; then
+mkdir ${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+fi
+
+cd ${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+
+if [ "$1" = "0" ] ; then
 cp ../${JOBFILE} .
+fi
 
 NCPU=64
 CREA_FILE_DUMP=1
@@ -63,17 +97,17 @@ CREA_FILE_DUMP=1
 #NUMERO_PUNTI_GRIGLIA_X=3072
 #NUMERO_PUNTI_GRIGLIA_Y=1536
 NUMERO_PUNTI_GRIGLIA_X=7168
-NUMERO_PUNTI_GRIGLIA_Y=3584
+NUMERO_PUNTI_GRIGLIA_Y=7168
 ##NB: mettere il seguente numero ad 1 per fare simulazioni 2D
 NUMERO_PUNTI_GRIGLIA_Z=1
 
 #NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=1500
-NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=3500
+NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=7000
 
 
 ##nb: ricordarsi di risolvere la skin depth
 NUMERO_PUNTI_GRIGLIA_PER_MICRON=100.0
-RAPPORTO_DIMENSIONE_GRIGLIA_TRASVERSA_GRIGLIA_LONGITUDINALE=2.0
+RAPPORTO_DIMENSIONE_GRIGLIA_TRASVERSA_GRIGLIA_LONGITUDINALE=1.0
 
 ##### a questo punto sappiamo le dimensioni in micron della griglia 
 ##### Dimx = nx/k0    Dimy = ny*yx_rat/k0
@@ -99,6 +133,8 @@ ALGORITMO_INTEGRAZIONE=0
 ##### mdl,dmdl,ibeam 
 ##NB: per il seguente dato, 1=polarizzato p, 2=polarizzato s, 3=polarizzato circolarmente
 LASER_MODEL=1
+
+
 ##NB: per il seguente dato, ecco le chiamate effettuate nel codice
 # case(1)
 #  call one_layer_multisp(ny_targ,xf0)  !e+Z1+Z2
@@ -110,8 +146,11 @@ LASER_MODEL=1
 #  call one_layer_nano_wires(ny_targ,xf0) !foam+ high Z +H coating mass lim
 # case(6)
 #  call one_layer_nano_tubes(ny_targ,xf0)  ! (e+ (Z,A) ions now nsp=2
+if [ "$MATERIAL" = "CH2" ] ; then
+PLASMA_MODEL=1
+else
 PLASMA_MODEL=3
-
+fi
 
 
 
@@ -124,10 +163,17 @@ NUMERO_SPECIE=3
 ##NB: per la documentazione riguardante il seguente numero, riferirsi alla spiegazione di PLASMA_MODEL
 NUMERO_SPECIE_SECONDARIO=1
 ##NB: per i seguenti valori di solito si usa ionizzazione 9 e peso 27 (alluminio)
+if [ "$MATERIAL" = "CH2" ] ; then
 NUMERO_IONIZZAZIONE_Z1=10
 NUMERO_ATOMICO_SPECIE_1=13
 NUMERO_MASSA_SPECIE_1="27.0"
 NUMERO_IONIZZAZIONE_Z1_MAX=10
+else
+NUMERO_IONIZZAZIONE_Z1=4
+NUMERO_ATOMICO_SPECIE_1=6
+NUMERO_MASSA_SPECIE_1="12.0"
+NUMERO_IONIZZAZIONE_Z1_MAX=4
+fi
 NUMERO_IONIZZAZIONE_Z2=1
 NUMERO_ATOMICO_SPECIE_2=1
 NUMERO_MASSA_SPECIE_2="1.0"
@@ -141,6 +187,18 @@ TEMP_INIZIALE_PLASMA_2=0.0
 TEMP_INIZIALE_PLASMA_3=0.0
 TEMP_INIZIALE_PLASMA_4=0.0
 
+if [ "$MATERIAL" = "CH2" ] ; then
+#### np_xc
+NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA=12
+NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA=4
+NUMERO_PROTONI_LONGITUDINALMENTE_PER_CELLA=6
+#### np_yc
+NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA=12
+NUMERO_IONI_TRASVERSALMENTE_PER_CELLA=6
+NUMERO_PROTONI_TRASVERSALMENTE_PER_CELLA=8
+
+else
+
 #### np_xc
 NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=12
 NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE=4
@@ -148,8 +206,6 @@ NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE=4
 NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE=4
 NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE=4
 NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE=4
-
-
 #### np_yc
 NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE=9
 NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE=3
@@ -157,7 +213,7 @@ NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE=4
 NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE=4
 NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=4
 NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE=4
-
+fi
 
 #### a questo punto e' meglio controllare che np_xc_el_l2*np_yc_el_l2 sia
 #### uguale a Z_i*np_xc_ion_l2*np_yc_ion_l2
@@ -285,19 +341,33 @@ t0_pl_2=${TEMP_INIZIALE_PLASMA_2}
 t0_pl_3=${TEMP_INIZIALE_PLASMA_3}
 t0_pl_4=${TEMP_INIZIALE_PLASMA_4}
 
+if [ "$MATERIAL" = "CH2" ] ; then
+np_per_xc_1=${NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA}
+np_per_xc_2=${NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA}
+np_per_xc_3=${NUMERO_PROTONI_LONGITUDINALMENTE_PER_CELLA}
+np_per_xc_4=1
+np_per_xc_5=1
+np_per_xc_6=1
+np_per_yc_1=${NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA}
+np_per_yc_2=${NUMERO_IONI_TRASVERSALMENTE_PER_CELLA}
+np_per_yc_3=${NUMERO_PROTONI_TRASVERSALMENTE_PER_CELLA}
+np_per_yc_4=1
+np_per_yc_5=1
+np_per_yc_6=1
+else
 np_per_xc_1=${NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE}
 np_per_xc_2=${NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_CENTRALE}
 np_per_xc_3=${NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE}
 np_per_xc_4=${NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_FRONTALE}
 np_per_xc_5=${NUMERO_ELETTRONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE}
 np_per_xc_6=${NUMERO_IONI_LONGITUDINALMENTE_PER_CELLA_LAYER_POSTERIORE}
-
 np_per_yc_1=${NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE}
 np_per_yc_2=${NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_CENTRALE}
 np_per_yc_3=${NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE}
 np_per_yc_4=${NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_FRONTALE}
 np_per_yc_5=${NUMERO_ELETTRONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE}
 np_per_yc_6=${NUMERO_IONI_TRASVERSALMENTE_PER_CELLA_LAYER_POSTERIORE}
+fi
 
 t0_lp=${POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER}
 xc_lp=${DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO}
@@ -350,7 +420,15 @@ dump=${CREA_FILE_DUMP}
 npe_yz=${NCPU}
 
 
+ if [ ! -f ./dumpRestart/dumpout000001.bin ] && [ "$1" = "1" ] ; then
+   echo "Missing dump files! Aborting submitting pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam} !"
+   cd ..
+   continue
+ fi
 
+ if [ "$1" = "1" ] ; then
+  mv $INPUTFILE $INPUTFILE.old$PREVIOUS_STEP
+ fi
 
  rm -f ${INPUTFILE}
  touch ${INPUTFILE}
@@ -474,7 +552,15 @@ npe_yz=${NCPU}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
 
-#bsub < $JOBFILE
+ if [ "$production" = "true" ] ; then
+  if [ "$HPC" = "cnaf" ] ; then
+   bsub < $JOBFILE
+  elif [ "$HPC" = "galileo" ] ; then
+   qsub $JOBFILE
+  elif [ "$HPC" = "fermi" ] ; then
+   llsubmit $JOBFILE
+  fi
+ fi
 
 cd ..
 
@@ -483,4 +569,8 @@ done
 done
 done
 done
+done
+
+
+
 
