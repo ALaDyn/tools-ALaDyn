@@ -256,7 +256,7 @@ int leggi_particelle(Parametri * parametri)
 
   if (parametri->p[OUT_VTK])
   {
-    printf("\nRichiesta scrittura file .vtk\n");
+    printf("\nENABLED .vtk FILE\n");
     binary_vtk = fopen(nomefile_vtk, "wb");
 
     // Scrittura primo Header VTK e memorizzazione sua dimensione in contatori[0]
@@ -292,26 +292,26 @@ int leggi_particelle(Parametri * parametri)
 
   if (parametri->p[OUT_CLEAN_BINARY])
   {
-    printf("\nRichiesta scrittura file binario unico e pulito\n");
+    printf("\nENABLED CLEAN .bin FILE\n");
     binary_clean = fopen(nomefile_bin_clean, "wb");
   }
 
 
   if (parametri->p[OUT_PROPAGA])
   {
-    printf("\nRichiesta scrittura file ASCII per Propaga\n");
+    printf("\nENABLED .txt FILE FOR PROPAGA\n");
     ascii_propaga = fopen(nomefile_propaga, "w");
   }
 
   if (parametri->p[OUT_XYZE])
   {
-    printf("\nRichiesta scrittura file ASCII con x, y, z, E\n");
+    printf("\nENABLED .txt FILE WITH x, y, z, E\n");
     ascii_xyze = fopen(nomefile_xyze, "w");
   }
 
   if (parametri->p[OUT_CSV])
   {
-    printf("\nRichiesta scrittura file ASCII CSV per Paraview\n");
+    printf("\nENABLED .csv FILE FOR PARAVIEW\n");
     ascii_csv = fopen(nomefile_csv, "w");
   }
 
@@ -361,7 +361,7 @@ int leggi_particelle(Parametri * parametri)
       nomefile_bin << parametri->filebasename << "_" << std::setfill('0') << std::setw(3) << indice_multifile << ".bin";
       if ((file_in = fopen(nomefile_bin.str().c_str(), "rb")) == NULL)
       {
-        printf("Sono finiti i files! \n");
+        printf("End of files! \n");
         break;
       }
       fseeko(file_in, 0, SEEK_END);
@@ -369,14 +369,14 @@ int leggi_particelle(Parametri * parametri)
       rewind(file_in);
       num_of_floats_in_file = (dim_file_in_bytes / sizeof(float));
       num_of_particles_in_file = (int)(num_of_floats_in_file / parametri->ndv);
-      printf("Il file %s_%.3i.bin contiene %llu particelle\n", parametri->filebasename.c_str(), indice_multifile, (unsigned long long int) num_of_particles_in_file);
+      printf("File %s_%.3i.bin has %llu particles\n", parametri->filebasename.c_str(), indice_multifile, (unsigned long long int) num_of_particles_in_file);
       fflush(stdout);
       num_of_passes = (int)((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) + 1;
       num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
       dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
       if (dimensione_array_particelle > parametri->nptot)
       {
-        printf("Read a npart=%llu, non valid. Exiting!", (unsigned long long int) dimensione_array_particelle);
+        printf("Read npart=%llu: not valid! Exiting...\n", (unsigned long long int) dimensione_array_particelle);
         break;
       }
       val[0] = (unsigned int)dimensione_array_particelle;
@@ -910,12 +910,12 @@ int leggi_particelle(Parametri * parametri)
     fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
     fprintf(parameters, "ncpu_y=%i\n", parametri->ncpu_y);
     fprintf(parameters, "ncpu_z=%i\n", parametri->ncpu_z);
-    fprintf(parameters, "npx_ricampionati=%llu\n", (unsigned long long int) parametri->npx_ricampionati);
-    fprintf(parameters, "npy_ricampionati=%llu\n", (unsigned long long int) parametri->npy_ricampionati);
-    fprintf(parameters, "npz_ricampionati=%llu\n", (unsigned long long int) parametri->npz_ricampionati);
-    fprintf(parameters, "npx_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npx_ricampionati_per_cpu);
-    fprintf(parameters, "npy_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npy_ricampionati_per_cpu);
-    fprintf(parameters, "npz_ricampionati_per_cpu=%llu\n", (unsigned long long int) parametri->npz_ricampionati_per_cpu);
+    fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) parametri->npx_ricampionati);
+    fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) parametri->npy_ricampionati);
+    fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) parametri->npz_ricampionati);
+    fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) parametri->npx_ricampionati_per_cpu);
+    fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) parametri->npy_ricampionati_per_cpu);
+    fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) parametri->npz_ricampionati_per_cpu);
     fprintf(parameters, "tnow=%f\n", parametri->tnow);
     fprintf(parameters, "xmin=%f\n", parametri->xmin);
     fprintf(parameters, "xmax=%f\n", parametri->xmax);
@@ -964,8 +964,8 @@ int leggi_particelle(Parametri * parametri)
     Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
     Estremi_out << "CHMIN = " << estremi_min[12] << std::endl;
     Estremi_out << "CHMAX = " << estremi_max[12] << std::endl;
-    if (parametri->p[OUT_PARAMS]) Estremi_out << "peso_accumulato = " << peso_accumulato << std::endl;
-    if (parametri->p[OUT_PARAMS]) Estremi_out << "carica_accumulata = " << carica_accumulata << std::endl;
+    if (parametri->p[OUT_PARAMS]) Estremi_out << "collected_weight = " << peso_accumulato << std::endl;
+    if (parametri->p[OUT_PARAMS]) Estremi_out << "collected_charge = " << carica_accumulata << std::endl;
     Estremi_out.close();
   }
 
@@ -1094,7 +1094,7 @@ int leggi_particelle(Parametri * parametri)
     }
   }
 
-  printf("fread_size=%lu\nFine\n\n", (unsigned long)fread_size);
+  printf("fread_size=%lu\nEND\n\n", (unsigned long)fread_size);
 
 
   if (parametri->p[OUT_VTK])

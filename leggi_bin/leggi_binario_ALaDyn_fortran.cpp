@@ -62,7 +62,7 @@ int main(const int argc, const char *argv[])
     file_bin.open(nomefile_bin.str().c_str(), std::ios::binary | std::ios::in);
     if (file_bin.fail())
     {
-      std::cout << "Input file non trovato" << std::endl;
+      std::cout << "Input file not found" << std::endl;
       return -3;
     }
     else parametri.multifile = true;
@@ -123,7 +123,7 @@ int main(const int argc, const char *argv[])
 
   if (testParametri == false)
   {
-    std::cout << "Parametri non coerenti" << std::endl;
+    std::cout << "Incoherent parameters!" << std::endl;
     return -2;
   }
 
@@ -132,7 +132,7 @@ int main(const int argc, const char *argv[])
   {
     parametri.organizza_minimi_massimi();
 #ifdef ENABLE_DEBUG
-    printf("Chiamata main parametri.organizza_minimi_massimi()\n");
+    printf("Calling function parametri.organizza_minimi_massimi()\n");
     printf("Emin=%g    Emax=%g   dE=%g\n", parametri.minimi[8], parametri.massimi[8], parametri.dimmi_dim(8));
     fflush(stdout);
 #endif
@@ -140,15 +140,15 @@ int main(const int argc, const char *argv[])
 
 
 #ifdef ENABLE_DEBUG
-  printf("file_griglia? %i\n", parametri.file_griglia);
-  printf("file_spaziofasi? %i\n", parametri.file_spaziofasi);
+  printf("grid_file? %i\n", parametri.file_griglia);
+  printf("phasespace_file? %i\n", parametri.file_spaziofasi);
 
-  printf("file_campi_Ex? %i\n", parametri.file_campi_Ex);
-  printf("file_campi_Ey? %i\n", parametri.file_campi_Ey);
-  printf("file_campi_Ez? %i\n", parametri.file_campi_Ez);
-  printf("file_campi_Bx? %i\n", parametri.file_campi_Bx);
-  printf("file_campi_By? %i\n", parametri.file_campi_By);
-  printf("file_campi_Bz? %i\n", parametri.file_campi_Bz);
+  printf("Ex_field_file? %i\n", parametri.file_campi_Ex);
+  printf("Ey_field_file? %i\n", parametri.file_campi_Ey);
+  printf("Ez_field_file? %i\n", parametri.file_campi_Ez);
+  printf("Bx_field_file? %i\n", parametri.file_campi_Bx);
+  printf("By_field_file? %i\n", parametri.file_campi_By);
+  printf("Bz_field_file? %i\n", parametri.file_campi_Bz);
 
   printf("file_eden? %i\n", parametri.file_densita_elettroni);
   printf("file_pden? %i\n", parametri.file_densita_protoni);
@@ -174,7 +174,7 @@ int main(const int argc, const char *argv[])
 
   if (parametri.file_griglia)         leggi_griglia(&parametri);
   else if (parametri.file_spaziofasi) leggi_particelle(&parametri);
-  else printf("Unuseful file\n");
+  else printf("Unknown file name, I don't know what to do with it! Rename it or change tool!\n");
   fflush(stdout);
 
   return 0;

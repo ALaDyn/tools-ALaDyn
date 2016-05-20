@@ -271,16 +271,18 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     if (file_version == -2) file_version = 3;
   }
 
+  std::cout << "Parsing an ALaDyn file versioned as v" << file_version << std::endl;
+  
   if (file_version == 1) {
     if (file_griglia) {
       /*
-      int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
-      model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
-      LPf_ord,der_ord,ns_ind,i_end/)
-
       real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
       n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
       gam0,nb_over_np,b_charge,vbeam/)
+
+      int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
+      model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
+      LPf_ord,der_ord,file_version,i_end/)
       */
       ncpu_y = intpar[0];
       ncpu_z = intpar[1];
@@ -295,7 +297,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       npy = npy_ricampionati * fattore_ricampionamento;
       npz_ricampionati = intpar[6];
       npz_per_cpu = intpar[7];
-      npz = npz_ricampionati * fattore_ricampionamento;
+      if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
+      else npz = npz_ricampionati;
       npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
       npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
       npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
@@ -326,7 +329,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       int_par(1:20) = (/ npe_yloc, npe_zloc, npe_xloc, &
       nx1, ny1, loc_nyc_max, nz1, loc_nzc_max, jump, iby, iform, &
       model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
-      LPf_ord, der_ord, ns_ind, i_end / )
+      LPf_ord, der_ord, file_version, i_end / )
       */
       ncpu_y = intpar[0];
       ncpu_z = intpar[1];
@@ -343,7 +346,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
       npx = npx_ricampionati * fattore_ricampionamento;
       npy = npy_ricampionati * fattore_ricampionamento;
-      npz = npz_ricampionati * fattore_ricampionamento;
+      if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
+      else npz = npz_ricampionati;
       npx_per_cpu = npx / ncpu_x;
       header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams*sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
     }
@@ -366,14 +370,14 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   else if (file_version == 3) {
     if (file_griglia) {
       /*
+      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+      gam0,nb_over_np,b_charge,vbeam/)
+
       int_par(1:20) = (/npe_loc,npe_zloc,npe_xloc,&
       nx1,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
       model_id,dmodel_id,nsp,curr_ndim,mp_per_cell(1),&
       LPf_ord,der_ord,file_version,i_end/)
-      --------------------
-      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-      gam0,nb_over_np,b_charge,vbeam/)
       */
       ncpu_y = intpar[0];
       ncpu_z = intpar[1];
@@ -388,7 +392,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       fattore_ricampionamento = intpar[8];
       npx = npx_ricampionati * fattore_ricampionamento;
       npy = npy_ricampionati * fattore_ricampionamento;
-      npz = npz_ricampionati * fattore_ricampionamento;
+      if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
+      else npz = npz_ricampionati;
       npx_per_cpu = npx / ncpu_x;
       npy_per_cpu = npy / ncpu_y;
       npz_per_cpu = npz / ncpu_z;
@@ -413,14 +418,14 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     if (file_griglia) {
 
       /*
+      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+      gam0,nb_over_np,b_charge,vbeam/)
+
       int_par(1:20) = (/ npe_loc, npe_zloc, npe_xloc, nx1, ny1, nz1, &
       jump, ibx, iby, iform, pid, &
       model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
       nptot, ndv, file_version, i_end / )
-      --------------------
-      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-      gam0,nb_over_np,b_charge,vbeam/)
       */
 
       /*npe_xloc*/ ncpu_x = intpar[2];
@@ -468,7 +473,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     {
       if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
       else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
-      else printf("Attenzione: valore illegale di ndv\n"), exit(-17);
+      else printf("Attention: illegal value for ndv\n"), exit(-17);
       if (ndv == 4 || ndv == 5) zmin = 0.0, zmax = 1.0;
       p[NCOLONNE] = ndv;
       p_b[NCOLONNE] = false;
@@ -574,16 +579,16 @@ void Parametri::debug_read_parameters()
   std::cout << "npx = " << npx << std::endl;
   std::cout << "npy = " << npy << std::endl;
   std::cout << "npz = " << npz << std::endl;
-  std::cout << "npx_ricampionati = " << npx_ricampionati << std::endl;
-  std::cout << "npy_ricampionati = " << npy_ricampionati << std::endl;
-  std::cout << "npz_ricampionati = " << npz_ricampionati << std::endl;
-  std::cout << "fattore_ricampionamento = " << fattore_ricampionamento << std::endl;
+  std::cout << "npx_resampled = " << npx_ricampionati << std::endl;
+  std::cout << "npy_resampled = " << npy_ricampionati << std::endl;
+  std::cout << "npz_resampled = " << npz_ricampionati << std::endl;
+  std::cout << "resampling_factor = " << fattore_ricampionamento << std::endl;
   std::cout << "npx_per_cpu = " << npx_per_cpu << std::endl;
   std::cout << "npy_per_cpu = " << npy_per_cpu << std::endl;
   std::cout << "npz_per_cpu = " << npz_per_cpu << std::endl;
-  std::cout << "npx_ricampionati_per_cpu = " << npx_ricampionati_per_cpu << std::endl;
-  std::cout << "npy_ricampionati_per_cpu = " << npy_ricampionati_per_cpu << std::endl;
-  std::cout << "npz_ricampionati_per_cpu = " << npz_ricampionati_per_cpu << std::endl;
+  std::cout << "npx_resampled_per_cpu = " << npx_ricampionati_per_cpu << std::endl;
+  std::cout << "npy_resampled_per_cpu = " << npy_ricampionati_per_cpu << std::endl;
+  std::cout << "npz_resampled_per_cpu = " << npz_ricampionati_per_cpu << std::endl;
   std::cout << "nptot = " << nptot << std::endl;
   std::cout << "ndv = " << ndv << std::endl;
   std::cout << "endianness = " << endianness << std::endl;
@@ -592,11 +597,11 @@ void Parametri::debug_read_parameters()
 void Parametri::chiedi_numero_colonne()
 {
   int ncolonne;
-  std::cout << "Quale versione di file e` data in pasto al parser? (1|2|3|4): ";
+  std::cout << "Which file version is this? (1|2|3|4): ";
   std::cin >> file_version;
   if (file_version < 3)
   {
-    std::cout << "Il file contiene 4, 5, 6 o 7 colonne? ";
+    std::cout << "How many columns are present in the binary file? (4|5|6|7): ";
     std::cin >> ncolonne;
     if (ncolonne == 6 || ncolonne == 4) p[WEIGHT] = 0;
     else if (ncolonne == 7 || ncolonne == 5) p[WEIGHT] = 1;
@@ -623,13 +628,13 @@ void Parametri::chiedi_numero_colonne()
 void Parametri::chiedi_2Do3D()
 {
   int dimensioni;
-  std::cout << "E' una griglia 3D (3) o 2D (2)? ";
+  std::cout << "Is it a 3D (3) or 2D (2) grid? ";
   std::cin >> dimensioni;
   if (dimensioni == 2) p[NCOLONNE] = 1;
   else if (dimensioni == 3) p[NCOLONNE] = 3;
   else
   {
-    std::cout << "Choice not valid" << std::endl;
+    std::cout << "Invalid choice" << std::endl;
     exit(-5);
   }
   p_b[NCOLONNE] = false;
@@ -638,7 +643,7 @@ void Parametri::chiedi_2Do3D()
 
 void Parametri::chiedi_endian_file()
 {
-  std::cout << "Il file e' little [x86] (0) o big [ppc] (1) endian? ";
+  std::cout << "Tell me something about endianness: is it little [x86] (0) or big [ppc] (1)? ";
   std::cin >> endian_file;
   if (endian_file != 1 && endian_file != 0) exit(-4);
 }
@@ -664,7 +669,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -676,7 +681,7 @@ void Parametri::check_filename(const char *nomefile)
     }
     else
     {
-      std::cout << "File non riconosciuto" << std::endl;
+      std::cout << "Unrecognized file" << std::endl;
       exit(-15);
     }
   }
@@ -704,7 +709,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -730,7 +735,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -756,13 +761,13 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
     else
     {
-      std::cout << "File non riconosciuto" << std::endl;
+      std::cout << "Unrecognized file" << std::endl;
       exit(-15);
     }
   }
@@ -790,13 +795,13 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
     else
     {
-      std::cout << "File non riconosciuto" << std::endl;
+      std::cout << "Unrecognized file" << std::endl;
       exit(-15);
     }
   }
@@ -818,7 +823,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -832,7 +837,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -846,7 +851,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -860,7 +865,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -872,7 +877,7 @@ void Parametri::check_filename(const char *nomefile)
     }
     else
     {
-      std::cout << "File non riconosciuto" << std::endl;
+      std::cout << "Unrecognized file" << std::endl;
       exit(-15);
     }
   }
@@ -888,7 +893,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -902,7 +907,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -916,7 +921,7 @@ void Parametri::check_filename(const char *nomefile)
       }
       else
       {
-        std::cout << "File non riconosciuto" << std::endl;
+        std::cout << "Unrecognized file" << std::endl;
         exit(-15);
       }
     }
@@ -928,13 +933,13 @@ void Parametri::check_filename(const char *nomefile)
     }
     else
     {
-      std::cout << "File non riconosciuto" << std::endl;
+      std::cout << "Unrecognized file" << std::endl;
       exit(-15);
     }
   }
   else
   {
-    std::cout << "File non riconosciuto" << std::endl;
+    std::cout << "Unrecognized file" << std::endl;
     exit(-15);
   }
 }
@@ -1775,7 +1780,7 @@ void Parametri::parse_command_line()
       failed_opening_file = fileParametri.fail();
       if (failed_opening_file)
       {
-        std::cout << "Impossibile aprire il file " << nomefile << " contenente i parametri di binnaggio" << std::endl;
+        std::cout << "Unable to open file " << nomefile << " which contains the binning parameters" << std::endl;
         exit(50);
       }
       while (!fileParametri.eof())
@@ -1932,34 +1937,34 @@ void Parametri::parse_command_line()
     }
     if (p_b[FIND_MINMAX] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi cercare massimi e minimi? 0 per no, 1 per si': ";
+      std::cout << "Do you want to find minimum and maximum values for common parameters? 0 (NO) - 1 (YES): ";
       std::cin >> p[FIND_MINMAX];
       p_b[FIND_MINMAX] = false;
     }
     if (p_b[DO_BINNING] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi fare il binnaggio dei dati? 1 si', 0 no: ";
+      std::cout << "Do you want to do a histogram (data binning)? 0 (NO) - 1 (YES): ";
       std::cin >> p[DO_BINNING];
       p_b[DO_BINNING] = false;
     }
     if (p[DO_BINNING] == 1 && nbin_b && !do_not_ask_missing)
     {
-      std::cout << "Quanti bin per asse vuoi usare? (consiglio: 120): ";
+      std::cout << "How many bins per axis? (common ALaDyn choice: 120): ";
       std::cin >> nbin;
       nbin_x = nbin_y = nbin_z = nbin_px = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = nbin_w = nbin_ch = nbin;
     }
 
     if (p[DO_BINNING] == 1 && !do_not_ask_missing)
     {
-      std::cout << "Vuoi fare il plot x-px? 0 per no, 1 per si': ";
+      std::cout << "Do you want to do an x-px plot? 0 (NO) - 1 (YES): ";
       std::cin >> fai_plot_xpx;
-      std::cout << "Vuoi fare il plot E-theta (deg)? 0 per no, 1 per si': ";
+      std::cout << "E-theta (deg)? 0 (NO) - 1 (YES): ";
       std::cin >> fai_plot_Etheta;
-      std::cout << "Vuoi fare il plot E-theta (rad)? 0 per no, 1 per si': ";
+      std::cout << "E-theta (rad)? 0 (NO) - 1 (YES): ";
       std::cin >> fai_plot_EthetaT;
-      std::cout << "Vuoi fare lo spettro in energia? 0 per no, 1 per si': ";
+      std::cout << "Energy spectrum? 0 (NO) - 1 (YES): ";
       std::cin >> fai_plot_Espec;
-      std::cout << "Vuoi fare il plot rfc? 0 per no, 1 per si': ";
+      std::cout << "RFC plot? 0 (NO) - 1 (YES): ";
       std::cin >> fai_plot_rcf;
       if (fai_plot_xpx)
       {
@@ -2108,7 +2113,7 @@ void Parametri::parse_command_line()
 
 
 #ifdef ENABLE_DEBUG
-    std::cout << "Dal file " << nomefile << " ho letto i seguenti estremi:" << std::endl;
+    std::cout << "In file " << nomefile << " I found these binning parameters:" << std::endl;
     std::cout << "XMIN = " << xmin << std::endl;
     std::cout << "XMAX = " << xmax << std::endl;
     std::cout << "YMIN = " << ymin << std::endl;
@@ -2140,37 +2145,37 @@ void Parametri::parse_command_line()
 #endif
     if (p_b[OUT_VTK] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
+      std::cout << "Do you want the .vtk binary output?? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_VTK];
       p_b[OUT_VTK] = false;
     }
     if (p_b[OUT_CLEAN_BINARY] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output completo binario pulito? 1 si', 0 no: ";
+      std::cout << "Do you want the .bin output, cleaned from Fortran metadata? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_CLEAN_BINARY];
       p_b[OUT_CLEAN_BINARY] = false;
     }
     if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output completo per Propaga? 1 si', 0 no: ";
+      std::cout << "Do you want the .ppg output for Propaga? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_PROPAGA];
       p_b[OUT_PROPAGA] = false;
     }
     if (p_b[OUT_XYZE] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output di un file ASCII contenente x y (z) ed energia? 1 si', 0 no: ";
+      std::cout << "Do you want a .txt file with x y (z) and Energy? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_XYZE];
       p_b[OUT_XYZE] = false;
     }
     if (p_b[OUT_CSV] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output completo CSV per Paraview? 1 si', 0 no: ";
+      std::cout << "Do you want a .csv file for Paraview? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_CSV];
       p_b[OUT_CSV] = false;
     }
     if (p_b[OUT_PARAMS] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
+      std::cout << "Do you want a .dat files with simulation parameters? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_PARAMS];
       p_b[OUT_PARAMS] = false;
     }
@@ -2179,58 +2184,58 @@ void Parametri::parse_command_line()
   {
     if (p_b[OUT_VTK] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output completo binario VTK? 1 si', 0 no: ";
+      std::cout << "Do you want the .vtk binary output?? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_VTK];
       p_b[OUT_VTK] = false;
     }
     if (p_b[OUT_VTK_NOSTRETCH] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output binario VTK della parte non stretchata? 1 si', 0 no: ";
+      std::cout << "Do you want the .vtk binary output only for the unstretched part of the grid? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_VTK_NOSTRETCH];
       p_b[OUT_VTK_NOSTRETCH] = false;
     }
     if (p[OUT_VTK_NOSTRETCH] && !do_not_ask_missing)
     {
-      std::cout << "La griglia e' stretchata anche lungo l'asse x? 1 si', 0 no: ";
+      std::cout << "Is the grid stretched also along x? 0 (NO) - 1 (YES): ";
       std::cin >> stretched_along_x;
     }
     if (p[NCOLONNE] > 1)
     {
       if (p_b[OUT_CUTX] && !do_not_ask_missing)
       {
-        std::cout << "Vuoi l'output di una slice tagliata lungo x per gnuplot? 1 si', 0 no: ";
+        std::cout << "Do you want a .txt from a slice along x, for gnuplot? 0 (NO) - 1 (YES): ";
         std::cin >> p[OUT_CUTX];
         p_b[OUT_CUTX] = false;
         float posizione_taglio = 0.0;
         if (p[OUT_CUTX] == 1)
         {
-          std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
+          std::cout << "Please tell me at which position should I cut the slice (in micrometers): ";
           std::cin >> posizione_taglio;
           posizioni_taglio_griglia_x.push_back(posizione_taglio);
         }
       }
       if (p_b[OUT_CUTY] && !do_not_ask_missing)
       {
-        std::cout << "Vuoi l'output di una slice tagliata lungo y per gnuplot? 1 si', 0 no: ";
+        std::cout << "Do you want a .txt from a slice along y, for gnuplot? 0 (NO) - 1 (YES): ";
         std::cin >> p[OUT_CUTY];
         p_b[OUT_CUTY] = false;
         float posizione_taglio = 0.0;
         if (p[OUT_CUTY] == 1)
         {
-          std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
+          std::cout << "Please tell me at which position should I cut the slice (in micrometers): ";
           std::cin >> posizione_taglio;
           posizioni_taglio_griglia_y.push_back(posizione_taglio);
         }
       }
       if (p_b[OUT_CUTZ] && !do_not_ask_missing)
       {
-        std::cout << "Vuoi l'output di una slice tagliata lungo z per gnuplot? 1 si', 0 no: ";
+        std::cout << "Do you want a .txt from a slice along z, for gnuplot? 0 (NO) - 1 (YES): ";
         std::cin >> p[OUT_CUTZ];
         p_b[OUT_CUTZ] = false;
         float posizione_taglio = 0.0;
         if (p[OUT_CUTZ] == 1)
         {
-          std::cout << "Dimmi in che posizione (in micrometri) tagliare: ";
+          std::cout << "Please tell me at which position should I cut the slice (in micrometers): ";
           std::cin >> posizione_taglio;
           posizioni_taglio_griglia_z.push_back(posizione_taglio);
         }
@@ -2242,7 +2247,7 @@ void Parametri::parse_command_line()
     {
       if (p_b[OUT_GRID2D] && !do_not_ask_missing)
       {
-        std::cout << "Vuoi riscrivere la griglia in ASCII per gnuplot? 1 si', 0 no: ";
+        std::cout << "Do you want a .txt file for gnuplot? 0 (NO) - 1 (YES): ";
         std::cin >> p[OUT_GRID2D];
         p_b[OUT_GRID2D] = false;
       }
@@ -2255,13 +2260,13 @@ void Parametri::parse_command_line()
     }
     if (p_b[OUT_PARAMS] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output dei parametri contenuti nel file? 1 si', 0 no: ";
+      std::cout << "Do you want a .dat files with simulation parameters? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_PARAMS];
       p_b[OUT_PARAMS] = false;
     }
     if (p_b[OUT_LINEOUT_X] && !do_not_ask_missing)
     {
-      std::cout << "Vuoi l'output di un lineout della griglia lungo x? 1 si', 0 no: ";
+      std::cout << "Do you want a lineout along x? 0 (NO) - 1 (YES): ";
       std::cin >> p[OUT_LINEOUT_X];
       p_b[OUT_LINEOUT_X] = false;
     }
@@ -2275,7 +2280,7 @@ bool Parametri::check_parametri()
   bool test = true;
   if (!p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1)   // check swap o non-swap
   {
-    printf("Attenzione: modalita` swap mal definita\n");
+    printf("Warning: swap mode badly defined\n");
     test = false;
   }
   else
@@ -2292,7 +2297,7 @@ bool Parametri::check_parametri()
     }
     else
     {
-      printf("Attenzione: modalita` swap non definita\n");
+      printf("Warning: swap mode undefined\n");
       test = false;
     }
   }
@@ -2300,7 +2305,7 @@ bool Parametri::check_parametri()
   {
     if (!p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1)
     {
-      printf("Attenzione: modalita` weight mal definita\n");
+      printf("Warning: weight mode badly defined\n");
       test = false;
     }
     else
@@ -2317,13 +2322,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: modalita` weight non definita\n");
+        printf("Warning: weight mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_CSV] && p[OUT_CSV] != 0 && p[OUT_CSV] != 1)  // check leggi_particelle: out-ascii o non-out-ascii
     {
-      printf("Attenzione: output csv mal definito\n");
+      printf("Warning: csv mode badly defined\n");
       test = false;
     }
     else
@@ -2340,13 +2345,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output csv non definito\n");
+        printf("Warning: csv mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_PROPAGA] && p[OUT_PROPAGA] != 0 && p[OUT_PROPAGA] != 1)  // check leggi_particelle: out-ascii o non-out-ascii
     {
-      printf("Attenzione: output ppg mal definito\n");
+      printf("Warning: ppg mode badly defined\n");
       test = false;
     }
     else
@@ -2363,13 +2368,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output ppg non definito\n");
+        printf("Warning: ppg mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_XYZE] && p[OUT_XYZE] != 0 && p[OUT_XYZE] != 1)
     {
-      printf("Attenzione: output xyzE mal definito\n");
+      printf("Warning: xyzE mode badly defined\n");
       test = false;
     }
     else
@@ -2386,13 +2391,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output xyzE non definito\n");
+        printf("Warning: xyzE mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1)
     {
-      printf("Attenzione: output vtk mal definito\n");
+      printf("Warning: vtk mode badly defined\n");
       test = false;
     }
     else
@@ -2409,13 +2414,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output vtk non definito\n");
+        printf("Warning: vtk mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_CLEAN_BINARY] && p[OUT_CLEAN_BINARY] != 0 && p[OUT_CLEAN_BINARY] != 1)
     {
-      printf("Attenzione: output binario pulito mal definito\n");
+      printf("Warning: bin mode badly defined\n");
       test = false;
     }
     else
@@ -2432,14 +2437,14 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output binario pulito non definito\n");
+        printf("Warning: bin mode undefined\n");
         test = false;
       }
     }
 
     if (!p_b[FIND_MINMAX] && p[FIND_MINMAX] != 0 && p[FIND_MINMAX] != 1)
     {
-      printf("Attenzione: ricerca minimi/massimi mal definita\n");
+      printf("Warning: min/max mode badly defined\n");
       test = false;
     }
     else
@@ -2456,13 +2461,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: ricerca minimi/massimi non definita\n");
+        printf("Warning: min/max mode undefined\n");
         test = false;
       }
     }
     if (!p_b[DO_BINNING] && p[DO_BINNING] != 0 && p[DO_BINNING] != 1)
     {
-      printf("Attenzione: parametro binnaggio mal definito\n");
+      printf("Warning: binning mode badly defined\n");
       test = false;
     }
     else
@@ -2479,13 +2484,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: parametro binnaggio non definito\n");
+        printf("Warning: binning mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1)
     {
-      printf("Attenzione: output parametri mal definito\n");
+      printf("Warning: dat mode badly defined\n");
       test = false;
     }
     else
@@ -2502,13 +2507,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output parametri non definito\n");
+        printf("Warning: dat mode undefined\n");
         test = false;
       }
     }
     if (!p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7 && p[NCOLONNE] != 8)
     {
-      printf("Attenzione: ncolonne mal definite\n");
+      printf("Warning: column number badly defined\n");
       test = false;
     }
     else
@@ -2525,7 +2530,7 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: numero colonne nel file binario non definito\n");
+        printf("Warning: column number undefined\n");
         test = false;
       }
     }
@@ -2533,132 +2538,132 @@ bool Parametri::check_parametri()
 
     if (xmin > xmax)
     {
-      printf("Attenzione: xmin > xmax\n");
+      printf("Warning: xmin > xmax\n");
       test = false;
     }
     if (ymin > ymax)
     {
-      printf("Attenzione: ymin > ymax\n");
+      printf("Warning: ymin > ymax\n");
       test = false;
     }
     if (zmin > zmax)
     {
-      printf("Attenzione: zmin > zmax\n");
+      printf("Warning: zmin > zmax\n");
       test = false;
     }
     if (pxmin > pxmax)
     {
-      printf("Attenzione: pxmin > pxmax\n");
+      printf("Warning: pxmin > pxmax\n");
       test = false;
     }
     if (pymin > pymax)
     {
-      printf("Attenzione: pymin > pymax\n");
+      printf("Warning: pymin > pymax\n");
       test = false;
     }
     if (pzmin > pzmax)
     {
-      printf("Attenzione: pzmin > pzmax\n");
+      printf("Warning: pzmin > pzmax\n");
       test = false;
     }
     if (Emin > Emax)
     {
-      printf("Attenzione: Emin > Emax\n");
+      printf("Warning: Emin > Emax\n");
       test = false;
     }
     if (thetamin > thetamax)
     {
-      printf("Attenzione: thetamin > thetamax\n");
+      printf("Warning: thetamin > thetamax\n");
       test = false;
     }
     if (thetaTmin > thetaTmax)
     {
-      printf("Attenzione: thetaTmin > thetaTmax\n");
+      printf("Warning: thetaTmin > thetaTmax\n");
       test = false;
     }
     if (tymin > tymax)
     {
-      printf("Attenzione: tymin > tymax\n");
+      printf("Warning: tymin > tymax\n");
       test = false;
     }
     if (tzmin > tzmax)
     {
-      printf("Attenzione: tzmin > tzmax\n");
+      printf("Warning: tzmin > tzmax\n");
       test = false;
     }
     if (wmin > wmax)
     {
-      printf("Attenzione: wmin > wmax\n");
+      printf("Warning: wmin > wmax\n");
       test = false;
     }
     if (chmin > chmax)
     {
-      printf("Attenzione: chmin > chmax\n");
+      printf("Warning: chmin > chmax\n");
       test = false;
     }
     if (nbin_x <= 0)
     {
-      printf("Attenzione: nbin_x < 0\n");
+      printf("Warning: nbin_x < 0\n");
       test = false;
     }
     if (nbin_y <= 0)
     {
-      printf("Attenzione: nbin_y < 0\n");
+      printf("Warning: nbin_y < 0\n");
       test = false;
     }
     if (nbin_z <= 0)
     {
-      printf("Attenzione: nbin_z < 0\n");
+      printf("Warning: nbin_z < 0\n");
       test = false;
     }
     if (nbin_px <= 0)
     {
-      printf("Attenzione: nbin_px < 0\n");
+      printf("Warning: nbin_px < 0\n");
       test = false;
     }
     if (nbin_py <= 0)
     {
-      printf("Attenzione: nbin_py < 0\n");
+      printf("Warning: nbin_py < 0\n");
       test = false;
     }
     if (nbin_pz <= 0)
     {
-      printf("Attenzione: nbin_pz < 0\n");
+      printf("Warning: nbin_pz < 0\n");
       test = false;
     }
     if (nbin_E <= 0)
     {
-      printf("Attenzione: nbin_E < 0\n");
+      printf("Warning: nbin_E < 0\n");
       test = false;
     }
     if (nbin_theta <= 0)
     {
-      printf("Attenzione: nbin_theta < 0\n");
+      printf("Warning: nbin_theta < 0\n");
       test = false;
     }
     if (nbin_thetaT <= 0)
     {
-      printf("Attenzione: nbin_thetaT < 0\n");
+      printf("Warning: nbin_thetaT < 0\n");
       test = false;
     }
     if (nbin_ty <= 0)
     {
-      printf("Attenzione: nbin_ty < 0\n");
+      printf("Warning: nbin_ty < 0\n");
       test = false;
     }
     if (nbin_tz <= 0)
     {
-      printf("Attenzione: nbin_tz < 0\n");
+      printf("Warning: nbin_tz < 0\n");
       test = false;
     }
     if (nbin_w <= 0)
     {
-      printf("Attenzione: nbin_w < 0\n");
+      printf("Warning: nbin_w < 0\n");
       test = false;
     }
     if (nbin_ch <= 0)
     {
-      printf("Attenzione: nbin_ch < 0\n");
+      printf("Warning: nbin_ch < 0\n");
       test = false;
     }
   }
@@ -2666,7 +2671,7 @@ bool Parametri::check_parametri()
   {
     if (!p_b[OUT_VTK_NOSTRETCH] && p[OUT_VTK_NOSTRETCH] != 0 && p[OUT_VTK_NOSTRETCH] != 1)
     {
-      printf("Attenzione: output vtk nostretch mal definito\n");
+      printf("Warning: .vtk non-stretched badly defined\n");
       test = false;
     }
     else
@@ -2683,13 +2688,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output binario non definito\n");
+        printf("Warning: .vtk non-stretched undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1)
     {
-      printf("Attenzione: output binario mal definito\n");
+      printf("Warning: .vtk badly defined\n");
       test = false;
     }
     else
@@ -2706,13 +2711,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output binario non definito\n");
+        printf("Warning: .vtk undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1)
     {
-      printf("Attenzione: output parametri mal definito\n");
+      printf("Warning: .dat parameter output badly defined\n");
       test = false;
     }
     else
@@ -2729,13 +2734,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output parametri non definito\n");
+        printf("Warning: .dat parameter output undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_LINEOUT_X] && p[OUT_LINEOUT_X] != 0 && p[OUT_LINEOUT_X] != 1)
     {
-      printf("Attenzione: output lineout mal definito\n");
+      printf("Warning: lineout output badly defined\n");
       test = false;
     }
     else
@@ -2752,13 +2757,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output lineout non definito\n");
+        printf("Warning: lineout output undefined\n");
         test = false;
       }
     }
     if (!p_b[NCOLONNE] && p[NCOLONNE] < 1)
     {
-      printf("Attenzione: dimensioni griglia mal definite\n");
+      printf("Warning: grid size badly defined\n");
       test = false;
     }
     else
@@ -2769,14 +2774,14 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: non capisco se la griglia e' 2D o 3D\n");
-        if (file_version < 2) printf("Con i files privi di .dat e' necessario specificare -ncol su riga di comando in modalita' batch\n");
+        printf("Warning: unable to understand grid size\n");
+        printf("If necessary (no .dat file available) please use -ncol at command line\n");
         test = false;
       }
     }
     if (!p_b[OUT_CUTX] && p[OUT_CUTX] != 0 && p[OUT_CUTX] != 1)
     {
-      printf("Attenzione: output slice mal definito\n");
+      printf("Warning: slice mode badly defined\n");
       test = false;
     }
     else
@@ -2793,13 +2798,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output slice non definito\n");
+        printf("Warning: slice mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_CUTY] && p[OUT_CUTY] != 0 && p[OUT_CUTY] != 1)
     {
-      printf("Attenzione: output slice mal definito\n");
+      printf("Warning: slice mode badly defined\n");
       test = false;
     }
     else
@@ -2816,13 +2821,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output slice non definito\n");
+        printf("Warning: slice mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_CUTZ] && p[OUT_CUTZ] != 0 && p[OUT_CUTZ] != 1)
     {
-      printf("Attenzione: output slice mal definito\n");
+      printf("Warning: slice mode badly defined\n");
       test = false;
     }
     else
@@ -2839,13 +2844,13 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output slice non definito\n");
+        printf("Warning: slice mode undefined\n");
         test = false;
       }
     }
     if (!p_b[OUT_GRID2D] && p[OUT_GRID2D] != 0 && p[OUT_GRID2D] != 1)
     {
-      printf("Attenzione: output griglia 2D mal definito\n");
+      printf("Warning: 2D grid output badly defined\n");
       test = false;
     }
     else
@@ -2862,7 +2867,7 @@ bool Parametri::check_parametri()
       }
       else
       {
-        printf("Attenzione: output griglia 2D non definito\n");
+        printf("Warning: 2D grid output undefined\n");
         test = false;
       }
     }
