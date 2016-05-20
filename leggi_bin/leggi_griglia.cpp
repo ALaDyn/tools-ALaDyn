@@ -68,8 +68,10 @@ int leggi_griglia(Parametri * parametri)
 
           if (header[0] != parametri->npx_ricampionati_per_cpu ||
             header[1] != parametri->npy_ricampionati_per_cpu ||
-            header[2] != parametri->npz_ricampionati_per_cpu)
-            std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
+            header[2] != parametri->npz_ricampionati_per_cpu) {
+            printf("\nWARNING: unexpected number of points in this chunk!\n");
+            printf("header[] = [%i,%i,%i], parameters[] = [%llu,%llu,%llu]\n", header[0], header[1], header[2], (unsigned long long int) parametri->npx_ricampionati_per_cpu, (unsigned long long int) parametri->npy_ricampionati_per_cpu, (unsigned long long int) parametri->npz_ricampionati_per_cpu);
+          }
 
           printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) parametri->npx_ricampionati_per_cpu, header[1], (unsigned long long int) parametri->npy_ricampionati_per_cpu, header[2], (unsigned long long int) parametri->npz_ricampionati_per_cpu, ipx + 1, parametri->ncpu_x, ipy + 1, parametri->ncpu_y, ipz + 1, parametri->ncpu_z);
           fflush(stdout);
