@@ -68,7 +68,8 @@ int leggi_griglia(Parametri * parametri)
 
           if (header[0] != parametri->npx_ricampionati_per_cpu ||
             header[1] != parametri->npy_ricampionati_per_cpu ||
-            (header[2] != parametri->npz_ricampionati_per_cpu && header[2] != 0 && parametri->npz_ricampionati_per_cpu != 1)) {
+            (header[2] != parametri->npz_ricampionati_per_cpu && header[2] != 1 && parametri->npz_ricampionati_per_cpu != 0)) // fix for 2D files, which have 1 point in z for parameters but none for the binary dump
+          {
             printf("\nWARNING: unexpected number of points in this chunk!\n");
             printf("header[] = [%i,%i,%i], parameters[] = [%llu,%llu,%llu]\n", header[0], header[1], header[2], (unsigned long long int) parametri->npx_ricampionati_per_cpu, (unsigned long long int) parametri->npy_ricampionati_per_cpu, (unsigned long long int) parametri->npz_ricampionati_per_cpu);
           }
