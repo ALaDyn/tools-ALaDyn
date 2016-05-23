@@ -11,8 +11,8 @@
 #define _SCL_SECURE_NO_WARNINGS
 
 #define MAJOR_RELEASE  6
-#define MINOR_RELEASE  2
-#define BUGFIX_RELEASE 2
+#define MINOR_RELEASE  3
+#define BUGFIX_RELEASE 0
 
 #include <iostream>
 #include <vector>
@@ -168,6 +168,7 @@ struct Parametri
   bool file_griglia, file_spaziofasi;
   bool file_particelle_P, file_particelle_E, file_particelle_HI, file_particelle_LI, file_particelle_generic_ion;
   bool file_campi_Ex, file_campi_Ey, file_campi_Ez, file_campi_Bx, file_campi_By, file_campi_Bz;
+  bool file_correnti_Jx, file_correnti_Jy, file_correnti_Jz;
   bool file_densita_elettroni, file_densita_protoni, file_densita_HI, file_densita_LI, file_densita_generic_ion, file_densita_driver;
   bool file_densita_energia_griglia_elettroni, file_densita_energia_griglia_protoni, file_densita_energia_griglia_HI, file_densita_energia_griglia_LI, file_densita_energia_griglia_generic_ion;
   Parametri();

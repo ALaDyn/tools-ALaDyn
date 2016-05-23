@@ -937,6 +937,56 @@ void Parametri::check_filename(const char *nomefile)
       exit(-15);
     }
   }
+  else if (nomefile[0] == 'J')
+  {
+    if (nomefile[1] == 'x')
+    {
+      if (nomefile[2] == 'f')
+      {
+        file_correnti_Jx = true;
+        file_griglia = true;
+        sprintf(support_label, "Jx");
+      }
+      else
+      {
+        std::cout << "Unrecognized file" << std::endl;
+        exit(-15);
+      }
+    }
+    else if (nomefile[1] == 'y')
+    {
+      if (nomefile[2] == 'f')
+      {
+        file_correnti_Jy = true;
+        file_griglia = true;
+        sprintf(support_label, "Jy");
+      }
+      else
+      {
+        std::cout << "Unrecognized file" << std::endl;
+        exit(-15);
+      }
+    }
+    else if (nomefile[1] == 'z')
+    {
+      if (nomefile[2] == 'f')
+      {
+        file_correnti_Jz = true;
+        file_griglia = true;
+        sprintf(support_label, "Jz");
+      }
+      else
+      {
+        std::cout << "Unrecognized file" << std::endl;
+        exit(-15);
+      }
+    }
+    else
+    {
+      std::cout << "Unrecognized file" << std::endl;
+      exit(-15);
+    }
+  }
   else
   {
     std::cout << "Unrecognized file" << std::endl;
