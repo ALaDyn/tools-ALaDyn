@@ -40,7 +40,8 @@ def	generate_folder_output_structure(path,savedata):
 					###---###
 	directory_ionization   = os.path.join(directory,'ionization')
 					###---###
-					
+	directory_Energy_Density = os.path.join(directory, 'Energy_Density')
+	
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
 	if not os.path.exists( directory_E ):
