@@ -52,7 +52,9 @@ def	generate_folder_output_structure(path,savedata):
 	if not os.path.exists( directory_ionization ):
 		os.makedirs(directory_ionization)
 					###---###
-
+	if not os.path.exists( directory_Energy_Density ):
+		os.makedirs(directory_Energy_Density)
+	
 	if (savedata == 'True'):
 		directory = os.path.join(path,'data')
 		if not os.path.exists( directory ):
@@ -65,17 +67,19 @@ def	generate_folder_output_structure(path,savedata):
 						###---###
 		directory_ionization = os.path.join(directory,'ionization')
 						###---###
-										
+		directory_Energy_Density	= os.path.join(directory, 'Energy Density')	
 		if not os.path.exists( directory_rho ):
 			os.makedirs(directory_rho)
 		if not os.path.exists( directory_E ):
 			os.makedirs(directory_E)
 		if not os.path.exists( directory_B ):
-			os.makedirs(directory_B)
+			os.makedirs(directory_B)	
 		if not os.path.exists( directory_moving_window ):
 			os.makedirs( directory_moving_window )
 		if not os.path.exists( directory_ionization ):
 			os.makedirs( directory_ionization )
+		if not os.path.exists( directory_Energy_Density ):
+			os.makedirs( directory_Energy_Density )
 
 
 
