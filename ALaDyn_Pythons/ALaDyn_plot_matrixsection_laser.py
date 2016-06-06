@@ -1,8 +1,8 @@
 #!/usr/bin/python
 ######################################################################
 # Name:         ALaDyn_plot_section.py
-# Author:		A. Marocchino
-# Date:			2014-11-04
+# Author:	A. Marocchino
+# Date:		2014-11-04
 # Purpose:      it nests into 'ALaDyn_read_binary MATRIX' it does it using much less memory than the previous version
 # Source:       python
 #####################################################################
@@ -37,15 +37,15 @@ if(len(sys.argv)<2):
 	exit(0)
 
 if sys.argv[1] == -1:
-	frame_begin		  = 0
+	frame_begin	  = 0
 	frame_end         = last_output(os.getcwd())
-	axis_to_cut		  = 'y'
-	cell_to_cut		  = 0
+	axis_to_cut	  = 'y'
+	cell_to_cut	  = 0
 else:
-	frame_begin 		= int(		sys.argv[1])
-	frame_end			= int(		sys.argv[2])
-	axis_to_cut			= str(		sys.argv[3])
-	cell_to_cut			= int(		sys.argv[4])
+	frame_begin 	= int(		sys.argv[1])
+	frame_end	= int(		sys.argv[2])
+	axis_to_cut	= str(		sys.argv[3])
+	cell_to_cut	= int(		sys.argv[4])
 ### --- ###
 
 

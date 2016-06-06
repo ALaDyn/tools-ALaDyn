@@ -149,6 +149,7 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 		r = np.zeros((nx,nz))
 	elif axis_to_cut == 'z':
 		r = np.zeros((nx,ny))
+		print 'through here',r.shape
 	rr=[]
 # 	print 'number of Np processors: Np_y=',nproc_y,'Np_z=', nproc_z
 
@@ -170,9 +171,9 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 						temp = struct.unpack('f', f.read(4))[0]
 						if axis_to_cut == 'x' and i == nx/2+cell_to_cut:
 							r[j+offsety,k+offsetz] = temp
-						elif axis_to_cut == 'y' and j+offsety == ny/2+cell_to_cut:
+						elif axis_to_cut == 'y' and (j+offsety == ny/2+cell_to_cut or ny==1):
 							r[i,k+offsetz] = temp
-						elif axis_to_cut == 'z' and k+offsetz == nz/2+cell_to_cut:
+						elif axis_to_cut == 'z' and (k+offsetz == nz/2+cell_to_cut or nz==1):
 							r[i,j+offsety] = temp
 			struct.unpack('i', f.read(4))
 			offsety += npy
