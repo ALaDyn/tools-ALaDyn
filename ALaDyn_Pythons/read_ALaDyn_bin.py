@@ -149,7 +149,6 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 		r = np.zeros((nx,nz))
 	elif axis_to_cut == 'z':
 		r = np.zeros((nx,ny))
-		print 'through here',r.shape
 	rr=[]
 # 	print 'number of Np processors: Np_y=',nproc_y,'Np_z=', nproc_z
 
