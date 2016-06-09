@@ -67,7 +67,7 @@ if __name__ == '__main__':
 		path_read  = os.path.join(path,'%4.4i'%i)
 		path_write = path
 
-		if output_exists(path,'rho',i) == True:
+		if output_exists(path_read,'rho',i) == True:
 			print 'rho --- frame >>> ',i
 			M,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Bdenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
@@ -78,17 +78,17 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
-		if output_exists(path,'ionization',i) == True:
+		if output_exists(path_read,'ionization',i) == True:
 			print 'ionization rate --- frame >>> ',i
 			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			np.savetxt( os.path.join(path_write,'data','ionization',('ionization_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
 
-		if output_exists(path,'Energy_density',i) == True:
+		if output_exists(path_read,'Energy_density',i) == True:
             		print 'energy density --- frame >>> ',i
             		ED,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Elenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
             		np.savetxt( os.path.join(path_write,'data','Energy_Density',('Energy_Density'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
 
-		if output_exists(path,'E',i) == True:
+		if output_exists(path_read,'E',i) == True:
 			print 'E --- frame >>> ',i
 			Exb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Exbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Exf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Exfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
 
-		if output_exists(path,'B',i) == True:
+		if output_exists(path_read,'B',i) == True:
 			print 'B --- frame >>> ',i
 			#Bxb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bxbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Bxf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Bxfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
