@@ -40,38 +40,38 @@ public:
   int32_t Nx, Ny, Nz, n_cell, Nsp, Nsb;
   int32_t iter, nst, sp_step, nvar, npvar;
 
-  float * timesteps;
-  float ** Etot;
-  float ** Emean;
-  float ** Emax;
-  float ** px;
-  float ** py;
-  float ** pz;
-  float ** sigma_px;
-  float ** sigma_py;
-  float ** sigma_pz;
-  float ** Jz;
-  float ** mean_charge;
-  float ** charge_per_cell;
-  float * charge_tot;
-  float * Ex2;
-  float * Ey2;
-  float * Ez2;
-  float * Bx2;
-  float * By2;
-  float * Bz2;
-  float * Ex2_on_solid_target;
-  float * Ey2_on_solid_target;
-  float * Ez2_on_solid_target;
-  float * Bx2_on_solid_target;
-  float * By2_on_solid_target;
-  float * Bz2_on_solid_target;
-  float * Ex_max;
-  float * Ey_max;
-  float * Ez_max;
-  float * Bx_max;
-  float * By_max;
-  float * Bz_max;
+  double * timesteps;
+  double ** Etot;
+  double ** Emean;
+  double ** Emax;
+  double ** px;
+  double ** py;
+  double ** pz;
+  double ** sigma_px;
+  double ** sigma_py;
+  double ** sigma_pz;
+  double ** Jz;
+  double ** mean_charge;
+  double ** charge_per_cell;
+  double * charge_tot;
+  double * Ex2;
+  double * Ey2;
+  double * Ez2;
+  double * Bx2;
+  double * By2;
+  double * Bz2;
+  double * Ex2_on_solid_target;
+  double * Ey2_on_solid_target;
+  double * Ez2_on_solid_target;
+  double * Bx2_on_solid_target;
+  double * By2_on_solid_target;
+  double * Bz2_on_solid_target;
+  double * Ex_max;
+  double * Ey_max;
+  double * Ez_max;
+  double * Bx_max;
+  double * By_max;
+  double * Bz_max;
 
   void allocate_arrays();
   void deallocate_arrays();
@@ -138,53 +138,53 @@ void Diag_data::start(std::ifstream &infile) {
 }
 
 void Diag_data::allocate_arrays() {
-  timesteps = new float[nst];
+  timesteps = new double[nst];
 
-  Etot = new float*[Nsp];
-  Emean = new float*[Nsp];
-  Emax = new float*[Nsp];
-  px = new float*[Nsp];
-  py = new float*[Nsp];
-  pz = new float*[Nsp];
-  sigma_px = new float*[Nsp];
-  sigma_py = new float*[Nsp];
-  sigma_pz = new float*[Nsp];
-  Jz = new float*[Nsp];
-  mean_charge = new float*[Nsp];
-  charge_per_cell = new float*[Nsp];
+  Etot = new double*[Nsp];
+  Emean = new double*[Nsp];
+  Emax = new double*[Nsp];
+  px = new double*[Nsp];
+  py = new double*[Nsp];
+  pz = new double*[Nsp];
+  sigma_px = new double*[Nsp];
+  sigma_py = new double*[Nsp];
+  sigma_pz = new double*[Nsp];
+  Jz = new double*[Nsp];
+  mean_charge = new double*[Nsp];
+  charge_per_cell = new double*[Nsp];
   for (int32_t i = 0; i < Nsp; i++) {
-    Etot[i] = new float[nst];
-    Emean[i] = new float[nst];
-    Emax[i] = new float[nst];
-    px[i] = new float[nst];
-    py[i] = new float[nst];
-    pz[i] = new float[nst];
-    sigma_px[i] = new float[nst];
-    sigma_py[i] = new float[nst];
-    sigma_pz[i] = new float[nst];
-    Jz[i] = new float[nst];
-    mean_charge[i] = new float[nst];
-    charge_per_cell[i] = new float[nst];
+    Etot[i] = new double[nst];
+    Emean[i] = new double[nst];
+    Emax[i] = new double[nst];
+    px[i] = new double[nst];
+    py[i] = new double[nst];
+    pz[i] = new double[nst];
+    sigma_px[i] = new double[nst];
+    sigma_py[i] = new double[nst];
+    sigma_pz[i] = new double[nst];
+    Jz[i] = new double[nst];
+    mean_charge[i] = new double[nst];
+    charge_per_cell[i] = new double[nst];
   }
-  charge_tot = new float[nst];
-  Ex2 = new float[nst];
-  Ey2 = new float[nst];
-  Ez2 = new float[nst];
-  Bx2 = new float[nst];
-  By2 = new float[nst];
-  Bz2 = new float[nst];
-  Ex2_on_solid_target = new float[nst];
-  Ey2_on_solid_target = new float[nst];
-  Ez2_on_solid_target = new float[nst];
-  Bx2_on_solid_target = new float[nst];
-  By2_on_solid_target = new float[nst];
-  Bz2_on_solid_target = new float[nst];
-  Ex_max = new float[nst];
-  Ey_max = new float[nst];
-  Ez_max = new float[nst];
-  Bx_max = new float[nst];
-  By_max = new float[nst];
-  Bz_max = new float[nst];
+  charge_tot = new double[nst];
+  Ex2 = new double[nst];
+  Ey2 = new double[nst];
+  Ez2 = new double[nst];
+  Bx2 = new double[nst];
+  By2 = new double[nst];
+  Bz2 = new double[nst];
+  Ex2_on_solid_target = new double[nst];
+  Ey2_on_solid_target = new double[nst];
+  Ez2_on_solid_target = new double[nst];
+  Bx2_on_solid_target = new double[nst];
+  By2_on_solid_target = new double[nst];
+  Bz2_on_solid_target = new double[nst];
+  Ex_max = new double[nst];
+  Ey_max = new double[nst];
+  Ez_max = new double[nst];
+  Bx_max = new double[nst];
+  By_max = new double[nst];
+  Bz_max = new double[nst];
 }
 
 void Diag_data::deallocate_arrays() {
@@ -680,7 +680,7 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   {
     riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
     boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-    for (size_t j = 0; j < tokens.size(); j++) timesteps[ntimesteps++] = boost::lexical_cast<float>(tokens[j]);
+    for (size_t j = 0; j < tokens.size(); j++) timesteps[ntimesteps++] = boost::lexical_cast<double>(tokens[j]);
   }
 
   riga.clear(), std::getline(infile, riga);
@@ -696,12 +696,12 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
     {
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      Etot[i][j] = boost::lexical_cast<float>(tokens[0]);
-      Emax[i][j] = boost::lexical_cast<float>(tokens[1]);
-      Jz[i][j] = boost::lexical_cast<float>(tokens[2]);
-      px[i][j] = boost::lexical_cast<float>(tokens[3]);
-      py[i][j] = boost::lexical_cast<float>(tokens[4]);
-      pz[i][j] = boost::lexical_cast<float>(tokens[5]);
+      Etot[i][j] = boost::lexical_cast<double>(tokens[0]);
+      Emax[i][j] = boost::lexical_cast<double>(tokens[1]);
+      Jz[i][j] = boost::lexical_cast<double>(tokens[2]);
+      px[i][j] = boost::lexical_cast<double>(tokens[3]);
+      py[i][j] = boost::lexical_cast<double>(tokens[4]);
+      pz[i][j] = boost::lexical_cast<double>(tokens[5]);
     }
 
     riga.clear(), std::getline(infile, riga);
@@ -709,11 +709,11 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
     {
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      sigma_px[i][j] = boost::lexical_cast<float>(tokens[0]);
-      sigma_py[i][j] = boost::lexical_cast<float>(tokens[1]);
-      sigma_pz[i][j] = boost::lexical_cast<float>(tokens[2]);
-      mean_charge[i][j] = boost::lexical_cast<float>(tokens[3]);
-      charge_per_cell[i][j] = boost::lexical_cast<float>(tokens[4]);
+      sigma_px[i][j] = boost::lexical_cast<double>(tokens[0]);
+      sigma_py[i][j] = boost::lexical_cast<double>(tokens[1]);
+      sigma_pz[i][j] = boost::lexical_cast<double>(tokens[2]);
+      mean_charge[i][j] = boost::lexical_cast<double>(tokens[3]);
+      charge_per_cell[i][j] = boost::lexical_cast<double>(tokens[4]);
     }
   }
 
@@ -725,18 +725,18 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
     {
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      Ex2[j] = boost::lexical_cast<float>(tokens[0]);
-      Ey2[j] = boost::lexical_cast<float>(tokens[1]);
+      Ex2[j] = boost::lexical_cast<double>(tokens[0]);
+      Ey2[j] = boost::lexical_cast<double>(tokens[1]);
       Ez2[j] = 0.0;
       Bx2[j] = 0.0;
       By2[j] = 0.0;
-      Bz2[j] = boost::lexical_cast<float>(tokens[2]);
-      Ex_max[j] = boost::lexical_cast<float>(tokens[3]);
-      Ey_max[j] = boost::lexical_cast<float>(tokens[4]);
+      Bz2[j] = boost::lexical_cast<double>(tokens[2]);
+      Ex_max[j] = boost::lexical_cast<double>(tokens[3]);
+      Ey_max[j] = boost::lexical_cast<double>(tokens[4]);
       Ez_max[j] = 0.0;
       Bx_max[j] = 0.0;
       By_max[j] = 0.0;
-      Bz_max[j] = boost::lexical_cast<float>(tokens[5]);
+      Bz_max[j] = boost::lexical_cast<double>(tokens[5]);
     }
   }
   else {
@@ -744,24 +744,24 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
     {
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      Ex2[j] = boost::lexical_cast<float>(tokens[0]);
-      Ey2[j] = boost::lexical_cast<float>(tokens[1]);
-      Ez2[j] = boost::lexical_cast<float>(tokens[2]);
-      Ex_max[j] = boost::lexical_cast<float>(tokens[3]);
-      Ey_max[j] = boost::lexical_cast<float>(tokens[4]);
-      Ez_max[j] = boost::lexical_cast<float>(tokens[5]);
+      Ex2[j] = boost::lexical_cast<double>(tokens[0]);
+      Ey2[j] = boost::lexical_cast<double>(tokens[1]);
+      Ez2[j] = boost::lexical_cast<double>(tokens[2]);
+      Ex_max[j] = boost::lexical_cast<double>(tokens[3]);
+      Ey_max[j] = boost::lexical_cast<double>(tokens[4]);
+      Ez_max[j] = boost::lexical_cast<double>(tokens[5]);
     }
     riga.clear(), std::getline(infile, riga);
     for (int j = 0; j < nst; j++)
     {
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      Bx2[j] = boost::lexical_cast<float>(tokens[0]);
-      By2[j] = boost::lexical_cast<float>(tokens[1]);
-      Bz2[j] = boost::lexical_cast<float>(tokens[2]);
-      Bx_max[j] = boost::lexical_cast<float>(tokens[3]);
-      By_max[j] = boost::lexical_cast<float>(tokens[4]);
-      Bz_max[j] = boost::lexical_cast<float>(tokens[5]);
+      Bx2[j] = boost::lexical_cast<double>(tokens[0]);
+      By2[j] = boost::lexical_cast<double>(tokens[1]);
+      Bz2[j] = boost::lexical_cast<double>(tokens[2]);
+      Bx_max[j] = boost::lexical_cast<double>(tokens[3]);
+      By_max[j] = boost::lexical_cast<double>(tokens[4]);
+      Bz_max[j] = boost::lexical_cast<double>(tokens[5]);
     }
   }
 
@@ -772,19 +772,19 @@ void Diag_data::decode_diag_v3(std::ifstream &infile) {
   {
     riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
     boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-    Ex2_on_solid_target[j] = boost::lexical_cast<float>(tokens[0]);
-    Ey2_on_solid_target[j] = boost::lexical_cast<float>(tokens[1]);
+    Ex2_on_solid_target[j] = boost::lexical_cast<double>(tokens[0]);
+    Ey2_on_solid_target[j] = boost::lexical_cast<double>(tokens[1]);
     if (Nz > 1) {
-      Ez2_on_solid_target[j] = boost::lexical_cast<float>(tokens[2]);
-      Bx2_on_solid_target[j] = boost::lexical_cast<float>(tokens[3]);
-      By2_on_solid_target[j] = boost::lexical_cast<float>(tokens[4]);
-      Bz2_on_solid_target[j] = boost::lexical_cast<float>(tokens[5]);
+      Ez2_on_solid_target[j] = boost::lexical_cast<double>(tokens[2]);
+      Bx2_on_solid_target[j] = boost::lexical_cast<double>(tokens[3]);
+      By2_on_solid_target[j] = boost::lexical_cast<double>(tokens[4]);
+      Bz2_on_solid_target[j] = boost::lexical_cast<double>(tokens[5]);
     }
     else {
       Ez2_on_solid_target[j] = 0.0;
       Bx2_on_solid_target[j] = 0.0;
       By2_on_solid_target[j] = 0.0;
-      Bz2_on_solid_target[j] = boost::lexical_cast<float>(tokens[2]);
+      Bz2_on_solid_target[j] = boost::lexical_cast<double>(tokens[2]);
     }
   }
 
@@ -857,13 +857,13 @@ void Diag_data::decode_diag_v4(std::ifstream &infile) {
 void Diag_data::decode_spec_v1_v2(std::ifstream &infile) {
   int ntimestep = sp_step;
   std::string riga, tipo;
-  float time, emax, energy, dE, *spectrum, *selected_spectrum;
+  double time, emax, energy, dE, *spectrum, *selected_spectrum;
   int nbin;
   std::getline(infile, riga);
   infile >> nbin;
 
-  selected_spectrum = new float[nbin];
-  spectrum = new float[nbin];
+  selected_spectrum = new double[nbin];
+  spectrum = new double[nbin];
 
 
   std::getline(infile, riga);
@@ -934,15 +934,15 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
   std::vector<std::string> tipo(Nsp);
   std::vector<std::string> tokens;
 
-  float time, emax, energy, dE, *spectrum, *selected_spectrum;
+  double time, emax, energy, dE, *spectrum, *selected_spectrum;
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
   int32_t nbin = boost::lexical_cast<int32_t>(tokens[0]);
   int32_t contatore_bin;
 
-  selected_spectrum = new float[nbin];
-  spectrum = new float[nbin];
+  selected_spectrum = new double[nbin];
+  spectrum = new double[nbin];
 
   for (int i = 0; i < Nsp; i++)
   {
@@ -955,8 +955,8 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
       riga.clear(), std::getline(infile, riga);
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      time = boost::lexical_cast<float>(tokens[0]);
-      emax = boost::lexical_cast<float>(tokens[1]);
+      time = boost::lexical_cast<double>(tokens[0]);
+      emax = boost::lexical_cast<double>(tokens[1]);
       energy = emax / nbin;
       dE = emax / nbin;
 
@@ -965,7 +965,7 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
       while (contatore_bin < nbin) {
         riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
         boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-        for (size_t j = 0; j < tokens.size(); j++) spectrum[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+        for (size_t j = 0; j < tokens.size(); j++) spectrum[contatore_bin++] = boost::lexical_cast<double>(tokens[j]);
       }
 
       contatore_bin = 0;
@@ -973,7 +973,7 @@ void Diag_data::decode_spec_v3(std::ifstream &infile) {
       while (contatore_bin < nbin) {
         riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
         boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum[contatore_bin++] = boost::lexical_cast<double>(tokens[j]);
       }
 
       std::ostringstream nomefile_out;
@@ -1012,16 +1012,16 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
   std::vector<std::string> tipo(Nsp);
   std::vector<std::string> tokens;
 
-  float time, emax, energy, dE, *spectrum, *selected_spectrum_1, *selected_spectrum_2;
+  double time, emax, energy, dE, *spectrum, *selected_spectrum_1, *selected_spectrum_2;
   riga.clear(), std::getline(infile, riga);
   riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
   boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
   int32_t nbin = boost::lexical_cast<int32_t>(tokens[0]);
   int32_t contatore_bin;
 
-  selected_spectrum_1 = new float[nbin];
-  selected_spectrum_2 = new float[nbin];
-  spectrum = new float[nbin];
+  selected_spectrum_1 = new double[nbin];
+  selected_spectrum_2 = new double[nbin];
+  spectrum = new double[nbin];
 
   for (int i = 0; i < Nsp; i++)
   {
@@ -1034,8 +1034,8 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       riga.clear(), std::getline(infile, riga);
       riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
       boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-      time = boost::lexical_cast<float>(tokens[0]);
-      emax = boost::lexical_cast<float>(tokens[1]);
+      time = boost::lexical_cast<double>(tokens[0]);
+      emax = boost::lexical_cast<double>(tokens[1]);
       energy = emax / nbin;
       dE = emax / nbin;
 
@@ -1044,7 +1044,7 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       while (contatore_bin < nbin) {
         riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
         boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-        for (size_t j = 0; j < tokens.size(); j++) spectrum[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+        for (size_t j = 0; j < tokens.size(); j++) spectrum[contatore_bin++] = boost::lexical_cast<double>(tokens[j]);
       }
 
       contatore_bin = 0;
@@ -1052,7 +1052,7 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       while (contatore_bin < nbin) {
         riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
         boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum_1[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum_1[contatore_bin++] = boost::lexical_cast<double>(tokens[j]);
       }
 
       contatore_bin = 0;
@@ -1060,7 +1060,7 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
       while (contatore_bin < nbin) {
         riga.clear(), tokens.clear(), std::getline(infile, riga), boost::algorithm::trim(riga);
         boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
-        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum_2[contatore_bin++] = boost::lexical_cast<float>(tokens[j]);
+        for (size_t j = 0; j < tokens.size(); j++) selected_spectrum_2[contatore_bin++] = boost::lexical_cast<double>(tokens[j]);
       }
 
       std::ostringstream nomefile_out;
