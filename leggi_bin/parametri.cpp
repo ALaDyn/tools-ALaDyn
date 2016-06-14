@@ -272,22 +272,35 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
 
   std::cout << "Parsing an ALaDyn file versioned as v" << file_version << std::endl;
-  
-  if (file_version == 1) {
-    if (file_griglia) {
-      /*
-      real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
-      n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
-      gam0,nb_over_np,b_charge,vbeam/)
 
-      int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
-      model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
-      LPf_ord,der_ord,file_version,i_end/)
-      */
-      ncpu_y = intpar[0];
-      ncpu_z = intpar[1];
-      ncpu_x = 1;
-      ncpu = ncpu_x * ncpu_y * ncpu_z;
+  if (file_version == 1) {
+
+    /*
+    real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
+    n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
+    gam0,nb_over_np,b_charge,vbeam/)
+
+    int_par(1:20) = (/npe_loc,npe_zloc,nx,nxh,ny1,loc_nyc_max,nz1,loc_nzc_max,jump,iby,iform,&
+    model_id,dmodel_id,nsp,curr_ndim,np_per_cell(1),&
+    LPf_ord,der_ord,file_version,i_end/)
+    */
+
+    ncpu_y = intpar[0];
+    ncpu_z = intpar[1];
+    ncpu_x = 1;
+    last_cpu = ncpu_x * ncpu_y * ncpu_z;
+    ncpu = ncpu_x * ncpu_y * ncpu_z;
+
+    endianness = intpar[19];
+    tnow = realpar[0];
+    xmin = realpar[1];
+    xmax = realpar[2];
+    ymin = realpar[3];
+    ymax = realpar[4];
+    zmin = realpar[5];
+    zmax = realpar[6];
+
+    if (file_griglia) {
       npx = intpar[2];
       npx_ricampionati = intpar[3];
       npx_per_cpu = npx / ncpu_x;
@@ -302,15 +315,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
       npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
       npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
     }
     else {
       nptot = (long long int) intpar[16];
       ndv = intpar[17];
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float);
     }
-
+  }
+  else if (file_version == 2) {
     endianness = intpar[19];
+
     tnow = realpar[0];
     xmin = realpar[1];
     xmax = realpar[2];
@@ -318,23 +333,26 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ymax = realpar[4];
     zmin = realpar[5];
     zmax = realpar[6];
-  }
-  else if (file_version == 2) {
+
     if (file_griglia) {
+
       /*
       real_par(1:20) = (/ tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0_x, w0_y, &
       n_over_nc, a0, lam0, E0, ompe, targ_in, targ_end, &
       gam0, nb_over_np, b_charge, vbeam / )
-  
+
       int_par(1:20) = (/ npe_yloc, npe_zloc, npe_xloc, &
       nx1, ny1, loc_nyc_max, nz1, loc_nzc_max, jump, iby, iform, &
       model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
       LPf_ord, der_ord, file_version, i_end / )
       */
+
       ncpu_y = intpar[0];
       ncpu_z = intpar[1];
       ncpu_x = intpar[2];
       ncpu = ncpu_x * ncpu_y * ncpu_z;
+      last_cpu = ncpu_x * ncpu_y * ncpu_z;
+
       npx_ricampionati = intpar[3];
       npy_ricampionati = intpar[4];
       npy_per_cpu = intpar[5];
@@ -349,16 +367,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
       else npz = npz_ricampionati;
       npx_per_cpu = npx / ncpu_x;
-      header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams*sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
+      header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams * sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
     }
 
     else {
       nptot = (long long int) intpar[16];
       ndv = intpar[17];
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float);
     }
 
-    endianness = intpar[19];
+  }
+  else if (file_version == 3) {
     tnow = realpar[0];
     xmin = realpar[1];
     xmax = realpar[2];
@@ -366,8 +385,10 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     ymax = realpar[4];
     zmin = realpar[5];
     zmax = realpar[6];
-  }
-  else if (file_version == 3) {
+
+    header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float);
+    endianness = intpar[19];
+
     if (file_griglia) {
       /*
       real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
@@ -379,10 +400,13 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       model_id,dmodel_id,nsp,curr_ndim,mp_per_cell(1),&
       LPf_ord,der_ord,file_version,i_end/)
       */
+
       ncpu_y = intpar[0];
       ncpu_z = intpar[1];
       ncpu_x = intpar[2];
       ncpu = ncpu_x * ncpu_y * ncpu_z;
+      last_cpu = ncpu_x * ncpu_y * ncpu_z;
+
       npx_ricampionati = intpar[3];
       npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
       npy_ricampionati = intpar[4];
@@ -402,9 +426,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       nptot = (long long int) intpar[16];
       ndv = intpar[17];
     }
-
-    header_size_bytes = (nparams + 1) * sizeof(int) + nparams*sizeof(float);
-    endianness = intpar[19];
+  }
+  else if (file_version == 4) {
     tnow = realpar[0];
     xmin = realpar[1];
     xmax = realpar[2];
@@ -413,10 +436,10 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-  }
-  else if (file_version == 4) {
-    if (file_griglia) {
+    header_size_bytes = 0;
+    /*i_end*/    endianness = intpar[19];
 
+    if (file_griglia) {
       /*
       real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
       n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
@@ -431,7 +454,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       /*npe_xloc*/ ncpu_x = intpar[2];
       /*npe_loc*/  ncpu_y = intpar[0];
       /*npe_zloc*/ ncpu_z = intpar[1];
-      /**/         ncpu = ncpu_x * ncpu_y * ncpu_z;
+      ncpu = ncpu_x * ncpu_y * ncpu_z;
+      last_cpu = ncpu_x * ncpu_y * ncpu_z;
       /*nx1*/      npx_per_cpu = intpar[3];
       /*jump*/     fattore_ricampionamento = intpar[6];
       /**/         npx_ricampionati_per_cpu = npx_per_cpu / fattore_ricampionamento;
@@ -447,19 +471,16 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       /**/         npz_ricampionati = npz_ricampionati_per_cpu * ncpu_z;
     }
     else {
+      /*
+      int_par(1:20) = (/ npe, nx, ny_loc, nz_loc, jmp, iby, iform, &
+        model_id, dmodel_id, nsp, curr_ndim, mp_per_cell(1), &
+        LPf_ord, der_ord, iform, pid, nptot, ndv, file_version, i_end / )
+      */
+      ncpu = intpar[0];
+      last_cpu = intpar[0];
       nptot = (long long int) intpar[16];
       ndv = intpar[17];
     }
-
-    endianness = intpar[19];
-
-    tnow = realpar[0];
-    xmin = realpar[1];
-    xmax = realpar[2];
-    ymin = realpar[3];
-    ymax = realpar[4];
-    zmin = realpar[5];
-    zmax = realpar[6];
   }
 
 
@@ -550,7 +571,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
   endian_file = (endianness - 1);
 
-  }
+}
 
 
 
@@ -2229,7 +2250,7 @@ void Parametri::parse_command_line()
       std::cin >> p[OUT_PARAMS];
       p_b[OUT_PARAMS] = false;
     }
-  }
+        }
   else
   {
     if (p_b[OUT_VTK] && !do_not_ask_missing)
@@ -2321,7 +2342,7 @@ void Parametri::parse_command_line()
       p_b[OUT_LINEOUT_X] = false;
     }
   }
-}
+      }
 
 
 

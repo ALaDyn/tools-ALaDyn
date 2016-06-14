@@ -4,12 +4,6 @@
 
 int leggi_particelle(Parametri * parametri)
 {
-  std::ostringstream nomefile_bin, nomefile_dat, nomefile_Estremi;
-  nomefile_bin << parametri->filebasename << ".bin";
-  nomefile_dat << parametri->filebasename << ".dat";
-  std::string riga_persa;
-  char* trascura;
-  trascura = new char[MAX_LENGTH_FILENAME];
   std::FILE *file_in = NULL;
   int indice_multifile = 0;
   int contatori[] = { 0, 0, 0 };
@@ -17,12 +11,11 @@ int leggi_particelle(Parametri * parametri)
   long long particelle_accumulate = 0;
   double peso_accumulato = 0.0;
   double carica_accumulata = 0.0;
-  size_t dim_file_in_bytes, num_of_floats_in_file, num_of_particles_in_file, num_of_passes, num_residual_particles, dimensione_array_particelle;
-  unsigned int val[2];
-  float array_supporto8[8];
-  float array_supporto6[6];
+  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0, dimensione_array_particelle = 0;
+  unsigned int val[2] = { 0, 0 };
+  float array_supporto8[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  float array_supporto6[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
-  if (!parametri->multifile) file_in = fopen(nomefile_bin.str().c_str(), "rb");
 
   std::FILE *binary_vtk = NULL;
   std::FILE *binary_clean = NULL;
@@ -33,16 +26,19 @@ int leggi_particelle(Parametri * parametri)
   std::ofstream Estremi_out;
   int conta_processori = 0;
 
-  int npart_loc;
-  int buff;
+  int npart_loc = 0;
+  int buff = 0;
 
-  float x, y, z, px, py, pz, ptot;
-  float ch, w;
-  float gamma, theta, thetaT, E, ty, tz;
-  float *estremi_min, *estremi_max;
+  float x = 0.0, y = 0.0, z = 0.0, px = 0.0, py = 0.0, pz = 0.0, ptot = 0.0;
+  float ch = 0.0, w = 0.0;
+  float gamma = 0.0, theta = 0.0, thetaT = 0.0, E = 0.0, ty = 0.0, tz = 0.0;
+  float *estremi_min = NULL, *estremi_max = NULL;
 
-  short buffshort[2];
+  short buffshort[2] = { 0, 0 };
   float *particelle = NULL;
+  char nomefile_bin[MAX_LENGTH_FILENAME];
+  char nomefile_dat[MAX_LENGTH_FILENAME];
+  char nomefile_extremes[MAX_LENGTH_FILENAME];
   char nomefile_vtk[MAX_LENGTH_FILENAME];
   char nomefile_bin_clean[MAX_LENGTH_FILENAME];
   char nomefile_propaga[MAX_LENGTH_FILENAME];
@@ -218,6 +214,15 @@ int leggi_particelle(Parametri * parametri)
   sprintf(nomefile_vtk, "%s.vtk", parametri->filebasename.c_str());
   sprintf(nomefile_bin_clean, "%s_clean.bin", parametri->filebasename.c_str());
 
+  sprintf(nomefile_bin, "%s.bin", parametri->filebasename.c_str());
+  sprintf(nomefile_dat, "%s.dat", parametri->filebasename.c_str());
+  sprintf(nomefile_extremes, "%s.extremes", parametri->filebasename.c_str());
+  sprintf(nomefile_parametri, "%s.parameters", parametri->filebasename.c_str());
+
+  memset(&nomefile_binnato[0], 0, sizeof(nomefile_binnato));
+
+  if (!parametri->multifile) file_in = fopen(nomefile_bin, "rb");
+
 
 #ifdef ENABLE_DEBUG
   std::cout << "NPTOT = " << parametri->nptot << std::endl;
@@ -251,7 +256,7 @@ int leggi_particelle(Parametri * parametri)
     std::cout << "WMAX = " << parametri->wmax << std::endl;
     std::cout << "CHMIN = " << parametri->chmin << std::endl;
     std::cout << "CHMAX = " << parametri->chmax << std::endl;
-  }
+}
 #endif
 
   if (parametri->p[OUT_VTK])
@@ -266,7 +271,7 @@ int leggi_particelle(Parametri * parametri)
     contatori[0] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
     contatori[0] += fprintf(binary_vtk, "POINTS %llu float\n", (unsigned long long int) parametri->nptot);
 
-    fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3, SEEK_SET);
+    fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3, SEEK_SET);
 
     //Scrittura secondo Header VTK e memorizzazione sua dimensione in contatori[1]
     //contatori[1] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
@@ -277,7 +282,7 @@ int leggi_particelle(Parametri * parametri)
 
     if (parametri->p[WEIGHT])
     {
-      fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3, SEEK_SET);
+      fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3, SEEK_SET);
 
       //Scrittura terzo Header VTK e memorizzazione sua dimensione in contatori[2]
       //contatori[2] += fprintf(binary_vtk,"DATASET STRUCTURED_POINTS\n");
@@ -295,7 +300,6 @@ int leggi_particelle(Parametri * parametri)
     printf("\nENABLED CLEAN .bin FILE\n");
     binary_clean = fopen(nomefile_bin_clean, "wb");
   }
-
 
   if (parametri->p[OUT_PROPAGA])
   {
@@ -322,8 +326,10 @@ int leggi_particelle(Parametri * parametri)
     if (!parametri->multifile)
     {
       if (conta_processori >= parametri->last_cpu) break;
-      /*skip header*/
-      std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
+      if (conta_processori == 0) {
+        /*skip header*/
+        std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
+      }
 
       if (parametri->file_version == 1)
       {
@@ -351,15 +357,15 @@ int leggi_particelle(Parametri * parametri)
 #else
       printf("proc number \t %i \t npart=%i \r", conta_processori, npart_loc);
 #endif
-      printf("\n");
       fflush(stdout);
       num_of_passes = 1;
     }
     else  //we do have multifiles i.e. Prpout00_000.bin
     {
-      nomefile_bin.str("");
-      nomefile_bin << parametri->filebasename << "_" << std::setfill('0') << std::setw(3) << indice_multifile << ".bin";
-      if ((file_in = fopen(nomefile_bin.str().c_str(), "rb")) == NULL)
+      memset(&nomefile_bin[0], 0, sizeof(nomefile_bin));
+      sprintf(nomefile_bin, "%s_%03d.bin", parametri->filebasename.c_str(), indice_multifile);
+
+      if ((file_in = fopen(nomefile_bin, "rb")) == NULL)
       {
         printf("End of files! \n");
         break;
@@ -415,7 +421,6 @@ int leggi_particelle(Parametri * parametri)
 #else
           printf("npart_loc = %i\t\t ndv=%i\r", val[0], parametri->ndv);
 #endif
-          printf("\n");
           fflush(stdout);
           fread_size = std::fread(particelle, sizeof(float), val[0] * parametri->ndv, file_in);
           if (parametri->p[SWAP]) swap_endian_f(particelle, (size_t)val[0] * parametri->ndv);
@@ -807,7 +812,7 @@ int leggi_particelle(Parametri * parametri)
             if (parametri->file_version == 3) charge_index = 5;
             else charge_index = 0;
             // scrittura coordinate x, y, z
-            fseeko(binary_vtk, contatori[0] + particelle_accumulate*sizeof(float) * 3, SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
             for (unsigned int i = 0; i < val[0]; i += parametri->ndv)
             {
               fwrite((void*)(particelle + i), sizeof(float), 2, binary_vtk);
@@ -815,7 +820,7 @@ int leggi_particelle(Parametri * parametri)
             }
 
             // scrittura momenti px, py, pz
-            fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + particelle_accumulate*sizeof(float) * 3, SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
             for (unsigned int i = 2; i < val[0]; i += parametri->ndv)
             {
               fwrite((void*)(particelle + i), sizeof(float), 2, binary_vtk);
@@ -829,30 +834,30 @@ int leggi_particelle(Parametri * parametri)
             if (parametri->file_version == 3) charge_index = 7;
             else charge_index = 0;
             // scrittura coordinate x, y, z
-            fseeko(binary_vtk, contatori[0] + particelle_accumulate*sizeof(float) * 3, SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
             for (unsigned int i = 0; i < val[0]; i += parametri->ndv)
               fwrite((void*)(particelle + i), sizeof(float), 3, binary_vtk);
 
             // scrittura momenti px, py, pz
-            fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + particelle_accumulate*sizeof(float) * 3, SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
             for (unsigned int i = 3; i < val[0]; i += parametri->ndv)
               fwrite((void*)(particelle + i), sizeof(float), 3, binary_vtk);
           }
 
-          else printf("parametri->ndv imprevisto: %i\n", parametri->ndv);
+          else printf("\nparametri->ndv imprevisto: %i\n", parametri->ndv);
 
 
           if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
           {
             // scrittura pesi
-            fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3 + contatori[2] + particelle_accumulate*sizeof(float), SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
             for (unsigned int i = weight_index; i < val[0]; i += parametri->ndv)
               fwrite((void*)(particelle + i), sizeof(float), 1, binary_vtk);
           }
           else if (parametri->p[WEIGHT] && parametri->overwrite_weight)
           {
             // scrittura pesi sovrascritti da linea comando
-            fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3 + contatori[2] + particelle_accumulate*sizeof(float), SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
             for (unsigned int i = weight_index; i < val[0]; i += parametri->ndv)
               fwrite((void*)(&(parametri->overwrite_weight_value)), sizeof(float), 1, binary_vtk);
           }
@@ -860,14 +865,14 @@ int leggi_particelle(Parametri * parametri)
           if (parametri->file_version == 3 && !parametri->overwrite_charge)
           {
             // scrittura pesi
-            fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3 + contatori[2] + particelle_accumulate*sizeof(float), SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
             for (unsigned int i = charge_index; i < val[0]; i += parametri->ndv)
               fwrite((void*)(particelle + i), sizeof(float), 1, binary_vtk);
           }
           else if (parametri->file_version == 3 && parametri->overwrite_charge)
           {
             // scrittura pesi sovrascritti da linea comando
-            fseeko(binary_vtk, contatori[0] + parametri->nptot*sizeof(float) * 3 + contatori[1] + parametri->nptot*sizeof(float) * 3 + contatori[2] + particelle_accumulate*sizeof(float), SEEK_SET);
+            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
             for (unsigned int i = charge_index; i < val[0]; i += parametri->ndv)
               fwrite((void*)(&(parametri->overwrite_weight_value)), sizeof(float), 1, binary_vtk);
           }
@@ -904,7 +909,6 @@ int leggi_particelle(Parametri * parametri)
     emittance_y = sqrt((em_y2 - em_y*em_y)*(em_py2 - em_py*em_py) - (em_ypy - em_y*em_py)*(em_ypy - em_y*em_py));
     emittance_z = sqrt((em_z2 - em_z*em_z)*(em_pz2 - em_pz*em_pz) - (em_zpz - em_z*em_pz)*(em_zpz - em_z*em_pz));
 
-    sprintf(nomefile_parametri, "%s.parameters", parametri->filebasename.c_str());
     parameters = fopen(nomefile_parametri, "w");
     printf("\nWriting the parameters file\n");
     fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
@@ -933,9 +937,8 @@ int leggi_particelle(Parametri * parametri)
 
   if (parametri->p[FIND_MINMAX])
   {
-    nomefile_Estremi << parametri->filebasename << ".extremes";
-    Estremi_out.open(nomefile_Estremi.str().c_str());
-    if (Estremi_out.fail()) printf("unable to create .extremes file");
+    Estremi_out.open(nomefile_extremes);
+    if (Estremi_out.fail()) printf("\nunable to create .extremes file");
     Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
     Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
     Estremi_out << "YMIN = " << estremi_min[1] << std::endl;
@@ -1094,7 +1097,7 @@ int leggi_particelle(Parametri * parametri)
     }
   }
 
-  printf("fread_size=%lu\nEND\n\n", (unsigned long)fread_size);
+  printf("\nfread_size=%lu\nEND\n\n", (unsigned long)fread_size);
 
 
   if (parametri->p[OUT_VTK])
