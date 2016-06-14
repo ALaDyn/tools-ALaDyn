@@ -45,6 +45,9 @@ Parametri::Parametri()
   overwrite_weight_value = 1.0;
   overwrite_charge_value = 1.0;
   do_not_ask_missing = false;
+  memset(&support_label[0], 0, sizeof(support_label));
+  memset(&minimi[0], 0, sizeof(float) * sizeof(minimi));
+  memset(&massimi[0], 0, sizeof(float) * sizeof(massimi));
 
   last_cpu = MAX_NUMBER_OF_CPUS;    // il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
 
@@ -60,6 +63,7 @@ Parametri::Parametri()
   file_griglia = false;
   file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = file_particelle_generic_ion = false;
   file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
+  file_correnti_Jx = file_correnti_Jy = file_correnti_Jz = false;
   file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = file_densita_generic_ion = file_densita_driver = false;
   file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = file_densita_energia_griglia_generic_ion = false;
 }
@@ -571,7 +575,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
   }
   endian_file = (endianness - 1);
 
-}
+  }
 
 
 
@@ -2250,7 +2254,7 @@ void Parametri::parse_command_line()
       std::cin >> p[OUT_PARAMS];
       p_b[OUT_PARAMS] = false;
     }
-        }
+  }
   else
   {
     if (p_b[OUT_VTK] && !do_not_ask_missing)
@@ -2342,7 +2346,7 @@ void Parametri::parse_command_line()
       p_b[OUT_LINEOUT_X] = false;
     }
   }
-      }
+}
 
 
 
