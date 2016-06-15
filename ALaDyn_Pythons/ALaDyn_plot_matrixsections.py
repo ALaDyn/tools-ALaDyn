@@ -72,8 +72,9 @@ if __name__ == '__main__':
 			M,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Bdenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			np.savetxt( os.path.join(path_write,'data','rho',('rho_bunch_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(M.transpose())+np.abs(K.transpose()),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','rho',('rho_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','rho',('rho_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(K.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','rho',('rho_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(M.transpose())+np.abs(K.transpose()),fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
@@ -111,9 +112,9 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path_write,'data','E_field',('Ey_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Eyb.transpose()+Eyf.transpose(),fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','E_field',('Ez_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Ezb.transpose()+Ezf.transpose(),fmt='%15.14e')
 
-			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
 
 		if output_exists(path_read,'B',i) == True:
@@ -121,16 +122,24 @@ if __name__ == '__main__':
 			#Bxb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bxbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Bxf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Bxfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			#Byb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bybout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+			Byb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bybout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Byf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Byfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			#Bzb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bzbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+			Bzb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bzbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Bzf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Bzfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			np.savetxt( os.path.join(path_write,'data','B_field',('Bx_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bxf.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','B_field',('By_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Byf.transpose(),fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','B_field',('Bz_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bzf.transpose(),fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','B_field',('Bx_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bxf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('By_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Byb.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('Bz_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bzb.transpose(),fmt='%15.14e')
 
-			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
-			np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('Bx_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bxf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('By_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Byf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('Bz_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bzf.transpose(),fmt='%15.14e')
+
+			np.savetxt( os.path.join(path_write,'data','B_field',('Bx_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bxf.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('By_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Byf.transpose()+Byb.transpose(),fmt='%15.14e')
+			np.savetxt( os.path.join(path_write,'data','B_field',('Bz_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bzf.transpose()+Bzb.transpose(),fmt='%15.14e')
+
+			#np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
