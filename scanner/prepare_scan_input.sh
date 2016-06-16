@@ -549,7 +549,7 @@ npe_yz=${NCPU}
 
  printf '&MPIPARAMS\n' >> ${INPUTFILE}
  printf ' nprocx = 1,\n' >> ${INPUTFILE}
- printf ' nprocx = %s,\n' "${npe_yz}" >> ${INPUTFILE}
+ printf ' nprocy = %s,\n' "${npe_yz}" >> ${INPUTFILE}
  printf ' nprocz = 1\n' >> ${INPUTFILE}
  printf '/' >> ${INPUTFILE}
  printf '\n\n' >> ${INPUTFILE}
