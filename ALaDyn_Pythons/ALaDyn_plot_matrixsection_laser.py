@@ -61,13 +61,16 @@ if __name__ == '__main__':
 
 
 	for i in range(frame_begin, frame_end+1 ):
-		print '-------------------'
+		print '*** frm::',i
 		s='%2.2i'%i
 		path_read  = os.path.join(path,'%4.4i'%i)
 		path_write = path
 
-		K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+		K,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 		np.savetxt( os.path.join(path_write,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(K.transpose()),fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
 		Exf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Exfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 		Eyf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Eyfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
