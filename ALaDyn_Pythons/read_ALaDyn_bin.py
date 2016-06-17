@@ -1,7 +1,7 @@
 #!/usr/bin/python
 ######################################################################
 # Name:         read_ALaDyn_dat.py
-# Author:       
+# Author:		A. Marocchino
 # Date:			2014-02-18
 # Purpose:      reads dued binary frm output
 # Source:       python
@@ -67,7 +67,7 @@ def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 			npy= struct.unpack('i', f.read(4))[0]
 			npz= struct.unpack('i', f.read(4))[0]
 			struct.unpack('i', f.read(4))
-	
+
 			struct.unpack('i', f.read(4))
 			for k in range(0,npz):
 				for j in range(0,npy):
@@ -76,14 +76,14 @@ def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 			struct.unpack('i', f.read(4))
 			offsety += npy
 		offsetz += npz;
-		
+
 	if grid_no_grid == 'nogrid':
 		return r
 
 	#--- * --- * --- * --- * --- * ---#
 	#- reading grid -#
 	struct.unpack('i', f.read(4))
-	X=[]; [X.append(struct.unpack('f', f.read(4))[0]) for i in range(0,nx)]	
+	X=[]; [X.append(struct.unpack('f', f.read(4))[0]) for i in range(0,nx)]
 	struct.unpack('i', f.read(4))
 
 	struct.unpack('i', f.read(4))
@@ -102,7 +102,7 @@ def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 # 				y[i,j,k] = Y[j]
 # 				z[i,j,k] = Z[k]
 	x=X; y=Y; z=Z;
-				
+
 	return (r,x,y,z)
 
 
@@ -162,7 +162,7 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 			npy= struct.unpack('i', f.read(4))[0]
 			npz= struct.unpack('i', f.read(4))[0]
 			struct.unpack('i', f.read(4))
-	
+
 			struct.unpack('i', f.read(4))
 			for k in range(0,npz):
 				for j in range(0,npy):
@@ -177,14 +177,14 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 			struct.unpack('i', f.read(4))
 			offsety += npy
 		offsetz += npz;
-		
+
 	if grid_no_grid == 'nogrid':
 		return r
 
 	#--- * --- * --- * --- * --- * ---#
 	#- reading grid -#
 	struct.unpack('i', f.read(4))
-	X=[]; [X.append(struct.unpack('f', f.read(4))[0]) for i in range(0,nx)]	
+	X=[]; [X.append(struct.unpack('f', f.read(4))[0]) for i in range(0,nx)]
 	struct.unpack('i', f.read(4))
 
 	struct.unpack('i', f.read(4))
@@ -196,7 +196,7 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 	struct.unpack('i', f.read(4))
 
 	x=X; y=Y; z=Z;
-	
+
 	return (r,x,y,z)
 
 # 	if axis_to_cut == 'x':
@@ -205,17 +205,3 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 # 		return (r,x,z)
 # 	elif axis_to_cut == 'z':
 # 		return (r,x,y)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
