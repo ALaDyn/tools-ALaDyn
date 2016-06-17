@@ -204,10 +204,10 @@ def RK4_Pusher(Exp, Eyp, Bzp, px_index, py_index, ux_p, uy_p, Dt):
  
 #Bzp    = np.array(np.genfromtxt('Bz_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float)) 
 	
-Exp    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/E_field','Ex_tot_y_13.txt')))*1e9
-Eyp    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/E_field','Ey_tot_y_13.txt')))*1e9
+Ex    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/E_field','Ex_tot_y_13.txt')))*1e9
+Ey    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/E_field','Ey_tot_y_13.txt')))*1e9
 	
-Bzp    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/B_field','Bz_tot_y_13.txt')))*1e9 
+Bz    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/B_field','Bz_tot_y_13.txt')))*1e9 
 	
 #print Exp.shape, Eyp.shape, Bzp.shape	
 [NGX,NGY]=Exp.shape
