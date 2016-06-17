@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import scipy as sc
 import os, os.path, sys
 
-from read_ALaDyn_bin import *
-from ALaDyn_plot_matrixsections import *
-from ALaDyn_plot_utilities_Efield import *
-from ALaDyn_plot_utilities_Bfield import *
-from ALaDyn_plot_utilities_axes import *
+#from read_ALaDyn_bin import *
+#from ALaDyn_plot_matrixsections import *
+#from ALaDyn_plot_utilities_Efield import *
+#from ALaDyn_plot_utilities_Bfield import *
+#from ALaDyn_plot_utilities_axes import *
 
 
 # def YEE_Ex_deposition(weights, px_index, dx):
@@ -197,55 +197,57 @@ from ALaDyn_plot_utilities_axes import *
 #data=np.array(np.genfromtxt('bubble_RK4.dat',dtype=float))
 
 
-Ex_b   = np.array(np.genfromtxt('Ex_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
-Ey_b   = np.array(np.genfromtxt('Ey_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
+#Ex_b   = np.array(np.genfromtxt('Ex_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
+#Ey_b   = np.array(np.genfromtxt('Ey_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
 
-Ex_bkg = np.array(np.genfromtxt('Ex_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
-Ey_bkg = np.array(np.genfromtxt('Ey_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
+#Ex_bkg = np.array(np.genfromtxt('Ex_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
+#Ey_bkg = np.array(np.genfromtxt('Ey_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float))
  
-Bzp    = np.array(np.genfromtxt('Bz_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float)) 
+#Bzp    = np.array(np.genfromtxt('Bz_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt',dtype=float)) 
 	
-Exp    = Ex_b + Ex_bkg
-Eyp    = Ey_b + Ey_bkg
+Exp    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/E_field','Ex_tot_y_13.txt')))
+Eyp    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/E_field','Ey_tot_y_13.txt')))
 	
-
+Bzp    = np.array(np.genfromtxt(os.path.join('/home/HPC/mira/SCRATCH/2nd_bubble/data/B_field','Bz_tot_y_13.txt'))) 
 	
-	
+#print Exp.shape, Eyp.shape, Bzp.shape	
+[NGX,NGY]=Exp.shape
+print NGX,NGY
 # NGX = 8
 # NGY = 8
-# dx = 1
-# dy = 1
-# Np = 10
-# Dt = 1e-5
-# qm = 1
-# px_effective = 0
-# py_effective = 0
-# count = 0
+dx = 1e-6
+dy = 1e-6
+Np = 1
+Dt = 1e-5
+qm = 1
+px_effective = 0
+py_effective = 0
+count = 0
 
 
-# xp = dx*(np.ones(Np)*(NGX-1)-0.5)
-# yp = np.linspace(2,5,Np)
+xp = dx*(np.ones(Np)*(NGX-1)-0.5)
+yp = np.linspace(2,5,Np)
 
-# ux_p = np.ones(Np)
-# uy_p = np.zeros(Np)
-
-
-
-
-
-# px_index 		= np.zeros(Np)
-# py_index 		= np.zeros(Np)
-
-
-# cell_index_x 	= np.zeros(Np)
-# cell_index_y 	= np.zeros(Np)
-
-# weights 		= np.zeros((2,2))
+ux_p = 3.e8*np.ones(Np)
+uy_p = np.zeros(Np)
 
 
 
-# for	count in range (0,10000):	
-	# for i in range (0,Np):
+
+
+px_index 		= np.zeros(Np)
+py_index 		= np.zeros(Np)
+
+
+cell_index_x 	= np.zeros(Np)
+cell_index_y 	= np.zeros(Np)
+
+weights 		= np.zeros((2,2))
+
+
+
+for count in range (0,10000):	
+	 for i in range (0,Np):
 		# px_index[i] = xp[i] - np.floor(xp[i]) 
 		# py_index[i] = yp[i] - np.floor(yp[i])
 		# cell_index_x[i] = np.floor(xp[i])
