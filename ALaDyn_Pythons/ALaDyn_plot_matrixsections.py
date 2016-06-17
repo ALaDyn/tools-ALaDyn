@@ -122,10 +122,10 @@ if __name__ == '__main__':
 			#Bxb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bxbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Bxf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Bxfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			Byb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bybout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+			Byb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Bybout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Byf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Byfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
-			Bzb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bzbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
+			Bzb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Bzbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Bzf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Bzfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
 			#np.savetxt( os.path.join(path_write,'data','B_field',('Bx_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Bxf.transpose(),fmt='%15.14e')
