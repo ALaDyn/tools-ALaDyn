@@ -1,5 +1,5 @@
 /******************************************************************************
-Copyright 2014, 2015 Stefano Sinigardi
+Copyright 2014-2016 Stefano Sinigardi
 The program is distributed under the terms of the GNU General Public License
 ******************************************************************************/
 
@@ -25,9 +25,6 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
 #define MEV_TO_JOULE 1.602176565E-13
-
-#define SKIP_INIZIALE  (1./5.)    // skip the first one fifth of the data
-#define SKIP_FINALE    (4./5.)    // skip the last fifth of the data, since they do not fit very well into an exponential
 
 
 #include <iostream>
@@ -63,10 +60,12 @@ int main(int argc, char* argv[])
     exit(1);
   }
 
-  bool scan = false, func = false, gnuplot = false, piccante = false;
+  bool scan = false, func = false, gnuplot = false, piccante = false, oldminmax = false;
   int inputfile_position = 0;
   double mass = -1.0;
   double nmacro_to_nphys = 1.0;
+  double min_mev = std::numeric_limits<double>::epsilon();
+  double max_mev = std::numeric_limits<double>::infinity();
 
   for (int i = 1; i < argc; i++)
     /************************************************************************
@@ -90,6 +89,18 @@ int main(int argc, char* argv[])
     else if (std::string(argv[i]) == "-piccante")
     {
       piccante = true;
+    }
+    else if (std::string(argv[i]) == "-oldminmax")
+    {
+      oldminmax = true;
+    }
+    else if (std::string(argv[i]) == "-min")
+    {
+      min_mev = atof(argv[i + 1]);
+    }
+    else if (std::string(argv[i]) == "-max")
+    {
+      max_mev = atof(argv[i + 1]);
     }
     else if (std::string(argv[i]) == "-mass")
     {
@@ -156,6 +167,11 @@ int main(int argc, char* argv[])
   double * particles_front = new double[righe.size()];
   double * particles_rear = new double[righe.size()];
   std::stringstream ss;
+  if (oldminmax)
+  {
+    min_mev = energies[righe.size() / 5];
+    max_mev = energies[righe.size() / 5 * 4];
+  }
 
   if (piccante)
   {
@@ -193,10 +209,9 @@ int main(int argc, char* argv[])
   double sum_f = 0., sum_f2 = 0., sum_logf = 0., sum_x2f = 0., sum_flogf = 0., sum_xf = 0., sum_xflogf = 0.;
   double sum_r = 0., sum_r2 = 0., sum_logr = 0., sum_x2r = 0., sum_rlogr = 0., sum_xr = 0., sum_xrlogr = 0.;
 
-  unsigned int inizio = (int)(SKIP_INIZIALE * righe.size());
-  unsigned int fine = (int)(SKIP_FINALE * righe.size());
-  for (unsigned int it = inizio; it < fine; it++)
+  for (size_t it = 0; it < righe.size(); it++)
   {
+    if (energies[it] < min_mev || energies[it] > max_mev) continue;
     x = energies[it];
     y = particles[it];
     f = particles_front[it];
@@ -279,8 +294,8 @@ int main(int argc, char* argv[])
 
     int Xres = 1280; // fix, make it possible to define on command line
     int Yres = 720; // fix, make it possible to define on command line
-    //  int Emin = 0; // fix, read it from the infile
-    //  int Emax = 60; // fix, read it from the infile
+    double Emin = energies[0]; // fix, read it from the infile
+    double Emax = energies[righe.size()-1]; // fix, read it from the infile
     char image_type[] = "png";
 
     fprintf(outfile, "#!/gnuplot\n");
@@ -300,7 +315,7 @@ int main(int argc, char* argv[])
     fprintf(outfile, "set xlabel 'E (MeV)' \n");
     fprintf(outfile, "set ylabel 'dN/dE (MeV^{-1})'\n");
     fprintf(outfile, "set format y '10^{%%L}'\n");
-    //  fprintf(outfile, "set xrange[%i:%i]\n", Emin, Emax);
+    fprintf(outfile, "#set xrange[%e:%e]\n", Emin, Emax);
     fprintf(outfile, "set logscale y\n");
     fprintf(outfile, "plot FILE_IN u 1:($2*%g) w histeps lt 1 lc rgb 'blue' lw 3 t 'full spectrum',\\", nmacro_to_nphys);
     fprintf(outfile, "\n");
@@ -322,7 +337,7 @@ int main(int argc, char* argv[])
   if (scan)
   {
     printf(" \t %g  \t  %g \t  %g  \t  %g \t  %g  \t  %g \t   %g     \t   %g     \t       %g       \t     %g       \t ",
-               aveE1,  N0_1,  aveE2,  N0_2,  aveE3,  N0_3, max_energy, tot_energy, tot_energy_front, tot_energy_rear);
+      aveE1, N0_1, aveE2, N0_2, aveE3, N0_3, max_energy, tot_energy, tot_energy_front, tot_energy_rear);
   }
 
 
