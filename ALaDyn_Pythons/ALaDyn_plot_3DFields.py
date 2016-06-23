@@ -37,13 +37,11 @@ if(len(sys.argv)<2):
 if sys.argv[1] == -1:
 	frame_begin	  = 0
 	frame_end         = last_output(os.getcwd())
-	axis_to_cut	  = 'y'
-	cell_to_cut	  = 0
+
 else:
 	frame_begin 	= int(		sys.argv[1])
 	frame_end	= int(		sys.argv[2])
-	axis_to_cut	= str(		sys.argv[3])
-	cell_to_cut	= int(		sys.argv[4])
+
 ### --- ###
 
 
