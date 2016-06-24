@@ -75,9 +75,11 @@ if __name__ == '__main__':
 		Ezb,ax4,ax5,ax6 = read_ALaDyn_bin(path_read,'Ezbout'+s+'.bin','grid')
 		
 		
-		np.savetxt( os.path.join(path_write,'data','E_field',('Ex_tot_3D_'+('%2.2i'%i)+'.txt')),Exf.transpose()+Exb.transpose(),fmt='%15.14e')
-		np.savetxt( os.path.join(path_write,'data','E_field',('Ey_tot_3D_'+('%2.2i'%i)+'.txt')),Eyf.transpose()+Eyb.transpose(),fmt='%15.14e')
-		np.savetxt( os.path.join(path_write,'data','E_field',('Ez_tot_3D_'+('%2.2i'%i)+'.txt')),Ezf.transpose()+Ezb.transpose(),fmt='%15.14e')
+		print Exf
+		
+		np.savetxt( os.path.join(path_write,'data','E_field',('Ex_tot_3D_'+('%2.2i'%i)+'.txt')),Exf+Exb,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','E_field',('Ey_tot_3D_'+('%2.2i'%i)+'.txt')),Eyf+Eyb,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','E_field',('Ez_tot_3D_'+('%2.2i'%i)+'.txt')),Ezf+Ezb,fmt='%15.14e')
 
 		
 		Bxf,ax1,ax2,ax3 = read_ALaDyn_bin(path_read,'Bxfout'+s+'.bin','grid')
@@ -89,6 +91,6 @@ if __name__ == '__main__':
 		Bzb,ax4,ax5,ax6 = read_ALaDyn_bin(path_read,'Bzbout'+s+'.bin','grid')
         
         
-        np.savetxt( os.path.join(path_write,'data','B_field',('Bx_tot_3D_'+('%2.2i'%i)+'.txt')),Exf.transpose(),fmt='%15.14e')
-        np.savetxt( os.path.join(path_write,'data','B_field',('By_tot_3D_'+('%2.2i'%i)+'.txt')),Byf.transpose()+Byb.transpose(),fmt='%15.14e')
-        np.savetxt( os.path.join(path_write,'data','B_field',('Bz_tot_3D_'+('%2.2i'%i)+'.txt')),Bzf.transpose()+Bzb.transpose(),fmt='%15.14e')
+        np.savetxt( os.path.join(path_write,'data','B_field',('Bx_tot_3D_'+('%2.2i'%i)+'.txt')),Exf,fmt='%15.14e')
+        np.savetxt( os.path.join(path_write,'data','B_field',('By_tot_3D_'+('%2.2i'%i)+'.txt')),Byf+Byb,fmt='%15.14e')
+        np.savetxt( os.path.join(path_write,'data','B_field',('Bz_tot_3D_'+('%2.2i'%i)+'.txt')),Bzf+Bzb,fmt='%15.14e')
