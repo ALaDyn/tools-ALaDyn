@@ -97,10 +97,12 @@ int main(int argc, char* argv[])
     else if (std::string(argv[i]) == "-min")
     {
       min_mev = atof(argv[i + 1]);
+      i++;
     }
     else if (std::string(argv[i]) == "-max")
     {
       max_mev = atof(argv[i + 1]);
+      i++;
     }
     else if (std::string(argv[i]) == "-mass")
     {
