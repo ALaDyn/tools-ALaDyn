@@ -75,7 +75,7 @@ if __name__ == '__main__':
 		path_write = path
 
 		K,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,slice_position)
-		reduce_matrix_dimension(K,cell_to_cut)
+		K = reduce_matrix_dimension(K,cell_to_cut)
 		np.savetxt( os.path.join(path_write,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(K.transpose()),fmt='%15.14e')
 		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
@@ -84,12 +84,12 @@ if __name__ == '__main__':
 		del K
 
 		Exf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Exfout'+s+'.bin','grid',axis_to_cut,slice_position)
-		reduce_matrix_dimension(Exf,cell_to_cut)
+		Exf = reduce_matrix_dimension(Exf,cell_to_cut)
 		np.savetxt( os.path.join(path_write,'data','E_field',('Ex_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Exf.transpose(),fmt='%15.14e')
 		del Exf
 
 		Eyf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Eyfout'+s+'.bin','grid',axis_to_cut,slice_position)
-		reduce_matrix_dimension(Eyf,cell_to_cut)
+		Eyf = reduce_matrix_dimension(Eyf,cell_to_cut)
 		np.savetxt( os.path.join(path_write,'data','E_field',('Ey_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),Eyf.transpose(),fmt='%15.14e')
 		del Eyf
 
