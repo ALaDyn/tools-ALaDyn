@@ -75,7 +75,6 @@ if __name__ == '__main__':
 		path_write = path
 
 		K,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,slice_position)
-		print K.shape
 		reduce_matrix_dimension(K,cell_to_cut)
 		np.savetxt( os.path.join(path_write,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(K.transpose()),fmt='%15.14e')
 		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
