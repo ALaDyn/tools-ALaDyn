@@ -1,55 +1,55 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
+    <Filter Include="File di origine">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
+    <Filter Include="File di intestazione">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
+    <Filter Include="File di risorse">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\boost">
-      <UniqueIdentifier>{221c87fe-416b-42fa-ba73-63255c6b5a1e}</UniqueIdentifier>
+    <Filter Include="File di origine\boost">
+      <UniqueIdentifier>{b151b2c8-7f35-4cc4-8d9a-9662e463c41b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="InGenUO.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.codecvt_error_category.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.operations.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.path.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.path_traits.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.portability.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.unique_path.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.utf8_codecvt_facet.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.windows_file_codecvt.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_system.error_code.cpp">
-      <Filter>Source Files\boost</Filter>
-    </ClCompile>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ClCompile Include="extract_nptot.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.codecvt_error_category.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.operations.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.path.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.path_traits.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.portability.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.unique_path.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.utf8_codecvt_facet.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.windows_file_codecvt.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_system.error_code.cpp">
+      <Filter>File di origine\boost</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -13,37 +13,40 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\boost">
+      <UniqueIdentifier>{2e52738e-c52d-4560-a442-62d018a3bdd0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_system.error_code.cpp">
+    <ClCompile Include="interpolate_scan_results.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.codecvt_error_category.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.operations.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.path.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.path_traits.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.portability.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.unique_path.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.utf8_codecvt_facet.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_filesystem.windows_file_codecvt.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
-    <ClCompile Include="interpolate_scan_results.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\boost_system.error_code.cpp">
+      <Filter>Source Files\boost</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

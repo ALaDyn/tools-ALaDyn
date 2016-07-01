@@ -509,6 +509,7 @@ int main()
   std::string inputnml = percorso + "input.nml";
 
   print_input_nml(parametri, inputnml);
+  return 0;
 }
 
 

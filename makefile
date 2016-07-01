@@ -2,6 +2,7 @@
 TOOLS := analizza_binario \
 combina_vtk \
 exponential_fit \
+extract_nptot \
 fix_nptot \
 InGenUO \
 interpolate_scan_results \
