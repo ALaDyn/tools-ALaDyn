@@ -25,8 +25,6 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 #define _USE_MATH_DEFINES
 #define _CRT_SECURE_NO_WARNINGS
 
-#define INITIAL_DATA_SKIP  (1./5.)
-#define FINAL_DATA_SKIP    (5./5.)  
 
 
 #include <iostream>
@@ -69,7 +67,7 @@ int main(int argc, char* argv[])
   int Xres = 1280;
   int Yres = 720;
   char image_type[] = "png";
-  int colonna_x, colonna_y;
+  int colonna_x = 1, colonna_y = 2;
   bool scan = false, func = false, gnuplot = false;
   int inputfile_position = 0;
   std::string riga;
@@ -78,6 +76,8 @@ int main(int argc, char* argv[])
   std::stringstream ss;
   double sum_y = 0., sum_logx = 0., sum_ylogx = 0., sum_log2x = 0.;
   double x = 0., y = 0., logx = 0., logy = 0.;
+  double min_val = std::numeric_limits<double>::epsilon();
+  double max_val = std::numeric_limits<double>::infinity();
 
 
   for (int i = 1; i < argc; i++) {
@@ -91,6 +91,8 @@ int main(int argc, char* argv[])
     else if (std::string(argv[i]) == "-func")     func = true;
     else if (std::string(argv[i]) == "-x")        colonna_x = atoi(argv[++i]);
     else if (std::string(argv[i]) == "-y")        colonna_y = atoi(argv[++i]);
+    else if (std::string(argv[i]) == "-min")      min_val = atof(argv[++i]);
+    else if (std::string(argv[i]) == "-max")      max_val = atof(argv[++i]);
     else                                          inputfile_position = i;
   }
 
@@ -154,10 +156,8 @@ int main(int argc, char* argv[])
     energy[it] = values[colonna_y];
   }
 
-  size_t inizio = (int)(INITIAL_DATA_SKIP * n);
-  size_t fine = (int)(FINAL_DATA_SKIP * n);
-
-  for (size_t it = inizio; it < fine; it++) {
+  for (size_t it = 0; it < righe.size(); it++) {
+    if (time[it] < min_val || time[it] > max_val) continue;
     x = time[it];
     y = energy[it];
     x > 0.0 ? logx = log(x) : 0.0;
@@ -199,6 +199,7 @@ int main(int argc, char* argv[])
     fprintf(outfile, "f(x) = a + b*log(x)\n");
     fprintf(outfile, "set xlabel 't' \n");
     fprintf(outfile, "set ylabel 'E (MeV)'\n");
+    fprintf(outfile, "set logscale x\n");
     fprintf(outfile, "plot FILE_IN u %i:%i w points pt 7 lc rgb 'blue' ps 1.5 notitle,\\",colonna_x+1, colonna_y+1);
     fprintf(outfile, "\n");
     fprintf(outfile, "f(x) w lines lt 1 lc rgb 'red' lw 2 notitle");
