@@ -162,7 +162,7 @@ int main(int argc, const char* argv[]) {
     if (infile.eof()) break;
     if (riga[0] == '#') continue;
     boost::algorithm::trim(riga);
-    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_off);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(";: =\t"), boost::token_compress_off);
     if (!matrix.size()) ncolumns = tokens.size();
     if (ncolumns != tokens.size()) {
       std::cout << "Warning, row has an unexpected length" << std::endl;
@@ -185,11 +185,39 @@ int main(int argc, const char* argv[]) {
     }
     if (!found) unique_y_values.push_back(tokens[column_y]);
 
-    for (auto i : tokens) dtokens.push_back(boost::lexical_cast<double>(i));
+    for (auto i : tokens) {
+      try
+      {
+        dtokens.push_back(boost::lexical_cast<double>(i));
+      }
+      catch (boost::bad_lexical_cast const&)
+      {
+        dtokens.push_back(0.0);
+      }
+    }
+
     matrix.push_back(dtokens);
   }
-  for (auto i : unique_x_values) dunique_x_values.push_back(boost::lexical_cast<double>(i));
-  for (auto i : unique_y_values) dunique_y_values.push_back(boost::lexical_cast<double>(i));
+  for (auto i : unique_x_values) {
+    try
+    {
+      dunique_x_values.push_back(boost::lexical_cast<double>(i));
+    }
+    catch (boost::bad_lexical_cast const&)
+    {
+      dunique_x_values.push_back(0.0);
+    }
+  }
+  for (auto i : unique_y_values) {
+    try
+    {
+      dunique_y_values.push_back(boost::lexical_cast<double>(i));
+    }
+    catch (boost::bad_lexical_cast const&)
+    {
+      dunique_x_values.push_back(0.0);
+    }
+  }
   infile.close();
 
   riga.clear(), tokens.clear();
