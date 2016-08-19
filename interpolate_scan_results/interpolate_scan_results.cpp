@@ -162,7 +162,7 @@ int main(int argc, const char* argv[]) {
     if (infile.eof()) break;
     if (riga[0] == '#') continue;
     boost::algorithm::trim(riga);
-    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_on);
+    boost::algorithm::split(tokens, riga, boost::algorithm::is_any_of(": =\t"), boost::token_compress_off);
     if (!matrix.size()) ncolumns = tokens.size();
     if (ncolumns != tokens.size()) {
       std::cout << "Warning, row has an unexpected length" << std::endl;
