@@ -40,7 +40,7 @@ def	generate_folder_output_structure(path,savedata):
 					###---###
 	directory_ionization   = os.path.join(directory,'ionization')
 					###---###
-	directory_Energy_Density = os.path.join(directory, 'Energy_Density')
+	directory_Energy_Density = os.path.join(directory, 'Ene_Den')
 	
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
@@ -68,7 +68,7 @@ def	generate_folder_output_structure(path,savedata):
 						###---###
 		directory_ionization = os.path.join(directory,'ionization')
 						###---###
-		directory_Energy_Density	= os.path.join(directory, 'Energy Density')	
+		directory_Energy_Density	= os.path.join(directory, 'EneDen')	
 		if not os.path.exists( directory_rho ):
 			os.makedirs(directory_rho)
 		if not os.path.exists( directory_E ):
@@ -116,6 +116,14 @@ def output_exists(path,quantity,frame):
 			return True
 		else:
 			return False
+
+			###---###
+
+	if quantity == 'EneDen':
+		if os.path.isfile(os.path.join(path,'Elenout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False	
 
 			###---###	
 	
