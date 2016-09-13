@@ -132,7 +132,7 @@ def plot_energy_density_sections(path,frame,EneDen_min,EneDen_max,isolines,cellt
 		x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
 
 	
-		np.savetxt( os.path.join(path,'data','EneDen',('EneDen_section_'+('%2.2i'%frame)+'.dat')),EneDen[:,:,z2].T,fmt='%15.14e')
+		np.savetxt( os.path.join(path,'data','EneDen',('Energy_Density'+('%2.2i'%frame)+'.dat')),EneDen[:,:,z2].T,fmt='%15.14e')
 # 		np.savetxt( 'rho_section_'+('%2.2i'%frame)+'.dat' ,rho[:,:,z2].T,fmt='%15.14e')
 # 		np.savetxt( 'rho_b_section_'+('%2.2i'%frame)+'.dat' ,rho_b[:,:,z2].T,fmt='%15.14e')
 
