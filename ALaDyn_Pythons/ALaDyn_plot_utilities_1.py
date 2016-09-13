@@ -35,12 +35,10 @@ def	generate_folder_output_structure(path,savedata):
 		os.makedirs(directory)
 	
 	directory_rho = os.path.join(directory,'rho')
+	directory_ionization   = os.path.join(directory,'ionization')
+	directory_Energy_Density = os.path.join(directory, 'Ene_Den')
 	directory_E   = os.path.join(directory,'E_field')
 	directory_B   = os.path.join(directory,'B_field')
-					###---###
-	directory_ionization   = os.path.join(directory,'ionization')
-					###---###
-	directory_Energy_Density = os.path.join(directory, 'Ene_Den')
 	
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
@@ -61,26 +59,26 @@ def	generate_folder_output_structure(path,savedata):
 		if not os.path.exists( directory ):
 			os.makedirs(directory)
 	
-		directory_rho = os.path.join(directory,'rho')
-		directory_E   = os.path.join(directory,'E_field')
-		directory_B   = os.path.join(directory,'B_field')
-		directory_moving_window = os.path.join(directory,'Moving_window_axes')
-						###---###
-		directory_ionization = os.path.join(directory,'ionization')
-						###---###
-		directory_Energy_Density	= os.path.join(directory, 'EneDen')	
+		directory_rho 		 = os.path.join(directory,'rho')
+		directory_ionization     = os.path.join(directory,'ionization')
+		directory_Energy_Density = os.path.join(directory, 'EneDen')	
+		directory_E   		 = os.path.join(directory,'E_field')
+		directory_B   		 = os.path.join(directory,'B_field')
+		directory_moving_window  = os.path.join(directory,'Moving_window_axes')
+
+
 		if not os.path.exists( directory_rho ):
 			os.makedirs(directory_rho)
+		if not os.path.exists( directory_ionization ):
+			os.makedirs( directory_ionization )
+		if not os.path.exists( directory_Energy_Density ):
+			os.makedirs( directory_Energy_Density )
 		if not os.path.exists( directory_E ):
 			os.makedirs(directory_E)
 		if not os.path.exists( directory_B ):
 			os.makedirs(directory_B)	
 		if not os.path.exists( directory_moving_window ):
 			os.makedirs( directory_moving_window )
-		if not os.path.exists( directory_ionization ):
-			os.makedirs( directory_ionization )
-		if not os.path.exists( directory_Energy_Density ):
-			os.makedirs( directory_Energy_Density )
 
 
 
