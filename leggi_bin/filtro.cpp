@@ -161,27 +161,27 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
     pntt_loc = dati + i*n_dati[1];
     flag = true;
 
-    if (((parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) && parametri->file_version < 3) || (parametri->p[NCOLONNE] == 8 && parametri->file_version == 3))
+    if (((parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) && parametri->file_version < 3) || (parametri->p[NCOLONNE] == 8 && parametri->file_version >= 3))
     {
       p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
       if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = pntt_loc[6];
       else
         w = parametri->overwrite_weight_value;
-      if (parametri->file_version == 3 && !parametri->overwrite_charge)
+      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
         ch = pntt_loc[7];
       else
         ch = parametri->overwrite_charge_value;
     }
 
-    else if (((parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) && parametri->file_version < 3) || (parametri->p[NCOLONNE] == 6 && parametri->file_version == 3))
+    else if (((parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) && parametri->file_version < 3) || (parametri->p[NCOLONNE] == 6 && parametri->file_version >= 3))
     {
       p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
       if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
         w = pntt_loc[4];
       else
         w = parametri->overwrite_weight_value;
-      if (parametri->file_version == 3 && !parametri->overwrite_charge)
+      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
         ch = pntt_loc[5];
       else
         ch = parametri->overwrite_charge_value;

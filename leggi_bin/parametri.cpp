@@ -1535,12 +1535,22 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_xy")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_xy = 1;
     }
     else if (argv[i] == "-plot_xw")
     {
       if (p[WEIGHT])
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_xw = 1;
       }
       else
@@ -1552,6 +1562,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_xz = 1;
       }
       else
@@ -1563,6 +1578,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_yz = 1;
       }
       else
@@ -1574,6 +1594,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_rcf = 1;
       }
       else
@@ -1583,16 +1608,31 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_xpx")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_xpx = 1;
     }
     else if (argv[i] == "-plot_xpy")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_xpy = 1;
     }
     else if (argv[i] == "-plot_xpz")
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_xpz = 1;
       }
       else
@@ -1602,16 +1642,31 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_ypx")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_ypx = 1;
     }
     else if (argv[i] == "-plot_ypy")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_ypy = 1;
     }
     else if (argv[i] == "-plot_ypz")
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_ypz = 1;
       }
       else
@@ -1623,6 +1678,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_zpx = 1;
       }
       else
@@ -1634,6 +1694,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_zpy = 1;
       }
       else
@@ -1645,6 +1710,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_zpz = 1;
       }
       else
@@ -1654,12 +1724,22 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_pxpy")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_pxpy = 1;
     }
     else if (argv[i] == "-plot_pxpz")
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_pxpz = 1;
       }
       else
@@ -1671,6 +1751,11 @@ void Parametri::parse_command_line()
     {
       if (p[NCOLONNE] > 5)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_pypz = 1;
       }
       else
@@ -1680,20 +1765,40 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_etheta")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_Etheta = 1;
     }
     else if (argv[i] == "-plot_ethetaT")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_EthetaT = 1;
     }
     else if (argv[i] == "-plot_espec")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_Espec = 1;
     }
     else if (argv[i] == "-plot_chspec")
     {
-      if (file_version == 3)
+      if (file_version >= 3)
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_chspec = 1;
       }
       else
@@ -1705,6 +1810,11 @@ void Parametri::parse_command_line()
     {
       if (p[WEIGHT])
       {
+        if (p_b[DO_BINNING]) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          p[DO_BINNING] = 1;
+          p_b[DO_BINNING] = false;
+        }
         fai_plot_wspec = 1;
       }
       else
@@ -1714,10 +1824,20 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_thetaspec")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_thetaspec = 1;
     }
     else if (argv[i] == "-plot_thetaTspec")
     {
+      if (p_b[DO_BINNING]) {
+        std::cout << "You asked to enable plotting functions" << std::endl;
+        p[DO_BINNING] = 1;
+        p_b[DO_BINNING] = false;
+      }
       fai_plot_thetaTspec = 1;
     }
     else if (argv[i] == "-nbin")

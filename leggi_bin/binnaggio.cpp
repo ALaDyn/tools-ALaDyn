@@ -43,7 +43,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   float dato_da_binnare_x = 0., dato_da_binnare_y = 0.;
   for (int i = 0; i < npart; i++)
   {
-    if (((ndv == 4 || ndv == 5) && parametri->file_version < 3) || (ndv == 6 && parametri->file_version == 3))
+    if (((ndv == 4 || ndv == 5) && parametri->file_version < 3) || (ndv == 6 && parametri->file_version >= 3))
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
@@ -53,7 +53,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         w = *(particelle + i*ndv + 4);
       else
         w = parametri->overwrite_weight_value;
-      if (parametri->file_version == 3 && !parametri->overwrite_charge)
+      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
         ch = *(particelle + i*ndv + 5);
       else
         ch = parametri->overwrite_charge_value;
@@ -93,7 +93,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_y == 12) dato_da_binnare_y = w;
       else if (binnare_su_y == 13) dato_da_binnare_y = ch;
     }
-    else if (((ndv == 6 || ndv == 7) && parametri->file_version < 3) || (ndv == 8 && parametri->file_version == 3))
+    else if (((ndv == 6 || ndv == 7) && parametri->file_version < 3) || (ndv == 8 && parametri->file_version >= 3))
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
@@ -105,7 +105,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         w = *(particelle + i*ndv + 6);
       else
         w = parametri->overwrite_weight_value;
-      if (parametri->file_version == 3 && !parametri->overwrite_charge)
+      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
         ch = *(particelle + i*ndv + 7);
       else
         ch = parametri->overwrite_charge_value;
@@ -199,7 +199,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
   fflush(stdout);
   for (int i = 0; i < npart; i++)
   {
-    if (((ndv == 4 || ndv == 5) && parametri->file_version < 3) || (ndv == 6 && parametri->file_version == 3))
+    if (((ndv == 4 || ndv == 5) && parametri->file_version < 3) || (ndv == 6 && parametri->file_version >= 3))
     {
       x = *(particelle + i*ndv);
       y = *(particelle + i*ndv + 1);
@@ -209,7 +209,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         w = *(particelle + i*ndv + 4);
       else
         w = parametri->overwrite_weight_value;
-      if (parametri->file_version == 3 && !parametri->overwrite_charge)
+      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
         ch = *(particelle + i*ndv + 5);
       else
         ch = parametri->overwrite_charge_value;
@@ -234,7 +234,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
       else if (binnare_su_x == 11) std::cout << "Unable to bin on tz in 2D" << std::endl;
       else if (binnare_su_x == 12) dato_da_binnare_x = w;
     }
-    else if (((ndv == 6 || ndv == 7) && parametri->file_version < 3) || (ndv == 8 && parametri->file_version == 3))
+    else if (((ndv == 6 || ndv == 7) && parametri->file_version < 3) || (ndv == 8 && parametri->file_version >= 3))
     {
       px = *(particelle + i*ndv + 3);
       py = *(particelle + i*ndv + 4);
@@ -243,7 +243,7 @@ _Binnaggio::_Binnaggio(float * particelle, int npart, int ndv, Parametri * param
         w = *(particelle + i*ndv + 6);
       else
         w = parametri->overwrite_weight_value;
-      if (parametri->file_version == 3 && !parametri->overwrite_charge)
+      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
         ch = *(particelle + i*ndv + 7);
       else
         ch = parametri->overwrite_charge_value;
