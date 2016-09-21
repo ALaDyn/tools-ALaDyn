@@ -11,7 +11,7 @@
 #define _SCL_SECURE_NO_WARNINGS
 
 #define MAJOR_RELEASE  6
-#define MINOR_RELEASE  4
+#define MINOR_RELEASE  5
 #define BUGFIX_RELEASE 0
 
 #include <iostream>

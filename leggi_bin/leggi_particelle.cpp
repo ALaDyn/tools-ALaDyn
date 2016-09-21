@@ -256,7 +256,7 @@ int leggi_particelle(Parametri * parametri)
     std::cout << "WMAX = " << parametri->wmax << std::endl;
     std::cout << "CHMIN = " << parametri->chmin << std::endl;
     std::cout << "CHMAX = " << parametri->chmax << std::endl;
-}
+  }
 #endif
 
   if (parametri->p[OUT_VTK])
@@ -719,37 +719,37 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_CSV])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+          for (unsigned int i = 0; i < val[0]; i++)
           {
-            for (unsigned int i = 0; i < val[0]; i++)
-            {
-              x = particelle[i*parametri->ndv + 0];
-              y = particelle[i*parametri->ndv + 1];
-              z = particelle[i*parametri->ndv + 2];
-              px = particelle[i*parametri->ndv + 3];
-              py = particelle[i*parametri->ndv + 4];
-              pz = particelle[i*parametri->ndv + 5];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 6];
-              else w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 7];
-              else ch = parametri->overwrite_charge_value;
-              if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
-            }
-          }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
-          {
-            for (unsigned int i = 0; i < val[0]; i++)
-            {
-              x = particelle[i*parametri->ndv + 0];
-              z = particelle[i*parametri->ndv + 1];
-              px = particelle[i*parametri->ndv + 2];
-              pz = particelle[i*parametri->ndv + 3];
+            x = particelle[i*parametri->ndv + 0];
+            y = particelle[i*parametri->ndv + 1];
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) z = 0;
+            else z = particelle[i*parametri->ndv + 2];
+            px = particelle[i*parametri->ndv + 3];
+            py = particelle[i*parametri->ndv + 4];
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) pz = 0;
+            else pz = particelle[i*parametri->ndv + 5];
+
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 4];
               else w = parametri->overwrite_weight_value;
+            }
+            else {
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 6];
+              else w = parametri->overwrite_weight_value;
+            }
+
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
               if (parametri->file_version >= 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 5];
               else ch = parametri->overwrite_charge_value;
-              if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, 0, %e, %e, 0, %e, %e, %e\n", x, z, px, pz, w, ch);
             }
+            else {
+              if (parametri->file_version >= 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 7];
+              else ch = parametri->overwrite_charge_value;
+            }
+
+
+            if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
           }
         }
 
@@ -757,39 +757,36 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_CLEAN_BINARY])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+          for (unsigned int i = 0; i < val[0]; i++)
           {
-            for (unsigned int i = 0; i < val[0]; i++)
-            {
-              array_supporto8[0] = particelle[i*parametri->ndv + 0];
-              array_supporto8[1] = particelle[i*parametri->ndv + 1];
-              array_supporto8[2] = particelle[i*parametri->ndv + 2];
-              array_supporto8[3] = particelle[i*parametri->ndv + 3];
-              array_supporto8[4] = particelle[i*parametri->ndv + 4];
-              array_supporto8[5] = particelle[i*parametri->ndv + 5];
+            array_supporto8[0] = particelle[i*parametri->ndv + 0];
+            array_supporto8[1] = particelle[i*parametri->ndv + 1];
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) array_supporto8[2] = 0;
+            else array_supporto8[2] = particelle[i*parametri->ndv + 2];
+            array_supporto8[3] = particelle[i*parametri->ndv + 3];
+            array_supporto8[4] = particelle[i*parametri->ndv + 4];
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) array_supporto8[5] = 0;
+            else array_supporto8[5] = particelle[i*parametri->ndv + 5];
+
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto8[6] = particelle[i*parametri->ndv + 4];
+              else array_supporto8[6] = parametri->overwrite_weight_value;
+            }
+            else {
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto8[6] = particelle[i*parametri->ndv + 6];
               else array_supporto8[6] = parametri->overwrite_weight_value;
+            }
+
+            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
+              if (parametri->file_version >= 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 5];
+              else array_supporto8[7] = parametri->overwrite_charge_value;
+            }
+            else {
               if (parametri->file_version >= 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 7];
               else array_supporto8[7] = parametri->overwrite_charge_value;
-
-              if (i % parametri->subsample == 0) fwrite((void*)(array_supporto8), sizeof(float), 8, binary_clean);
             }
-          }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
-          {
-            for (unsigned int i = 0; i < val[0]; i++)
-            {
-              array_supporto6[0] = particelle[i*parametri->ndv + 0];
-              array_supporto6[1] = particelle[i*parametri->ndv + 1];
-              array_supporto6[2] = particelle[i*parametri->ndv + 2];
-              array_supporto6[3] = particelle[i*parametri->ndv + 3];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto6[4] = particelle[i*parametri->ndv + 4];
-              else array_supporto6[4] = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge) array_supporto6[5] = particelle[i*parametri->ndv + 5];
-              else array_supporto6[5] = parametri->overwrite_charge_value;
 
-              if (i % parametri->subsample == 0) fwrite((void*)(array_supporto6), sizeof(float), 6, binary_clean);
-            }
+            if (i % parametri->subsample == 0) fwrite((void*)(array_supporto8), sizeof(float), 8, binary_clean);
           }
         }
 
