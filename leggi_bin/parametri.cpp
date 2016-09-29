@@ -16,6 +16,7 @@ Parametri::Parametri()
   span = 5;
   ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
   nptot = ndv = 0;
+  is_2d_sim = false;
   npx = npy = npz = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
   npx_ricampionati = npy_ricampionati = npz_ricampionati = npx_ricampionati_per_cpu = npy_ricampionati_per_cpu = npz_ricampionati_per_cpu = 0;
   fattore_ricampionamento = 0;
@@ -219,6 +220,8 @@ void Parametri::leggi_parametri_da_file_bin(const char * filename)
   ymax = realpar[4];  //estremi della griglia
   zmin = realpar[5];  //estremi della griglia
   zmax = realpar[6];  //estremi della griglia
+
+  is_2d_sim = ((ndv == 4 || ndv == 5) && file_version < 3) || (ndv == 6 && file_version >= 3);
 
   header_size_bytes = (7 + nparams) * sizeof(int) + nparams * sizeof(float);
   if (fread_size != header_size_bytes) std::cout << "error: header size is different than expected" << std::endl << std::flush;
@@ -574,8 +577,9 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     }
   }
   endian_file = (endianness - 1);
+  is_2d_sim = ((ndv == 4 || ndv == 5) && file_version < 3) || (ndv == 6 && file_version >= 3);
+}
 
-  }
 
 
 
@@ -655,7 +659,7 @@ void Parametri::chiedi_2Do3D()
   int dimensioni;
   std::cout << "Is it a 3D (3) or 2D (2) grid? ";
   std::cin >> dimensioni;
-  if (dimensioni == 2) p[NCOLONNE] = 1;
+  if (dimensioni == 2) p[NCOLONNE] = 1, is_2d_sim = true;
   else if (dimensioni == 3) p[NCOLONNE] = 3;
   else
   {

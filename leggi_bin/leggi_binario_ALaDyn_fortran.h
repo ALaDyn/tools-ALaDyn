@@ -12,7 +12,7 @@
 
 #define MAJOR_RELEASE  6
 #define MINOR_RELEASE  5
-#define BUGFIX_RELEASE 0
+#define BUGFIX_RELEASE 1
 
 #include <iostream>
 #include <vector>
@@ -128,6 +128,7 @@ struct Parametri
   int argc;
   std::string * argv;
   std::string filebasename;
+  bool is_2d_sim;
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
   unsigned int ndv, fattore_ricampionamento;
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;

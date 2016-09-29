@@ -428,7 +428,27 @@ int leggi_particelle(Parametri * parametri)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+            if (parametri->is_2d_sim)
+            {
+              x = *(particelle + i*parametri->ndv);
+              y = *(particelle + i*parametri->ndv + 1);
+              z = 0.0;
+              px = *(particelle + i*parametri->ndv + 2);
+              py = *(particelle + i*parametri->ndv + 3);
+              pz = 0.0;
+              ptot = sqrt(px*px + py*py);
+              px /= ptot;
+              py /= ptot;
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+                w = *(particelle + i*parametri->ndv + 4);
+              else
+                w = parametri->overwrite_weight_value;
+              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
+                ch = *(particelle + i*parametri->ndv + 5);
+              else
+                ch = parametri->overwrite_charge_value;
+            }
+            else
             {
               x = *(particelle + i*parametri->ndv);
               y = *(particelle + i*parametri->ndv + 1);
@@ -446,26 +466,6 @@ int leggi_particelle(Parametri * parametri)
                 w = parametri->overwrite_weight_value;
               if (parametri->file_version >= 3 && !parametri->overwrite_charge)
                 ch = *(particelle + i*parametri->ndv + 7);
-              else
-                ch = parametri->overwrite_charge_value;
-            }
-            else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
-            {
-              x = *(particelle + i*parametri->ndv);
-              y = *(particelle + i*parametri->ndv + 1);
-              z = 0.0;
-              px = *(particelle + i*parametri->ndv + 2);
-              py = *(particelle + i*parametri->ndv + 3);
-              pz = 0.0;
-              ptot = sqrt(px*px + py*py);
-              px /= ptot;
-              py /= ptot;
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = *(particelle + i*parametri->ndv + 4);
-              else
-                w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-                ch = *(particelle + i*parametri->ndv + 5);
               else
                 ch = parametri->overwrite_charge_value;
             }
@@ -494,7 +494,53 @@ int leggi_particelle(Parametri * parametri)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+            if (parametri->is_2d_sim)
+            {
+              x = *(particelle + i*parametri->ndv);
+              y = *(particelle + i*parametri->ndv + 1);
+              px = *(particelle + i*parametri->ndv + 2);
+              py = *(particelle + i*parametri->ndv + 3);
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+                w = *(particelle + i*parametri->ndv + 4);
+              else
+                w = parametri->overwrite_weight_value;
+              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
+                ch = *(particelle + i*parametri->ndv + 5);
+              else
+                ch = parametri->overwrite_charge_value;
+              gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
+              theta = (float)(atan2(py, px)*180. / M_PI);       //theta
+              thetaT = (float)atan(sqrt((py*py) / (px*px)));
+              E = (float)(gamma*parametri->massa_particella_MeV); //energia
+              if (px > 0) ty = py / px;
+              else ty = 0.0;
+              if (x < estremi_min[0]) estremi_min[0] = x;
+              if (x > estremi_max[0]) estremi_max[0] = x;
+              if (y < estremi_min[1]) estremi_min[1] = y;
+              if (y > estremi_max[1]) estremi_max[1] = y;
+              estremi_min[2] = 0., estremi_max[2] = 1.;
+              if (px < estremi_min[3]) estremi_min[3] = px;
+              if (px > estremi_max[3]) estremi_max[3] = px;
+              if (py < estremi_min[4]) estremi_min[4] = py;
+              if (py > estremi_max[4]) estremi_max[4] = py;
+              estremi_min[5] = 0., estremi_max[5] = 1.;
+              if (gamma < estremi_min[6]) estremi_min[6] = gamma;
+              if (gamma > estremi_max[6]) estremi_max[6] = gamma;
+              if (theta < estremi_min[7]) estremi_min[7] = theta;
+              if (theta > estremi_max[7]) estremi_max[7] = theta;
+              if (E < estremi_min[8]) estremi_min[8] = E;
+              if (E > estremi_max[8]) estremi_max[8] = E;
+              if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
+              if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
+              if (ty < estremi_min[10]) estremi_min[10] = ty;
+              if (ty > estremi_max[10]) estremi_max[10] = ty;
+              estremi_min[11] = -1., estremi_max[11] = 1.;
+              if (w < estremi_min[12]) estremi_min[12] = w;
+              if (w > estremi_max[12]) estremi_max[12] = w;
+              if (ch < estremi_min[13]) estremi_min[13] = ch;
+              if (ch > estremi_max[13]) estremi_max[13] = ch;
+            }
+            else
             {
               x = *(particelle + i*parametri->ndv);
               y = *(particelle + i*parametri->ndv + 1);
@@ -553,52 +599,6 @@ int leggi_particelle(Parametri * parametri)
               if (ch < estremi_min[13]) estremi_min[13] = ch;
               if (ch > estremi_max[13]) estremi_max[13] = ch;
             }
-            else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
-            {
-              x = *(particelle + i*parametri->ndv);
-              y = *(particelle + i*parametri->ndv + 1);
-              px = *(particelle + i*parametri->ndv + 2);
-              py = *(particelle + i*parametri->ndv + 3);
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = *(particelle + i*parametri->ndv + 4);
-              else
-                w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-                ch = *(particelle + i*parametri->ndv + 5);
-              else
-                ch = parametri->overwrite_charge_value;
-              gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
-              theta = (float)(atan2(py, px)*180. / M_PI);       //theta
-              thetaT = (float)atan(sqrt((py*py) / (px*px)));
-              E = (float)(gamma*parametri->massa_particella_MeV); //energia
-              if (px > 0) ty = py / px;
-              else ty = 0.0;
-              if (x < estremi_min[0]) estremi_min[0] = x;
-              if (x > estremi_max[0]) estremi_max[0] = x;
-              if (y < estremi_min[1]) estremi_min[1] = y;
-              if (y > estremi_max[1]) estremi_max[1] = y;
-              estremi_min[2] = 0., estremi_max[2] = 1.;
-              if (px < estremi_min[3]) estremi_min[3] = px;
-              if (px > estremi_max[3]) estremi_max[3] = px;
-              if (py < estremi_min[4]) estremi_min[4] = py;
-              if (py > estremi_max[4]) estremi_max[4] = py;
-              estremi_min[5] = 0., estremi_max[5] = 1.;
-              if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-              if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-              if (theta < estremi_min[7]) estremi_min[7] = theta;
-              if (theta > estremi_max[7]) estremi_max[7] = theta;
-              if (E < estremi_min[8]) estremi_min[8] = E;
-              if (E > estremi_max[8]) estremi_max[8] = E;
-              if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
-              if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
-              if (ty < estremi_min[10]) estremi_min[10] = ty;
-              if (ty > estremi_max[10]) estremi_max[10] = ty;
-              estremi_min[11] = -1., estremi_max[11] = 1.;
-              if (w < estremi_min[12]) estremi_min[12] = w;
-              if (w > estremi_max[12]) estremi_max[12] = w;
-              if (ch < estremi_min[13]) estremi_min[13] = ch;
-              if (ch > estremi_max[13]) estremi_max[13] = ch;
-            }
           }
         }
         if (parametri->p[DO_BINNING])
@@ -631,7 +631,30 @@ int leggi_particelle(Parametri * parametri)
 
         if (parametri->p[OUT_PROPAGA])
         {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+          if (parametri->is_2d_sim)
+          {
+            for (unsigned int i = 0; i < val[0]; i++)
+            {
+              x = particelle[i*parametri->ndv + 1] * ((float)1.e-4);
+              z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
+              px = particelle[i*parametri->ndv + 3];
+              pz = particelle[i*parametri->ndv + 2];
+              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+                w = particelle[i*parametri->ndv + 4];
+              else
+                w = parametri->overwrite_weight_value;
+              //if (parametri->file_version >= 3 && !parametri->overwrite_charge)
+              //  ch = particelle[i*parametri->ndv + 5];
+              //else
+              //  ch = parametri->overwrite_charge_value;
+
+              if (i % parametri->subsample == 0) {
+                if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 3, w, i + 1);
+                else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 1, w, i + 1);
+              }
+            }
+          }
+          else
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -656,7 +679,13 @@ int leggi_particelle(Parametri * parametri)
               }
             }
           }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
+        }
+
+
+
+        if (parametri->p[OUT_XYZE])
+        {
+          if (parametri->is_2d_sim)
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -664,28 +693,12 @@ int leggi_particelle(Parametri * parametri)
               z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
               px = particelle[i*parametri->ndv + 3];
               pz = particelle[i*parametri->ndv + 2];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = particelle[i*parametri->ndv + 4];
-              else
-                w = parametri->overwrite_weight_value;
-              //if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-              //  ch = particelle[i*parametri->ndv + 5];
-              //else
-              //  ch = parametri->overwrite_charge_value;
-
-              if (i % parametri->subsample == 0) {
-                if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 3, w, i + 1);
-                else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 1, w, i + 1);
-              }
+              gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
+              E = (float)(gamma*parametri->massa_particella_MeV);   //energia
+              if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
             }
           }
-        }
-
-
-
-        if (parametri->p[OUT_XYZE])
-        {
-          if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+          else
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
@@ -700,19 +713,6 @@ int leggi_particelle(Parametri * parametri)
               if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e %e\n", x, y, z, E);
             }
           }
-          else if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
-          {
-            for (unsigned int i = 0; i < val[0]; i++)
-            {
-              x = particelle[i*parametri->ndv + 1] * ((float)1.e-4);
-              z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
-              px = particelle[i*parametri->ndv + 3];
-              pz = particelle[i*parametri->ndv + 2];
-              gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
-              E = (float)(gamma*parametri->massa_particella_MeV);   //energia
-              if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
-            }
-          }
         }
 
 
@@ -723,14 +723,14 @@ int leggi_particelle(Parametri * parametri)
           {
             x = particelle[i*parametri->ndv + 0];
             y = particelle[i*parametri->ndv + 1];
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) z = 0;
+            if (parametri->is_2d_sim) z = 0;
             else z = particelle[i*parametri->ndv + 2];
             px = particelle[i*parametri->ndv + 3];
             py = particelle[i*parametri->ndv + 4];
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) pz = 0;
+            if (parametri->is_2d_sim) pz = 0;
             else pz = particelle[i*parametri->ndv + 5];
 
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
+            if (parametri->is_2d_sim) {
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 4];
               else w = parametri->overwrite_weight_value;
             }
@@ -739,7 +739,7 @@ int leggi_particelle(Parametri * parametri)
               else w = parametri->overwrite_weight_value;
             }
 
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
+            if (parametri->is_2d_sim) {
               if (parametri->file_version >= 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 5];
               else ch = parametri->overwrite_charge_value;
             }
@@ -761,14 +761,14 @@ int leggi_particelle(Parametri * parametri)
           {
             array_supporto8[0] = particelle[i*parametri->ndv + 0];
             array_supporto8[1] = particelle[i*parametri->ndv + 1];
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) array_supporto8[2] = 0;
+            if (parametri->is_2d_sim) array_supporto8[2] = 0;
             else array_supporto8[2] = particelle[i*parametri->ndv + 2];
             array_supporto8[3] = particelle[i*parametri->ndv + 3];
             array_supporto8[4] = particelle[i*parametri->ndv + 4];
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) array_supporto8[5] = 0;
+            if (parametri->is_2d_sim) array_supporto8[5] = 0;
             else array_supporto8[5] = particelle[i*parametri->ndv + 5];
 
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
+            if (parametri->is_2d_sim) {
               if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto8[6] = particelle[i*parametri->ndv + 4];
               else array_supporto8[6] = parametri->overwrite_weight_value;
             }
@@ -777,7 +777,7 @@ int leggi_particelle(Parametri * parametri)
               else array_supporto8[6] = parametri->overwrite_weight_value;
             }
 
-            if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3)) {
+            if (parametri->is_2d_sim) {
               if (parametri->file_version >= 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 5];
               else array_supporto8[7] = parametri->overwrite_charge_value;
             }
@@ -799,7 +799,7 @@ int leggi_particelle(Parametri * parametri)
           }
           int weight_index, charge_index;
 
-          if (((parametri->ndv == 4 || parametri->ndv == 5) && parametri->file_version < 3) || (parametri->ndv == 6 && parametri->file_version >= 3))
+          if (parametri->is_2d_sim)
           {
             weight_index = 4;
             if (parametri->file_version >= 3) charge_index = 5;
