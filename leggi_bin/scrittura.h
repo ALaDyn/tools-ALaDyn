@@ -2,10 +2,10 @@
 
 #include "leggi_binario_ALaDyn_fortran.h"
 
-struct _Scrittura
+struct _Write
 {
-  _Scrittura(Parametri *, float **, std::string, std::string, std::string);
-  _Scrittura(Parametri *, float *, std::string, std::string);
+  _Write(Parameters *, aladyn_float **, std::string, std::string, std::string);
+  _Write(Parameters *, aladyn_float *, std::string, std::string);
 };
 
 

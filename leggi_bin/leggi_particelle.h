@@ -7,25 +7,25 @@
 #include "swap_tools.h"
 
 
-class Particella_v1 {
+class Part_v1 {
   double x, y, z;
   double px, py, pz;
 };
-class Particella_v2 {
+class Part_v2 {
   double x, y, z;
   double px, py, pz;
   double weight;
 };
-class Particella_v3 {
+class Part_v3 {
   double x, y, z;
   double px, py, pz;
   float weight;
   int charge;
 };
-union Particella_vX {
-  Particella_v1 particella_v1;
-  Particella_v2 particella_v2;
-  Particella_v3 particella_v3;
+union Part_vX {
+  Part_v1 part_v1;
+  Part_v2 part_v2;
+  Part_v3 part_v3;
 };
 union double_as_two_float {
   double d;
@@ -35,6 +35,6 @@ union double_as_two_float {
 
 
 
-int leggi_particelle(Parametri * );
+int read_phase_space_file(Parameters * );
 
 

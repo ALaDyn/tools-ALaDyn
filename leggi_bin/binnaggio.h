@@ -3,10 +3,10 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-struct _Binnaggio
+struct _Binning
 {
-  _Binnaggio(float *, int, int, Parametri *, float **, std::string, std::string);
-  _Binnaggio(float *, int, int, Parametri *, float *, std::string);
+  _Binning(aladyn_float *, Parameters *, aladyn_float **, std::string, std::string);
+  _Binning(aladyn_float *, Parameters *, aladyn_float *, std::string);
 };
 
 

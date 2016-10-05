@@ -3,30 +3,41 @@
 #include "swap_tools.h"
 
 
-/* costruttore default - inizializza a zero per ora. Siccome tutto e' inizializzato a zero
-non puo' nemmeno calcolare le le dimensioni dei bin!
-Verificare che non ci siano cose intelligenti da poter fare! */
-Parametri::Parametri()
+Parameters::Parameters()
 {
-  nparams = NUMERO_PARAMETRI_FILE_DAT;
-  intpar.resize(NUMERO_PARAMETRI_FILE_DAT, 0);
-  realpar.resize(NUMERO_PARAMETRI_FILE_DAT, 0.0);
+  nparams = NUMBER_OF_PARAMS_IN_DAT_FILE;
+  intpar.resize(NUMBER_OF_PARAMS_IN_DAT_FILE, 0);
+  realpar.resize(NUMBER_OF_PARAMS_IN_DAT_FILE, 0.0);
   header_size_bytes = 0;
   subsample = 1;
   span = 5;
   ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
   nptot = ndv = 0;
-  is_2d_sim = false;
+  we_dont_know_file_version = true;
+  we_dont_know_if_sim_is_2d = true;
+  sim_is_2d = false;
+  we_have_to_find_minmax = false;
+  we_dont_know_if_we_have_to_find_minmax = true;
+  we_have_to_do_binning = false;
+  we_dont_know_if_we_have_to_do_binning = true;
+  file_has_weight = false;
+  we_dont_know_if_file_has_weight = true;
+  file_has_charge = false;
+  we_dont_know_if_file_has_charge = true;
+  we_have_to_do_swap = false;
+  we_dont_know_if_we_have_to_do_swap = true;
+  out_vtk = out_ppg = out_params = out_csv = out_xyze = out_cutx = out_cuty = out_cutz = out_grid2d = out_clean_bin = out_lineoutx = out_vtk_nostretch = false;
+  minmax_found = false;
   npx = npy = npz = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
-  npx_ricampionati = npy_ricampionati = npz_ricampionati = npx_ricampionati_per_cpu = npy_ricampionati_per_cpu = npz_ricampionati_per_cpu = 0;
-  fattore_ricampionamento = 0;
+  npx_resampled = npy_resampled = npz_resampled = npx_resampled_per_cpu = npy_resampled_per_cpu = npz_resampled_per_cpu = 0;
+  resampling_factor = 0;
   endianness = 0;
-  file_version = 1;
+  file_version = -10;
   fixed_aladyn_version = false;
   multifile = false;
   stretched_grid = true;
   stretched_along_x = 1;
-  massa_particella_MeV = 0.;
+  mass_MeV = 0.;
   nbin = nbin_x = nbin_px = nbin_y = nbin_py = nbin_z = nbin_pz = nbin_w = nbin_ch = nbin_E = nbin_gamma = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = NUMBER_OF_BIN_BY_DEFAULT;
   tnow = 0.0;
   xmin = pxmin = ymin = pymin = zmin = pzmin = wmin = chmin = thetamin = thetaTmin = Emin = gammamin = 0.0;
@@ -38,140 +49,185 @@ Parametri::Parametri()
   nbin_b = true;
   nbin_E_b = nbin_theta_b = nbin_thetaT_b = nbin_ty_b = nbin_tz_b = nbin_gamma_b = true;
   nbin_x_b = nbin_px_b = nbin_y_b = nbin_py_b = nbin_z_b = nbin_pz_b = true;
-  fai_plot_wspec = fai_plot_chspec = fai_plot_Espec = fai_plot_thetaspec = fai_plot_thetaTspec = fai_plot_Etheta = fai_plot_EthetaT = false;
-  fai_plot_xy = fai_plot_xz = fai_plot_yz = fai_plot_xpx = fai_plot_xpy = fai_plot_xpz = fai_plot_ypx = false;
-  fai_plot_ypy = fai_plot_ypz = fai_plot_zpx = fai_plot_zpy = fai_plot_zpz = fai_plot_pxpy = fai_plot_pxpz = fai_plot_pypz = fai_plot_xw = fai_plot_rcf = false;
+  do_plot_wspec = do_plot_chspec = do_plot_Espec = do_plot_thetaspec = do_plot_thetaTspec = do_plot_Etheta = do_plot_EthetaT = false;
+  do_plot_xy = do_plot_xz = do_plot_yz = do_plot_xpx = do_plot_xpy = do_plot_xpz = do_plot_ypx = false;
+  do_plot_ypy = do_plot_ypz = do_plot_zpx = do_plot_zpy = do_plot_zpz = do_plot_pxpy = do_plot_pxpz = do_plot_pypz = do_plot_xw = do_plot_rcf = false;
   overwrite_weight = false;
   overwrite_charge = false;
   overwrite_weight_value = 1.0;
   overwrite_charge_value = 1.0;
   do_not_ask_missing = false;
   memset(&support_label[0], 0, sizeof(support_label));
-  memset(&minimi[0], 0, sizeof(float) * sizeof(minimi));
-  memset(&massimi[0], 0, sizeof(float) * sizeof(massimi));
-
   last_cpu = MAX_NUMBER_OF_CPUS;    // il tool funziona quindi per un ncpu_max, attualmente, pari a 32768
-
-  for (int i = 0; i < NPARAMETRI; i++)
-  {
-    p_b[i] = true;
-    p[i] = -1;
-  }
-
   endian_file = 0;
   endian_machine = is_big_endian();
-  file_spaziofasi = false;
-  file_griglia = false;
-  file_particelle_P = file_particelle_E = file_particelle_HI = file_particelle_LI = file_particelle_generic_ion = false;
-  file_campi_Ex = file_campi_Ey = file_campi_Ez = file_campi_Bx = file_campi_By = file_campi_Bz = false;
-  file_correnti_Jx = file_correnti_Jy = file_correnti_Jz = false;
-  file_densita_elettroni = file_densita_protoni = file_densita_LI = file_densita_HI = file_densita_generic_ion = file_densita_driver = false;
-  file_densita_energia_griglia_elettroni = file_densita_energia_griglia_protoni = file_densita_energia_griglia_HI = file_densita_energia_griglia_LI = file_densita_energia_griglia_generic_ion = false;
+  phasespace_file = false;
+  grid_file = false;
+}
+
+
+void Parameters::man(const char argv[]) {
+  std::cout << "Interactive: " << argv << std::endl;
+  std::cout << "Batch:       " << argv << " filebasename -arguments" << std::endl;
+  std::cout << "----------Argument list------------------- " << std::endl;
+  std::cout << "-params (write a .parameters file with params from .bin/.dat files)" << std::endl;
+  std::cout << "-swap/-noswap (force endianess swap) -force_v1 -force_v2 -force_v3 -force_v4 (force specific file format)" << std::endl;
+  std::cout << "-dump_vtk -dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
+  std::cout << "-dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
+  std::cout << "(use -no_stretch_x if the grid is not stretched along x axis)" << std::endl;
+  std::cout << "-dump_ppg -dump_csv -dump_clean -dump_xyzE -parameters -find_minxmax" << std::endl;
+  std::cout << "-[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #number" << std::endl;
+  std::cout << "-plot_AB A,B={x,y,z,px,py,pz}" << std::endl;
+  std::cout << "-plot_etheta -plot_ethetaT -plot_rfc -plot_espec -plot_thetaspec -plot_thetaTspec -plot_chspec" << std::endl;
+  std::cout << "-nbin #num" << std::endl;
+  std::cout << "-nbin[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch] #num" << std::endl;
+  std::cout << "-dontask [TRY TO RUN IN NON-INTERACTIVE MODE]" << std::endl;
+  std::cout << "Filters: \n +[x,y,z,px,py,pz,theta,thetaT,gamma,E,ty,tz,w,ch]min/max #num" << std::endl;
+  std::cout << "----------Argument list------------------- " << std::endl;
+}
+
+
+aladyn_float Parameters::get_size_x()
+{
+  return (xmax - xmin) / static_cast <aladyn_float> (nbin_x);
+}
+aladyn_float Parameters::get_size_y()
+{
+  return (ymax - ymin) / static_cast <aladyn_float> (nbin_y);
+}
+aladyn_float Parameters::get_size_z()
+{
+  return (zmax - zmin) / static_cast <aladyn_float> (nbin_z);
+}
+aladyn_float Parameters::get_size_ty()
+{
+  return (tymax - tymin) / static_cast <aladyn_float> (nbin_ty);
+}
+aladyn_float Parameters::get_size_tz()
+{
+  return (tzmax - tzmin) / static_cast <aladyn_float> (nbin_tz);
+}
+aladyn_float Parameters::get_size_px()
+{
+  return (pxmax - pxmin) / static_cast <aladyn_float> (nbin_px);
+}
+aladyn_float Parameters::get_size_py()
+{
+  return (pymax - pymin) / static_cast <aladyn_float> (nbin_py);
+}
+aladyn_float Parameters::get_size_pz()
+{
+  return (pzmax - pzmin) / static_cast <aladyn_float> (nbin_pz);
+}
+aladyn_float Parameters::get_size_w()
+{
+  return (wmax - wmin) / static_cast <aladyn_float> (nbin_w);
+}
+aladyn_float Parameters::get_size_ch()
+{
+  return (chmax - chmin) / static_cast <aladyn_float> (nbin_ch);
+}
+aladyn_float Parameters::get_size_gamma()
+{
+  return (gammamax - gammamin) / static_cast <aladyn_float> (nbin_gamma);
+}
+aladyn_float Parameters::get_size_theta()
+{
+  return (thetamax - thetamin) / static_cast <aladyn_float> (nbin_theta);
+}
+aladyn_float Parameters::get_size_thetaT()
+{
+  return (thetaTmax - thetaTmin) / static_cast <aladyn_float> (nbin_thetaT);
+}
+aladyn_float Parameters::get_size_E()
+{
+  return (Emax - Emin) / static_cast <aladyn_float> (nbin_E);
+}
+
+
+int Parameters::get_nbin(int column)
+{
+  if (column == COLUMN_X)           return nbin_x;
+  else if (column == COLUMN_Y)      return nbin_y;
+  else if (column == COLUMN_Z)      return nbin_z;
+  else if (column == COLUMN_PX)     return nbin_px;
+  else if (column == COLUMN_PY)     return nbin_py;
+  else if (column == COLUMN_PZ)     return nbin_pz;
+  else if (column == COLUMN_GAMMA)  return nbin_gamma;
+  else if (column == COLUMN_THETA)  return nbin_theta;
+  else if (column == COLUMN_E)      return nbin_E;
+  else if (column == COLUMN_THETAT) return nbin_thetaT;
+  else if (column == COLUMN_TY)     return nbin_ty;
+  else if (column == COLUMN_TZ)     return nbin_tz;
+  else if (column == COLUMN_W)      return nbin_w;
+  else if (column == COLUMN_CH)     return nbin_ch;
+  else return INVALID_COLUMN;
+}
+
+
+aladyn_float Parameters::get_min(int column)
+{
+  if (column == COLUMN_X)           return xmin;
+  else if (column == COLUMN_Y)      return ymin;
+  else if (column == COLUMN_Z)      return zmin;
+  else if (column == COLUMN_PX)     return pxmin;
+  else if (column == COLUMN_PY)     return pymin;
+  else if (column == COLUMN_PZ)     return pzmin;
+  else if (column == COLUMN_GAMMA)  return gammamin;
+  else if (column == COLUMN_THETA)  return thetamin;
+  else if (column == COLUMN_E)      return Emin;
+  else if (column == COLUMN_THETAT) return thetaTmin;
+  else if (column == COLUMN_TY)     return tymin;
+  else if (column == COLUMN_TZ)     return tzmin;
+  else if (column == COLUMN_W)      return wmin;
+  else if (column == COLUMN_CH)     return chmin;
+  else return INVALID_COLUMN;
+}
+
+
+aladyn_float Parameters::get_max(int column)
+{
+  if (column == COLUMN_X)           return xmax;
+  else if (column == COLUMN_Y)      return ymax;
+  else if (column == COLUMN_Z)      return zmax;
+  else if (column == COLUMN_PX)     return pxmax;
+  else if (column == COLUMN_PY)     return pymax;
+  else if (column == COLUMN_PZ)     return pzmax;
+  else if (column == COLUMN_GAMMA)  return gammamax;
+  else if (column == COLUMN_THETA)  return thetamax;
+  else if (column == COLUMN_E)      return Emax;
+  else if (column == COLUMN_THETAT) return thetaTmax;
+  else if (column == COLUMN_TY)     return tymax;
+  else if (column == COLUMN_TZ)     return tzmax;
+  else if (column == COLUMN_W)      return wmax;
+  else if (column == COLUMN_CH)     return chmax;
+  else return INVALID_COLUMN;
 }
 
 
 
-float Parametri::dimmi_dimx()
+aladyn_float Parameters::get_size_(int column)
 {
-  return (xmax - xmin) / static_cast <float> (nbin_x);
-}
-float Parametri::dimmi_dimy()
-{
-  return (ymax - ymin) / static_cast <float> (nbin_y);
-}
-float Parametri::dimmi_dimz()
-{
-  return (zmax - zmin) / static_cast <float> (nbin_z);
-}
-float Parametri::dimmi_dimty()
-{
-  return (tymax - tymin) / static_cast <float> (nbin_ty);
-}
-float Parametri::dimmi_dimtz()
-{
-  return (tzmax - tzmin) / static_cast <float> (nbin_tz);
-}
-float Parametri::dimmi_dimpx()
-{
-  return (pxmax - pxmin) / static_cast <float> (nbin_px);
-}
-float Parametri::dimmi_dimpy()
-{
-  return (pymax - pymin) / static_cast <float> (nbin_py);
-}
-float Parametri::dimmi_dimpz()
-{
-  return (pzmax - pzmin) / static_cast <float> (nbin_pz);
-}
-float Parametri::dimmi_dimw()
-{
-  return (wmax - wmin) / static_cast <float> (nbin_w);
-}
-float Parametri::dimmi_dimch()
-{
-  return (chmax - chmin) / static_cast <float> (nbin_ch);
-}
-float Parametri::dimmi_dimgamma()
-{
-  return (gammamax - gammamin) / static_cast <float> (nbin_gamma);
-}
-float Parametri::dimmi_dimtheta()
-{
-  return (thetamax - thetamin) / static_cast <float> (nbin_theta);
-}
-float Parametri::dimmi_dimthetaT()
-{
-  return (thetaTmax - thetaTmin) / static_cast <float> (nbin_thetaT);
-}
-float Parametri::dimmi_dimE()
-{
-  return (Emax - Emin) / static_cast <float> (nbin_E);
-}
-
-
-int Parametri::dimmi_nbin(int colonna)
-{
-  if (colonna == 0)       return nbin_x;
-  else if (colonna == 1)  return nbin_y;
-  else if (colonna == 2)  return nbin_z;
-  else if (colonna == 3)  return nbin_px;
-  else if (colonna == 4)  return nbin_py;
-  else if (colonna == 5)  return nbin_pz;
-  else if (colonna == 6)  return nbin_gamma;
-  else if (colonna == 7)  return nbin_theta;
-  else if (colonna == 8)  return nbin_E;
-  else if (colonna == 9)  return nbin_thetaT;
-  else if (colonna == 10) return nbin_ty;
-  else if (colonna == 11) return nbin_tz;
-  else if (colonna == 12) return nbin_w;
-  else if (colonna == 13) return nbin_ch;
-  else return 120;
+  if (column == 0)       return get_size_x();
+  else if (column == 1)  return get_size_y();
+  else if (column == 2)  return get_size_z();
+  else if (column == 3)  return get_size_px();
+  else if (column == 4)  return get_size_py();
+  else if (column == 5)  return get_size_pz();
+  else if (column == 6)  return get_size_gamma();
+  else if (column == 7)  return get_size_theta();
+  else if (column == 8)  return get_size_E();
+  else if (column == 9)  return get_size_thetaT();
+  else if (column == 10) return get_size_ty();
+  else if (column == 11) return get_size_tz();
+  else if (column == 12) return get_size_w();
+  else if (column == 13) return get_size_ch();
+  else return INVALID_COLUMN;
 }
 
 
 
-float Parametri::dimmi_dim(int colonna)
-{
-  if (colonna == 0)       return dimmi_dimx();
-  else if (colonna == 1)  return dimmi_dimy();
-  else if (colonna == 2)  return dimmi_dimz();
-  else if (colonna == 3)  return dimmi_dimpx();
-  else if (colonna == 4)  return dimmi_dimpy();
-  else if (colonna == 5)  return dimmi_dimpz();
-  else if (colonna == 6)  return dimmi_dimgamma();
-  else if (colonna == 7)  return dimmi_dimtheta();
-  else if (colonna == 8)  return dimmi_dimE();
-  else if (colonna == 9)  return dimmi_dimthetaT();
-  else if (colonna == 10) return dimmi_dimty();
-  else if (colonna == 11) return dimmi_dimtz();
-  else if (colonna == 12) return dimmi_dimw();
-  else if (colonna == 13) return dimmi_dimch();
-  else return 1.0;
-}
-
-
-
-void Parametri::leggi_parametri_da_file_bin(const char * filename)
+void Parameters::read_params_from_bin_file(const char * filename)
 {
   std::FILE * file_in = NULL;
   int fortran_buff;
@@ -185,17 +241,17 @@ void Parametri::leggi_parametri_da_file_bin(const char * filename)
   fread_size += std::fread(&nparams, sizeof(int), 1, file_in);
   fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
-  if (p[SWAP]) swap_endian_i(&nparams, 1);
+  if (we_have_to_do_swap) swap_endian_i(&nparams, 1);
 
   fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
   fread_size += std::fread(&intpar[0], sizeof(int), nparams, file_in);
   fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
   fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
-  fread_size += std::fread(&realpar[0], sizeof(float), nparams, file_in);
+  fread_size += std::fread(&realpar[0], sizeof(aladyn_float), nparams, file_in);
   fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);
 
-  if (p[SWAP]) swap_endian_i(intpar);
-  if (p[SWAP]) swap_endian_f(realpar);
+  if (we_have_to_do_swap) swap_endian_i(intpar);
+  if (we_have_to_do_swap) swap_endian_f(realpar);
 
   fclose(file_in);
 
@@ -203,39 +259,44 @@ void Parametri::leggi_parametri_da_file_bin(const char * filename)
   ncpu_x = 1;
   ncpu_y = intpar[0];
   ncpu_z = intpar[1];
-  npx_ricampionati_per_cpu = intpar[2];
+  npx_resampled_per_cpu = intpar[2];
   npx = intpar[3];
   npy = intpar[4];
-  npy_ricampionati_per_cpu = intpar[5];
+  npy_resampled_per_cpu = intpar[5];
   npz = intpar[6];
-  npz_ricampionati_per_cpu = intpar[7];
+  npz_resampled_per_cpu = intpar[7];
   nptot = (long long int) intpar[16];
   ndv = intpar[17];
   file_version = intpar[18];
   endianness = intpar[19];
-  tnow = realpar[0];  //tempo dell'output
-  xmin = realpar[1];  //estremi della griglia
-  xmax = realpar[2];  //estremi della griglia
-  ymin = realpar[3];  //estremi della griglia
-  ymax = realpar[4];  //estremi della griglia
-  zmin = realpar[5];  //estremi della griglia
-  zmax = realpar[6];  //estremi della griglia
+  tnow = realpar[0];
+  xmin = realpar[1];
+  xmax = realpar[2];
+  ymin = realpar[3];
+  ymax = realpar[4];
+  zmin = realpar[5];
+  zmax = realpar[6];
 
-  is_2d_sim = ((ndv == 4 || ndv == 5) && file_version < 3) || (ndv == 6 && file_version >= 3);
+  sim_is_2d = ((ndv == 4 || ndv == 5) && file_version < 3) || (ndv == 6 && file_version >= 3);
 
-  header_size_bytes = (7 + nparams) * sizeof(int) + nparams * sizeof(float);
+  header_size_bytes = (7 + nparams) * sizeof(int) + nparams * sizeof(aladyn_float);
   if (fread_size != header_size_bytes) std::cout << "error: header size is different than expected" << std::endl << std::flush;
 }
 
 
+void Parameters::check_swap() {
+  if (endian_file == endian_machine) we_have_to_do_swap = false;
+  we_dont_know_if_we_have_to_do_swap = false;
+}
 
-void Parametri::leggi_file_dat(std::ifstream& file_dat)
+
+void Parameters::read_params_from_dat_file(std::ifstream& file_dat)
 {
-  std::string riga_persa;
-  int fattore_ricampionamento;
+  std::string forget_this_line;
+  int resampling_factor;
   //  int discriminante_versione_file;
-  float coord;
-  std::getline(file_dat, riga_persa); // per leggere la riga Integer parameters
+  aladyn_float coord;
+  std::getline(file_dat, forget_this_line); // per leggere la riga Integer parameters
 
 
   for (int i = 0; i < nparams; i++)
@@ -253,8 +314,8 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       file_dat.ignore(std::numeric_limits<std::streamsize>::max(), ' ');
     }
   }
-  std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga degli interi
-  std::getline(file_dat, riga_persa); // per leggere la riga Real parameters
+  std::getline(file_dat, forget_this_line); // per pulire i caratteri rimanenti sull'ultima riga degli interi
+  std::getline(file_dat, forget_this_line); // per leggere la riga Real parameters
   for (int i = 0; i < nparams; i++)
   {
     file_dat >> realpar[i];
@@ -307,27 +368,27 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    if (file_griglia) {
+    if (grid_file) {
       npx = intpar[2];
-      npx_ricampionati = intpar[3];
+      npx_resampled = intpar[3];
       npx_per_cpu = npx / ncpu_x;
-      fattore_ricampionamento = (int)(npx / npx_ricampionati);
-      npy_ricampionati = intpar[4];
+      resampling_factor = (int)(npx / npx_resampled);
+      npy_resampled = intpar[4];
       npy_per_cpu = intpar[5];
-      npy = npy_ricampionati * fattore_ricampionamento;
-      npz_ricampionati = intpar[6];
+      npy = npy_resampled * resampling_factor;
+      npz_resampled = intpar[6];
       npz_per_cpu = intpar[7];
-      if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
-      else npz = npz_ricampionati;
-      npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-      npy_ricampionati_per_cpu = npy_ricampionati / ncpu_y;
-      npz_ricampionati_per_cpu = npz_ricampionati / ncpu_z;
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
+      if (npz_resampled > 1) npz = npz_resampled * resampling_factor;
+      else npz = npz_resampled;
+      npx_resampled_per_cpu = npx_resampled / ncpu_x;
+      npy_resampled_per_cpu = npy_resampled / ncpu_y;
+      npz_resampled_per_cpu = npz_resampled / ncpu_z;
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(aladyn_float) + 6 * sizeof(int); // there are 6 fortran buffers: two around nparams, two around intpars and two around realpars
     }
     else {
       nptot = (long long int) intpar[16];
       ndv = intpar[17];
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float);
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(aladyn_float);
     }
   }
   else if (file_version == 2) {
@@ -341,7 +402,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    if (file_griglia) {
+    if (grid_file) {
 
       /*
       real_par(1:20) = (/ tnow, xmin, xmax, ymin, ymax, zmin, zmax, w0_x, w0_y, &
@@ -360,27 +421,27 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       ncpu = ncpu_x * ncpu_y * ncpu_z;
       last_cpu = ncpu_x * ncpu_y * ncpu_z;
 
-      npx_ricampionati = intpar[3];
-      npy_ricampionati = intpar[4];
+      npx_resampled = intpar[3];
+      npy_resampled = intpar[4];
       npy_per_cpu = intpar[5];
-      npz_ricampionati = intpar[6];
+      npz_resampled = intpar[6];
       npz_per_cpu = intpar[7];
-      fattore_ricampionamento = intpar[8];
-      npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-      npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
-      npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
-      npx = npx_ricampionati * fattore_ricampionamento;
-      npy = npy_ricampionati * fattore_ricampionamento;
-      if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
-      else npz = npz_ricampionati;
+      resampling_factor = intpar[8];
+      npx_resampled_per_cpu = npx_resampled / ncpu_x;
+      npy_resampled_per_cpu = npy_per_cpu / resampling_factor;
+      npz_resampled_per_cpu = npz_per_cpu / resampling_factor;
+      npx = npx_resampled * resampling_factor;
+      npy = npy_resampled * resampling_factor;
+      if (npz_resampled > 1) npz = npz_resampled * resampling_factor;
+      else npz = npz_resampled;
       npx_per_cpu = npx / ncpu_x;
-      header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams * sizeof(float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
+      header_size_bytes = (nparams + 1 + 6) * sizeof(int) + nparams * sizeof(aladyn_float); // +1 for n_par, +6 for fortran buffers (2 around nparams, 2 around intpars, 2 around realpars)
     }
 
     else {
       nptot = (long long int) intpar[16];
       ndv = intpar[17];
-      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float);
+      header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(aladyn_float);
     }
 
   }
@@ -393,10 +454,10 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     zmin = realpar[5];
     zmax = realpar[6];
 
-    header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(float);
+    header_size_bytes = (nparams + 1) * sizeof(int) + nparams * sizeof(aladyn_float);
     endianness = intpar[19];
 
-    if (file_griglia) {
+    if (grid_file) {
       /*
       real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
       n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
@@ -414,17 +475,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       ncpu = ncpu_x * ncpu_y * ncpu_z;
       last_cpu = ncpu_x * ncpu_y * ncpu_z;
 
-      npx_ricampionati = intpar[3];
-      npx_ricampionati_per_cpu = npx_ricampionati / ncpu_x;
-      npy_ricampionati = intpar[4];
-      npy_ricampionati_per_cpu = intpar[5];
-      npz_ricampionati = intpar[6];
-      npz_ricampionati_per_cpu = intpar[7];
-      fattore_ricampionamento = intpar[8];
-      npx = npx_ricampionati * fattore_ricampionamento;
-      npy = npy_ricampionati * fattore_ricampionamento;
-      if (npz_ricampionati > 1) npz = npz_ricampionati * fattore_ricampionamento;
-      else npz = npz_ricampionati;
+      npx_resampled = intpar[3];
+      npx_resampled_per_cpu = npx_resampled / ncpu_x;
+      npy_resampled = intpar[4];
+      npy_resampled_per_cpu = intpar[5];
+      npz_resampled = intpar[6];
+      npz_resampled_per_cpu = intpar[7];
+      resampling_factor = intpar[8];
+      npx = npx_resampled * resampling_factor;
+      npy = npy_resampled * resampling_factor;
+      if (npz_resampled > 1) npz = npz_resampled * resampling_factor;
+      else npz = npz_resampled;
       npx_per_cpu = npx / ncpu_x;
       npy_per_cpu = npy / ncpu_y;
       npz_per_cpu = npz / ncpu_z;
@@ -446,7 +507,7 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     header_size_bytes = 0;
     /*i_end*/    endianness = intpar[19];
 
-    if (file_griglia) {
+    if (grid_file) {
       /*
       real_par(1:20) =(/tnow,xmin,xmax,ymin,ymax,zmin,zmax,w0_x,w0_y,&
       n_over_nc,a0,lam0,E0,ompe,targ_in,targ_end,&
@@ -464,18 +525,18 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
       ncpu = ncpu_x * ncpu_y * ncpu_z;
       last_cpu = ncpu_x * ncpu_y * ncpu_z;
       /*nx1*/      npx_per_cpu = intpar[3];
-      /*jump*/     fattore_ricampionamento = intpar[6];
-      /**/         npx_ricampionati_per_cpu = npx_per_cpu / fattore_ricampionamento;
+      /*jump*/     resampling_factor = intpar[6];
+      /**/         npx_resampled_per_cpu = npx_per_cpu / resampling_factor;
       /*ny1*/      npy_per_cpu = intpar[4];
-      /**/         npy_ricampionati_per_cpu = npy_per_cpu / fattore_ricampionamento;
+      /**/         npy_resampled_per_cpu = npy_per_cpu / resampling_factor;
       /*nz1*/      npz_per_cpu = intpar[5];
-      /**/         npz_ricampionati_per_cpu = npz_per_cpu / fattore_ricampionamento;
+      /**/         npz_resampled_per_cpu = npz_per_cpu / resampling_factor;
       /**/         npx = npx_per_cpu * ncpu_x;
       /**/         npy = npy_per_cpu * ncpu_y;
       /**/         npz = npz_per_cpu * ncpu_z;
-      /**/         npx_ricampionati = npx_ricampionati_per_cpu * ncpu_x;
-      /**/         npy_ricampionati = npy_ricampionati_per_cpu * ncpu_y;
-      /**/         npz_ricampionati = npz_ricampionati_per_cpu * ncpu_z;
+      /**/         npx_resampled = npx_resampled_per_cpu * ncpu_x;
+      /**/         npy_resampled = npy_resampled_per_cpu * ncpu_y;
+      /**/         npz_resampled = npz_resampled_per_cpu * ncpu_z;
     }
     else {
       /*
@@ -496,80 +557,71 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
 #endif
 
 
-  if (file_spaziofasi) {
+  if (phasespace_file) {
     if (file_version < 3)
     {
-      if (ndv == 4 || ndv == 6) p[WEIGHT] = 0;
-      else if (ndv == 5 || ndv == 7) p[WEIGHT] = 1;
+      if (ndv == 4 || ndv == 6) file_has_weight = 0;
+      else if (ndv == 5 || ndv == 7) file_has_weight = 1;
       else printf("Attention: illegal value for ndv\n"), exit(-17);
       if (ndv == 4 || ndv == 5) zmin = 0.0, zmax = 1.0;
-      p[NCOLONNE] = ndv;
-      p_b[NCOLONNE] = false;
-      p_b[WEIGHT] = false;
+      we_dont_know_if_file_has_weight = false;
     }
     else
     {
-      p[WEIGHT] = 1;
-      p_b[WEIGHT] = false;
+      file_has_weight = 1;
+      we_dont_know_if_file_has_weight = false;
       if (ndv < 7) zmin = 0.0, zmax = 1.0; // a 2D file has 6 floats (columns): x, y, px, py, w, ch
-      p[NCOLONNE] = ndv;
-      p_b[NCOLONNE] = false;
       if (nptot == -1)
       {
-        std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga dei real
-        std::getline(file_dat, riga_persa); // per leggere la riga Number of particles
+        std::getline(file_dat, forget_this_line); // per pulire i caratteri rimanenti sull'ultima riga dei real
+        std::getline(file_dat, forget_this_line); // per leggere la riga Number of particles
         file_dat >> nptot;
       }
     }
   }
   else {
     if (npz == 1) zmin = 0.0, zmax = 1.0;
-    p[WEIGHT] = 0;
-    p[NCOLONNE] = (int)npz;
-    p_b[NCOLONNE] = false;
-    p_b[WEIGHT] = false;
-
     if (file_version > 2) {
-      std::getline(file_dat, riga_persa); // per pulire i caratteri rimanenti sull'ultima riga dei float
-      std::getline(file_dat, riga_persa); // per togliere la riga vuota che separa la griglia dai parametri
+      std::getline(file_dat, forget_this_line); // per pulire i caratteri rimanenti sull'ultima riga dei aladyn_float
+      std::getline(file_dat, forget_this_line); // per togliere la riga vuota che separa la griglia dai params
 
 
-      for (unsigned int i = 0; i < npx_ricampionati; i++)
+      for (unsigned int i = 0; i < npx_resampled; i++)
       {
         file_dat >> coord;
         xcoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npy_ricampionati; i++)
+      for (unsigned int i = 0; i < npy_resampled; i++)
       {
         file_dat >> coord;
         ycoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npz_ricampionati; i++)
+      for (unsigned int i = 0; i < npz_resampled; i++)
       {
         file_dat >> coord;
         zcoord.push_back(coord);
       }
     }
     else {     // mettiamo una griglia temporanea fissa, che al limite sara' sovrascritta da quella stretchata se presente nel binario
-      float dx, dy, dz;
-      if (npx_ricampionati > 1) dx = (xmax - xmin) / (npx_ricampionati - 1);
+      aladyn_float dx, dy, dz;
+      if (npx_resampled > 1) dx = (xmax - xmin) / (npx_resampled - 1);
       else dx = (xmax - xmin);
-      if (npy_ricampionati > 1) dy = (ymax - ymin) / (npy_ricampionati - 1);
+      if (npy_resampled > 1) dy = (ymax - ymin) / (npy_resampled - 1);
       else dy = (ymax - ymin);
-      if (npz_ricampionati > 1) dz = (zmax - zmin) / (npz_ricampionati - 1);
+      if (npz_resampled > 1) dz = (zmax - zmin) / (npz_resampled - 1);
       else dz = (zmax - zmin);
 
-      for (unsigned int i = 0; i < npx_ricampionati; i++)
+      for (unsigned int i = 0; i < npx_resampled; i++)
       {
         coord = xmin + dx*i;
         xcoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npy_ricampionati; i++)
+      for (unsigned int i = 0; i < npy_resampled; i++)
       {
         coord = ymin + dy*i;
         ycoord.push_back(coord);
       }
-      for (unsigned int i = 0; i < npz_ricampionati; i++)
+      for (unsigned int i = 0; i < npz_resampled; i++)
       {
         coord = zmin + dz*i;
         zcoord.push_back(coord);
@@ -577,16 +629,17 @@ void Parametri::leggi_file_dat(std::ifstream& file_dat)
     }
   }
   endian_file = (endianness - 1);
-  is_2d_sim = ((ndv == 4 || ndv == 5) && file_version < 3) || (ndv == 6 && file_version >= 3);
+  sim_is_2d = ((ndv == 4 || ndv == 5) && file_version < 3) || (ndv == 6 && file_version >= 3);
+  we_dont_know_if_sim_is_2d = false;
 }
 
 
 
 
-void Parametri::debug_read_parameters()
+void Parameters::debug_read_parameters()
 {
   std::cout << "Integer parameters" << std::endl;
-  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  for (int i = 0; i < NUMBER_OF_PARAMS_IN_DAT_FILE; i++)
   {
     std::cout << std::setw(14) << intpar[i];
     if (i > 0 && !((i + 1) % 4)) std::cout << std::endl;
@@ -594,7 +647,7 @@ void Parametri::debug_read_parameters()
   std::cout << std::endl;
 
   std::cout << "Real parameters" << std::endl;
-  for (int i = 0; i < NUMERO_PARAMETRI_FILE_DAT; i++)
+  for (int i = 0; i < NUMBER_OF_PARAMS_IN_DAT_FILE; i++)
   {
     std::cout << std::setw(14) << realpar[i];
     if (i > 0 && !((i + 1) % 4)) std::cout << std::endl;
@@ -608,22 +661,22 @@ void Parametri::debug_read_parameters()
   std::cout << "npx = " << npx << std::endl;
   std::cout << "npy = " << npy << std::endl;
   std::cout << "npz = " << npz << std::endl;
-  std::cout << "npx_resampled = " << npx_ricampionati << std::endl;
-  std::cout << "npy_resampled = " << npy_ricampionati << std::endl;
-  std::cout << "npz_resampled = " << npz_ricampionati << std::endl;
-  std::cout << "resampling_factor = " << fattore_ricampionamento << std::endl;
+  std::cout << "npx_resampled = " << npx_resampled << std::endl;
+  std::cout << "npy_resampled = " << npy_resampled << std::endl;
+  std::cout << "npz_resampled = " << npz_resampled << std::endl;
+  std::cout << "resampling_factor = " << resampling_factor << std::endl;
   std::cout << "npx_per_cpu = " << npx_per_cpu << std::endl;
   std::cout << "npy_per_cpu = " << npy_per_cpu << std::endl;
   std::cout << "npz_per_cpu = " << npz_per_cpu << std::endl;
-  std::cout << "npx_resampled_per_cpu = " << npx_ricampionati_per_cpu << std::endl;
-  std::cout << "npy_resampled_per_cpu = " << npy_ricampionati_per_cpu << std::endl;
-  std::cout << "npz_resampled_per_cpu = " << npz_ricampionati_per_cpu << std::endl;
+  std::cout << "npx_resampled_per_cpu = " << npx_resampled_per_cpu << std::endl;
+  std::cout << "npy_resampled_per_cpu = " << npy_resampled_per_cpu << std::endl;
+  std::cout << "npz_resampled_per_cpu = " << npz_resampled_per_cpu << std::endl;
   std::cout << "nptot = " << nptot << std::endl;
   std::cout << "ndv = " << ndv << std::endl;
   std::cout << "endianness = " << endianness << std::endl;
 }
 
-void Parametri::chiedi_numero_colonne()
+void Parameters::ask_file_dims()
 {
   int ncolonne;
   std::cout << "Which file version is this? (1|2|3|4): ";
@@ -632,45 +685,40 @@ void Parametri::chiedi_numero_colonne()
   {
     std::cout << "How many columns are present in the binary file? (4|5|6|7): ";
     std::cin >> ncolonne;
-    if (ncolonne == 6 || ncolonne == 4) p[WEIGHT] = 0;
-    else if (ncolonne == 7 || ncolonne == 5) p[WEIGHT] = 1;
+    if (ncolonne == 6 || ncolonne == 4) file_has_weight = 0;
+    else if (ncolonne == 7 || ncolonne == 5) file_has_weight = 1;
     else exit(-5);
-    p[NCOLONNE] = ncolonne;
-    p_b[NCOLONNE] = false;
-    p_b[WEIGHT] = false;
+    we_dont_know_if_file_has_weight = false;
+    if (ncolonne == 4 || ncolonne == 5) sim_is_2d = true;
+    we_dont_know_if_sim_is_2d = false;
   }
-  else
+  else if (file_version == 3)
   {
-    std::cout << "Il file e` di una sim 2D o 3D (scrivi solo il numero)? ";
+    std::cout << "is the sim 2D (2) or 3D (3)? ";
     std::cin >> ncolonne;
-    if (ncolonne == 2) p[NCOLONNE] = 6;
-    else if (ncolonne == 3) p[NCOLONNE] = 8;
-    else exit(-5);
-    p_b[NCOLONNE] = false;
-    p[WEIGHT] = 1;
-    p_b[WEIGHT] = false;
+    if (ncolonne == 2) sim_is_2d = true;
+    we_dont_know_if_sim_is_2d = false;
+    file_has_weight = true;
+    we_dont_know_if_file_has_weight = false;
+    file_has_charge = false;
+    we_dont_know_if_file_has_charge = false;
   }
-
-}
-
-
-void Parametri::chiedi_2Do3D()
-{
-  int dimensioni;
-  std::cout << "Is it a 3D (3) or 2D (2) grid? ";
-  std::cin >> dimensioni;
-  if (dimensioni == 2) p[NCOLONNE] = 1, is_2d_sim = true;
-  else if (dimensioni == 3) p[NCOLONNE] = 3;
   else
   {
-    std::cout << "Invalid choice" << std::endl;
-    exit(-5);
+    std::cout << "is the sim 2D (2) or 3D (3)? ";
+    std::cin >> ncolonne;
+    if (ncolonne == 2) sim_is_2d = true;
+    we_dont_know_if_sim_is_2d = false;
+    file_has_weight = true;
+    we_dont_know_if_file_has_weight = false;
+    file_has_charge = true;
+    we_dont_know_if_file_has_charge = false;
   }
-  p_b[NCOLONNE] = false;
+
 }
 
 
-void Parametri::chiedi_endian_file()
+void Parameters::ask_file_endianness()
 {
   std::cout << "Tell me something about endianness: is it little [x86] (0) or big [ppc] (1)? ";
   std::cin >> endian_file;
@@ -678,7 +726,7 @@ void Parametri::chiedi_endian_file()
 }
 
 
-void Parametri::check_filename(const char *nomefile)
+void Parameters::check_filename(const char *nomefile)
 {
   if (nomefile[0] == 'P')
   {
@@ -686,15 +734,13 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV;
-        file_particelle_P = true;
-        file_spaziofasi = true;
+        mass_MeV = (aladyn_float)MP_MEV;
+        phasespace_file = true;
       }
       else if (nomefile[2] == 'e')
       {
-        file_densita_energia_griglia_protoni = true;
-        file_griglia = true;
-        sprintf(support_label, "pren");
+        grid_file = true;
+        support_label = "pren";
       }
       else
       {
@@ -704,9 +750,8 @@ void Parametri::check_filename(const char *nomefile)
     }
     else if (nomefile[1] == 'd')
     {
-      file_densita_protoni = true;
-      file_griglia = true;
-      sprintf(support_label, "pden");
+      grid_file = true;
+      support_label = "pden";
     }
     else
     {
@@ -720,21 +765,18 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV; // fix wrong!
-        file_particelle_HI = true;
-        file_spaziofasi = true;
+        mass_MeV = (aladyn_float)MP_MEV; // fix wrong!
+        phasespace_file = true;
       }
       else if (nomefile[2] == 'd')
       {
-        file_densita_HI = true;
-        file_griglia = true;
-        sprintf(support_label, "hidn");
+        grid_file = true;
+        support_label = "hidn";
       }
       else if (nomefile[2] == 'e')
       {
-        file_densita_energia_griglia_HI = true;
-        file_griglia = true;
-        sprintf(support_label, "hien");
+        grid_file = true;
+        support_label = "hien";
       }
       else
       {
@@ -746,21 +788,18 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV; // fix wrong!
-        file_particelle_generic_ion = true;
-        file_spaziofasi = true;
+        mass_MeV = (aladyn_float)MP_MEV; // fix wrong!
+        phasespace_file = true;
       }
       else if (nomefile[2] == 'd')
       {
-        file_densita_generic_ion = true;
-        file_griglia = true;
-        sprintf(support_label, "h1dn");
+        grid_file = true;
+        support_label = "h1dn";
       }
       else if (nomefile[2] == 'e')
       {
-        file_densita_energia_griglia_generic_ion = true;
-        file_griglia = true;
-        sprintf(support_label, "h1en");
+        grid_file = true;
+        support_label = "h1en";
       }
       else
       {
@@ -772,21 +811,18 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV; // fix wrong!
-        file_particelle_generic_ion = true;
-        file_spaziofasi = true;
+        mass_MeV = (aladyn_float)MP_MEV; // fix wrong!
+        phasespace_file = true;
       }
       else if (nomefile[2] == 'd')
       {
-        file_densita_generic_ion = true;
-        file_griglia = true;
-        sprintf(support_label, "h2dn");
+        grid_file = true;
+        support_label = "h2dn";
       }
       else if (nomefile[2] == 'e')
       {
-        file_densita_energia_griglia_generic_ion = true;
-        file_griglia = true;
-        sprintf(support_label, "h2en");
+        grid_file = true;
+        support_label = "h2en";
       }
       else
       {
@@ -806,21 +842,18 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)MP_MEV; // fix wrong!
-        file_particelle_LI = true;
-        file_spaziofasi = true;
+        mass_MeV = (aladyn_float)MP_MEV; // fix wrong!
+        phasespace_file = true;
       }
       else if (nomefile[2] == 'd')
       {
-        file_densita_LI = true;
-        file_griglia = true;
-        sprintf(support_label, "lidn");
+        grid_file = true;
+        support_label = "lidn";
       }
       else if (nomefile[2] == 'e')
       {
-        file_densita_energia_griglia_LI = true;
-        file_griglia = true;
-        sprintf(support_label, "lien");
+        grid_file = true;
+        support_label = "lien";
       }
       else
       {
@@ -840,15 +873,13 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'p')
       {
-        massa_particella_MeV = (float)ME_MEV;
-        file_particelle_E = true;
-        file_spaziofasi = true;
+        mass_MeV = (aladyn_float)ME_MEV;
+        phasespace_file = true;
       }
       else if (nomefile[2] == 'e')
       {
-        file_densita_energia_griglia_elettroni = true;
-        file_griglia = true;
-        sprintf(support_label, "elen");
+        grid_file = true;
+        support_label = "elen";
       }
       else
       {
@@ -860,9 +891,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_campi_Ex = true;
-        file_griglia = true;
-        sprintf(support_label, "Ex");
+        grid_file = true;
+        support_label = "Ex";
       }
       else
       {
@@ -874,9 +904,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_campi_Ey = true;
-        file_griglia = true;
-        sprintf(support_label, "Ey");
+        grid_file = true;
+        support_label = "Ey";
       }
       else
       {
@@ -888,9 +917,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_campi_Ez = true;
-        file_griglia = true;
-        sprintf(support_label, "Ez");
+        grid_file = true;
+        support_label = "Ez";
       }
       else
       {
@@ -900,9 +928,8 @@ void Parametri::check_filename(const char *nomefile)
     }
     else if (nomefile[1] == 'd')
     {
-      file_densita_elettroni = true;
-      file_griglia = true;
-      sprintf(support_label, "eden");
+      grid_file = true;
+      support_label = "eden";
     }
     else
     {
@@ -916,9 +943,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_campi_Bx = true;
-        file_griglia = true;
-        sprintf(support_label, "Bx");
+        grid_file = true;
+        support_label = "Bx";
       }
       else
       {
@@ -930,9 +956,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_campi_By = true;
-        file_griglia = true;
-        sprintf(support_label, "By");
+        grid_file = true;
+        support_label = "By";
       }
       else
       {
@@ -944,9 +969,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_campi_Bz = true;
-        file_griglia = true;
-        sprintf(support_label, "Bz");
+        grid_file = true;
+        support_label = "Bz";
       }
       else
       {
@@ -956,9 +980,8 @@ void Parametri::check_filename(const char *nomefile)
     }
     else if (nomefile[1] == 'd')
     {
-      file_densita_driver = true;
-      file_griglia = true;
-      sprintf(support_label, "Bd");
+      grid_file = true;
+      support_label = "Bd";
     }
     else
     {
@@ -972,9 +995,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_correnti_Jx = true;
-        file_griglia = true;
-        sprintf(support_label, "Jx");
+        grid_file = true;
+        support_label = "Jx";
       }
       else
       {
@@ -986,9 +1008,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_correnti_Jy = true;
-        file_griglia = true;
-        sprintf(support_label, "Jy");
+        grid_file = true;
+        support_label = "Jy";
       }
       else
       {
@@ -1000,9 +1021,8 @@ void Parametri::check_filename(const char *nomefile)
     {
       if (nomefile[2] == 'f')
       {
-        file_correnti_Jz = true;
-        file_griglia = true;
-        sprintf(support_label, "Jz");
+        grid_file = true;
+        support_label = "Jz";
       }
       else
       {
@@ -1024,7 +1044,7 @@ void Parametri::check_filename(const char *nomefile)
 }
 
 
-void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
+void Parameters::check_forced_version(const int cl_argc, const char ** cl_argv)
 {
   argc = cl_argc;
   argv = new std::string[argc];
@@ -1057,11 +1077,11 @@ void Parametri::check_forced_version(const int cl_argc, const char ** cl_argv)
 
 
 
-void Parametri::parse_command_line()
+void Parameters::parse_command_line()
 {
-  std::ifstream fileParametri;
+  std::ifstream fileParameters;
   std::string nomefile;
-  bool usa_file_parametri = false;
+  bool usa_file_params = false;
   bool failed_opening_file;
 
   for (int i = 2; i < argc; i++)
@@ -1077,34 +1097,33 @@ void Parametri::parse_command_line()
       if (i < argc - 1 && argv[i + 1][0] != '-')
       {
         nomefile = std::string(argv[i + 1]);
-        usa_file_parametri = true;
+        usa_file_params = true;
         i++;
         std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
       }
       else
       {
         nomefile = filebasename + ".extremes";
-        usa_file_parametri = true;
+        usa_file_params = true;
         std::cout << "Using " << nomefile << " as the binning parameters file" << std::endl;
       }
     }
     else if (argv[i] == "-params")
     {
       std::cout << "Enabled the output of the parameters from .dat/.bin files" << std::endl;
-      p[OUT_PARAMS] = 1;
-      p_b[OUT_PARAMS] = false;
+      out_params = true;
     }
     else if (argv[i] == "-swap")
     {
       std::cout << "Forcing byte swapping (endianness)" << std::endl;
-      p[SWAP] = 1;
-      p_b[SWAP] = false;
+      we_have_to_do_swap = true;
+      we_dont_know_if_we_have_to_do_swap = false;
     }
     else if (argv[i] == "-noswap")
     {
       std::cout << "Forcing byte NON swapping (endianness)" << std::endl;
-      p[SWAP] = 0;
-      p_b[SWAP] = false;
+      we_have_to_do_swap = 0;
+      we_dont_know_if_we_have_to_do_swap = false;
     }
     else if (argv[i] == "-stop")
     {
@@ -1123,7 +1142,7 @@ void Parametri::parse_command_line()
     else if (argv[i] == "-subsample")
     {
       subsample = atoi(argv[i + 1].c_str());
-      if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI)
+      if (phasespace_file)
       {
         if (subsample < 1)
         {
@@ -1141,29 +1160,42 @@ void Parametri::parse_command_line()
       }
       i++;
     }
-    else if (argv[i] == "-ncol")
+    else if (argv[i] == "-ncol3d")
     {
+      sim_is_2d = false;
       int ncolumns = atoi(argv[i + 1].c_str());
-      p[NCOLONNE] = ncolumns;
-      if (ncolumns == 6) p[WEIGHT] = 0;
-      else if (ncolumns == 7) p[WEIGHT] = 1;
-      std::cout << "Forced number of columns in binary file to " << ncolumns << std::endl;
-      p_b[NCOLONNE] = false;
-      p_b[WEIGHT] = false;
+      if (ncolumns == 6) file_has_weight = false, file_has_charge = false;
+      else if (ncolumns == 7) file_has_weight = true, file_has_charge = false;
+      else if (ncolumns == 8) file_has_weight = true, file_has_charge = true;
+      std::cout << "Forced number of columns in 3D binary file to " << ncolumns << std::endl;
+      we_dont_know_if_file_has_weight = false;
+      we_dont_know_if_file_has_charge = false;
+      we_dont_know_if_sim_is_2d = false;
+      i++;
+    }
+    else if (argv[i] == "-ncol2d")
+    {
+      sim_is_2d = true;
+      int ncolumns = atoi(argv[i + 1].c_str());
+      if (ncolumns == 4) file_has_weight = false, file_has_charge = false;
+      else if (ncolumns == 5) file_has_weight = true, file_has_charge = false;
+      else if (ncolumns == 6) file_has_weight = true, file_has_charge = true;
+      std::cout << "Forced number of columns in 2D binary file to " << ncolumns << std::endl;
+      we_dont_know_if_file_has_weight = false;
+      we_dont_know_if_file_has_charge = false;
+      we_dont_know_if_sim_is_2d = false;
       i++;
     }
     else if (argv[i] == "-dump_vtk")
     {
       std::cout << "You asked to have a VTK dump of the input file" << std::endl;
-      p[OUT_VTK] = 1;
-      p_b[OUT_VTK] = false;
+      out_vtk = true;
     }
     else if (argv[i] == "-dump_vtk_nostretch")
     {
       std::cout << "You asked to have a VTK dump of the non-stretched grid.\n";
       std::cout << "If not explicitly said, the grid will be considered stretched in ALL directions" << std::endl;
-      p[OUT_VTK_NOSTRETCH] = 1;
-      p_b[OUT_VTK_NOSTRETCH] = false;
+      out_vtk_nostretch = true;
     }
     else if (argv[i] == "-no_stretch_x")
     {
@@ -1172,12 +1204,12 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-dump_cutx")
     {
-      if (p[NCOLONNE] > 1)
+      if (!sim_is_2d)
       {
         if (argv[i + 1][0] != '-')
         {
-          float posizione_taglio = (float)atof(argv[i + 1].c_str());
-          posizioni_taglio_griglia_x.push_back(posizione_taglio);
+          aladyn_float posizione_taglio = (aladyn_float)atof(argv[i + 1].c_str());
+          where_to_cut_grid_along_x.push_back(posizione_taglio);
           std::cout << "You asked to cut the grid at x = " << posizione_taglio << std::endl;
           i++;
         }
@@ -1185,26 +1217,24 @@ void Parametri::parse_command_line()
         {
           std::cout << "You asked to cut the grid at the middle of the x-axis" << std::endl;
         }
-        p[OUT_CUTX] = 1;
-        p_b[OUT_CUTX] = false;
+        out_cutx = 1;
       }
       else
       {
         std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
         if (argv[i + 1][0] != '-') i++;
-        p[OUT_CUTX] = 0;
-        p_b[OUT_CUTX] = false;
+        out_cutx = 0;
       }
     }
 
     else if (argv[i] == "-dump_cuty")
     {
-      if (p[NCOLONNE] > 1)
+      if (!sim_is_2d)
       {
         if (argv[i + 1][0] != '-')
         {
-          float posizione_taglio = (float)atof(argv[i + 1].c_str());
-          posizioni_taglio_griglia_y.push_back(posizione_taglio);
+          aladyn_float posizione_taglio = (aladyn_float)atof(argv[i + 1].c_str());
+          where_to_cut_grid_along_y.push_back(posizione_taglio);
           std::cout << "You asked to cut the grid at y = " << posizione_taglio << std::endl;
           i++;
         }
@@ -1212,26 +1242,24 @@ void Parametri::parse_command_line()
         {
           std::cout << "You asked to cut the grid at the middle of the y-axis" << std::endl;
         }
-        p[OUT_CUTY] = 1;
-        p_b[OUT_CUTY] = false;
+        out_cuty = 1;
       }
       else
       {
         std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
         if (argv[i + 1][0] != '-') i++;
-        p[OUT_CUTY] = 0;
-        p_b[OUT_CUTY] = false;
+        out_cuty = 0;
       }
     }
 
     else if (argv[i] == "-dump_cutz")
     {
-      if (p[NCOLONNE] > 1)
+      if (!sim_is_2d)
       {
         if (argv[i + 1][0] != '-')
         {
-          float posizione_taglio = (float)atof(argv[i + 1].c_str());
-          posizioni_taglio_griglia_z.push_back(posizione_taglio);
+          aladyn_float posizione_taglio = (aladyn_float)atof(argv[i + 1].c_str());
+          where_to_cut_grid_along_z.push_back(posizione_taglio);
           std::cout << "You asked to cut the grid at z = " << posizione_taglio << std::endl;
           i++;
         }
@@ -1239,323 +1267,313 @@ void Parametri::parse_command_line()
         {
           std::cout << "You asked to cut the grid at the middle of the z-axis" << std::endl;
         }
-        p[OUT_CUTZ] = 1;
-        p_b[OUT_CUTZ] = false;
+        out_cutz = true;
       }
       else
       {
         std::cout << "Unable to apply a cut on the grid in 2D, please use -dump_gnuplot" << std::endl;
         if (argv[i + 1][0] != '-') i++;
-        p[OUT_CUTZ] = 0;
-        p_b[OUT_CUTZ] = false;
+        out_cutz = 0;
       }
     }
 
     else if (argv[i] == "-dump_lineoutx")
     {
       std::cout << "You asked to have a lineout of the grid along the x-axis" << std::endl;
-      p[OUT_LINEOUT_X] = 1;
-      p_b[OUT_LINEOUT_X] = false;
+      out_lineoutx = 1;
     }
 
     else if (argv[i] == "-dump_gnuplot")
     {
-      if (p[NCOLONNE] == 1)
+      if (sim_is_2d)
       {
         std::cout << "You asked to rewrite the 2D grid in ASCII format for gnuplot" << std::endl;
-        p[OUT_GRID2D] = 1;
-        p_b[OUT_GRID2D] = false;
+        out_grid2d = 1;
       }
       else
       {
         std::cout << "Unable to write a 3D grid for gnuplot without slicing it, please use dump_cutx/y/z" << std::endl;
-        p[OUT_GRID2D] = 0;
-        p_b[OUT_GRID2D] = false;
+        out_grid2d = 0;
       }
     }
     else if (argv[i] == "-dump_propaga")
     {
       std::cout << "You asked to have a .ppg dump of the input phase space" << std::endl;
-      p[OUT_PROPAGA] = 1;
-      p_b[OUT_PROPAGA] = false;
+      out_ppg = 1;
     }
     else if (argv[i] == "-dump_csv")
     {
       std::cout << "You asked to have a .csv dump of the input phase space" << std::endl;
-      p[OUT_CSV] = 1;
-      p_b[OUT_CSV] = false;
+      out_csv = 1;
     }
     else if (argv[i] == "-dump_xyzE")
     {
       std::cout << "You asked to have a xy(z)E dump of the input phase space" << std::endl;
-      p[OUT_XYZE] = 1;
-      p_b[OUT_XYZE] = false;
+      out_xyze = 1;
     }
     else if (argv[i] == "-dump_clean")
     {
       std::cout << "You asked to have a unique, clean binary file as the output" << std::endl;
-      p[OUT_CLEAN_BINARY] = 1;
-      p_b[OUT_CLEAN_BINARY] = false;
+      out_clean_bin = 1;
     }
     else if (argv[i] == "-parameters")
     {
       std::cout << "You asked to write the simulation parameters file" << std::endl;
-      p[OUT_PARAMS] = 1;
-      p_b[OUT_PARAMS] = false;
+      out_params = 1;
     }
     else if (argv[i] == "-find_minmax")
     {
       std::cout << "You asked to search for minima and maxima" << std::endl;
-      p[FIND_MINMAX] = 1;
-      p_b[FIND_MINMAX] = false;
+      we_have_to_find_minmax = true;
+      we_dont_know_if_we_have_to_find_minmax = false;
     }
     else if (argv[i] == "-do_binning")
     {
       std::cout << "You asked to enable plotting functions" << std::endl;
-      p[DO_BINNING] = 1;
-      p_b[DO_BINNING] = false;
+      we_have_to_do_binning = true;
+      we_dont_know_if_we_have_to_do_binning = false;
     }
     else if (argv[i] == "-xmin")
     {
-      xmin = (float)atof(argv[i + 1].c_str());
+      xmin = (aladyn_float)atof(argv[i + 1].c_str());
       xmin_b = false;
       i++;
     }
     else if (argv[i] == "-xmax")
     {
-      xmax = (float)atof(argv[i + 1].c_str());
+      xmax = (aladyn_float)atof(argv[i + 1].c_str());
       xmax_b = false;
       i++;
     }
     else if (argv[i] == "-weight")
     {
       overwrite_weight = true;
-      overwrite_weight_value = (float)atof(argv[i + 1].c_str());
+      overwrite_weight_value = (aladyn_float)atof(argv[i + 1].c_str());
       i++;
     }
     else if (argv[i] == "-charge")
     {
       overwrite_charge = true;
-      overwrite_charge_value = (float)atof(argv[i + 1].c_str());
+      overwrite_charge_value = (aladyn_float)atof(argv[i + 1].c_str());
       i++;
     }
     else if (argv[i] == "-wmin")
     {
-      wmin = (float)atof(argv[i + 1].c_str());
+      wmin = (aladyn_float)atof(argv[i + 1].c_str());
       wmin_b = false;
       i++;
     }
     else if (argv[i] == "-wmax")
     {
-      wmax = (float)atof(argv[i + 1].c_str());
+      wmax = (aladyn_float)atof(argv[i + 1].c_str());
       wmax_b = false;
       i++;
     }
     else if (argv[i] == "-chmin")
     {
-      chmin = (float)atof(argv[i + 1].c_str());
+      chmin = (aladyn_float)atof(argv[i + 1].c_str());
       chmin_b = false;
       i++;
     }
     else if (argv[i] == "-chmax")
     {
-      chmax = (float)atof(argv[i + 1].c_str());
+      chmax = (aladyn_float)atof(argv[i + 1].c_str());
       chmax_b = false;
       i++;
     }
     else if (argv[i] == "-ymin")
     {
-      ymin = (float)atof(argv[i + 1].c_str());
+      ymin = (aladyn_float)atof(argv[i + 1].c_str());
       ymin_b = false;
       i++;
     }
     else if (argv[i] == "-ymax")
     {
-      ymax = (float)atof(argv[i + 1].c_str());
+      ymax = (aladyn_float)atof(argv[i + 1].c_str());
       ymax_b = false;
       i++;
     }
     else if (argv[i] == "-zmin")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        zmin = (float)atof(argv[i + 1].c_str());
-        zmin_b = false;
-        i++;
+        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+        zmin = (aladyn_float)atof(argv[i + 1].c_str());
+        zmin_b = false;
+        i++;
       }
     }
     else if (argv[i] == "-zmax")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        zmax = (float)atof(argv[i + 1].c_str());
-        zmax_b = false;
-        i++;
+        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+        zmax = (aladyn_float)atof(argv[i + 1].c_str());
+        zmax_b = false;
+        i++;
       }
     }
     else if (argv[i] == "-tymin")
     {
-      tymin = (float)atof(argv[i + 1].c_str());
+      tymin = (aladyn_float)atof(argv[i + 1].c_str());
       tymin_b = false;
       i++;
     }
     else if (argv[i] == "-tymax")
     {
-      tymax = (float)atof(argv[i + 1].c_str());
+      tymax = (aladyn_float)atof(argv[i + 1].c_str());
       tymax_b = false;
       i++;
     }
     else if (argv[i] == "-tzmin")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        tzmin = (float)atof(argv[i + 1].c_str());
-        tzmin_b = false;
-        i++;
+        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+        tzmin = (aladyn_float)atof(argv[i + 1].c_str());
+        tzmin_b = false;
+        i++;
       }
     }
     else if (argv[i] == "-tzmax")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        tzmax = (float)atof(argv[i + 1].c_str());
-        tzmax_b = false;
-        i++;
+        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+        tzmax = (aladyn_float)atof(argv[i + 1].c_str());
+        tzmax_b = false;
+        i++;
       }
     }
     else if (argv[i] == "-pxmin")
     {
-      pxmin = (float)atof(argv[i + 1].c_str());
+      pxmin = (aladyn_float)atof(argv[i + 1].c_str());
       pxmin_b = false;
       i++;
     }
     else if (argv[i] == "-pxmax")
     {
-      pxmax = (float)atof(argv[i + 1].c_str());
+      pxmax = (aladyn_float)atof(argv[i + 1].c_str());
       pxmax_b = false;
       i++;
     }
     else if (argv[i] == "-pymin")
     {
-      pymin = (float)atof(argv[i + 1].c_str());
+      pymin = (aladyn_float)atof(argv[i + 1].c_str());
       pymin_b = false;
       i++;
     }
     else if (argv[i] == "-pymax")
     {
-      pymax = (float)atof(argv[i + 1].c_str());
+      pymax = (aladyn_float)atof(argv[i + 1].c_str());
       pymax_b = false;
       i++;
     }
     else if (argv[i] == "-pzmin")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        pzmin = (float)atof(argv[i + 1].c_str());
-        pzmin_b = false;
-        i++;
+        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+        pzmin = (aladyn_float)atof(argv[i + 1].c_str());
+        pzmin_b = false;
+        i++;
       }
     }
     else if (argv[i] == "-pzmax")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        pzmax = (float)atof(argv[i + 1].c_str());
-        pzmax_b = false;
-        i++;
+        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to apply a cut in z-dimension on a 2D file" << std::endl;
+        pzmax = (aladyn_float)atof(argv[i + 1].c_str());
+        pzmax_b = false;
+        i++;
       }
     }
     else if (argv[i] == "-thetamin")
     {
-      thetamin = (float)atof(argv[i + 1].c_str());
+      thetamin = (aladyn_float)atof(argv[i + 1].c_str());
       thetamin_b = false;
       i++;
     }
     else if (argv[i] == "-thetamax")
     {
-      thetamax = (float)atof(argv[i + 1].c_str());
+      thetamax = (aladyn_float)atof(argv[i + 1].c_str());
       thetamax_b = false;
       i++;
     }
     else if (argv[i] == "-thetaTmin")
     {
-      thetaTmin = (float)atof(argv[i + 1].c_str());
+      thetaTmin = (aladyn_float)atof(argv[i + 1].c_str());
       thetaTmin_b = false;
       i++;
     }
     else if (argv[i] == "-thetaTmax")
     {
-      thetaTmax = (float)atof(argv[i + 1].c_str());
+      thetaTmax = (aladyn_float)atof(argv[i + 1].c_str());
       thetaTmax_b = false;
       i++;
     }
     else if (argv[i] == "-gammamin")
     {
-      gammamin = (float)atof(argv[i + 1].c_str());
+      gammamin = (aladyn_float)atof(argv[i + 1].c_str());
       gammamin_b = false;
       i++;
     }
     else if (argv[i] == "-gammamax")
     {
-      gammamax = (float)atof(argv[i + 1].c_str());
+      gammamax = (aladyn_float)atof(argv[i + 1].c_str());
       gammamax_b = false;
       i++;
     }
     else if (argv[i] == "-Emin")
     {
-      Emin = (float)atof(argv[i + 1].c_str());
+      Emin = (aladyn_float)atof(argv[i + 1].c_str());
       Emin_b = false;
       i++;
     }
     else if (argv[i] == "-Emax")
     {
-      Emax = (float)atof(argv[i + 1].c_str());
+      Emax = (aladyn_float)atof(argv[i + 1].c_str());
       Emax_b = false;
       i++;
     }
     else if (argv[i] == "-plot_xy")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_xy = 1;
+      do_plot_xy = 1;
     }
     else if (argv[i] == "-plot_xw")
     {
-      if (p[WEIGHT])
+      if (file_has_weight)
       {
-        if (p_b[DO_BINNING]) {
+        if (we_dont_know_if_we_have_to_do_binning) {
           std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
         }
-        fai_plot_xw = 1;
+        do_plot_xw = 1;
       }
       else
       {
@@ -1564,246 +1582,246 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_xz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_xz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_xz = 1;
       }
     }
     else if (argv[i] == "-plot_yz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_yz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_yz = 1;
       }
     }
     else if (argv[i] == "-plot_rcf")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_rcf = 1;
+        std::cout << "Unable to do a plot with tz using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with tz using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_rcf = 1;
       }
     }
     else if (argv[i] == "-plot_xpx")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_xpx = 1;
+      do_plot_xpx = 1;
     }
     else if (argv[i] == "-plot_xpy")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_xpy = 1;
+      do_plot_xpy = 1;
     }
     else if (argv[i] == "-plot_xpz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_xpz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_xpz = 1;
       }
     }
     else if (argv[i] == "-plot_ypx")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_ypx = 1;
+      do_plot_ypx = 1;
     }
     else if (argv[i] == "-plot_ypy")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_ypy = 1;
+      do_plot_ypy = 1;
     }
     else if (argv[i] == "-plot_ypz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_ypz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_ypz = 1;
       }
     }
     else if (argv[i] == "-plot_zpx")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_zpx = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_zpx = 1;
       }
     }
     else if (argv[i] == "-plot_zpy")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_zpy = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_zpy = 1;
       }
     }
     else if (argv[i] == "-plot_zpz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_zpz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_zpz = 1;
       }
     }
     else if (argv[i] == "-plot_pxpy")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_pxpy = 1;
+      do_plot_pxpy = 1;
     }
     else if (argv[i] == "-plot_pxpz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_pxpz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_pxpz = 1;
       }
     }
     else if (argv[i] == "-plot_pypz")
     {
-      if (p[NCOLONNE] > 5)
+      if (sim_is_2d)
       {
-        if (p_b[DO_BINNING]) {
-          std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
-        }
-        fai_plot_pypz = 1;
+        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
       }
       else
       {
-        std::cout << "Unable to do a plot with z using a 2D file" << std::endl;
+        if (we_dont_know_if_we_have_to_do_binning) {
+          std::cout << "You asked to enable plotting functions" << std::endl;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
+        }
+        do_plot_pypz = 1;
       }
     }
     else if (argv[i] == "-plot_etheta")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_Etheta = 1;
+      do_plot_Etheta = 1;
     }
     else if (argv[i] == "-plot_ethetaT")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_EthetaT = 1;
+      do_plot_EthetaT = 1;
     }
     else if (argv[i] == "-plot_espec")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_Espec = 1;
+      do_plot_Espec = 1;
     }
     else if (argv[i] == "-plot_chspec")
     {
-      if (file_version >= 3)
+      if (file_has_charge)
       {
-        if (p_b[DO_BINNING]) {
+        if (we_dont_know_if_we_have_to_do_binning) {
           std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
         }
-        fai_plot_chspec = 1;
+        do_plot_chspec = 1;
       }
       else
       {
@@ -1812,14 +1830,14 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_wspec")
     {
-      if (p[WEIGHT])
+      if (file_has_weight)
       {
-        if (p_b[DO_BINNING]) {
+        if (we_dont_know_if_we_have_to_do_binning) {
           std::cout << "You asked to enable plotting functions" << std::endl;
-          p[DO_BINNING] = 1;
-          p_b[DO_BINNING] = false;
+          we_have_to_do_binning = 1;
+          we_dont_know_if_we_have_to_do_binning = false;
         }
-        fai_plot_wspec = 1;
+        do_plot_wspec = 1;
       }
       else
       {
@@ -1828,21 +1846,21 @@ void Parametri::parse_command_line()
     }
     else if (argv[i] == "-plot_thetaspec")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_thetaspec = 1;
+      do_plot_thetaspec = 1;
     }
     else if (argv[i] == "-plot_thetaTspec")
     {
-      if (p_b[DO_BINNING]) {
+      if (we_dont_know_if_we_have_to_do_binning) {
         std::cout << "You asked to enable plotting functions" << std::endl;
-        p[DO_BINNING] = 1;
-        p_b[DO_BINNING] = false;
+        we_have_to_do_binning = 1;
+        we_dont_know_if_we_have_to_do_binning = false;
       }
-      fai_plot_thetaTspec = 1;
+      do_plot_thetaTspec = 1;
     }
     else if (argv[i] == "-nbin")
     {
@@ -1971,158 +1989,158 @@ void Parametri::parse_command_line()
 
   std::string nomepar, evita, leggi;
 
-  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
+  if (phasespace_file)
   {
-    if (usa_file_parametri)
+    if (usa_file_params)
     {
-      fileParametri.open(nomefile.c_str());
-      failed_opening_file = fileParametri.fail();
+      fileParameters.open(nomefile.c_str());
+      failed_opening_file = fileParameters.fail();
       if (failed_opening_file)
       {
         std::cout << "Unable to open file " << nomefile << " which contains the binning parameters" << std::endl;
         exit(50);
       }
-      while (!fileParametri.eof())
+      while (!fileParameters.eof())
       {
-        fileParametri >> nomepar >> evita >> leggi;
+        fileParameters >> nomepar >> evita >> leggi;
         if ((nomepar == "xmin" || nomepar == "XMIN") && xmin_b)
         {
-          xmin = (float)std::atof(leggi.c_str());
+          xmin = (aladyn_float)std::atof(leggi.c_str());
           xmin_b = false;
         }
         else if ((nomepar == "xmax" || nomepar == "XMAX") && xmax_b)
         {
-          xmax = (float)std::atof(leggi.c_str());
+          xmax = (aladyn_float)std::atof(leggi.c_str());
           xmax_b = false;
         }
         else if ((nomepar == "ymin" || nomepar == "YMIN") && ymin_b)
         {
-          ymin = (float)std::atof(leggi.c_str());
+          ymin = (aladyn_float)std::atof(leggi.c_str());
           ymin_b = false;
         }
         else if ((nomepar == "ymax" || nomepar == "YMAX") && ymax_b)
         {
-          ymax = (float)std::atof(leggi.c_str());
+          ymax = (aladyn_float)std::atof(leggi.c_str());
           ymax_b = false;
         }
         else if ((nomepar == "zmin" || nomepar == "ZMIN") && zmin_b)
         {
-          zmin = (float)std::atof(leggi.c_str());
+          zmin = (aladyn_float)std::atof(leggi.c_str());
           zmin_b = false;
         }
         else if ((nomepar == "zmax" || nomepar == "ZMAX") && zmax_b)
         {
-          zmax = (float)std::atof(leggi.c_str());
+          zmax = (aladyn_float)std::atof(leggi.c_str());
           zmax_b = false;
         }
         else if ((nomepar == "tymin" || nomepar == "TYMIN") && tymin_b)
         {
-          tymin = (float)std::atof(leggi.c_str());
+          tymin = (aladyn_float)std::atof(leggi.c_str());
           tymin_b = false;
         }
         else if ((nomepar == "tymax" || nomepar == "TYMAX") && tymax_b)
         {
-          tymax = (float)std::atof(leggi.c_str());
+          tymax = (aladyn_float)std::atof(leggi.c_str());
           tymax_b = false;
         }
         else if ((nomepar == "tzmin" || nomepar == "TZMIN") && tzmin_b)
         {
-          tzmin = (float)std::atof(leggi.c_str());
+          tzmin = (aladyn_float)std::atof(leggi.c_str());
           tzmin_b = false;
         }
         else if ((nomepar == "tzmax" || nomepar == "TZMAX") && tzmax_b)
         {
-          tzmax = (float)std::atof(leggi.c_str());
+          tzmax = (aladyn_float)std::atof(leggi.c_str());
           tzmax_b = false;
         }
         else if ((nomepar == "pxmin" || nomepar == "PXMIN") && pxmin_b)
         {
-          pxmin = (float)std::atof(leggi.c_str());
+          pxmin = (aladyn_float)std::atof(leggi.c_str());
           pxmin_b = false;
         }
         else if ((nomepar == "pxmax" || nomepar == "PXMAX") && pxmax_b)
         {
-          pxmax = (float)std::atof(leggi.c_str());
+          pxmax = (aladyn_float)std::atof(leggi.c_str());
           pxmax_b = false;
         }
         else if ((nomepar == "pymin" || nomepar == "PYMIN") && pymin_b)
         {
-          pymin = (float)std::atof(leggi.c_str());
+          pymin = (aladyn_float)std::atof(leggi.c_str());
           pymin_b = false;
         }
         else if ((nomepar == "pymax" || nomepar == "PYMAX") && pymax_b)
         {
-          pymax = (float)std::atof(leggi.c_str());
+          pymax = (aladyn_float)std::atof(leggi.c_str());
           pymax_b = false;
         }
         else if ((nomepar == "pzmin" || nomepar == "PZMIN") && pzmin_b)
         {
-          pzmin = (float)std::atof(leggi.c_str());
+          pzmin = (aladyn_float)std::atof(leggi.c_str());
           pzmin_b = false;
         }
         else if ((nomepar == "pzmax" || nomepar == "PZMAX") && pzmax_b)
         {
-          pzmax = (float)std::atof(leggi.c_str());
+          pzmax = (aladyn_float)std::atof(leggi.c_str());
           pzmax_b = false;
         }
         else if ((nomepar == "gammamin" || nomepar == "GAMMAMIN") && gammamin_b)
         {
-          gammamin = (float)std::atof(leggi.c_str());
+          gammamin = (aladyn_float)std::atof(leggi.c_str());
           gammamin_b = false;
         }
         else if ((nomepar == "gammamax" || nomepar == "GAMMAMAX") && gammamax_b)
         {
-          gammamax = (float)std::atof(leggi.c_str());
+          gammamax = (aladyn_float)std::atof(leggi.c_str());
           gammamax_b = false;
         }
         else if ((nomepar == "thetamin" || nomepar == "THETAMIN") && thetamin_b)
         {
-          thetamin = (float)std::atof(leggi.c_str());
+          thetamin = (aladyn_float)std::atof(leggi.c_str());
           thetamin_b = false;
         }
         else if ((nomepar == "thetamax" || nomepar == "THETAMAX") && thetamax_b)
         {
-          thetamax = (float)std::atof(leggi.c_str());
+          thetamax = (aladyn_float)std::atof(leggi.c_str());
           thetamax_b = false;
         }
         else if ((nomepar == "thetaradmin" || nomepar == "THETARADMIN") && thetaTmin_b)
         {
-          thetaTmin = (float)std::atof(leggi.c_str());
+          thetaTmin = (aladyn_float)std::atof(leggi.c_str());
           thetaTmin_b = false;
         }
         else if ((nomepar == "thetaradmax" || nomepar == "THETARADMAX") && thetaTmax_b)
         {
-          thetaTmax = (float)std::atof(leggi.c_str());
+          thetaTmax = (aladyn_float)std::atof(leggi.c_str());
           thetaTmax_b = false;
         }
         else if ((nomepar == "emin" || nomepar == "EMIN") && Emin_b)
         {
-          Emin = (float)std::atof(leggi.c_str());
+          Emin = (aladyn_float)std::atof(leggi.c_str());
           Emin_b = false;
         }
         else if ((nomepar == "emax" || nomepar == "EMAX") && Emax_b)
         {
-          Emax = (float)std::atof(leggi.c_str());
+          Emax = (aladyn_float)std::atof(leggi.c_str());
           Emax_b = false;
         }
         else if ((nomepar == "wmin" || nomepar == "WMIN") && wmin_b)
         {
-          wmin = (float)std::atof(leggi.c_str());
+          wmin = (aladyn_float)std::atof(leggi.c_str());
           wmin_b = false;
         }
         else if ((nomepar == "wmax" || nomepar == "WMAX") && wmax_b)
         {
-          wmax = (float)std::atof(leggi.c_str());
+          wmax = (aladyn_float)std::atof(leggi.c_str());
           wmax_b = false;
         }
         else if ((nomepar == "chmin" || nomepar == "CHMIN") && chmin_b)
         {
-          chmin = (float)std::atof(leggi.c_str());
+          chmin = (aladyn_float)std::atof(leggi.c_str());
           chmin_b = false;
         }
         else if ((nomepar == "chmax" || nomepar == "CHMAX") && chmax_b)
         {
-          chmax = (float)std::atof(leggi.c_str());
+          chmax = (aladyn_float)std::atof(leggi.c_str());
           chmax_b = false;
         }
         /*
@@ -2132,40 +2150,40 @@ void Parametri::parse_command_line()
         }
         */
       }
-      fileParametri.close();
+      fileParameters.close();
     }
-    if (p_b[FIND_MINMAX] && !do_not_ask_missing)
+    if (we_dont_know_if_we_have_to_find_minmax && !do_not_ask_missing)
     {
       std::cout << "Do you want to find minimum and maximum values for common parameters? 0 (NO) - 1 (YES): ";
-      std::cin >> p[FIND_MINMAX];
-      p_b[FIND_MINMAX] = false;
+      std::cin >> we_have_to_find_minmax;
+      we_dont_know_if_we_have_to_find_minmax = false;
     }
-    if (p_b[DO_BINNING] && !do_not_ask_missing)
+    if (we_dont_know_if_we_have_to_do_binning && !do_not_ask_missing)
     {
       std::cout << "Do you want to do a histogram (data binning)? 0 (NO) - 1 (YES): ";
-      std::cin >> p[DO_BINNING];
-      p_b[DO_BINNING] = false;
+      std::cin >> we_have_to_do_binning;
+      we_dont_know_if_we_have_to_do_binning = false;
     }
-    if (p[DO_BINNING] == 1 && nbin_b && !do_not_ask_missing)
+    if (we_have_to_do_binning == 1 && nbin_b && !do_not_ask_missing)
     {
       std::cout << "How many bins per axis? (common ALaDyn choice: 120): ";
       std::cin >> nbin;
       nbin_x = nbin_y = nbin_z = nbin_px = nbin_py = nbin_pz = nbin_E = nbin_theta = nbin_thetaT = nbin_ty = nbin_tz = nbin_w = nbin_ch = nbin;
     }
 
-    if (p[DO_BINNING] == 1 && !do_not_ask_missing)
+    if (we_have_to_do_binning == 1 && !do_not_ask_missing)
     {
       std::cout << "Do you want to do an x-px plot? 0 (NO) - 1 (YES): ";
-      std::cin >> fai_plot_xpx;
+      std::cin >> do_plot_xpx;
       std::cout << "E-theta (deg)? 0 (NO) - 1 (YES): ";
-      std::cin >> fai_plot_Etheta;
+      std::cin >> do_plot_Etheta;
       std::cout << "E-theta (rad)? 0 (NO) - 1 (YES): ";
-      std::cin >> fai_plot_EthetaT;
+      std::cin >> do_plot_EthetaT;
       std::cout << "Energy spectrum? 0 (NO) - 1 (YES): ";
-      std::cin >> fai_plot_Espec;
+      std::cin >> do_plot_Espec;
       std::cout << "RFC plot? 0 (NO) - 1 (YES): ";
-      std::cin >> fai_plot_rcf;
-      if (fai_plot_xpx)
+      std::cin >> do_plot_rcf;
+      if (do_plot_xpx)
       {
         if (xmin_b)
         {
@@ -2204,7 +2222,7 @@ void Parametri::parse_command_line()
           nbin_px_b = false;
         }
       }
-      if (fai_plot_Etheta || fai_plot_Espec || fai_plot_EthetaT)
+      if (do_plot_Etheta || do_plot_Espec || do_plot_EthetaT)
       {
         if (Emin_b)
         {
@@ -2225,7 +2243,7 @@ void Parametri::parse_command_line()
           nbin_E_b = false;
         }
       }
-      if (fai_plot_Etheta)
+      if (do_plot_Etheta)
       {
         if (thetamin_b)
         {
@@ -2246,7 +2264,7 @@ void Parametri::parse_command_line()
           nbin_theta_b = false;
         }
       }
-      if (fai_plot_EthetaT)
+      if (do_plot_EthetaT)
       {
         if (thetaTmin_b)
         {
@@ -2267,7 +2285,7 @@ void Parametri::parse_command_line()
           nbin_thetaT_b = false;
         }
       }
-      if (fai_plot_rcf)
+      if (do_plot_rcf)
       {
         if (tymin_b)
         {
@@ -2342,399 +2360,132 @@ void Parametri::parse_command_line()
     std::cout << "CHMIN = " << chmin << std::endl;
     std::cout << "CHMAX = " << chmax << std::endl;
 #endif
-    if (p_b[OUT_VTK] && !do_not_ask_missing)
+    if (!out_vtk && !do_not_ask_missing)
     {
       std::cout << "Do you want the .vtk binary output?? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_VTK];
-      p_b[OUT_VTK] = false;
+      std::cin >> out_vtk;
     }
-    if (p_b[OUT_CLEAN_BINARY] && !do_not_ask_missing)
+    if (!out_clean_bin && !do_not_ask_missing)
     {
       std::cout << "Do you want the .bin output, cleaned from Fortran metadata? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_CLEAN_BINARY];
-      p_b[OUT_CLEAN_BINARY] = false;
+      std::cin >> out_clean_bin;
     }
-    if (p_b[OUT_PROPAGA] && !do_not_ask_missing)
+    if (!out_ppg && !do_not_ask_missing)
     {
       std::cout << "Do you want the .ppg output for Propaga? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_PROPAGA];
-      p_b[OUT_PROPAGA] = false;
+      std::cin >> out_ppg;
     }
-    if (p_b[OUT_XYZE] && !do_not_ask_missing)
+    if (!out_xyze && !do_not_ask_missing)
     {
       std::cout << "Do you want a .txt file with x y (z) and Energy? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_XYZE];
-      p_b[OUT_XYZE] = false;
+      std::cin >> out_xyze;
     }
-    if (p_b[OUT_CSV] && !do_not_ask_missing)
+    if (!out_csv && !do_not_ask_missing)
     {
       std::cout << "Do you want a .csv file for Paraview? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_CSV];
-      p_b[OUT_CSV] = false;
+      std::cin >> out_csv;
     }
-    if (p_b[OUT_PARAMS] && !do_not_ask_missing)
+    if (!out_params && !do_not_ask_missing)
     {
       std::cout << "Do you want a .dat files with simulation parameters? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_PARAMS];
-      p_b[OUT_PARAMS] = false;
+      std::cin >> out_params;
     }
   }
   else
   {
-    if (p_b[OUT_VTK] && !do_not_ask_missing)
+    if (!out_vtk && !do_not_ask_missing)
     {
       std::cout << "Do you want the .vtk binary output?? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_VTK];
-      p_b[OUT_VTK] = false;
+      std::cin >> out_vtk;
     }
-    if (p_b[OUT_VTK_NOSTRETCH] && !do_not_ask_missing)
+    if (!out_vtk_nostretch && !do_not_ask_missing)
     {
       std::cout << "Do you want the .vtk binary output only for the unstretched part of the grid? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_VTK_NOSTRETCH];
-      p_b[OUT_VTK_NOSTRETCH] = false;
+      std::cin >> out_vtk_nostretch;
     }
-    if (p[OUT_VTK_NOSTRETCH] && !do_not_ask_missing)
+    if (out_vtk_nostretch && !do_not_ask_missing)
     {
       std::cout << "Is the grid stretched also along x? 0 (NO) - 1 (YES): ";
       std::cin >> stretched_along_x;
     }
-    if (p[NCOLONNE] > 1)
+    if (!sim_is_2d)
     {
-      if (p_b[OUT_CUTX] && !do_not_ask_missing)
+      if (!out_cutx && !do_not_ask_missing)
       {
         std::cout << "Do you want a .txt from a slice along x, for gnuplot? 0 (NO) - 1 (YES): ";
-        std::cin >> p[OUT_CUTX];
-        p_b[OUT_CUTX] = false;
-        float posizione_taglio = 0.0;
-        if (p[OUT_CUTX] == 1)
+        std::cin >> out_cutx;
+        aladyn_float posizione_taglio = 0.0;
+        if (out_cutx == 1)
         {
           std::cout << "Please tell me at which position should I cut the slice (in micrometers): ";
           std::cin >> posizione_taglio;
-          posizioni_taglio_griglia_x.push_back(posizione_taglio);
+          where_to_cut_grid_along_x.push_back(posizione_taglio);
         }
       }
-      if (p_b[OUT_CUTY] && !do_not_ask_missing)
+      if (!out_cuty && !do_not_ask_missing)
       {
         std::cout << "Do you want a .txt from a slice along y, for gnuplot? 0 (NO) - 1 (YES): ";
-        std::cin >> p[OUT_CUTY];
-        p_b[OUT_CUTY] = false;
-        float posizione_taglio = 0.0;
-        if (p[OUT_CUTY] == 1)
+        std::cin >> out_cuty;
+        aladyn_float posizione_taglio = 0.0;
+        if (out_cuty == 1)
         {
           std::cout << "Please tell me at which position should I cut the slice (in micrometers): ";
           std::cin >> posizione_taglio;
-          posizioni_taglio_griglia_y.push_back(posizione_taglio);
+          where_to_cut_grid_along_y.push_back(posizione_taglio);
         }
       }
-      if (p_b[OUT_CUTZ] && !do_not_ask_missing)
+      if (!out_cutz && !do_not_ask_missing)
       {
         std::cout << "Do you want a .txt from a slice along z, for gnuplot? 0 (NO) - 1 (YES): ";
-        std::cin >> p[OUT_CUTZ];
-        p_b[OUT_CUTZ] = false;
-        float posizione_taglio = 0.0;
-        if (p[OUT_CUTZ] == 1)
+        std::cin >> out_cutz;
+        aladyn_float posizione_taglio = 0.0;
+        if (out_cutz == 1)
         {
           std::cout << "Please tell me at which position should I cut the slice (in micrometers): ";
           std::cin >> posizione_taglio;
-          posizioni_taglio_griglia_z.push_back(posizione_taglio);
+          where_to_cut_grid_along_z.push_back(posizione_taglio);
         }
       }
-      p[OUT_GRID2D] = 0;
-      p_b[OUT_GRID2D] = false;
+      out_grid2d = 0;
     }
     else
     {
-      if (p_b[OUT_GRID2D] && !do_not_ask_missing)
+      if (!out_grid2d && !do_not_ask_missing)
       {
         std::cout << "Do you want a .txt file for gnuplot? 0 (NO) - 1 (YES): ";
-        std::cin >> p[OUT_GRID2D];
-        p_b[OUT_GRID2D] = false;
+        std::cin >> out_grid2d;
       }
-      p[OUT_CUTX] = 0;
-      p_b[OUT_CUTX] = false;
-      p[OUT_CUTY] = 0;
-      p_b[OUT_CUTY] = false;
-      p[OUT_CUTZ] = 0;
-      p_b[OUT_CUTZ] = false;
+      out_cutx = 0;
+      out_cuty = 0;
+      out_cutz = 0;
     }
-    if (p_b[OUT_PARAMS] && !do_not_ask_missing)
+    if (!out_params && !do_not_ask_missing)
     {
       std::cout << "Do you want a .dat files with simulation parameters? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_PARAMS];
-      p_b[OUT_PARAMS] = false;
+      std::cin >> out_params;
     }
-    if (p_b[OUT_LINEOUT_X] && !do_not_ask_missing)
+    if (!out_lineoutx && !do_not_ask_missing)
     {
       std::cout << "Do you want a lineout along x? 0 (NO) - 1 (YES): ";
-      std::cin >> p[OUT_LINEOUT_X];
-      p_b[OUT_LINEOUT_X] = false;
+      std::cin >> out_lineoutx;
     }
   }
 }
 
 
 
-bool Parametri::check_parametri()
+bool Parameters::check_params()
 {
   bool test = true;
-  if (!p_b[SWAP] && p[SWAP] != 0 && p[SWAP] != 1)   // check swap o non-swap
+  if (we_dont_know_if_we_have_to_do_swap && do_not_ask_missing)
   {
-    printf("Warning: swap mode badly defined\n");
-    test = false;
+    we_have_to_do_swap = 0;
+    we_dont_know_if_we_have_to_do_swap = false;
+    test = true;
   }
-  else
+  else test = false;
+  if (phasespace_file)
   {
-    if (!p_b[SWAP] && (p[SWAP] == 0 || p[SWAP] == 1))
-    {
-      test = true;    // tutto ok, in questo caso il parametro va bene!
-    }
-    else if (p_b[SWAP] && do_not_ask_missing)
-    {
-      p[SWAP] = 0;
-      p_b[SWAP] = false;
-      test = true;
-    }
-    else
-    {
-      printf("Warning: swap mode undefined\n");
-      test = false;
-    }
-  }
-  if (file_particelle_P || file_particelle_E || file_particelle_HI || file_particelle_LI || file_particelle_generic_ion)
-  {
-    if (!p_b[WEIGHT] && p[WEIGHT] != 0 && p[WEIGHT] != 1)
-    {
-      printf("Warning: weight mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[WEIGHT] && (p_b[WEIGHT] == 0 || p_b[WEIGHT] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[WEIGHT] && do_not_ask_missing)
-      {
-        p[WEIGHT] = 1;
-        p_b[WEIGHT] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: weight mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_CSV] && p[OUT_CSV] != 0 && p[OUT_CSV] != 1)  // check leggi_particelle: out-ascii o non-out-ascii
-    {
-      printf("Warning: csv mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_CSV] && (p_b[OUT_CSV] == 0 || p_b[OUT_CSV] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_CSV] && do_not_ask_missing)
-      {
-        p[OUT_CSV] = 0;
-        p_b[OUT_CSV] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: csv mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_PROPAGA] && p[OUT_PROPAGA] != 0 && p[OUT_PROPAGA] != 1)  // check leggi_particelle: out-ascii o non-out-ascii
-    {
-      printf("Warning: ppg mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_PROPAGA] && (p_b[OUT_PROPAGA] == 0 || p_b[OUT_PROPAGA] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_PROPAGA] && do_not_ask_missing)
-      {
-        p[OUT_PROPAGA] = 0;
-        p_b[OUT_PROPAGA] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: ppg mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_XYZE] && p[OUT_XYZE] != 0 && p[OUT_XYZE] != 1)
-    {
-      printf("Warning: xyzE mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_XYZE] && (p_b[OUT_XYZE] == 0 || p_b[OUT_XYZE] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_XYZE] && do_not_ask_missing)
-      {
-        p[OUT_XYZE] = 0;
-        p_b[OUT_XYZE] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: xyzE mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1)
-    {
-      printf("Warning: vtk mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_VTK] && (p[OUT_VTK] == 0 || p[OUT_VTK] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_VTK] && do_not_ask_missing)
-      {
-        p[OUT_VTK] = 0;
-        p_b[OUT_VTK] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: vtk mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_CLEAN_BINARY] && p[OUT_CLEAN_BINARY] != 0 && p[OUT_CLEAN_BINARY] != 1)
-    {
-      printf("Warning: bin mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_CLEAN_BINARY] && (p[OUT_CLEAN_BINARY] == 0 || p[OUT_CLEAN_BINARY] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_CLEAN_BINARY] && do_not_ask_missing)
-      {
-        p[OUT_CLEAN_BINARY] = 0;
-        p_b[OUT_CLEAN_BINARY] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: bin mode undefined\n");
-        test = false;
-      }
-    }
-
-    if (!p_b[FIND_MINMAX] && p[FIND_MINMAX] != 0 && p[FIND_MINMAX] != 1)
-    {
-      printf("Warning: min/max mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[FIND_MINMAX] && (p[FIND_MINMAX] == 0 || p[FIND_MINMAX] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[FIND_MINMAX] && do_not_ask_missing)
-      {
-        p[FIND_MINMAX] = 0;
-        p_b[FIND_MINMAX] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: min/max mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[DO_BINNING] && p[DO_BINNING] != 0 && p[DO_BINNING] != 1)
-    {
-      printf("Warning: binning mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[DO_BINNING] && (p[DO_BINNING] == 0 || p[DO_BINNING] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[DO_BINNING] && do_not_ask_missing)
-      {
-        p[DO_BINNING] = 0;
-        p_b[DO_BINNING] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: binning mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1)
-    {
-      printf("Warning: dat mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_PARAMS] && do_not_ask_missing)
-      {
-        p[OUT_PARAMS] = 0;
-        p_b[OUT_PARAMS] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: dat mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[NCOLONNE] && p[NCOLONNE] != 4 && p[NCOLONNE] != 5 && p[NCOLONNE] != 6 && p[NCOLONNE] != 7 && p[NCOLONNE] != 8)
-    {
-      printf("Warning: column number badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[NCOLONNE] && (p[NCOLONNE] == 4 || p[NCOLONNE] == 5 || p[NCOLONNE] == 6 || p[NCOLONNE] == 7 || p[NCOLONNE] == 8))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[NCOLONNE] && do_not_ask_missing)
-      {
-        p[NCOLONNE] = 8;
-        p_b[NCOLONNE] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: column number undefined\n");
-        test = false;
-      }
-    }
-
-
     if (xmin > xmax)
     {
       printf("Warning: xmin > xmax\n");
@@ -2866,247 +2617,9 @@ bool Parametri::check_parametri()
       test = false;
     }
   }
-  else
-  {
-    if (!p_b[OUT_VTK_NOSTRETCH] && p[OUT_VTK_NOSTRETCH] != 0 && p[OUT_VTK_NOSTRETCH] != 1)
-    {
-      printf("Warning: .vtk non-stretched badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_VTK_NOSTRETCH] && (p[OUT_VTK_NOSTRETCH] == 0 || p[OUT_VTK_NOSTRETCH] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_VTK_NOSTRETCH] && do_not_ask_missing)
-      {
-        p[OUT_VTK_NOSTRETCH] = 0;
-        p_b[OUT_VTK_NOSTRETCH] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: .vtk non-stretched undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_VTK] && p[OUT_VTK] != 0 && p[OUT_VTK] != 1)
-    {
-      printf("Warning: .vtk badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_VTK] && (p[OUT_VTK] == 0 || p[OUT_VTK] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_VTK] && do_not_ask_missing)
-      {
-        p[OUT_VTK] = 0;
-        p_b[OUT_VTK] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: .vtk undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_PARAMS] && p[OUT_PARAMS] != 0 && p[OUT_PARAMS] != 1)
-    {
-      printf("Warning: .dat parameter output badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_PARAMS] && (p[OUT_PARAMS] == 0 || p[OUT_PARAMS] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_PARAMS] && do_not_ask_missing)
-      {
-        p[OUT_PARAMS] = 0;
-        p_b[OUT_PARAMS] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: .dat parameter output undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_LINEOUT_X] && p[OUT_LINEOUT_X] != 0 && p[OUT_LINEOUT_X] != 1)
-    {
-      printf("Warning: lineout output badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_LINEOUT_X] && (p[OUT_LINEOUT_X] == 0 || p[OUT_LINEOUT_X] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_LINEOUT_X] && do_not_ask_missing)
-      {
-        p[OUT_LINEOUT_X] = 0;
-        p_b[OUT_LINEOUT_X] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: lineout output undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[NCOLONNE] && p[NCOLONNE] < 1)
-    {
-      printf("Warning: grid size badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[NCOLONNE] && p[NCOLONNE] >= 1)
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else
-      {
-        printf("Warning: unable to understand grid size\n");
-        printf("If necessary (no .dat file available) please use -ncol at command line\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_CUTX] && p[OUT_CUTX] != 0 && p[OUT_CUTX] != 1)
-    {
-      printf("Warning: slice mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_CUTX] && (p[OUT_CUTX] == 0 || p[OUT_CUTX] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_CUTX] && do_not_ask_missing)
-      {
-        p[OUT_CUTX] = 0;
-        p_b[OUT_CUTX] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: slice mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_CUTY] && p[OUT_CUTY] != 0 && p[OUT_CUTY] != 1)
-    {
-      printf("Warning: slice mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_CUTY] && (p[OUT_CUTY] == 0 || p[OUT_CUTY] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_CUTY] && do_not_ask_missing)
-      {
-        p[OUT_CUTY] = 0;
-        p_b[OUT_CUTY] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: slice mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_CUTZ] && p[OUT_CUTZ] != 0 && p[OUT_CUTZ] != 1)
-    {
-      printf("Warning: slice mode badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_CUTZ] && (p[OUT_CUTZ] == 0 || p[OUT_CUTZ] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_CUTZ] && do_not_ask_missing)
-      {
-        p[OUT_CUTZ] = 0;
-        p_b[OUT_CUTZ] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: slice mode undefined\n");
-        test = false;
-      }
-    }
-    if (!p_b[OUT_GRID2D] && p[OUT_GRID2D] != 0 && p[OUT_GRID2D] != 1)
-    {
-      printf("Warning: 2D grid output badly defined\n");
-      test = false;
-    }
-    else
-    {
-      if (!p_b[OUT_GRID2D] && (p[OUT_GRID2D] == 0 || p[OUT_GRID2D] == 1))
-      {
-        test = true;    // tutto ok, in questo caso il parametro va bene!
-      }
-      else if (p_b[OUT_GRID2D] && do_not_ask_missing)
-      {
-        p[OUT_GRID2D] = 0;
-        p_b[OUT_GRID2D] = false;
-        test = true;
-      }
-      else
-      {
-        printf("Warning: 2D grid output undefined\n");
-        test = false;
-      }
-    }
-  }
 
 
   return test;
 }
 
-
-void Parametri::organizza_minimi_massimi()
-{
-  minimi[0] = xmin;
-  minimi[1] = ymin;
-  minimi[2] = zmin;
-  minimi[3] = pxmin;
-  minimi[4] = pymin;
-  minimi[5] = pzmin;
-  minimi[6] = gammamin;
-  minimi[7] = thetamin;
-  minimi[8] = Emin;
-  minimi[9] = thetaTmin;
-  minimi[10] = tymin;
-  minimi[11] = tzmin;
-  minimi[12] = wmin;
-  minimi[13] = chmin;
-
-  massimi[0] = xmax;
-  massimi[1] = ymax;
-  massimi[2] = zmax;
-  massimi[3] = pxmax;
-  massimi[4] = pymax;
-  massimi[5] = pzmax;
-  massimi[6] = gammamax;
-  massimi[7] = thetamax;
-  massimi[8] = Emax;
-  massimi[9] = thetaTmax;
-  massimi[10] = tymax;
-  massimi[11] = tzmax;
-  massimi[12] = wmax;
-  massimi[13] = chmax;
-}
 

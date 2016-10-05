@@ -3,9 +3,9 @@
 #include "leggi_binario_ALaDyn_fortran.h"
 
 
-// definizione numero filtri "abilitati"
-#ifndef NUM_FILTRI
-#define NUM_FILTRI               26
+//number of enabled filters
+#ifndef ENABLED_FILTERS
+#define ENABLED_FILTERS               26
 #endif
 
 #define __0X00                   0x1
@@ -34,7 +34,7 @@
 #define __0X23                   0x800000
 #define __0X24                   0x1000000
 #define __0X25                   0x2000000
-// fine filtri in uso, i prossimi sono codici liberi
+//from here going on we have spare filter codes
 #define __0X26                   0x4000000
 #define __0X27                   0x8000000
 #define __0X28                   0x10000000
@@ -44,7 +44,7 @@
 
 
 
-struct _Filtro
+struct _Filter
 {
   enum _Nomi
   {
@@ -52,55 +52,55 @@ struct _Filtro
     pxmin, pymin, pzmin, pxmax, pymax, pzmax,
     emin, emax, thetamin, thetamax, thetaTmin, thetaTmax,
     tymin, tymax, tzmin, tzmax, wmin, wmax, chmin, chmax
-  } nomi;
-  static float * costruisci_filtro(const char *, ...);
-  static float * costruisci_filtro(Parametri *);
-  static void individua_filtro(char *, float, float *&);
+  } name;
+  static aladyn_float * build_filter(const char *, ...);
+  static aladyn_float * build_filter(Parameters *);
+  static void find_filter(char *, aladyn_float, aladyn_float *&);
   static const unsigned int cost[];
-  static unsigned int maschera_interna;
-  struct _flag_filtri
+  static unsigned int internal_mask;
+  struct _flag_filters
   {
-    unsigned meno_xmin : 1;
-    unsigned meno_ymin : 1;
-    unsigned meno_zmin : 1;
-    unsigned piu_xmax : 1;
-    unsigned piu_ymax : 1;
-    unsigned piu_zmax : 1;
-    unsigned meno_pxmin : 1;
-    unsigned meno_pymin : 1;
-    unsigned meno_pzmin : 1;
-    unsigned piu_pxmax : 1;
-    unsigned piu_pymax : 1;
-    unsigned piu_pzmax : 1;
-    unsigned meno_Emin : 1;
-    unsigned piu_Emax : 1;
-    unsigned meno_thetamin : 1;
-    unsigned piu_thetamax : 1;
-    unsigned meno_thetaTmin : 1;
-    unsigned piu_thetaTmax : 1;
-    unsigned meno_tymin : 1;
-    unsigned meno_tzmin : 1;
-    unsigned piu_tymax : 1;
-    unsigned piu_tzmax : 1;
-    unsigned meno_wmin : 1;
-    unsigned piu_wmax : 1;
-    unsigned meno_chmin : 1;
-    unsigned piu_chmax : 1;
-    _flag_filtri operator=(int)
+    unsigned minus_xmin : 1;
+    unsigned minus_ymin : 1;
+    unsigned minus_zmin : 1;
+    unsigned plus_xmax : 1;
+    unsigned plus_ymax : 1;
+    unsigned plus_zmax : 1;
+    unsigned minus_pxmin : 1;
+    unsigned minus_pymin : 1;
+    unsigned minus_pzmin : 1;
+    unsigned plus_pxmax : 1;
+    unsigned plus_pymax : 1;
+    unsigned plus_pzmax : 1;
+    unsigned minus_Emin : 1;
+    unsigned plus_Emax : 1;
+    unsigned minus_thetamin : 1;
+    unsigned plus_thetamax : 1;
+    unsigned minus_thetaTmin : 1;
+    unsigned plus_thetaTmax : 1;
+    unsigned minus_tymin : 1;
+    unsigned minus_tzmin : 1;
+    unsigned plus_tymax : 1;
+    unsigned plus_tzmax : 1;
+    unsigned minus_wmin : 1;
+    unsigned plus_wmax : 1;
+    unsigned minus_chmin : 1;
+    unsigned plus_chmax : 1;
+    _flag_filters operator=(int)
     {
-      meno_xmin = meno_ymin = meno_zmin =
-        meno_pxmin = meno_pymin = meno_pzmin =
-        piu_xmax = piu_ymax = piu_zmax =
-        piu_pxmax = piu_pymax = piu_pzmax =
-        meno_Emin = piu_Emax = meno_thetamin = piu_thetamax =
-        meno_thetaTmin = piu_thetaTmax = meno_tymin =
-        piu_tymax = meno_tzmin = piu_tzmax =
-        meno_wmin = piu_wmax = meno_chmin = piu_chmax = 0;
+      minus_xmin = minus_ymin = minus_zmin =
+        minus_pxmin = minus_pymin = minus_pzmin =
+        plus_xmax = plus_ymax = plus_zmax =
+        plus_pxmax = plus_pymax = plus_pzmax =
+        minus_Emin = plus_Emax = minus_thetamin = plus_thetamax =
+        minus_thetaTmin = plus_thetaTmax = minus_tymin =
+        plus_tymax = minus_tzmin = plus_tzmax =
+        minus_wmin = plus_wmax = minus_chmin = plus_chmax = 0;
       return *this;
     }
     // varie ed eventuali
-  } flag_filtri;
+  } flag_filters;
   static const char * descr[];
-  _Filtro(Parametri*, float *, unsigned int[], float *, unsigned int = 0);
+  _Filter(Parameters*, aladyn_float *, unsigned int[], aladyn_float *, unsigned int = 0);
 };
 

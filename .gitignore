@@ -288,3 +288,9 @@ docs/_build/
 target/
 *.opendb
 *.db
+*.dat
+*.bin
+*.png
+*.plt
+*.txt
+*.ppg

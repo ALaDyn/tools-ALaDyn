@@ -1,77 +1,6 @@
 
 #include "filtro.h"
 
-/*
-_Filtro
-
-è una struct orientata al filtraggio dei dati provenienti da simulazioni ALaDyn
-
-Al momento sono contemplati filtri di soglia minima e massima per
-
-CIASCUNA COORDINATA DI SPAZIO DI FASE e per ENERGIA
-
-Quest'ultima è, al presente, valutata da _Filtro stessa, ma si può molto
-facilmente introdurre modifiche per evitarne il calcolo, così come introdurre
-altri filtraggi su altre variabili e secondo altri criteri (Ad Majora).
-
-Questo file fornisce anche nomi mnemonici #define-iti per le costanti intere
-con un solo bit acceso -- INDIPENDENTEMENTE QUINDI DA MSB o LSB ----
-
-STRUTTURA DEL CODICE
-
-Il namespace cost
-
-definisce al suo interno nomi mnemonici per i filtri da applicare: ad esempio
-
-cost :: xmin
-
-serve ad attivare il filtro di soglia minima per la coordinata di fase X e
-
-cost :: ymin | cost :: pzmax
-
-attiva SIMULTANEAMENTE i filtri di soglia minima e massima per le coordinate di
-fase X e Pz. Ciò viene fatto utilizzando alcune (non tutte) delle citate costanti
-#define-ite.
-
-cost :: tutte
-
-raggruppa in un array ordinato tutte le precedenti costanti ed è utile per poter
-gestire i loop.
-
-DESCRIZIONE DELLA struct _Filtro
-
-La enum class _Nomi serve a "battezzare" con nomi mnemonici di valori
-CONSECUTIVI le stesse costanti del namespace cost; lo stesso fa l'array static
-_Filtro :: cost ma usando degli unsigned int.
-
-I metodi static
-
-float * _Filtro :: costruisci_filtro
-void _Filtro :: individua_filtro
-
-lavorando in coppia, risparmiano al programmatore la grana di doversi ricordare
-checchessia (nomi dei filtri, ordine di presenza negli array e quant'altro).
-
-La variabile static maschera_interna e la struct flag_filtri sono trasparenti
-all'utente finale.
-
-L'array di stringhe _Filtro :: descr è utile per trasmettere i richiesti
-argomenti alla funzione _Filtro :: costruisci_filtro.
-
-Il costruttore di _Filtro fa tutto il lavoro: può essere eseguito fornendogli
-quattro parametri oppure solo tre, lasciandogli l'arbitrio del quarto (ma solo
-se viene usato come terzo parametro il valore reso da costruisci_filtro).
-
-Il primo argomento da fornire al costruttore è, ovviamente, il puntatore ai
-dati da filtrare; il secondo è un puntatore a due interi che siano,
-nell'ordine, il numero di "particelle" e il numero di dati per particella.
-Il terzo argomento è un array ordinato di valori float che contiene le diverse
-soglie da utilizzare per la filtratura. Il quarto, se fornito, rappresenta i
-filtri da applicare; se non fornito viene costruito da "costruisci_filtro"
-assieme all'array da usare come terzo argomento.
-
-*/
-
 
 #ifndef _WIN32
 #include <strings.h>
@@ -120,7 +49,7 @@ namespace cost
   unsigned int chmin = __0X24;
   unsigned int chmax = __0X25;
 
-  unsigned int tutte[] =
+  unsigned int all_filter_index[] =
   {
     xmin, ymin, zmin,
     pxmin, pymin, pzmin,
@@ -137,55 +66,55 @@ namespace cost
 }
 
 
-_Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], float *val, unsigned int maschera)
+_Filter::_Filter(Parameters * params, aladyn_float *data, unsigned int n_data[], aladyn_float *val, unsigned int filter_mask)
 {
-  float * pntt_loc, p[] = { 0, 0, 0 }, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0., w = 0., ch = 0.;
-  unsigned int corrente = 0, tests[32];
+  aladyn_float * pntt_loc, p[] = { 0, 0, 0 }, E = 0., theta = 0., thetaT = 0., ty = 0., tz = 0., w = 0., ch = 0.;
+  unsigned int current_index = 0, tests[32];
   bool flag;
   unsigned char tot_test = 0;
 
-  flag_filtri = 0;
-  if (!maschera) maschera = maschera_interna;
-  if (!maschera)
+  flag_filters = 0;
+  if (!filter_mask) filter_mask = internal_mask;
+  if (!filter_mask)
   {
     return;
   }
   for (unsigned char c = 0; c < 32; ++c)
   {
-    unsigned int r = maschera & cost[c];
+    unsigned int r = filter_mask & cost[c];
     if (!r) continue;
     tests[tot_test++] = cost[c];
   }
-  for (unsigned int i = 0; i < n_dati[0]; ++i)
+  for (unsigned int i = 0; i < n_data[0]; ++i)
   {
-    pntt_loc = dati + i*n_dati[1];
+    pntt_loc = data + i*n_data[1];
     flag = true;
 
-    if (((parametri->p[NCOLONNE] == 6 || parametri->p[NCOLONNE] == 7) && parametri->file_version < 3) || (parametri->p[NCOLONNE] == 8 && parametri->file_version >= 3))
-    {
-      p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-        w = pntt_loc[6];
-      else
-        w = parametri->overwrite_weight_value;
-      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-        ch = pntt_loc[7];
-      else
-        ch = parametri->overwrite_charge_value;
-    }
-
-    else if (((parametri->p[NCOLONNE] == 4 || parametri->p[NCOLONNE] == 5) && parametri->file_version < 3) || (parametri->p[NCOLONNE] == 6 && parametri->file_version >= 3))
+    if (params->sim_is_2d)
     {
       p[0] = pntt_loc[2], p[1] = pntt_loc[3], p[2] = 0.0;
-      if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+      if (params->file_has_weight && !params->overwrite_weight)
         w = pntt_loc[4];
       else
-        w = parametri->overwrite_weight_value;
-      if (parametri->file_version >= 3 && !parametri->overwrite_charge)
+        w = params->overwrite_weight_value;
+      if (params->file_has_charge && !params->overwrite_charge)
         ch = pntt_loc[5];
       else
-        ch = parametri->overwrite_charge_value;
+        ch = params->overwrite_charge_value;
     }
+    else
+    {
+      p[0] = pntt_loc[3], p[1] = pntt_loc[4], p[2] = pntt_loc[5];
+      if (params->file_has_weight && !params->overwrite_weight)
+        w = pntt_loc[6];
+      else
+        w = params->overwrite_weight_value;
+      if (params->file_has_charge && !params->overwrite_charge)
+        ch = pntt_loc[7];
+      else
+        ch = params->overwrite_charge_value;
+    }
+
 
 
     for (unsigned char c = 0; c < tot_test; ++c)
@@ -193,13 +122,13 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
       if (!flag) break;
 
       if (tests[c] == __0X12 || tests[c] == __0X13)
-        E = (float)(parametri->massa_particella_MeV * (sqrtf(1.0f + p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) - 1.f));
+        E = (aladyn_float)(params->mass_MeV * (sqrtf(1.0f + p[0] * p[0] + p[1] * p[1] + p[2] * p[2]) - 1.f));
 
       else if (tests[c] == __0X14 || tests[c] == __0X15)
-        theta = (float)(atan2(sqrt(p[1] * p[1] + p[2] * p[2]), p[0])*180. / M_PI);
+        theta = (aladyn_float)(atan2(sqrt(p[1] * p[1] + p[2] * p[2]), p[0])*180. / M_PI);
 
       else if (tests[c] == __0X16 || tests[c] == __0X17)
-        thetaT = (float)atan(sqrt((p[1] * p[1] / (p[0] * p[0])) + (p[2] * p[2] / (p[0] * p[0]))));
+        thetaT = (aladyn_float)atan(sqrt((p[1] * p[1] / (p[0] * p[0])) + (p[2] * p[2] / (p[0] * p[0]))));
 
       else if (tests[c] == __0X18 || tests[c] == __0X19)
         ty = p[1] / p[0];
@@ -210,147 +139,147 @@ _Filtro::_Filtro(Parametri * parametri, float *dati, unsigned int n_dati[], floa
       switch (tests[c])
       {
       case __0X00: // cost::xmin
-        nomi = xmin;
-        flag_filtri.meno_xmin = pntt_loc[(int)nomi] >= val[(int)nomi];
-        flag = flag && flag_filtri.meno_xmin;
+        name = xmin;
+        flag_filters.minus_xmin = pntt_loc[(int)name] >= val[(int)name];
+        flag = flag && flag_filters.minus_xmin;
         break;
       case __0X01: // cost::ymin
-        nomi = ymin;
-        flag_filtri.meno_ymin = pntt_loc[(int)nomi] >= val[(int)nomi];
-        flag = flag && flag_filtri.meno_ymin;
+        name = ymin;
+        flag_filters.minus_ymin = pntt_loc[(int)name] >= val[(int)name];
+        flag = flag && flag_filters.minus_ymin;
         break;
       case __0X02: // cost::zmin
-        nomi = zmin;
-        flag_filtri.meno_zmin = pntt_loc[(int)nomi] >= val[(int)nomi];
-        flag = flag && flag_filtri.meno_zmin;
+        name = zmin;
+        flag_filters.minus_zmin = pntt_loc[(int)name] >= val[(int)name];
+        flag = flag && flag_filters.minus_zmin;
         break;
       case __0X03: // cost::pxmin
-        nomi = pxmin;
-        flag_filtri.meno_pxmin = pntt_loc[(int)nomi] >= val[(int)nomi];
-        flag = flag && flag_filtri.meno_pxmin;
+        name = pxmin;
+        flag_filters.minus_pxmin = pntt_loc[(int)name] >= val[(int)name];
+        flag = flag && flag_filters.minus_pxmin;
         break;
       case __0X04: // cost::pymin
-        nomi = pymin;
-        flag_filtri.meno_pymin = pntt_loc[(int)nomi] >= val[(int)nomi];
-        flag = flag && flag_filtri.meno_pymin;
+        name = pymin;
+        flag_filters.minus_pymin = pntt_loc[(int)name] >= val[(int)name];
+        flag = flag && flag_filters.minus_pymin;
         break;
       case __0X05: // cost::pzmin
-        nomi = pzmin;
-        flag_filtri.meno_pzmin = pntt_loc[(int)nomi] >= val[(int)nomi];
-        flag = flag && flag_filtri.meno_pzmin;
+        name = pzmin;
+        flag_filters.minus_pzmin = pntt_loc[(int)name] >= val[(int)name];
+        flag = flag && flag_filters.minus_pzmin;
         break;
       case __0X06: // cost::xmax
-        nomi = xmax;
-        flag_filtri.piu_xmax = pntt_loc[(int)nomi - 6] <= val[(int)nomi];
-        flag = flag && flag_filtri.piu_xmax;
+        name = xmax;
+        flag_filters.plus_xmax = pntt_loc[(int)name - 6] <= val[(int)name];
+        flag = flag && flag_filters.plus_xmax;
         break;
       case __0X07: // cost::ymax
-        nomi = ymax;
-        flag_filtri.piu_ymax = pntt_loc[(int)nomi - 6] <= val[(int)nomi];
-        flag = flag && flag_filtri.piu_ymax;
+        name = ymax;
+        flag_filters.plus_ymax = pntt_loc[(int)name - 6] <= val[(int)name];
+        flag = flag && flag_filters.plus_ymax;
         break;
       case __0X08: // cost::zmax
-        nomi = zmax;
-        flag_filtri.piu_zmax = pntt_loc[(int)nomi - 6] <= val[(int)nomi];
-        flag = flag && flag_filtri.piu_zmax;
+        name = zmax;
+        flag_filters.plus_zmax = pntt_loc[(int)name - 6] <= val[(int)name];
+        flag = flag && flag_filters.plus_zmax;
         break;
       case __0X09: // cost::pxmax
-        nomi = pxmax;
-        flag_filtri.piu_pxmax = pntt_loc[(int)nomi - 6] <= val[(int)nomi];
-        flag = flag && flag_filtri.piu_pxmax;
+        name = pxmax;
+        flag_filters.plus_pxmax = pntt_loc[(int)name - 6] <= val[(int)name];
+        flag = flag && flag_filters.plus_pxmax;
         break;
       case __0X10: // cost::pymax
-        nomi = pymax;
-        flag_filtri.piu_pymax = pntt_loc[(int)nomi - 6] <= val[(int)nomi];
-        flag = flag && flag_filtri.piu_pymax;
+        name = pymax;
+        flag_filters.plus_pymax = pntt_loc[(int)name - 6] <= val[(int)name];
+        flag = flag && flag_filters.plus_pymax;
         break;
       case __0X11: // cost::pzmax
-        nomi = pzmax;
-        flag_filtri.piu_pzmax = pntt_loc[(int)nomi - 6] <= val[(int)nomi];
-        flag = flag && flag_filtri.piu_pzmax;
+        name = pzmax;
+        flag_filters.plus_pzmax = pntt_loc[(int)name - 6] <= val[(int)name];
+        flag = flag && flag_filters.plus_pzmax;
         break;
       case __0X12: // cost::emin
-        nomi = emin;
-        flag_filtri.meno_Emin = E >= val[12];
-        flag = flag && flag_filtri.meno_Emin;
+        name = emin;
+        flag_filters.minus_Emin = E >= val[12];
+        flag = flag && flag_filters.minus_Emin;
         break;
       case __0X13:  // cost::emax
-        nomi = emax;
-        flag_filtri.piu_Emax = E <= val[13];
-        flag = flag && flag_filtri.piu_Emax;
+        name = emax;
+        flag_filters.plus_Emax = E <= val[13];
+        flag = flag && flag_filters.plus_Emax;
         break;
       case __0X14: // cost::thetamin
-        nomi = thetamin;
-        flag_filtri.meno_thetamin = theta >= val[14];
-        flag = flag && flag_filtri.meno_thetamin;
+        name = thetamin;
+        flag_filters.minus_thetamin = theta >= val[14];
+        flag = flag && flag_filters.minus_thetamin;
         break;
       case __0X15: // cost::thetamax
-        nomi = thetamax;
-        flag_filtri.piu_thetamax = theta <= val[15];
-        flag = flag && flag_filtri.piu_thetamax;
+        name = thetamax;
+        flag_filters.plus_thetamax = theta <= val[15];
+        flag = flag && flag_filters.plus_thetamax;
         break;
       case __0X16: // cost::thetaTmin
-        nomi = thetaTmin;
-        flag_filtri.meno_thetaTmin = thetaT >= val[16];
-        flag = flag && flag_filtri.meno_thetaTmin;
+        name = thetaTmin;
+        flag_filters.minus_thetaTmin = thetaT >= val[16];
+        flag = flag && flag_filters.minus_thetaTmin;
         break;
       case __0X17: // cost::thetaTmax
-        nomi = thetaTmax;
-        flag_filtri.piu_thetaTmax = thetaT <= val[17];
-        flag = flag && flag_filtri.piu_thetaTmax;
+        name = thetaTmax;
+        flag_filters.plus_thetaTmax = thetaT <= val[17];
+        flag = flag && flag_filters.plus_thetaTmax;
         break;
       case __0X18: // cost::tymin
-        nomi = tymin;
-        flag_filtri.meno_tymin = ty >= val[18];
-        flag = flag && flag_filtri.meno_tymin;
+        name = tymin;
+        flag_filters.minus_tymin = ty >= val[18];
+        flag = flag && flag_filters.minus_tymin;
         break;
       case __0X19: // cost::tymax
-        nomi = tymax;
-        flag_filtri.piu_tymax = ty <= val[19];
-        flag = flag && flag_filtri.piu_tymax;
+        name = tymax;
+        flag_filters.plus_tymax = ty <= val[19];
+        flag = flag && flag_filters.plus_tymax;
         break;
       case __0X20: // cost::tzmin
-        nomi = tzmin;
-        flag_filtri.meno_tzmin = tz >= val[20];
-        flag = flag && flag_filtri.meno_tzmin;
+        name = tzmin;
+        flag_filters.minus_tzmin = tz >= val[20];
+        flag = flag && flag_filters.minus_tzmin;
         break;
       case __0X21: // cost::tzmax
-        nomi = tzmax;
-        flag_filtri.piu_tzmax = tz <= val[21];
-        flag = flag && flag_filtri.piu_tzmax;
+        name = tzmax;
+        flag_filters.plus_tzmax = tz <= val[21];
+        flag = flag && flag_filters.plus_tzmax;
         break;
       case __0X22: // cost::wmin
-        nomi = wmin;
-        flag_filtri.meno_wmin = w >= val[22];
-        flag = flag && flag_filtri.meno_wmin;
+        name = wmin;
+        flag_filters.minus_wmin = w >= val[22];
+        flag = flag && flag_filters.minus_wmin;
         break;
       case __0X23: // cost::wmax
-        nomi = wmax;
-        flag_filtri.piu_wmax = w <= val[23];
-        flag = flag && flag_filtri.piu_wmax;
+        name = wmax;
+        flag_filters.plus_wmax = w <= val[23];
+        flag = flag && flag_filters.plus_wmax;
         break;
       case __0X24: // cost::chmin
-        nomi = chmin;
-        flag_filtri.meno_chmin = ch >= val[24];
-        flag = flag && flag_filtri.meno_chmin;
+        name = chmin;
+        flag_filters.minus_chmin = ch >= val[24];
+        flag = flag && flag_filters.minus_chmin;
         break;
       case __0X25: // cost::chmax
-        nomi = chmax;
-        flag_filtri.piu_chmax = ch <= val[25];
-        flag = flag && flag_filtri.piu_chmax;
+        name = chmax;
+        flag_filters.plus_chmax = ch <= val[25];
+        flag = flag && flag_filters.plus_chmax;
         break;
       }
 
     }
     if (!flag) continue;
-    for (unsigned int k = 0; k < n_dati[1]; ++k) dati[n_dati[1] * corrente + k] = pntt_loc[k];
-    corrente++;
+    for (unsigned int k = 0; k < n_data[1]; ++k) data[n_data[1] * current_index + k] = pntt_loc[k];
+    current_index++;
   }
-  n_dati[0] = corrente;
-  maschera_interna = 0;
+  n_data[0] = current_index;
+  internal_mask = 0;
 }
 
-const char * _Filtro::descr[] =
+const char * _Filter::descr[] =
 {
   "+xmin",
   "+ymin",
@@ -378,10 +307,10 @@ const char * _Filtro::descr[] =
   "+wmax",
   "+chmin",
   "+chmax"
-  // varie ed eventuali
+  //add here others if needed
 };
 
-const unsigned int _Filtro::cost[] =
+const unsigned int _Filter::cost[] =
 {
   __0X00, __0X01, __0X02, __0X03, __0X04, __0X05, __0X06, __0X07,
   __0X08, __0X09, __0X10, __0X11, __0X12, __0X13, __0X14, __0X15,
@@ -389,87 +318,88 @@ const unsigned int _Filtro::cost[] =
   __0X24, __0X25, __0X26, __0X27, __0X28, __0X29, __0X30, __0X31
 };
 
-float * _Filtro::costruisci_filtro(Parametri * parametri)
+aladyn_float * _Filter::build_filter(Parameters * params)
 {
-  char ** miei_args;
-  float * miei_val;
-  int indices[NUM_FILTRI], quanti = 0;
-  for (int i = 1; i < parametri->argc; ++i)
+  char ** my_args;
+  aladyn_float * my_vals;
+  int index[ENABLED_FILTERS], counter = 0;
+  for (int i = 1; i < params->argc; ++i)
   {
-    if (parametri->argv[i][0] == '+')
-      indices[quanti++] = i;
+    if (params->argv[i][0] == '+')
+      index[counter++] = i;
   }
-  indices[quanti] = -1;
-  if (!quanti) return (float *)NULL;
-  miei_args = new char *[NUM_FILTRI + 1], miei_args[NUM_FILTRI] = 0;
-  miei_val = new float[NUM_FILTRI + 1];
-  for (int i = 0; i < quanti; ++i)
-    miei_args[i] = const_cast<char*>(parametri->argv[indices[i]].c_str()),
-    miei_val[i] = (float)atof(parametri->argv[indices[i] + 1].c_str());
-  miei_args[quanti] = 0;
-  return costruisci_filtro(
-    miei_args[0], miei_val[0],
-    miei_args[1], miei_val[1],
-    miei_args[2], miei_val[2],
-    miei_args[3], miei_val[3],
-    miei_args[4], miei_val[4],
-    miei_args[5], miei_val[5],
-    miei_args[6], miei_val[6],
-    miei_args[7], miei_val[7],
-    miei_args[8], miei_val[8],
-    miei_args[9], miei_val[9],
-    miei_args[10], miei_val[10],
-    miei_args[11], miei_val[11],
-    miei_args[12], miei_val[12],
-    miei_args[13], miei_val[13],
-    miei_args[14], miei_val[14],
-    miei_args[15], miei_val[15],
-    miei_args[16], miei_val[16],
-    miei_args[17], miei_val[17],
-    miei_args[18], miei_val[18],
-    miei_args[19], miei_val[19],
-    miei_args[20], miei_val[20],
-    miei_args[21], miei_val[21],
-    miei_args[22], miei_val[22],
-    miei_args[23], miei_val[23],
-    miei_args[24], miei_val[24],
-    miei_args[25], miei_val[25],
-    miei_args[NUM_FILTRI]);
+  index[counter] = -1;
+  if (!counter) return (aladyn_float *)NULL;
+  my_args = new char *[ENABLED_FILTERS + 1], my_args[ENABLED_FILTERS] = 0;
+  my_vals = new aladyn_float[ENABLED_FILTERS + 1];
+  for (int i = 0; i < counter; ++i)
+    my_args[i] = const_cast<char*>(params->argv[index[i]].c_str()),
+    my_vals[i] = (aladyn_float)atof(params->argv[index[i] + 1].c_str());
+  my_args[counter] = 0;
+  return build_filter(
+    my_args[0], my_vals[0],
+    my_args[1], my_vals[1],
+    my_args[2], my_vals[2],
+    my_args[3], my_vals[3],
+    my_args[4], my_vals[4],
+    my_args[5], my_vals[5],
+    my_args[6], my_vals[6],
+    my_args[7], my_vals[7],
+    my_args[8], my_vals[8],
+    my_args[9], my_vals[9],
+    my_args[10], my_vals[10],
+    my_args[11], my_vals[11],
+    my_args[12], my_vals[12],
+    my_args[13], my_vals[13],
+    my_args[14], my_vals[14],
+    my_args[15], my_vals[15],
+    my_args[16], my_vals[16],
+    my_args[17], my_vals[17],
+    my_args[18], my_vals[18],
+    my_args[19], my_vals[19],
+    my_args[20], my_vals[20],
+    my_args[21], my_vals[21],
+    my_args[22], my_vals[22],
+    my_args[23], my_vals[23],
+    my_args[24], my_vals[24],
+    my_args[25], my_vals[25],
+    my_args[ENABLED_FILTERS]);
 }
 
 
-float * _Filtro::costruisci_filtro(const char *p, ...)
+aladyn_float * _Filter::build_filter(const char *p, ...)
 {
   va_list app;
-  char * buff = new char[MAX_LENGTH_FILENAME], *z = buff;
-  float val, *tutti_val = new float[NUM_FILTRI];
+  char * buff = new char[256], *z = buff;
+  aladyn_float val, *all_vals = new aladyn_float[ENABLED_FILTERS];
   va_start(app, p);
   strcpy(buff, p);
   do
   {
-    val = (float)va_arg(app, double);
-    individua_filtro(buff, val, tutti_val);
-    if (!tutti_val) return (float*)NULL;
+    val = (aladyn_float)va_arg(app, double);
+    find_filter(buff, val, all_vals);
+    if (!all_vals) return (aladyn_float*)NULL;
     z = va_arg(app, char *);
     if (!z) break;
     strcpy(buff, z);
   } while (1);
   va_end(app);
-  return tutti_val;
+  return all_vals;
 }
 
-void _Filtro::individua_filtro(char *b, float v, float *& V)
+
+void _Filter::find_filter(char *b, aladyn_float v, aladyn_float *& V)
 {
   int i;
-  for (i = 0; i < NUM_FILTRI; ++i) if (!strcasecmp(b, descr[i])) break;
-  if (i >= NUM_FILTRI)
+  for (i = 0; i < ENABLED_FILTERS; ++i) if (!strcasecmp(b, descr[i])) break;
+  if (i >= ENABLED_FILTERS)
   {
-    V = (float*)NULL; // non è detto che sia la cosa migliore da farsi
+    V = (aladyn_float*)NULL; // non è detto che sia la cosa migliore da farsi
     return;
   }
   V[i] = v;
-  maschera_interna |= cost::tutte[i];
+  internal_mask |= cost::all_filter_index[i];
 }
 
-unsigned int _Filtro::maschera_interna = 0;
+unsigned int _Filter::internal_mask = 0;
 

@@ -2,20 +2,21 @@
 #include "leggi_particelle.h"
 
 
-int leggi_particelle(Parametri * parametri)
+int read_phase_space_file(Parameters * params)
 {
+  size_t phasespace_size = 14; // x, y, z, px, py, pz, gamma, theta, thetaT, E, ty, tz, w, ch
   std::FILE *file_in = NULL;
-  int indice_multifile = 0;
+  int multifile_index = 0;
   int contatori[] = { 0, 0, 0 };
-  float zero = 0.0f;
-  long long particelle_accumulate = 0;
+  aladyn_float zero = 0.0f;
+  long long parts_accumulate = 0;
   double peso_accumulato = 0.0;
   double carica_accumulata = 0.0;
-  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0, dimensione_array_particelle = 0;
+  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0, dimensione_array_parts = 0;
   unsigned int val[2] = { 0, 0 };
-  float array_supporto8[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-  float array_supporto6[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-
+  aladyn_float array_supporto8[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  aladyn_float array_supporto6[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+  size_t max_number_of_particles_in_memory = MAX_NUM_OF_PARTICLES_IN_MEMORY;
 
   std::FILE *binary_vtk = NULL;
   std::FILE *binary_clean = NULL;
@@ -29,309 +30,307 @@ int leggi_particelle(Parametri * parametri)
   int npart_loc = 0;
   int buff = 0;
 
-  float x = 0.0, y = 0.0, z = 0.0, px = 0.0, py = 0.0, pz = 0.0, ptot = 0.0;
-  float ch = 0.0, w = 0.0;
-  float gamma = 0.0, theta = 0.0, thetaT = 0.0, E = 0.0, ty = 0.0, tz = 0.0;
-  float *estremi_min = NULL, *estremi_max = NULL;
+  aladyn_float x = 0.0, y = 0.0, z = 0.0, px = 0.0, py = 0.0, pz = 0.0, ptot = 0.0;
+  aladyn_float ch = 0.0, w = 0.0;
+  aladyn_float gamma = 0.0, theta = 0.0, thetaT = 0.0, E = 0.0, ty = 0.0, tz = 0.0;
+  double *estremi_min = NULL, *estremi_max = NULL;
 
   short buffshort[2] = { 0, 0 };
-  float *particelle = NULL;
-  char nomefile_bin[MAX_LENGTH_FILENAME];
-  char nomefile_dat[MAX_LENGTH_FILENAME];
-  char nomefile_extremes[MAX_LENGTH_FILENAME];
-  char nomefile_vtk[MAX_LENGTH_FILENAME];
-  char nomefile_bin_clean[MAX_LENGTH_FILENAME];
-  char nomefile_propaga[MAX_LENGTH_FILENAME];
-  char nomefile_xyze[MAX_LENGTH_FILENAME];
-  char nomefile_csv[MAX_LENGTH_FILENAME];
-  char nomefile_parametri[MAX_LENGTH_FILENAME];
-  char nomefile_binnato[MAX_LENGTH_FILENAME];
+  aladyn_float *parts = NULL;
+  std::string bin_filename;
+  std::string dat_filename;
+  std::string minmax_filename;
+  std::string vtk_filename;
+  std::string clean_bin_filename;
+  std::string ppg_filename;
+  std::string xyze_filename;
+  std::string csv_filename;
+  std::string params_filename;
+  std::string binned_filename;
 
   size_t fread_size = 0;
   double emittance_x = 0.0, emittance_y = 0.0, emittance_z = 0.0;
   double em_x2 = 0.0, em_x = 0.0, em_y2 = 0.0, em_y = 0.0, em_z2 = 0.0, em_z = 0.0;
   double em_px2 = 0.0, em_px = 0.0, em_py2 = 0.0, em_py = 0.0, em_pz2 = 0.0, em_pz = 0.0, em_xpx = 0.0, em_ypy = 0.0, em_zpz = 0.0;
 
-  estremi_min = new float[SEI_DIMENSIONI + ALTRI_PARAMETRI];
-  estremi_max = new float[SEI_DIMENSIONI + ALTRI_PARAMETRI];
-  for (int i = 0; i < (SEI_DIMENSIONI + ALTRI_PARAMETRI); i++)
+  estremi_min = new double[phasespace_size];
+  estremi_max = new double[phasespace_size];
+  for (size_t i = 0; i < phasespace_size; i++)
   {
-    estremi_min[i] = (float)NUMERO_MASSIMO;
-    estremi_max[i] = (float)-NUMERO_MASSIMO;
+    estremi_min[i] = std::numeric_limits<double>::max();
+    estremi_max[i] = std::numeric_limits<double>::lowest();
   }
 
-  float **xw = new float*[parametri->nbin_x + 3];
-  for (int i = 0; i < parametri->nbin_x + 3; i++)
+  aladyn_float **xw = new aladyn_float*[params->nbin_x + 3];
+  for (int i = 0; i < params->nbin_x + 3; i++)
   {
-    xw[i] = new float[parametri->nbin_w + 3];
-    for (int j = 0; j < parametri->nbin_w + 3; j++) xw[i][j] = 0.0;
+    xw[i] = new aladyn_float[params->nbin_w + 3];
+    for (int j = 0; j < params->nbin_w + 3; j++) xw[i][j] = 0.0;
   }
 
-  float **xy = new float*[parametri->nbin_x + 3];
-  for (int i = 0; i < parametri->nbin_x + 3; i++)
+  aladyn_float **xy = new aladyn_float*[params->nbin_x + 3];
+  for (int i = 0; i < params->nbin_x + 3; i++)
   {
-    xy[i] = new float[parametri->nbin_y + 3];
-    for (int j = 0; j < parametri->nbin_y + 3; j++) xy[i][j] = 0.0;
+    xy[i] = new aladyn_float[params->nbin_y + 3];
+    for (int j = 0; j < params->nbin_y + 3; j++) xy[i][j] = 0.0;
   }
 
-  float **xz = new float*[parametri->nbin_x + 3];
-  for (int i = 0; i < parametri->nbin_x + 3; i++)
+  aladyn_float **xz = new aladyn_float*[params->nbin_x + 3];
+  for (int i = 0; i < params->nbin_x + 3; i++)
   {
-    xz[i] = new float[parametri->nbin_z + 3];
-    for (int j = 0; j < parametri->nbin_z + 3; j++) xz[i][j] = 0.0;
+    xz[i] = new aladyn_float[params->nbin_z + 3];
+    for (int j = 0; j < params->nbin_z + 3; j++) xz[i][j] = 0.0;
   }
 
-  float **yz = new float*[parametri->nbin_y + 3];
-  for (int i = 0; i < parametri->nbin_y + 3; i++)
+  aladyn_float **yz = new aladyn_float*[params->nbin_y + 3];
+  for (int i = 0; i < params->nbin_y + 3; i++)
   {
-    yz[i] = new float[parametri->nbin_z + 3];
-    for (int j = 0; j < parametri->nbin_z + 3; j++) yz[i][j] = 0.0;
+    yz[i] = new aladyn_float[params->nbin_z + 3];
+    for (int j = 0; j < params->nbin_z + 3; j++) yz[i][j] = 0.0;
   }
 
-  float **rcf = new float*[parametri->nbin_ty + 3];
-  for (int i = 0; i < parametri->nbin_ty + 3; i++)
+  aladyn_float **rcf = new aladyn_float*[params->nbin_ty + 3];
+  for (int i = 0; i < params->nbin_ty + 3; i++)
   {
-    rcf[i] = new float[parametri->nbin_tz + 3];
-    for (int j = 0; j < parametri->nbin_tz + 3; j++) rcf[i][j] = 0.0;
+    rcf[i] = new aladyn_float[params->nbin_tz + 3];
+    for (int j = 0; j < params->nbin_tz + 3; j++) rcf[i][j] = 0.0;
   }
 
-  float **xpx = new float*[parametri->nbin_x + 3];
-  for (int i = 0; i < parametri->nbin_x + 3; i++)
+  aladyn_float **xpx = new aladyn_float*[params->nbin_x + 3];
+  for (int i = 0; i < params->nbin_x + 3; i++)
   {
-    xpx[i] = new float[parametri->nbin_px + 3];
-    for (int j = 0; j < parametri->nbin_px + 3; j++) xpx[i][j] = 0.0;
+    xpx[i] = new aladyn_float[params->nbin_px + 3];
+    for (int j = 0; j < params->nbin_px + 3; j++) xpx[i][j] = 0.0;
   }
 
-  float **xpy = new float*[parametri->nbin_x + 3];
-  for (int i = 0; i < parametri->nbin_x + 3; i++)
+  aladyn_float **xpy = new aladyn_float*[params->nbin_x + 3];
+  for (int i = 0; i < params->nbin_x + 3; i++)
   {
-    xpy[i] = new float[parametri->nbin_py + 3];
-    for (int j = 0; j < parametri->nbin_py + 3; j++) xpy[i][j] = 0.0;
+    xpy[i] = new aladyn_float[params->nbin_py + 3];
+    for (int j = 0; j < params->nbin_py + 3; j++) xpy[i][j] = 0.0;
   }
 
-  float **xpz = new float*[parametri->nbin_x + 3];
-  for (int i = 0; i < parametri->nbin_x + 3; i++)
+  aladyn_float **xpz = new aladyn_float*[params->nbin_x + 3];
+  for (int i = 0; i < params->nbin_x + 3; i++)
   {
-    xpz[i] = new float[parametri->nbin_pz + 3];
-    for (int j = 0; j < parametri->nbin_pz + 3; j++) xpz[i][j] = 0.0;
+    xpz[i] = new aladyn_float[params->nbin_pz + 3];
+    for (int j = 0; j < params->nbin_pz + 3; j++) xpz[i][j] = 0.0;
   }
 
-  float **ypx = new float*[parametri->nbin_y + 3];
-  for (int i = 0; i < parametri->nbin_y + 3; i++)
+  aladyn_float **ypx = new aladyn_float*[params->nbin_y + 3];
+  for (int i = 0; i < params->nbin_y + 3; i++)
   {
-    ypx[i] = new float[parametri->nbin_px + 3];
-    for (int j = 0; j < parametri->nbin_px + 3; j++) ypx[i][j] = 0.0;
+    ypx[i] = new aladyn_float[params->nbin_px + 3];
+    for (int j = 0; j < params->nbin_px + 3; j++) ypx[i][j] = 0.0;
   }
 
-  float **ypy = new float*[parametri->nbin_y + 3];
-  for (int i = 0; i < parametri->nbin_y + 3; i++)
+  aladyn_float **ypy = new aladyn_float*[params->nbin_y + 3];
+  for (int i = 0; i < params->nbin_y + 3; i++)
   {
-    ypy[i] = new float[parametri->nbin_py + 3];
-    for (int j = 0; j < parametri->nbin_py + 3; j++) ypy[i][j] = 0.0;
+    ypy[i] = new aladyn_float[params->nbin_py + 3];
+    for (int j = 0; j < params->nbin_py + 3; j++) ypy[i][j] = 0.0;
   }
 
-  float **ypz = new float*[parametri->nbin_y + 3];
-  for (int i = 0; i < parametri->nbin_y + 3; i++)
+  aladyn_float **ypz = new aladyn_float*[params->nbin_y + 3];
+  for (int i = 0; i < params->nbin_y + 3; i++)
   {
-    ypz[i] = new float[parametri->nbin_pz + 3];
-    for (int j = 0; j < parametri->nbin_pz + 3; j++) ypz[i][j] = 0.0;
+    ypz[i] = new aladyn_float[params->nbin_pz + 3];
+    for (int j = 0; j < params->nbin_pz + 3; j++) ypz[i][j] = 0.0;
   }
 
-  float **zpx = new float*[parametri->nbin_z + 3];
-  for (int i = 0; i < parametri->nbin_z + 3; i++)
+  aladyn_float **zpx = new aladyn_float*[params->nbin_z + 3];
+  for (int i = 0; i < params->nbin_z + 3; i++)
   {
-    zpx[i] = new float[parametri->nbin_px + 3];
-    for (int j = 0; j < parametri->nbin_px + 3; j++) zpx[i][j] = 0.0;
+    zpx[i] = new aladyn_float[params->nbin_px + 3];
+    for (int j = 0; j < params->nbin_px + 3; j++) zpx[i][j] = 0.0;
   }
 
-  float **zpy = new float*[parametri->nbin_z + 3];
-  for (int i = 0; i < parametri->nbin_z + 3; i++)
+  aladyn_float **zpy = new aladyn_float*[params->nbin_z + 3];
+  for (int i = 0; i < params->nbin_z + 3; i++)
   {
-    zpy[i] = new float[parametri->nbin_py + 3];
-    for (int j = 0; j < parametri->nbin_py + 3; j++) zpy[i][j] = 0.0;
+    zpy[i] = new aladyn_float[params->nbin_py + 3];
+    for (int j = 0; j < params->nbin_py + 3; j++) zpy[i][j] = 0.0;
   }
 
-  float **zpz = new float*[parametri->nbin_z + 3];
-  for (int i = 0; i < parametri->nbin_z + 3; i++)
+  aladyn_float **zpz = new aladyn_float*[params->nbin_z + 3];
+  for (int i = 0; i < params->nbin_z + 3; i++)
   {
-    zpz[i] = new float[parametri->nbin_pz + 3];
-    for (int j = 0; j < parametri->nbin_pz + 3; j++) zpz[i][j] = 0.0;
+    zpz[i] = new aladyn_float[params->nbin_pz + 3];
+    for (int j = 0; j < params->nbin_pz + 3; j++) zpz[i][j] = 0.0;
   }
 
-  float **pxpy = new float*[parametri->nbin_px + 3];
-  for (int i = 0; i < parametri->nbin_px + 3; i++)
+  aladyn_float **pxpy = new aladyn_float*[params->nbin_px + 3];
+  for (int i = 0; i < params->nbin_px + 3; i++)
   {
-    pxpy[i] = new float[parametri->nbin_py + 3];
-    for (int j = 0; j < parametri->nbin_py + 3; j++) pxpy[i][j] = 0.0;
+    pxpy[i] = new aladyn_float[params->nbin_py + 3];
+    for (int j = 0; j < params->nbin_py + 3; j++) pxpy[i][j] = 0.0;
   }
 
-  float **pxpz = new float*[parametri->nbin_px + 3];
-  for (int i = 0; i < parametri->nbin_px + 3; i++)
+  aladyn_float **pxpz = new aladyn_float*[params->nbin_px + 3];
+  for (int i = 0; i < params->nbin_px + 3; i++)
   {
-    pxpz[i] = new float[parametri->nbin_pz + 3];
-    for (int j = 0; j < parametri->nbin_pz + 3; j++) pxpz[i][j] = 0.0;
+    pxpz[i] = new aladyn_float[params->nbin_pz + 3];
+    for (int j = 0; j < params->nbin_pz + 3; j++) pxpz[i][j] = 0.0;
   }
 
-  float **pypz = new float*[parametri->nbin_py + 3];
-  for (int i = 0; i < parametri->nbin_py + 3; i++)
+  aladyn_float **pypz = new aladyn_float*[params->nbin_py + 3];
+  for (int i = 0; i < params->nbin_py + 3; i++)
   {
-    pypz[i] = new float[parametri->nbin_pz + 3];
-    for (int j = 0; j < parametri->nbin_pz + 3; j++) pypz[i][j] = 0.0;
+    pypz[i] = new aladyn_float[params->nbin_pz + 3];
+    for (int j = 0; j < params->nbin_pz + 3; j++) pypz[i][j] = 0.0;
   }
 
-  float **Etheta = new float*[parametri->nbin_E + 3];
-  for (int i = 0; i < parametri->nbin_E + 3; i++)
+  aladyn_float **Etheta = new aladyn_float*[params->nbin_E + 3];
+  for (int i = 0; i < params->nbin_E + 3; i++)
   {
-    Etheta[i] = new float[parametri->nbin_theta + 3];
-    for (int j = 0; j < parametri->nbin_theta + 3; j++) Etheta[i][j] = 0.0;
+    Etheta[i] = new aladyn_float[params->nbin_theta + 3];
+    for (int j = 0; j < params->nbin_theta + 3; j++) Etheta[i][j] = 0.0;
   }
 
-  float **EthetaT = new float*[parametri->nbin_E + 3];
-  for (int i = 0; i < parametri->nbin_E + 3; i++)
+  aladyn_float **EthetaT = new aladyn_float*[params->nbin_E + 3];
+  for (int i = 0; i < params->nbin_E + 3; i++)
   {
-    EthetaT[i] = new float[parametri->nbin_thetaT + 3];
-    for (int j = 0; j < parametri->nbin_thetaT + 3; j++) EthetaT[i][j] = 0.0;
+    EthetaT[i] = new aladyn_float[params->nbin_thetaT + 3];
+    for (int j = 0; j < params->nbin_thetaT + 3; j++) EthetaT[i][j] = 0.0;
   }
 
-  float *wspec = new float[parametri->nbin_w + 3];
-  for (int i = 0; i < parametri->nbin_w + 3; i++) wspec[i] = 0.0;
+  aladyn_float *wspec = new aladyn_float[params->nbin_w + 3];
+  for (int i = 0; i < params->nbin_w + 3; i++) wspec[i] = 0.0;
 
-  float *chspec = new float[parametri->nbin_ch + 3];
-  for (int i = 0; i < parametri->nbin_ch + 3; i++) chspec[i] = 0.0;
+  aladyn_float *chspec = new aladyn_float[params->nbin_ch + 3];
+  for (int i = 0; i < params->nbin_ch + 3; i++) chspec[i] = 0.0;
 
-  float *Espec = new float[parametri->nbin_E + 3];
-  for (int i = 0; i < parametri->nbin_E + 3; i++) Espec[i] = 0.0;
+  aladyn_float *Espec = new aladyn_float[params->nbin_E + 3];
+  for (int i = 0; i < params->nbin_E + 3; i++) Espec[i] = 0.0;
 
-  float *thetaspec = new float[parametri->nbin_theta + 3];
-  for (int i = 0; i < parametri->nbin_theta + 3; i++) thetaspec[i] = 0.0;
+  aladyn_float *thetaspec = new aladyn_float[params->nbin_theta + 3];
+  for (int i = 0; i < params->nbin_theta + 3; i++) thetaspec[i] = 0.0;
 
-  float *thetaTspec = new float[parametri->nbin_thetaT + 3];
-  for (int i = 0; i < parametri->nbin_thetaT + 3; i++) thetaTspec[i] = 0.0;
+  aladyn_float *thetaTspec = new aladyn_float[params->nbin_thetaT + 3];
+  for (int i = 0; i < params->nbin_thetaT + 3; i++) thetaTspec[i] = 0.0;
 
-  sprintf(nomefile_propaga, "%s.ppg", parametri->filebasename.c_str());
-  sprintf(nomefile_xyze, "%s_xyzE.ppg", parametri->filebasename.c_str());
-  sprintf(nomefile_csv, "%s.csv", parametri->filebasename.c_str());
-  sprintf(nomefile_vtk, "%s.vtk", parametri->filebasename.c_str());
-  sprintf(nomefile_bin_clean, "%s_clean.bin", parametri->filebasename.c_str());
 
-  sprintf(nomefile_bin, "%s.bin", parametri->filebasename.c_str());
-  sprintf(nomefile_dat, "%s.dat", parametri->filebasename.c_str());
-  sprintf(nomefile_extremes, "%s.extremes", parametri->filebasename.c_str());
-  sprintf(nomefile_parametri, "%s.parameters", parametri->filebasename.c_str());
+  ppg_filename = params->filebasename + ".ppg";
+  xyze_filename = params->filebasename + "_xyzE.ppg";
+  csv_filename = params->filebasename + ".csv";
+  vtk_filename = params->filebasename + ".vtk";
+  clean_bin_filename = params->filebasename + "_clean.bin";
+  bin_filename = params->filebasename + ".bin";
+  dat_filename = params->filebasename + ".dat";
+  minmax_filename = params->filebasename + ".extremes";
+  params_filename = params->filebasename + ".parameters";
 
-  memset(&nomefile_binnato[0], 0, sizeof(nomefile_binnato));
-
-  if (!parametri->multifile) file_in = fopen(nomefile_bin, "rb");
+  if (!params->multifile) file_in = fopen(bin_filename.c_str(), "rb");
 
 
 #ifdef ENABLE_DEBUG
-  std::cout << "NPTOT = " << parametri->nptot << std::endl;
-  if (parametri->p[DO_BINNING])
+  std::cout << "NPTOT = " << params->nptot << std::endl;
+  if (params->we_have_to_do_binning)
   {
-    std::cout << "XMIN = " << parametri->xmin << std::endl;
-    std::cout << "XMAX = " << parametri->xmax << std::endl;
-    std::cout << "YMIN = " << parametri->ymin << std::endl;
-    std::cout << "YMAX = " << parametri->ymax << std::endl;
-    std::cout << "ZMIN = " << parametri->zmin << std::endl;
-    std::cout << "ZMAX = " << parametri->zmax << std::endl;
-    std::cout << "PXMIN = " << parametri->pxmin << std::endl;
-    std::cout << "PXMAX = " << parametri->pxmax << std::endl;
-    std::cout << "PYMIN = " << parametri->pymin << std::endl;
-    std::cout << "PYMAX = " << parametri->pymax << std::endl;
-    std::cout << "PZMIN = " << parametri->pzmin << std::endl;
-    std::cout << "PZMAX = " << parametri->pzmax << std::endl;
-    std::cout << "TYMIN = " << parametri->tymin << std::endl;
-    std::cout << "TYMAX = " << parametri->tymax << std::endl;
-    std::cout << "TZMIN = " << parametri->tzmin << std::endl;
-    std::cout << "TZMAX = " << parametri->tzmax << std::endl;
-    std::cout << "GAMMAMIN = " << parametri->gammamin << std::endl;
-    std::cout << "GAMMAMAX = " << parametri->gammamax << std::endl;
-    std::cout << "THETAMIN = " << parametri->thetamin << std::endl;
-    std::cout << "THETAMAX = " << parametri->thetamax << std::endl;
-    std::cout << "THETARADMIN = " << parametri->thetaTmin << std::endl;
-    std::cout << "THETARADMAX = " << parametri->thetaTmax << std::endl;
-    std::cout << "EMIN = " << parametri->Emin << std::endl;
-    std::cout << "EMAX = " << parametri->Emax << std::endl;
-    std::cout << "WMIN = " << parametri->wmin << std::endl;
-    std::cout << "WMAX = " << parametri->wmax << std::endl;
-    std::cout << "CHMIN = " << parametri->chmin << std::endl;
-    std::cout << "CHMAX = " << parametri->chmax << std::endl;
+    std::cout << "XMIN = " << params->xmin << std::endl;
+    std::cout << "XMAX = " << params->xmax << std::endl;
+    std::cout << "YMIN = " << params->ymin << std::endl;
+    std::cout << "YMAX = " << params->ymax << std::endl;
+    std::cout << "ZMIN = " << params->zmin << std::endl;
+    std::cout << "ZMAX = " << params->zmax << std::endl;
+    std::cout << "PXMIN = " << params->pxmin << std::endl;
+    std::cout << "PXMAX = " << params->pxmax << std::endl;
+    std::cout << "PYMIN = " << params->pymin << std::endl;
+    std::cout << "PYMAX = " << params->pymax << std::endl;
+    std::cout << "PZMIN = " << params->pzmin << std::endl;
+    std::cout << "PZMAX = " << params->pzmax << std::endl;
+    std::cout << "TYMIN = " << params->tymin << std::endl;
+    std::cout << "TYMAX = " << params->tymax << std::endl;
+    std::cout << "TZMIN = " << params->tzmin << std::endl;
+    std::cout << "TZMAX = " << params->tzmax << std::endl;
+    std::cout << "GAMMAMIN = " << params->gammamin << std::endl;
+    std::cout << "GAMMAMAX = " << params->gammamax << std::endl;
+    std::cout << "THETAMIN = " << params->thetamin << std::endl;
+    std::cout << "THETAMAX = " << params->thetamax << std::endl;
+    std::cout << "THETARADMIN = " << params->thetaTmin << std::endl;
+    std::cout << "THETARADMAX = " << params->thetaTmax << std::endl;
+    std::cout << "EMIN = " << params->Emin << std::endl;
+    std::cout << "EMAX = " << params->Emax << std::endl;
+    std::cout << "WMIN = " << params->wmin << std::endl;
+    std::cout << "WMAX = " << params->wmax << std::endl;
+    std::cout << "CHMIN = " << params->chmin << std::endl;
+    std::cout << "CHMAX = " << params->chmax << std::endl;
   }
 #endif
 
-  if (parametri->p[OUT_VTK])
+  if (params->out_vtk)
   {
     printf("\nENABLED .vtk FILE\n");
-    binary_vtk = fopen(nomefile_vtk, "wb");
+    binary_vtk = fopen(vtk_filename.c_str(), "wb");
 
     // Scrittura primo Header VTK e memorizzazione sua dimensione in contatori[0]
     contatori[0] += fprintf(binary_vtk, "# vtk DataFile Version 2.0\n");
     contatori[0] += fprintf(binary_vtk, "titolo nostro\n");
     contatori[0] += fprintf(binary_vtk, "BINARY\n");
     contatori[0] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
-    contatori[0] += fprintf(binary_vtk, "POINTS %llu float\n", (unsigned long long int) parametri->nptot);
+    contatori[0] += fprintf(binary_vtk, "POINTS %llu aladyn_float\n", (unsigned long long int) params->nptot);
 
-    fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3, SEEK_SET);
+    fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3, SEEK_SET);
 
     //Scrittura secondo Header VTK e memorizzazione sua dimensione in contatori[1]
     //contatori[1] += fprintf(binary_vtk, "DATASET UNSTRUCTURED_GRID\n");
-    contatori[1] += fprintf(binary_vtk, "POINT_DATA %llu\n", (unsigned long long int) parametri->nptot);
-    //contatori[1] += fprintf(binary_vtk, "POINTS %i float\n", parametri->nptot);
-    contatori[1] += fprintf(binary_vtk, "VECTORS p float\n");
+    contatori[1] += fprintf(binary_vtk, "POINT_DATA %llu\n", (unsigned long long int) params->nptot);
+    //contatori[1] += fprintf(binary_vtk, "POINTS %i aladyn_float\n", params->nptot);
+    contatori[1] += fprintf(binary_vtk, "VECTORS p aladyn_float\n");
     //contatori[1] += fprintf(binary_vtk, "LOOKUP_TABLE default\n");
 
-    if (parametri->p[WEIGHT])
+    if (params->file_has_weight)
     {
-      fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3, SEEK_SET);
+      fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + params->nptot * sizeof(aladyn_float) * 3, SEEK_SET);
 
       //Scrittura terzo Header VTK e memorizzazione sua dimensione in contatori[2]
       //contatori[2] += fprintf(binary_vtk,"DATASET STRUCTURED_POINTS\n");
-      //contatori[2] += fprintf(binary_vtk,"DIMENSIONS %ui %i %i\n",parametri->nptot, 1, 1);
+      //contatori[2] += fprintf(binary_vtk,"DIMENSIONS %ui %i %i\n",params->nptot, 1, 1);
       //contatori[2] += fprintf(binary_vtk,"ORIGIN 0 0 0\n");
       //contatori[2] += fprintf(binary_vtk,"SPACING 1 1 1\n");
-      //contatori[2] += fprintf(binary_vtk,"POINT_DATA %ui\n",parametri->nptot);
-      contatori[2] += fprintf(binary_vtk, "SCALARS w float 1\n");
+      //contatori[2] += fprintf(binary_vtk,"POINT_DATA %ui\n",params->nptot);
+      contatori[2] += fprintf(binary_vtk, "SCALARS w aladyn_float 1\n");
       contatori[2] += fprintf(binary_vtk, "LOOKUP_TABLE default\n");
     }
   }
 
-  if (parametri->p[OUT_CLEAN_BINARY])
+  if (params->out_clean_bin)
   {
     printf("\nENABLED CLEAN .bin FILE\n");
-    binary_clean = fopen(nomefile_bin_clean, "wb");
+    binary_clean = fopen(clean_bin_filename.c_str(), "wb");
   }
 
-  if (parametri->p[OUT_PROPAGA])
+  if (params->out_ppg)
   {
     printf("\nENABLED .txt FILE FOR PROPAGA\n");
-    ascii_propaga = fopen(nomefile_propaga, "w");
+    ascii_propaga = fopen(ppg_filename.c_str(), "wb");
   }
 
-  if (parametri->p[OUT_XYZE])
+  if (params->out_xyze)
   {
     printf("\nENABLED .txt FILE WITH x, y, z, E\n");
-    ascii_xyze = fopen(nomefile_xyze, "w");
+    ascii_xyze = fopen(xyze_filename.c_str(), "wb");
   }
 
-  if (parametri->p[OUT_CSV])
+  if (params->out_csv)
   {
     printf("\nENABLED .csv FILE FOR PARAVIEW\n");
-    ascii_csv = fopen(nomefile_csv, "w");
+    ascii_csv = fopen(csv_filename.c_str(), "wb");
   }
 
   fflush(stdout);
 
   while (1)
   {
-    if (!parametri->multifile)
+    if (!params->multifile)
     {
-      if (conta_processori >= parametri->last_cpu) break;
+      if (conta_processori >= params->last_cpu) break;
       if (conta_processori == 0) {
         /*skip header*/
-        std::fseek(file_in, (long)parametri->header_size_bytes, SEEK_SET);
+        std::fseek(file_in, (long)params->header_size_bytes, SEEK_SET);
       }
 
-      if (parametri->file_version == 1)
+      if (params->file_version == 1)
       {
         fread_size = std::fread(&buff, sizeof(int), 1, file_in);
         fread_size = std::fread(&npart_loc, sizeof(int), 1, file_in);
@@ -343,15 +342,15 @@ int leggi_particelle(Parametri * parametri)
       }
 
       if (feof(file_in)) break;
-      if (parametri->p[SWAP]) swap_endian_i(&npart_loc, 1);
-      if (npart_loc > (long long int) parametri->nptot || npart_loc < 0)
+      if (params->we_have_to_do_swap) swap_endian_i(&npart_loc, 1);
+      if (npart_loc > (long long int) params->nptot || npart_loc < 0)
       {
         printf("Read a npart=%i, non valid. Exiting!", npart_loc);
         break;
       }
-      dimensione_array_particelle = npart_loc;
+      dimensione_array_parts = npart_loc;
       val[0] = (unsigned int)npart_loc;
-      val[1] = (unsigned int)parametri->ndv;
+      val[1] = (unsigned int)params->ndv;
 #ifdef ENABLE_DEBUG
       printf("proc number \t %i \t npart=%i \n", conta_processori, npart_loc);
 #else
@@ -362,10 +361,10 @@ int leggi_particelle(Parametri * parametri)
     }
     else  //we do have multifiles i.e. Prpout00_000.bin
     {
-      memset(&nomefile_bin[0], 0, sizeof(nomefile_bin));
-      sprintf(nomefile_bin, "%s_%03d.bin", parametri->filebasename.c_str(), indice_multifile);
+      memset(&bin_filename[0], 0, sizeof(bin_filename));
+      bin_filename = params->filebasename + "_" + std::to_string(multifile_index) + ".bin";
 
-      if ((file_in = fopen(nomefile_bin, "rb")) == NULL)
+      if ((file_in = fopen(bin_filename.c_str(), "rb")) == NULL)
       {
         printf("End of files! \n");
         break;
@@ -373,20 +372,20 @@ int leggi_particelle(Parametri * parametri)
       fseeko(file_in, 0, SEEK_END);
       dim_file_in_bytes = (int)ftello(file_in);
       rewind(file_in);
-      num_of_floats_in_file = (dim_file_in_bytes / sizeof(float));
-      num_of_particles_in_file = (int)(num_of_floats_in_file / parametri->ndv);
-      printf("File %s_%.3i.bin has %llu particles\n", parametri->filebasename.c_str(), indice_multifile, (unsigned long long int) num_of_particles_in_file);
+      num_of_floats_in_file = (dim_file_in_bytes / sizeof(aladyn_float));
+      num_of_particles_in_file = (int)(num_of_floats_in_file / params->ndv);
+      printf("File %s_%.3i.bin has %llu particles\n", params->filebasename.c_str(), multifile_index, (unsigned long long int) num_of_particles_in_file);
       fflush(stdout);
-      num_of_passes = (int)((float)(num_of_particles_in_file) / (float)(MAX_NUM_OF_PARTICLES_PER_SHOT)) + 1;
-      num_residual_particles = num_of_particles_in_file % MAX_NUM_OF_PARTICLES_PER_SHOT;
-      dimensione_array_particelle = MIN(MAX_NUM_OF_PARTICLES_PER_SHOT, num_of_particles_in_file);
-      if (dimensione_array_particelle > parametri->nptot)
+      num_of_passes = (int)((aladyn_float)(num_of_particles_in_file) / (aladyn_float)(max_number_of_particles_in_memory)) + 1;
+      num_residual_particles = num_of_particles_in_file % max_number_of_particles_in_memory;
+      dimensione_array_parts = std::min(max_number_of_particles_in_memory, num_of_particles_in_file);
+      if (dimensione_array_parts > params->nptot)
       {
-        printf("Read npart=%llu: not valid! Exiting...\n", (unsigned long long int) dimensione_array_particelle);
+        printf("Read npart=%llu: not valid! Exiting...\n", (unsigned long long int) dimensione_array_parts);
         break;
       }
-      val[0] = (unsigned int)dimensione_array_particelle;
-      val[1] = (unsigned int)parametri->ndv;
+      val[0] = (unsigned int)dimensione_array_parts;
+      val[1] = (unsigned int)params->ndv;
     }
 
     if (val[0] > 0)
@@ -395,79 +394,79 @@ int leggi_particelle(Parametri * parametri)
       for (size_t h = 0; h < num_of_passes; h++)
       {
         if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %llu of %llu\n", (unsigned long long int) (h + 1), (unsigned long long int) num_of_passes);
-        if (!parametri->multifile)
+        if (!params->multifile)
         {
-          particelle = new float[npart_loc*parametri->ndv];
-          if (parametri->file_version == 1)
+          parts = new aladyn_float[npart_loc*params->ndv];
+          if (params->file_version == 1)
           {
             fread_size = std::fread(buffshort, sizeof(short), 2, file_in);
-            fread_size = std::fread(particelle, sizeof(float), npart_loc*parametri->ndv, file_in);
+            fread_size = std::fread(parts, sizeof(aladyn_float), npart_loc*params->ndv, file_in);
             fread_size = std::fread(&buff, sizeof(int), 1, file_in);
           }
-          else fread_size = std::fread(particelle, sizeof(float), npart_loc*parametri->ndv, file_in);
-          if (parametri->p[SWAP]) swap_endian_f(particelle, (size_t)npart_loc*parametri->ndv);
+          else fread_size = std::fread(parts, sizeof(aladyn_float), npart_loc*params->ndv, file_in);
+          if (params->we_have_to_do_swap) swap_endian_f(parts, (size_t)npart_loc*params->ndv);
         }
         else
         {
-          if (h == num_of_passes - 1 && num_of_passes > 1) dimensione_array_particelle = num_residual_particles;
-          particelle = new float[dimensione_array_particelle*parametri->ndv];
-          val[0] = (unsigned int)dimensione_array_particelle;
+          if (h == num_of_passes - 1 && num_of_passes > 1) dimensione_array_parts = num_residual_particles;
+          parts = new aladyn_float[dimensione_array_parts*params->ndv];
+          val[0] = (unsigned int)dimensione_array_parts;
 #ifdef ENABLE_DEBUG
-          printf("npart_loc = %i\t\t ndv=%i\n", val[0], parametri->ndv);
+          printf("npart_loc = %i\t\t ndv=%i\n", val[0], params->ndv);
 #else
-          printf("npart_loc = %i\t\t ndv=%i\r", val[0], parametri->ndv);
+          printf("npart_loc = %i\t\t ndv=%i\r", val[0], params->ndv);
 #endif
           fflush(stdout);
-          fread_size = std::fread(particelle, sizeof(float), val[0] * parametri->ndv, file_in);
-          if (parametri->p[SWAP]) swap_endian_f(particelle, (size_t)val[0] * parametri->ndv);
+          fread_size = std::fread(parts, sizeof(aladyn_float), val[0] * params->ndv, file_in);
+          if (params->we_have_to_do_swap) swap_endian_f(parts, (size_t)val[0] * params->ndv);
         }
 
-        _Filtro(parametri, particelle, val, _Filtro::costruisci_filtro(parametri));
+        _Filter(params, parts, val, _Filter::build_filter(params));
 
-        if (parametri->p[OUT_PARAMS])
+        if (params->out_params)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            if (parametri->is_2d_sim)
+            if (params->sim_is_2d)
             {
-              x = *(particelle + i*parametri->ndv);
-              y = *(particelle + i*parametri->ndv + 1);
+              x = *(parts + i*params->ndv);
+              y = *(parts + i*params->ndv + 1);
               z = 0.0;
-              px = *(particelle + i*parametri->ndv + 2);
-              py = *(particelle + i*parametri->ndv + 3);
+              px = *(parts + i*params->ndv + 2);
+              py = *(parts + i*params->ndv + 3);
               pz = 0.0;
               ptot = sqrt(px*px + py*py);
               px /= ptot;
               py /= ptot;
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = *(particelle + i*parametri->ndv + 4);
+              if (params->file_has_weight && !params->overwrite_weight)
+                w = *(parts + i*params->ndv + 4);
               else
-                w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-                ch = *(particelle + i*parametri->ndv + 5);
+                w = params->overwrite_weight_value;
+              if (params->file_version >= 3 && !params->overwrite_charge)
+                ch = *(parts + i*params->ndv + 5);
               else
-                ch = parametri->overwrite_charge_value;
+                ch = params->overwrite_charge_value;
             }
             else
             {
-              x = *(particelle + i*parametri->ndv);
-              y = *(particelle + i*parametri->ndv + 1);
-              z = *(particelle + i*parametri->ndv + 2);
-              px = *(particelle + i*parametri->ndv + 3);
-              py = *(particelle + i*parametri->ndv + 4);
-              pz = *(particelle + i*parametri->ndv + 5);
+              x = *(parts + i*params->ndv);
+              y = *(parts + i*params->ndv + 1);
+              z = *(parts + i*params->ndv + 2);
+              px = *(parts + i*params->ndv + 3);
+              py = *(parts + i*params->ndv + 4);
+              pz = *(parts + i*params->ndv + 5);
               ptot = sqrt(px*px + py*py + pz*pz);
               px /= ptot;
               py /= ptot;
               pz /= ptot;
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = *(particelle + i*parametri->ndv + 6);
+              if (params->file_has_weight && !params->overwrite_weight)
+                w = *(parts + i*params->ndv + 6);
               else
-                w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-                ch = *(particelle + i*parametri->ndv + 7);
+                w = params->overwrite_weight_value;
+              if (params->file_version >= 3 && !params->overwrite_charge)
+                ch = *(parts + i*params->ndv + 7);
               else
-                ch = parametri->overwrite_charge_value;
+                ch = params->overwrite_charge_value;
             }
 
             em_x += (double)(x*w);
@@ -490,28 +489,28 @@ int leggi_particelle(Parametri * parametri)
           }
         }
 
-        if (parametri->p[FIND_MINMAX])
+        if (params->we_have_to_find_minmax)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            if (parametri->is_2d_sim)
+            if (params->sim_is_2d)
             {
-              x = *(particelle + i*parametri->ndv);
-              y = *(particelle + i*parametri->ndv + 1);
-              px = *(particelle + i*parametri->ndv + 2);
-              py = *(particelle + i*parametri->ndv + 3);
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = *(particelle + i*parametri->ndv + 4);
+              x = *(parts + i*params->ndv);
+              y = *(parts + i*params->ndv + 1);
+              px = *(parts + i*params->ndv + 2);
+              py = *(parts + i*params->ndv + 3);
+              if (params->file_has_weight && !params->overwrite_weight)
+                w = *(parts + i*params->ndv + 4);
               else
-                w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-                ch = *(particelle + i*parametri->ndv + 5);
+                w = params->overwrite_weight_value;
+              if (params->file_version >= 3 && !params->overwrite_charge)
+                ch = *(parts + i*params->ndv + 5);
               else
-                ch = parametri->overwrite_charge_value;
-              gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
-              theta = (float)(atan2(py, px)*180. / M_PI);       //theta
-              thetaT = (float)atan(sqrt((py*py) / (px*px)));
-              E = (float)(gamma*parametri->massa_particella_MeV); //energia
+                ch = params->overwrite_charge_value;
+              gamma = (aladyn_float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
+              theta = (aladyn_float)(atan2(py, px)*180. / M_PI);       //theta
+              thetaT = (aladyn_float)atan(sqrt((py*py) / (px*px)));
+              E = (aladyn_float)(gamma*params->mass_MeV); //energia
               if (px > 0) ty = py / px;
               else ty = 0.0;
               if (x < estremi_min[0]) estremi_min[0] = x;
@@ -542,24 +541,24 @@ int leggi_particelle(Parametri * parametri)
             }
             else
             {
-              x = *(particelle + i*parametri->ndv);
-              y = *(particelle + i*parametri->ndv + 1);
-              z = *(particelle + i*parametri->ndv + 2);
-              px = *(particelle + i*parametri->ndv + 3);
-              py = *(particelle + i*parametri->ndv + 4);
-              pz = *(particelle + i*parametri->ndv + 5);
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = *(particelle + i*parametri->ndv + 6);
+              x = *(parts + i*params->ndv);
+              y = *(parts + i*params->ndv + 1);
+              z = *(parts + i*params->ndv + 2);
+              px = *(parts + i*params->ndv + 3);
+              py = *(parts + i*params->ndv + 4);
+              pz = *(parts + i*params->ndv + 5);
+              if (params->file_has_weight && !params->overwrite_weight)
+                w = *(parts + i*params->ndv + 6);
               else
-                w = parametri->overwrite_weight_value;
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-                ch = *(particelle + i*parametri->ndv + 7);
+                w = params->overwrite_weight_value;
+              if (params->file_version >= 3 && !params->overwrite_charge)
+                ch = *(parts + i*params->ndv + 7);
               else
-                ch = parametri->overwrite_charge_value;
-              gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);     //gamma
-              theta = (float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);  //theta nb: py e pz sono quelli trasversi in ALaDyn!
-              thetaT = (float)atan(sqrt((py*py + pz*pz) / (px*px)));
-              E = (float)(gamma*parametri->massa_particella_MeV);   //energia
+                ch = params->overwrite_charge_value;
+              gamma = (aladyn_float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);     //gamma
+              theta = (aladyn_float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);  //theta nb: py e pz sono quelli trasversi in ALaDyn!
+              thetaT = (aladyn_float)atan(sqrt((py*py + pz*pz) / (px*px)));
+              E = (aladyn_float)(gamma*params->mass_MeV);   //energia
               if (px > 0)
               {
                 ty = py / px;
@@ -601,56 +600,51 @@ int leggi_particelle(Parametri * parametri)
             }
           }
         }
-        if (parametri->p[DO_BINNING])
+        if (params->we_have_to_do_binning)
         {
-          if (parametri->fai_plot_xy)     _Binnaggio(particelle, val[0], parametri->ndv, parametri, xy, "x", "y");
-          if (parametri->fai_plot_xz)     _Binnaggio(particelle, val[0], parametri->ndv, parametri, xz, "x", "z");
-          if (parametri->fai_plot_yz)     _Binnaggio(particelle, val[0], parametri->ndv, parametri, yz, "y", "z");
-          if (parametri->fai_plot_rcf)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, rcf, "ty", "tz");
-          if (parametri->fai_plot_xpx)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, xpx, "x", "px");
-          if (parametri->fai_plot_xpy)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, xpy, "x", "py");
-          if (parametri->fai_plot_xpz)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, xpz, "x", "pz");
-          if (parametri->fai_plot_ypx)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, ypx, "y", "px");
-          if (parametri->fai_plot_ypy)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, ypy, "y", "py");
-          if (parametri->fai_plot_ypz)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, ypz, "y", "pz");
-          if (parametri->fai_plot_zpx)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, zpx, "z", "px");
-          if (parametri->fai_plot_zpy)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, zpy, "z", "py");
-          if (parametri->fai_plot_zpz)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, zpz, "z", "pz");
-          if (parametri->fai_plot_pxpy)   _Binnaggio(particelle, val[0], parametri->ndv, parametri, pxpy, "px", "py");
-          if (parametri->fai_plot_pxpz)   _Binnaggio(particelle, val[0], parametri->ndv, parametri, pxpz, "px", "pz");
-          if (parametri->fai_plot_pypz)   _Binnaggio(particelle, val[0], parametri->ndv, parametri, pypz, "py", "pz");
-          if (parametri->fai_plot_xw)     _Binnaggio(particelle, val[0], parametri->ndv, parametri, xw, "x", "w");
-          if (parametri->fai_plot_Etheta)   _Binnaggio(particelle, val[0], parametri->ndv, parametri, Etheta, "E", "theta");
-          if (parametri->fai_plot_EthetaT)  _Binnaggio(particelle, val[0], parametri->ndv, parametri, EthetaT, "E", "thetaT");
-          if (parametri->fai_plot_Espec)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, Espec, "E");
-          if (parametri->fai_plot_wspec)    _Binnaggio(particelle, val[0], parametri->ndv, parametri, wspec, "w");
-          if (parametri->fai_plot_chspec)   _Binnaggio(particelle, val[0], parametri->ndv, parametri, chspec, "ch");
-          if (parametri->fai_plot_thetaspec)  _Binnaggio(particelle, val[0], parametri->ndv, parametri, thetaspec, "theta");
-          if (parametri->fai_plot_thetaTspec) _Binnaggio(particelle, val[0], parametri->ndv, parametri, thetaTspec, "thetaT");
+          if (params->do_plot_xy)         _Binning(parts, params, xy, "x", "y");
+          if (params->do_plot_xz)         _Binning(parts, params, xz, "x", "z");
+          if (params->do_plot_yz)         _Binning(parts, params, yz, "y", "z");
+          if (params->do_plot_rcf)        _Binning(parts, params, rcf, "ty", "tz");
+          if (params->do_plot_xpx)        _Binning(parts, params, xpx, "x", "px");
+          if (params->do_plot_xpy)        _Binning(parts, params, xpy, "x", "py");
+          if (params->do_plot_xpz)        _Binning(parts, params, xpz, "x", "pz");
+          if (params->do_plot_ypx)        _Binning(parts, params, ypx, "y", "px");
+          if (params->do_plot_ypy)        _Binning(parts, params, ypy, "y", "py");
+          if (params->do_plot_ypz)        _Binning(parts, params, ypz, "y", "pz");
+          if (params->do_plot_zpx)        _Binning(parts, params, zpx, "z", "px");
+          if (params->do_plot_zpy)        _Binning(parts, params, zpy, "z", "py");
+          if (params->do_plot_zpz)        _Binning(parts, params, zpz, "z", "pz");
+          if (params->do_plot_pxpy)       _Binning(parts, params, pxpy, "px", "py");
+          if (params->do_plot_pxpz)       _Binning(parts, params, pxpz, "px", "pz");
+          if (params->do_plot_pypz)       _Binning(parts, params, pypz, "py", "pz");
+          if (params->do_plot_xw)         _Binning(parts, params, xw, "x", "w");
+          if (params->do_plot_Etheta)     _Binning(parts, params, Etheta, "E", "theta");
+          if (params->do_plot_EthetaT)    _Binning(parts, params, EthetaT, "E", "thetaT");
+          if (params->do_plot_Espec)      _Binning(parts, params, Espec, "E");
+          if (params->do_plot_wspec)      _Binning(parts, params, wspec, "w");
+          if (params->do_plot_chspec)     _Binning(parts, params, chspec, "ch");
+          if (params->do_plot_thetaspec)  _Binning(parts, params, thetaspec, "theta");
+          if (params->do_plot_thetaTspec) _Binning(parts, params, thetaTspec, "thetaT");
         }
 
-        if (parametri->p[OUT_PROPAGA])
+        if (params->out_ppg)
         {
-          if (parametri->is_2d_sim)
+          if (params->sim_is_2d)
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
-              x = particelle[i*parametri->ndv + 1] * ((float)1.e-4);
-              z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
-              px = particelle[i*parametri->ndv + 3];
-              pz = particelle[i*parametri->ndv + 2];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = particelle[i*parametri->ndv + 4];
+              x = parts[i*params->ndv + 1] * ((aladyn_float)1.e-4);
+              z = parts[i*params->ndv + 0] * ((aladyn_float)1.e-4);
+              px = parts[i*params->ndv + 3];
+              pz = parts[i*params->ndv + 2];
+              if (params->file_has_weight && !params->overwrite_weight)
+                w = parts[i*params->ndv + 4];
               else
-                w = parametri->overwrite_weight_value;
-              //if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-              //  ch = particelle[i*parametri->ndv + 5];
-              //else
-              //  ch = parametri->overwrite_charge_value;
+                w = params->overwrite_weight_value;
 
-              if (i % parametri->subsample == 0) {
-                if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 3, w, i + 1);
-                else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 1, w, i + 1);
+              if (i % params->subsample == 0) {
+                fprintf(ascii_propaga, "%e 0 %e %e 0 %e %d %e 0 %d\n", x, z, px, pz, 1, w, i + 1); // fix: no distinction in the particle type column, always written as protons!
               }
             }
           }
@@ -658,24 +652,19 @@ int leggi_particelle(Parametri * parametri)
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
-              x = particelle[i*parametri->ndv + 1] * ((float)1.e-4);
-              y = particelle[i*parametri->ndv + 2] * ((float)1.e-4);
-              z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
-              px = particelle[i*parametri->ndv + 4];
-              py = particelle[i*parametri->ndv + 5];
-              pz = particelle[i*parametri->ndv + 3];
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
-                w = particelle[i*parametri->ndv + 6];
+              x = parts[i*params->ndv + 1] * ((aladyn_float)1.e-4);
+              y = parts[i*params->ndv + 2] * ((aladyn_float)1.e-4);
+              z = parts[i*params->ndv + 0] * ((aladyn_float)1.e-4);
+              px = parts[i*params->ndv + 4];
+              py = parts[i*params->ndv + 5];
+              pz = parts[i*params->ndv + 3];
+              if (params->file_has_weight && !params->overwrite_weight)
+                w = parts[i*params->ndv + 6];
               else
-                w = parametri->overwrite_weight_value;
-              //if (parametri->file_version >= 3 && !parametri->overwrite_charge)
-              //  ch = particelle[i*parametri->ndv + 7];
-              //else
-              //  ch = parametri->overwrite_charge_value;
+                w = params->overwrite_weight_value;
 
-              if (i % parametri->subsample == 0) {
-                if (parametri->file_particelle_E) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 3, w, i + 1);
-                else if (parametri->file_particelle_P || parametri->file_particelle_LI || parametri->file_particelle_HI || parametri->file_particelle_generic_ion) fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 1, w, i + 1);
+              if (i % params->subsample == 0) {
+                fprintf(ascii_propaga, "%e %e %e %e %e %e %d %e 0 %d\n", x, y, z, px, py, pz, 1, w, i + 1);  // fix: no distinction in the particle type column, always written as protons!
               }
             }
           }
@@ -683,204 +672,202 @@ int leggi_particelle(Parametri * parametri)
 
 
 
-        if (parametri->p[OUT_XYZE])
+        if (params->out_xyze)
         {
-          if (parametri->is_2d_sim)
+          if (params->sim_is_2d)
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
-              x = particelle[i*parametri->ndv + 1] * ((float)1.e-4);
-              z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
-              px = particelle[i*parametri->ndv + 3];
-              pz = particelle[i*parametri->ndv + 2];
-              gamma = (float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
-              E = (float)(gamma*parametri->massa_particella_MeV);   //energia
-              if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
+              x = parts[i*params->ndv + 1] * ((aladyn_float)1.e-4);
+              z = parts[i*params->ndv + 0] * ((aladyn_float)1.e-4);
+              px = parts[i*params->ndv + 3];
+              pz = parts[i*params->ndv + 2];
+              gamma = (aladyn_float)(sqrt(1. + px*px + py*py) - 1.);
+              E = (aladyn_float)(gamma*params->mass_MeV);
+              if (i % params->subsample == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
             }
           }
           else
           {
             for (unsigned int i = 0; i < val[0]; i++)
             {
-              x = particelle[i*parametri->ndv + 1] * ((float)1.e-4);
-              y = particelle[i*parametri->ndv + 2] * ((float)1.e-4);
-              z = particelle[i*parametri->ndv + 0] * ((float)1.e-4);
-              px = particelle[i*parametri->ndv + 4];
-              py = particelle[i*parametri->ndv + 5];
-              pz = particelle[i*parametri->ndv + 3];
-              gamma = (float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);     //gamma
-              E = (float)(gamma*parametri->massa_particella_MeV);         //energia
-              if (i % parametri->subsample == 0) fprintf(ascii_xyze, "%e %e %e %e\n", x, y, z, E);
+              x = parts[i*params->ndv + 1] * ((aladyn_float)1.e-4);
+              y = parts[i*params->ndv + 2] * ((aladyn_float)1.e-4);
+              z = parts[i*params->ndv + 0] * ((aladyn_float)1.e-4);
+              px = parts[i*params->ndv + 4];
+              py = parts[i*params->ndv + 5];
+              pz = parts[i*params->ndv + 3];
+              gamma = (aladyn_float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);
+              E = (aladyn_float)(gamma*params->mass_MeV);
+              if (i % params->subsample == 0) fprintf(ascii_xyze, "%e %e %e %e\n", x, y, z, E);
             }
           }
         }
 
 
 
-        if (parametri->p[OUT_CSV])
+        if (params->out_csv)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            x = particelle[i*parametri->ndv + 0];
-            y = particelle[i*parametri->ndv + 1];
-            if (parametri->is_2d_sim) z = 0;
-            else z = particelle[i*parametri->ndv + 2];
-            px = particelle[i*parametri->ndv + 3];
-            py = particelle[i*parametri->ndv + 4];
-            if (parametri->is_2d_sim) pz = 0;
-            else pz = particelle[i*parametri->ndv + 5];
+            x = parts[i*params->ndv + 0];
+            y = parts[i*params->ndv + 1];
+            if (params->sim_is_2d) z = 0;
+            else z = parts[i*params->ndv + 2];
+            px = parts[i*params->ndv + 3];
+            py = parts[i*params->ndv + 4];
+            if (params->sim_is_2d) pz = 0;
+            else pz = parts[i*params->ndv + 5];
 
-            if (parametri->is_2d_sim) {
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 4];
-              else w = parametri->overwrite_weight_value;
+            if (params->sim_is_2d) {
+              if (params->file_has_weight && !params->overwrite_weight) w = parts[i*params->ndv + 4];
+              else w = params->overwrite_weight_value;
             }
             else {
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) w = particelle[i*parametri->ndv + 6];
-              else w = parametri->overwrite_weight_value;
+              if (params->file_has_weight && !params->overwrite_weight) w = parts[i*params->ndv + 6];
+              else w = params->overwrite_weight_value;
             }
 
-            if (parametri->is_2d_sim) {
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 5];
-              else ch = parametri->overwrite_charge_value;
+            if (params->sim_is_2d) {
+              if (params->file_has_charge && !params->overwrite_charge) ch = parts[i*params->ndv + 5];
+              else ch = params->overwrite_charge_value;
             }
             else {
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge) ch = particelle[i*parametri->ndv + 7];
-              else ch = parametri->overwrite_charge_value;
+              if (params->file_has_charge && !params->overwrite_charge) ch = parts[i*params->ndv + 7];
+              else ch = params->overwrite_charge_value;
             }
 
 
-            if (i % parametri->subsample == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
+            if (i % params->subsample == 0) fprintf(ascii_csv, "%e, %e, %e, %e, %e, %e, %e, %e\n", x, y, z, px, py, pz, w, ch);
           }
         }
 
 
 
-        if (parametri->p[OUT_CLEAN_BINARY])
+        if (params->out_clean_bin)
         {
           for (unsigned int i = 0; i < val[0]; i++)
           {
-            array_supporto8[0] = particelle[i*parametri->ndv + 0];
-            array_supporto8[1] = particelle[i*parametri->ndv + 1];
-            if (parametri->is_2d_sim) array_supporto8[2] = 0;
-            else array_supporto8[2] = particelle[i*parametri->ndv + 2];
-            array_supporto8[3] = particelle[i*parametri->ndv + 3];
-            array_supporto8[4] = particelle[i*parametri->ndv + 4];
-            if (parametri->is_2d_sim) array_supporto8[5] = 0;
-            else array_supporto8[5] = particelle[i*parametri->ndv + 5];
+            array_supporto8[0] = parts[i*params->ndv + 0];
+            array_supporto8[1] = parts[i*params->ndv + 1];
+            if (params->sim_is_2d) array_supporto8[2] = 0;
+            else array_supporto8[2] = parts[i*params->ndv + 2];
+            array_supporto8[3] = parts[i*params->ndv + 3];
+            array_supporto8[4] = parts[i*params->ndv + 4];
+            if (params->sim_is_2d) array_supporto8[5] = 0;
+            else array_supporto8[5] = parts[i*params->ndv + 5];
 
-            if (parametri->is_2d_sim) {
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto8[6] = particelle[i*parametri->ndv + 4];
-              else array_supporto8[6] = parametri->overwrite_weight_value;
+            if (params->sim_is_2d) {
+              if (params->file_has_weight && !params->overwrite_weight) array_supporto8[6] = parts[i*params->ndv + 4];
+              else array_supporto8[6] = params->overwrite_weight_value;
             }
             else {
-              if (parametri->p[WEIGHT] && !parametri->overwrite_weight) array_supporto8[6] = particelle[i*parametri->ndv + 6];
-              else array_supporto8[6] = parametri->overwrite_weight_value;
+              if (params->file_has_weight && !params->overwrite_weight) array_supporto8[6] = parts[i*params->ndv + 6];
+              else array_supporto8[6] = params->overwrite_weight_value;
             }
 
-            if (parametri->is_2d_sim) {
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 5];
-              else array_supporto8[7] = parametri->overwrite_charge_value;
+            if (params->sim_is_2d) {
+              if (params->file_has_charge && !params->overwrite_charge) array_supporto8[7] = parts[i*params->ndv + 5];
+              else array_supporto8[7] = params->overwrite_charge_value;
             }
             else {
-              if (parametri->file_version >= 3 && !parametri->overwrite_charge) array_supporto8[7] = particelle[i*parametri->ndv + 7];
-              else array_supporto8[7] = parametri->overwrite_charge_value;
+              if (params->file_has_charge && !params->overwrite_charge) array_supporto8[7] = parts[i*params->ndv + 7];
+              else array_supporto8[7] = params->overwrite_charge_value;
             }
 
-            if (i % parametri->subsample == 0) fwrite((void*)(array_supporto8), sizeof(float), 8, binary_clean);
+            if (i % params->subsample == 0) fwrite((void*)(array_supporto8), sizeof(aladyn_float), 8, binary_clean);
           }
         }
 
 
-        if (parametri->p[OUT_VTK])
+        if (params->out_vtk)
         {
-          if (parametri->endian_machine == 0)
+          if (params->endian_machine == 0)
           {
-            swap_endian_f(particelle, (size_t)val[0] * parametri->ndv);
+            swap_endian_f(parts, (size_t)val[0] * params->ndv);
           }
           int weight_index, charge_index;
 
-          if (parametri->is_2d_sim)
+          if (params->sim_is_2d)
           {
             weight_index = 4;
-            if (parametri->file_version >= 3) charge_index = 5;
+            if (params->file_has_charge) charge_index = 5;
             else charge_index = 0;
             // scrittura coordinate x, y, z
-            fseeko(binary_vtk, contatori[0] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
-            for (unsigned int i = 0; i < val[0]; i += parametri->ndv)
+            fseeko(binary_vtk, contatori[0] + parts_accumulate * sizeof(aladyn_float) * 3, SEEK_SET);
+            for (unsigned int i = 0; i < val[0]; i += params->ndv)
             {
-              fwrite((void*)(particelle + i), sizeof(float), 2, binary_vtk);
-              fwrite((void*)&zero, sizeof(float), 1, binary_vtk);
+              fwrite((void*)(parts + i), sizeof(aladyn_float), 2, binary_vtk);
+              fwrite((void*)&zero, sizeof(aladyn_float), 1, binary_vtk);
             }
 
             // scrittura momenti px, py, pz
-            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
-            for (unsigned int i = 2; i < val[0]; i += parametri->ndv)
+            fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + parts_accumulate * sizeof(aladyn_float) * 3, SEEK_SET);
+            for (unsigned int i = 2; i < val[0]; i += params->ndv)
             {
-              fwrite((void*)(particelle + i), sizeof(float), 2, binary_vtk);
-              fwrite((void*)&zero, sizeof(float), 1, binary_vtk);
+              fwrite((void*)(parts + i), sizeof(aladyn_float), 2, binary_vtk);
+              fwrite((void*)&zero, sizeof(aladyn_float), 1, binary_vtk);
             }
           }
-
-          else if (((parametri->ndv == 6 || parametri->ndv == 7) && parametri->file_version < 3) || (parametri->ndv == 8 && parametri->file_version >= 3))
+          else
           {
             weight_index = 6;
-            if (parametri->file_version >= 3) charge_index = 7;
+            if (params->file_has_charge) charge_index = 7;
             else charge_index = 0;
             // scrittura coordinate x, y, z
-            fseeko(binary_vtk, contatori[0] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
-            for (unsigned int i = 0; i < val[0]; i += parametri->ndv)
-              fwrite((void*)(particelle + i), sizeof(float), 3, binary_vtk);
+            fseeko(binary_vtk, contatori[0] + parts_accumulate * sizeof(aladyn_float) * 3, SEEK_SET);
+            for (unsigned int i = 0; i < val[0]; i += params->ndv)
+              fwrite((void*)(parts + i), sizeof(aladyn_float), 3, binary_vtk);
 
             // scrittura momenti px, py, pz
-            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + particelle_accumulate * sizeof(float) * 3, SEEK_SET);
-            for (unsigned int i = 3; i < val[0]; i += parametri->ndv)
-              fwrite((void*)(particelle + i), sizeof(float), 3, binary_vtk);
+            fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + parts_accumulate * sizeof(aladyn_float) * 3, SEEK_SET);
+            for (unsigned int i = 3; i < val[0]; i += params->ndv)
+              fwrite((void*)(parts + i), sizeof(aladyn_float), 3, binary_vtk);
           }
 
-          else printf("\nparametri->ndv imprevisto: %i\n", parametri->ndv);
 
 
-          if (parametri->p[WEIGHT] && !parametri->overwrite_weight)
+          if (params->file_has_weight && !params->overwrite_weight)
           {
             // scrittura pesi
-            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
-            for (unsigned int i = weight_index; i < val[0]; i += parametri->ndv)
-              fwrite((void*)(particelle + i), sizeof(float), 1, binary_vtk);
+            fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + params->nptot * sizeof(aladyn_float) * 3 + contatori[2] + parts_accumulate * sizeof(aladyn_float), SEEK_SET);
+            for (unsigned int i = weight_index; i < val[0]; i += params->ndv)
+              fwrite((void*)(parts + i), sizeof(aladyn_float), 1, binary_vtk);
           }
-          else if (parametri->p[WEIGHT] && parametri->overwrite_weight)
+          else if (params->file_has_weight && params->overwrite_weight)
           {
             // scrittura pesi sovrascritti da linea comando
-            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
-            for (unsigned int i = weight_index; i < val[0]; i += parametri->ndv)
-              fwrite((void*)(&(parametri->overwrite_weight_value)), sizeof(float), 1, binary_vtk);
+            fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + params->nptot * sizeof(aladyn_float) * 3 + contatori[2] + parts_accumulate * sizeof(aladyn_float), SEEK_SET);
+            for (unsigned int i = weight_index; i < val[0]; i += params->ndv)
+              fwrite((void*)(&(params->overwrite_weight_value)), sizeof(aladyn_float), 1, binary_vtk);
           }
 
-          if (parametri->file_version >= 3 && !parametri->overwrite_charge)
+          if (params->file_has_charge && !params->overwrite_charge)
           {
             // scrittura pesi
-            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
-            for (unsigned int i = charge_index; i < val[0]; i += parametri->ndv)
-              fwrite((void*)(particelle + i), sizeof(float), 1, binary_vtk);
+            fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + params->nptot * sizeof(aladyn_float) * 3 + contatori[2] + parts_accumulate * sizeof(aladyn_float), SEEK_SET);
+            for (unsigned int i = charge_index; i < val[0]; i += params->ndv)
+              fwrite((void*)(parts + i), sizeof(aladyn_float), 1, binary_vtk);
           }
-          else if (parametri->file_version >= 3 && parametri->overwrite_charge)
+          else if (params->file_has_charge && params->overwrite_charge)
           {
             // scrittura pesi sovrascritti da linea comando
-            fseeko(binary_vtk, contatori[0] + parametri->nptot * sizeof(float) * 3 + contatori[1] + parametri->nptot * sizeof(float) * 3 + contatori[2] + particelle_accumulate * sizeof(float), SEEK_SET);
-            for (unsigned int i = charge_index; i < val[0]; i += parametri->ndv)
-              fwrite((void*)(&(parametri->overwrite_weight_value)), sizeof(float), 1, binary_vtk);
+            fseeko(binary_vtk, contatori[0] + params->nptot * sizeof(aladyn_float) * 3 + contatori[1] + params->nptot * sizeof(aladyn_float) * 3 + contatori[2] + parts_accumulate * sizeof(aladyn_float), SEEK_SET);
+            for (unsigned int i = charge_index; i < val[0]; i += params->ndv)
+              fwrite((void*)(&(params->overwrite_weight_value)), sizeof(aladyn_float), 1, binary_vtk);
           }
         }
-        particelle_accumulate += val[0];
-        delete[] particelle;
-        particelle = NULL;
+        parts_accumulate += val[0];
+        delete[] parts;
+        parts = NULL;
       }
     }
-    indice_multifile++;
+    multifile_index++;
     conta_processori++;
   }
 
 
-  if (parametri->p[OUT_PARAMS])
+  if (params->out_params)
   {
     em_x /= (double)peso_accumulato;
     em_y /= (double)peso_accumulato;
@@ -902,35 +889,35 @@ int leggi_particelle(Parametri * parametri)
     emittance_y = sqrt((em_y2 - em_y*em_y)*(em_py2 - em_py*em_py) - (em_ypy - em_y*em_py)*(em_ypy - em_y*em_py));
     emittance_z = sqrt((em_z2 - em_z*em_z)*(em_pz2 - em_pz*em_pz) - (em_zpz - em_z*em_pz)*(em_zpz - em_z*em_pz));
 
-    parameters = fopen(nomefile_parametri, "w");
+    parameters = fopen(params_filename.c_str(), "wb");
     printf("\nWriting the parameters file\n");
-    fprintf(parameters, "ncpu_x=%i\n", parametri->ncpu_x);
-    fprintf(parameters, "ncpu_y=%i\n", parametri->ncpu_y);
-    fprintf(parameters, "ncpu_z=%i\n", parametri->ncpu_z);
-    fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) parametri->npx_ricampionati);
-    fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) parametri->npy_ricampionati);
-    fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) parametri->npz_ricampionati);
-    fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) parametri->npx_ricampionati_per_cpu);
-    fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) parametri->npy_ricampionati_per_cpu);
-    fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) parametri->npz_ricampionati_per_cpu);
-    fprintf(parameters, "tnow=%f\n", parametri->tnow);
-    fprintf(parameters, "xmin=%f\n", parametri->xmin);
-    fprintf(parameters, "xmax=%f\n", parametri->xmax);
-    fprintf(parameters, "ymin=%f\n", parametri->ymin);
-    fprintf(parameters, "ymax=%f\n", parametri->ymax);
-    fprintf(parameters, "zmin=%f\n", parametri->zmin);
-    fprintf(parameters, "zmax=%f\n", parametri->zmax);
+    fprintf(parameters, "ncpu_x=%i\n", params->ncpu_x);
+    fprintf(parameters, "ncpu_y=%i\n", params->ncpu_y);
+    fprintf(parameters, "ncpu_z=%i\n", params->ncpu_z);
+    fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) params->npx_resampled);
+    fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) params->npy_resampled);
+    fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) params->npz_resampled);
+    fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) params->npx_resampled_per_cpu);
+    fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) params->npy_resampled_per_cpu);
+    fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) params->npz_resampled_per_cpu);
+    fprintf(parameters, "tnow=%f\n", params->tnow);
+    fprintf(parameters, "xmin=%f\n", params->xmin);
+    fprintf(parameters, "xmax=%f\n", params->xmax);
+    fprintf(parameters, "ymin=%f\n", params->ymin);
+    fprintf(parameters, "ymax=%f\n", params->ymax);
+    fprintf(parameters, "zmin=%f\n", params->zmin);
+    fprintf(parameters, "zmax=%f\n", params->zmax);
     ////////////////////////////////////////////////////////////////////////////
-    fprintf(parameters, "rms_emittance_x=%g\n", emittance_x);    //massa particelle su massa elettrone
-    fprintf(parameters, "rms_emittance_y=%g\n", emittance_y);    //massa particelle su massa elettrone
-    fprintf(parameters, "rms_emittance_z=%g\n", emittance_z);    //massa particelle su massa elettrone
+    fprintf(parameters, "rms_emittance_x=%g\n", emittance_x);    //massa parts su massa elettrone
+    fprintf(parameters, "rms_emittance_y=%g\n", emittance_y);    //massa parts su massa elettrone
+    fprintf(parameters, "rms_emittance_z=%g\n", emittance_z);    //massa parts su massa elettrone
     ////////////////////////////////////////////////////////////////////////////
     fclose(parameters);
   }
 
-  if (parametri->p[FIND_MINMAX])
+  if (params->we_have_to_find_minmax)
   {
-    Estremi_out.open(nomefile_extremes);
+    Estremi_out.open(minmax_filename);
     if (Estremi_out.fail()) printf("\nunable to create .extremes file");
     Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
     Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
@@ -960,170 +947,170 @@ int leggi_particelle(Parametri * parametri)
     Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
     Estremi_out << "CHMIN = " << estremi_min[12] << std::endl;
     Estremi_out << "CHMAX = " << estremi_max[12] << std::endl;
-    if (parametri->p[OUT_PARAMS]) Estremi_out << "collected_weight = " << peso_accumulato << std::endl;
-    if (parametri->p[OUT_PARAMS]) Estremi_out << "collected_charge = " << carica_accumulata << std::endl;
+    if (params->out_params) Estremi_out << "collected_weight = " << peso_accumulato << std::endl;
+    if (params->out_params) Estremi_out << "collected_charge = " << carica_accumulata << std::endl;
     Estremi_out.close();
   }
 
 
-  if (parametri->p[DO_BINNING])
+  if (params->we_have_to_do_binning)
   {
-    if (parametri->fai_plot_xy)
+    if (params->do_plot_xy)
     {
-      sprintf(nomefile_binnato, "%s_xy.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, xy, "x", "y", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_xy.txt";
+      _Write(params, xy, "x", "y", std::string(binned_filename));
     }
-    if (parametri->fai_plot_xz)
+    if (params->do_plot_xz)
     {
-      sprintf(nomefile_binnato, "%s_xz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, xz, "x", "z", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_xz.txt";
+      _Write(params, xz, "x", "z", std::string(binned_filename));
     }
-    if (parametri->fai_plot_yz)
+    if (params->do_plot_yz)
     {
-      sprintf(nomefile_binnato, "%s_yz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, yz, "y", "z", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_yz.txt";
+      _Write(params, yz, "y", "z", std::string(binned_filename));
     }
-    if (parametri->fai_plot_rcf)
+    if (params->do_plot_rcf)
     {
-      sprintf(nomefile_binnato, "%s_rcf.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, rcf, "ty", "tz", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_rcf.txt";
+      _Write(params, rcf, "ty", "tz", std::string(binned_filename));
     }
-    if (parametri->fai_plot_xpx)
+    if (params->do_plot_xpx)
     {
-      sprintf(nomefile_binnato, "%s_xpx.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, xpx, "x", "px", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_xpx.txt";
+      _Write(params, xpx, "x", "px", std::string(binned_filename));
     }
-    if (parametri->fai_plot_xpy)
+    if (params->do_plot_xpy)
     {
-      sprintf(nomefile_binnato, "%s_xpy.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, xpy, "x", "py", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_xpy.txt";
+      _Write(params, xpy, "x", "py", std::string(binned_filename));
     }
-    if (parametri->fai_plot_xpz)
+    if (params->do_plot_xpz)
     {
-      sprintf(nomefile_binnato, "%s_xpz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, xpz, "x", "pz", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_xpz.txt";
+      _Write(params, xpz, "x", "pz", std::string(binned_filename));
     }
-    if (parametri->fai_plot_ypx)
+    if (params->do_plot_ypx)
     {
-      sprintf(nomefile_binnato, "%s_ypx.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, ypx, "y", "px", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_ypx.txt";
+      _Write(params, ypx, "y", "px", std::string(binned_filename));
     }
-    if (parametri->fai_plot_ypy)
+    if (params->do_plot_ypy)
     {
-      sprintf(nomefile_binnato, "%s_ypy.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, ypy, "y", "py", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_ypy.txt";
+      _Write(params, ypy, "y", "py", std::string(binned_filename));
     }
-    if (parametri->fai_plot_ypz)
+    if (params->do_plot_ypz)
     {
-      sprintf(nomefile_binnato, "%s_ypz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, ypz, "y", "pz", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_ypz.txt";
+      _Write(params, ypz, "y", "pz", std::string(binned_filename));
     }
-    if (parametri->fai_plot_zpx)
+    if (params->do_plot_zpx)
     {
-      sprintf(nomefile_binnato, "%s_zpx.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, zpx, "z", "px", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_zpx.txt";
+      _Write(params, zpx, "z", "px", std::string(binned_filename));
     }
-    if (parametri->fai_plot_zpy)
+    if (params->do_plot_zpy)
     {
-      sprintf(nomefile_binnato, "%s_zpy.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, zpy, "z", "py", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_zpy.txt";
+      _Write(params, zpy, "z", "py", std::string(binned_filename));
     }
-    if (parametri->fai_plot_xpz)
+    if (params->do_plot_xpz)
     {
-      sprintf(nomefile_binnato, "%s_zpz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, zpz, "z", "pz", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_zpz.txt";
+      _Write(params, zpz, "z", "pz", std::string(binned_filename));
     }
-    if (parametri->fai_plot_pxpy)
+    if (params->do_plot_pxpy)
     {
-      sprintf(nomefile_binnato, "%s_pxpy.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, pxpy, "px", "py", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_pxpy.txt";
+      _Write(params, pxpy, "px", "py", std::string(binned_filename));
     }
-    if (parametri->fai_plot_pxpz)
+    if (params->do_plot_pxpz)
     {
-      sprintf(nomefile_binnato, "%s_pxpz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, pxpz, "px", "pz", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_pxpz.txt";
+      _Write(params, pxpz, "px", "pz", std::string(binned_filename));
     }
-    if (parametri->fai_plot_pypz)
+    if (params->do_plot_pypz)
     {
-      sprintf(nomefile_binnato, "%s_pypz.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, pypz, "py", "pz", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_pypz.txt";
+      _Write(params, pypz, "py", "pz", std::string(binned_filename));
     }
-    if (parametri->fai_plot_xw)
+    if (params->do_plot_xw)
     {
-      sprintf(nomefile_binnato, "%s_xw.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, xw, "x", "w", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_xw.txt";
+      _Write(params, xw, "x", "w", std::string(binned_filename));
     }
-    if (parametri->fai_plot_Etheta)
+    if (params->do_plot_Etheta)
     {
-      sprintf(nomefile_binnato, "%s_Etheta.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, Etheta, "E", "theta", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_Etheta.txt";
+      _Write(params, Etheta, "E", "theta", std::string(binned_filename));
     }
-    if (parametri->fai_plot_EthetaT)
+    if (params->do_plot_EthetaT)
     {
-      sprintf(nomefile_binnato, "%s_EthetaT.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, EthetaT, "E", "thetaT", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_EthetaT.txt";
+      _Write(params, EthetaT, "E", "thetaT", std::string(binned_filename));
     }
-    if (parametri->fai_plot_Espec)
+    if (params->do_plot_Espec)
     {
-      sprintf(nomefile_binnato, "%s_Espec.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, Espec, "E", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_Espec.txt";
+      _Write(params, Espec, "E", std::string(binned_filename));
     }
-    if (parametri->fai_plot_wspec)
+    if (params->do_plot_wspec)
     {
-      sprintf(nomefile_binnato, "%s_wspec.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, wspec, "w", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_wspec.txt";
+      _Write(params, wspec, "w", std::string(binned_filename));
     }
-    if (parametri->fai_plot_chspec)
+    if (params->do_plot_chspec)
     {
-      sprintf(nomefile_binnato, "%s_chspec.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, chspec, "ch", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_chspec.txt";
+      _Write(params, chspec, "ch", std::string(binned_filename));
     }
-    if (parametri->fai_plot_thetaspec)
+    if (params->do_plot_thetaspec)
     {
-      sprintf(nomefile_binnato, "%s_thetaspec.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, thetaspec, "theta", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_thetaspec.txt";
+      _Write(params, thetaspec, "theta", std::string(binned_filename));
     }
-    if (parametri->fai_plot_thetaTspec)
+    if (params->do_plot_thetaTspec)
     {
-      sprintf(nomefile_binnato, "%s_thetaTspec.txt", parametri->filebasename.c_str());
-      _Scrittura(parametri, thetaTspec, "thetaT", std::string(nomefile_binnato));
+      binned_filename = params->filebasename + "_thetaTspec.txt";
+      _Write(params, thetaTspec, "thetaT", std::string(binned_filename));
     }
   }
 
   printf("\nfread_size=%lu\nEND\n\n", (unsigned long)fread_size);
 
 
-  if (parametri->p[OUT_VTK])
+  if (params->out_vtk)
   {
     fflush(binary_vtk);
     fclose(binary_vtk);
   }
 
-  if (parametri->p[OUT_CLEAN_BINARY])
+  if (params->out_clean_bin)
   {
     fflush(binary_clean);
     fclose(binary_clean);
   }
 
-  if (parametri->p[OUT_PROPAGA])
+  if (params->out_ppg)
   {
     fflush(ascii_propaga);
     fclose(ascii_propaga);
   }
 
-  if (parametri->p[OUT_XYZE])
+  if (params->out_xyze)
   {
     fflush(ascii_xyze);
     fclose(ascii_xyze);
   }
 
-  if (parametri->p[OUT_CSV])
+  if (params->out_csv)
   {
     fflush(ascii_csv);
     fclose(ascii_csv);
   }
 
-  if (!parametri->multifile) fclose(file_in);
+  if (!params->multifile) fclose(file_in);
 
   return 0;
 }
