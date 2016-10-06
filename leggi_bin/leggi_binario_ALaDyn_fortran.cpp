@@ -17,7 +17,7 @@ int main(const int argc, const char *argv[])
 
   if (argc > 1)
   {
-    if (argv[1] == "-help" || argv[1] == "/help" || argv[1] == "-h" || argv[1] == "/h")
+    if (!(strcmp(argv[1], "-help") &&  strcmp(argv[1], "-h") &&  strcmp(argv[1], "/help")  &&  strcmp(argv[1], "/h")) )
     {
       params.man(argv[0]);
       exit(-1);
