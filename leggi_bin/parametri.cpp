@@ -286,6 +286,7 @@ void Parameters::read_params_from_bin_file(const char * filename)
 
 void Parameters::check_swap() {
   if (endian_file == endian_machine) we_have_to_do_swap = false;
+  else we_have_to_do_swap = true;
   we_dont_know_if_we_have_to_do_swap = false;
 }
 
@@ -2479,11 +2480,16 @@ bool Parameters::check_params()
   bool test = true;
   if (we_dont_know_if_we_have_to_do_swap && do_not_ask_missing)
   {
+    printf("Warning: we don't know if we have to do swap, forcing to \"no_swap\" since we are in batch mode!\n");
     we_have_to_do_swap = 0;
     we_dont_know_if_we_have_to_do_swap = false;
     test = true;
   }
-  else test = false;
+  else if (we_dont_know_if_we_have_to_do_swap)
+  {
+    printf("Warning: we don't know if we have to do swap!\n");
+    test = false;
+  }
   if (phasespace_file)
   {
     if (xmin > xmax)

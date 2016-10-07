@@ -7,7 +7,6 @@
 int main(const int argc, const char *argv[])
 {
   Parameters params;
-  bool testParameters = true;
 
   std::ostringstream bin_filename, dat_filename;
   std::string forget_this_line, endianness, columns;
@@ -76,13 +75,7 @@ int main(const int argc, const char *argv[])
 
   params.check_swap();
   params.parse_command_line();
-  testParameters = params.check_params();
-
-  if (testParameters == false)
-  {
-    std::cout << "Incoherent parameters!" << std::endl;
-    exit(-3);
-  }
+  params.check_params();
 
   if (params.grid_file)            read_grid_file(&params);
   else if (params.phasespace_file) read_phase_space_file(&params);
