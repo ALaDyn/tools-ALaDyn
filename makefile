@@ -1,16 +1,16 @@
 
-TOOLS := analizza_binario \
-combina_vtk \
+TOOLS := binary_analyzer \
+binary_decoder \
+diagspec_reader \
 exponential_fit \
 extract_nptot \
 fix_nptot \
 InGenUO \
 interpolate_scan_results \
-leggi_bin \
-leggi_diagspec \
-leggi_partdist \
 lightweight_coredump_analyzer \
-logaritmic_fit
+logaritmic_fit \
+merge_vtk \
+partdist_reader
 
 
 all:
