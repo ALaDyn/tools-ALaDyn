@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  7
 #define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 0
+#define BUGFIX_RELEASE 1
 
 typedef float aladyn_float;
 
