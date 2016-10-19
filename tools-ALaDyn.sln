@@ -27,6 +27,15 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "partdist_reader", "partdist
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "binary_decoder", "binary_decoder\binary_decoder.vcxproj", "{54C32540-D6C7-48FF-828B-CC25488912C8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{890C018A-0AF0-4831-828C-E6DE138AE3F1}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		build_at_cnaf.sh = build_at_cnaf.sh
+		build_at_galileo.sh = build_at_galileo.sh
+		build_at_marconi.sh = build_at_marconi.sh
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

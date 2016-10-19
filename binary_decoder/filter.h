@@ -1,6 +1,6 @@
 #pragma once
 
-#include "binary_decoder.h"
+#include "parameters.h"
 
 
 //number of enabled filters

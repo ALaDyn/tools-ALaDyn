@@ -22,7 +22,7 @@ int read_grid_file(Parameters * params)
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
-  printf("Expected at least %f MB of RAM occupancy\n", ((params->npx_resampled*params->npy_resampled*params->npz_resampled + params->npx_resampled + params->npx_resampled_per_cpu*params->npy_resampled_per_cpu*params->npz_resampled_per_cpu)*sizeof(aladyn_float) + ((params->npy_resampled*params->npz_resampled + 1)*sizeof(buffer))) / 1024. / 1024.);
+  printf("Expected at least %f MB of RAM occupancy\n", ((params->npx_resampled*params->npy_resampled*params->npz_resampled + params->npx_resampled + params->npx_resampled_per_cpu*params->npy_resampled_per_cpu*params->npz_resampled_per_cpu) * sizeof(aladyn_float) + ((params->npy_resampled*params->npz_resampled + 1) * sizeof(buffer))) / 1024. / 1024.);
   printf("ALLOCATING MEMORY\n");
   fflush(stdout);
 
@@ -33,7 +33,7 @@ int read_grid_file(Parameters * params)
     for (size_t j = 0; j < params->npy_resampled; j++)
     {
       field[i][j] = new aladyn_float[params->npx_resampled];
-      allocated_size += (params->npx_resampled)*sizeof(aladyn_float);
+      allocated_size += (params->npx_resampled) * sizeof(aladyn_float);
     }
 #ifdef ENABLE_DEBUG
     printf("Allocated %llu bytes for fields\r", (unsigned long long int) allocated_size);
@@ -102,7 +102,7 @@ int read_grid_file(Parameters * params)
     // se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei params
 
     fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
-    // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i data non e' di alcun interesse
+                                                                                   // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i data non e' di alcun interesse
 
     if (!std::feof(file_in))
     {
@@ -209,7 +209,7 @@ int read_grid_file(Parameters * params)
     clean_fields = std::fopen(grid_filename.c_str(), "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
-    // create a buffer to optimize writing to output_file, here the buffer size is 1k
+                                                            // create a buffer to optimize writing to output_file, here the buffer size is 1k
     const int LEN = FORCE_PRINTF_BUFFER_SIZE;
     char * buffer_out = new char[LEN];
     if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
@@ -339,7 +339,7 @@ int read_grid_file(Parameters * params)
       clean_fields = std::fopen(grid_filename.c_str(), "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
-      // create a buffer to optimize writing to output_file, here the buffer size is 1k
+                                                              // create a buffer to optimize writing to output_file, here the buffer size is 1k
       const int LEN = FORCE_PRINTF_BUFFER_SIZE;
       char * buffer_out = new char[LEN];
       if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
@@ -398,7 +398,7 @@ int read_grid_file(Parameters * params)
       clean_fields = std::fopen(grid_filename.c_str(), "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
-      // create a buffer to optimize writing to output_file, here the buffer size is 1k
+                                                              // create a buffer to optimize writing to output_file, here the buffer size is 1k
       const int LEN = FORCE_PRINTF_BUFFER_SIZE;
       char * buffer_out = new char[LEN];
       if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
@@ -457,7 +457,7 @@ int read_grid_file(Parameters * params)
       clean_fields = std::fopen(grid_filename.c_str(), "wb"); // binary has just the meaning here not to convert \n to \r\n in Windows. The file is ASCII anyway ;)
 
 #if defined(FORCE_PRINTF_BUFFER_SIZE) && (FORCE_PRINTF_BUFFER_SIZE > 0)
-      // create a buffer to optimize writing to output_file, here the buffer size is 1k
+                                                              // create a buffer to optimize writing to output_file, here the buffer size is 1k
       const int LEN = FORCE_PRINTF_BUFFER_SIZE;
       char * buffer_out = new char[LEN];
       if (setvbuf(clean_fields, buffer_out, _IOFBF, LEN) != 0)
@@ -539,7 +539,7 @@ int read_grid_file(Parameters * params)
     }
 
     fprintf(clean_fields, "POINT_DATA %lu\n", (long)(params->npx_resampled*params->npy_resampled*params->npz_resampled));
-    fprintf(clean_fields, "SCALARS %s aladyn_float 1\n", params->support_label.c_str());
+    fprintf(clean_fields, "SCALARS %s aladyn_float 1\n", params->filebasename.substr(0, 4).c_str());
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
     fwrite((void*)field, sizeof(aladyn_float), params->npz_resampled*params->npy_resampled*params->npx_resampled, clean_fields);
     fclose(clean_fields);
@@ -622,7 +622,7 @@ int read_grid_file(Parameters * params)
       params->ycoord[params->npy_resampled / 2] - params->ycoord[params->npy_resampled / 2 - 1],
       params->zcoord[params->npz_resampled / 2] - params->zcoord[params->npz_resampled / 2 - 1]);
     fprintf(clean_fields, "POINT_DATA %lu\n", (long)(npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z));
-    fprintf(clean_fields, "SCALARS %s aladyn_float 1\n", params->support_label.c_str());
+    fprintf(clean_fields, "SCALARS %s aladyn_float 1\n", params->filebasename.substr(0, 4).c_str());
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
     fwrite((void*)field_non_stretchato, sizeof(aladyn_float), npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z, clean_fields);
 
@@ -669,51 +669,248 @@ int read_grid_file(Parameters * params)
     fclose(clean_fields);
   }
 
-  if (params->out_params)
+  return 0;
+
+}
+
+
+
+
+int create_json_from_grid_file(Parameters * params)
+{
+  std::ostringstream bin_filename;
+  int multifile_index = 0;
+  int fortran_buff;
+  int header_size = 3;
+  int * header = new int[header_size];
+  aladyn_float *buffer = NULL;
+  std::FILE *file_in = NULL;
+  size_t fread_size = 0;
+  size_t allocated_size = 0;
+
+  printf("Creating Json file, expected at least %f MB of RAM occupancy\n", ((params->npx_resampled*params->npy_resampled*params->npz_resampled + params->npx_resampled + params->npx_resampled_per_cpu*params->npy_resampled_per_cpu*params->npz_resampled_per_cpu) * sizeof(aladyn_float) + ((params->npy_resampled*params->npz_resampled + 1) * sizeof(buffer))) / 1024. / 1024.);
+  printf("ALLOCATING MEMORY\n");
+  fflush(stdout);
+
+  aladyn_float *** field = new aladyn_float**[params->npz_resampled];
+  for (size_t i = 0; i < params->npz_resampled; i++)
   {
-    params_filename = params->filebasename + ".parameters";
-    parameters = std::fopen(params_filename.c_str(), "wb");
-    printf("Writing parameters to file\n");
-    fprintf(parameters, "ncpu_x=%u\n", params->ncpu_x);
-    fprintf(parameters, "ncpu_y=%u\n", params->ncpu_y);
-    fprintf(parameters, "ncpu_z=%u\n", params->ncpu_z);
-    fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) params->npx_resampled);
-    fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) params->npy_resampled);
-    fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) params->npz_resampled);
-    fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) params->npx_resampled_per_cpu);
-    fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) params->npy_resampled_per_cpu);
-    fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) params->npz_resampled_per_cpu);
-    fprintf(parameters, "tnow=%f\n", params->tnow);
-    fprintf(parameters, "xmin=%f\n", params->xmin);
-    fprintf(parameters, "xmax=%f\n", params->xmax);
-    fprintf(parameters, "ymin=%f\n", params->ymin);
-    fprintf(parameters, "ymax=%f\n", params->ymax);
-    fprintf(parameters, "zmin=%f\n", params->zmin);
-    fprintf(parameters, "zmax=%f\n", params->zmax);
-
-    fprintf(parameters, "\n\nGrid along x axis\n");
-    for (unsigned int i = 0; i < params->npx_resampled; i++)
+    field[i] = new aladyn_float*[params->npy_resampled];
+    for (size_t j = 0; j < params->npy_resampled; j++)
     {
-      fprintf(parameters, "%.4g  ", params->xcoord[i]);
-      if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+      field[i][j] = new aladyn_float[params->npx_resampled];
+      allocated_size += (params->npx_resampled) * sizeof(aladyn_float);
     }
-
-    fprintf(parameters, "\n\nGrid along y axis\n");
-    for (unsigned int i = 0; i < params->npy_resampled; i++)
-    {
-      fprintf(parameters, "%.4g  ", params->ycoord[i]);
-      if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
-    }
-
-    fprintf(parameters, "\n\nGrid along z axis\n");
-    for (unsigned int i = 0; i < params->npz_resampled; i++)
-    {
-      fprintf(parameters, "%.4g  ", params->zcoord[i]);
-      if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
-    }
-
-    fclose(parameters);
+#ifdef ENABLE_DEBUG
+    printf("Allocated %llu bytes for fields\r", (unsigned long long int) allocated_size);
+#endif
   }
+
+  printf("READING\n");
+  if (!params->multifile)
+  {
+    bin_filename.str("");
+    bin_filename << params->filebasename << ".bin";
+    file_in = fopen(bin_filename.str().c_str(), "rb");
+    if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
+    else std::cout << "File opened to read data!" << std::endl;
+
+    /*skip header*/
+    std::fseek(file_in, (long)params->header_size_bytes, SEEK_SET);
+    std::cout << "Fseek of " << params->header_size_bytes << " bytes from beginning of file done" << std::endl << std::flush;
+
+    for (unsigned int ipx = 0; ipx < params->ncpu_x; ipx++)
+    {
+      for (unsigned int ipz = 0; ipz < params->ncpu_z; ipz++)
+      {
+        for (unsigned int ipy = 0; ipy < params->ncpu_y; ipy++)
+        {
+          if (params->file_version == 1 || params->file_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += sizeof(int)*std::fread(header, sizeof(int), header_size, file_in);
+          if (params->file_version == 1 || params->file_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+
+          if (params->we_have_to_do_swap) swap_endian_i(header, header_size);
+
+          if (header[0] != params->npx_resampled_per_cpu ||
+            header[1] != params->npy_resampled_per_cpu ||
+            (header[2] != params->npz_resampled_per_cpu && header[2] != 1 && params->npz_resampled_per_cpu != 0)) // fix for 2D files, which have 1 point in z for parameters but none for the binary dump
+          {
+            printf("\nWARNING: unexpected number of points in this chunk!\n");
+            printf("header[] = [%i,%i,%i], parameters[] = [%llu,%llu,%llu]\n", header[0], header[1], header[2], (unsigned long long int) params->npx_resampled_per_cpu, (unsigned long long int) params->npy_resampled_per_cpu, (unsigned long long int) params->npz_resampled_per_cpu);
+          }
+
+          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+          fflush(stdout);
+
+          buffer = new aladyn_float[header[0] * header[1] * header[2]];
+          if (params->file_version == 1 || params->file_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+          fread_size += sizeof(aladyn_float)*std::fread(buffer, sizeof(aladyn_float), header[0] * header[1] * header[2], file_in);
+          if (params->file_version == 1 || params->file_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+
+          if (params->we_have_to_do_swap) swap_endian_f(buffer, header[0] * header[1] * header[2]);
+
+          for (size_t k = 0; k < header[2]; k++)
+            for (size_t j = 0; j < header[1]; j++)
+              for (size_t i = 0; i < header[0]; i++)
+                field[k + (ipz * params->npz_resampled_per_cpu)]
+                /* */[j + (ipy * params->npy_resampled_per_cpu)]
+          /*       */[i + (ipx * params->npx_resampled_per_cpu)] =
+            /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
+
+          delete[] buffer;
+          buffer = NULL;
+        }
+      }
+    }
+
+    // leggiamo ora le coordinate dei punti di griglia, presenti solo nelle versioni che possono prevedere griglia stretchata e che ancora non la scrivevano nel .dat
+    // se presenti, sovrascrivono quelle lette o precostruite (se non trovate nel file .dat) dalle routine dei params
+
+    fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);  // facciamo il test sul buffer Fortran della prima coordinata;
+                                                                                   // se esiste, non e' necessario tornare indietro perche' il buffer fortran che precede i data non e' di alcun interesse
+
+    if (!std::feof(file_in))
+    {
+      aladyn_float *x_coordinates, *y_coordinates, *z_coordinates;
+      x_coordinates = new aladyn_float[params->npx_resampled];
+      y_coordinates = new aladyn_float[params->npy_resampled];
+      z_coordinates = new aladyn_float[params->npz_resampled];
+      fread_size += sizeof(aladyn_float)*std::fread(x_coordinates, sizeof(aladyn_float), params->npx_resampled, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(aladyn_float)*std::fread(y_coordinates, sizeof(aladyn_float), params->npy_resampled, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+      fread_size += sizeof(aladyn_float)*std::fread(z_coordinates, sizeof(aladyn_float), params->npz_resampled, file_in);
+      fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
+
+      if (params->we_have_to_do_swap)
+      {
+        swap_endian_f(x_coordinates, params->npx_resampled);
+        swap_endian_f(y_coordinates, params->npy_resampled);
+        swap_endian_f(z_coordinates, params->npz_resampled);
+      }
+
+      params->xcoord.resize(params->npx_resampled, 0);
+      params->ycoord.resize(params->npy_resampled, 0);
+      params->zcoord.resize(params->npz_resampled, 0);
+
+      for (size_t i = 0; i < params->npx_resampled; i++)
+        params->xcoord[i] = x_coordinates[i];
+      for (size_t i = 0; i < params->npy_resampled; i++)
+        params->ycoord[i] = y_coordinates[i];
+      for (size_t i = 0; i < params->npz_resampled; i++)
+        params->zcoord[i] = z_coordinates[i];
+    }
+    else params->stretched_grid = false;
+  }
+  else
+  {
+    int header_size = 3;
+    int * header = new int[header_size];
+    while (1)
+    {
+      bin_filename.str("");
+      bin_filename << params->filebasename << "_" << std::setfill('0') << std::setw(3) << multifile_index << ".bin";
+      file_in = fopen(bin_filename.str().c_str(), "rb");
+      if (file_in == NULL)
+      {
+        std::cout << "End of files!" << std::endl;
+        break;
+      }
+      else std::cout << "Opened file #" << multifile_index << " to read data!" << std::endl;
+
+      /*skip header*/
+      std::fseek(file_in, (long)params->header_size_bytes, SEEK_SET);
+      std::cout << "Fseek of " << params->header_size_bytes << " bytes from beginning of file done" << std::endl << std::flush;
+
+      for (unsigned int ipx = 0; ipx < params->ncpu_x; ipx++)
+      {
+        for (unsigned int ipz = 0; ipz < params->ncpu_z; ipz++)
+        {
+          for (unsigned int ipy = 0; ipy < params->ncpu_y; ipy++)
+          {
+            fread_size += sizeof(int)*std::fread(header, sizeof(int), header_size, file_in);
+            if (params->we_have_to_do_swap) swap_endian_i(header, header_size);
+
+#ifdef ENABLE_DEBUG
+            if (header[0] != params->npx_resampled_per_cpu ||
+              header[1] != params->npy_resampled_per_cpu ||
+              header[2] != params->npz_resampled_per_cpu)
+              std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
+#endif
+
+            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+            fflush(stdout);
+
+            buffer = new aladyn_float[header[0] * header[1] * header[2]];
+            fread_size += sizeof(aladyn_float)*std::fread(buffer, sizeof(aladyn_float), header[0] * header[1] * header[2], file_in);
+
+            if (params->we_have_to_do_swap) swap_endian_f(buffer, params->npx_resampled_per_cpu*params->npy_resampled_per_cpu*params->npz_resampled_per_cpu);
+
+            for (size_t k = 0; k < header[2]; k++)
+              for (size_t j = 0; j < header[1]; j++)
+                for (size_t i = 0; i < header[0]; i++)
+                  field[k + (ipz * params->npz_resampled_per_cpu)]
+                  /* */[j + (ipy * params->npy_resampled_per_cpu)]
+            /*       */[i + (ipx * params->npx_resampled_per_cpu)] =
+              /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
+            delete[] buffer;
+            buffer = NULL;
+          }
+        }
+      }
+      multifile_index++;
+      fclose(file_in);
+    }
+  }
+
+  std::cout << std::endl << "JSON ROUTINE - END READING: TOTAL " << fread_size / (1024. * 1024.) << " MB READ" << std::endl << std::flush;
+
+  std::string json_filename;
+  std::FILE* parameters;
+  json_filename = params->filebasename + ".json";
+  parameters = std::fopen(json_filename.c_str(), "wb");
+  printf("Writing parameters to file\n");
+  fprintf(parameters, "ncpu_x=%u\n", params->ncpu_x);
+  fprintf(parameters, "ncpu_y=%u\n", params->ncpu_y);
+  fprintf(parameters, "ncpu_z=%u\n", params->ncpu_z);
+  fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) params->npx_resampled);
+  fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) params->npy_resampled);
+  fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) params->npz_resampled);
+  fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) params->npx_resampled_per_cpu);
+  fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) params->npy_resampled_per_cpu);
+  fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) params->npz_resampled_per_cpu);
+  fprintf(parameters, "tnow=%f\n", params->tnow);
+  fprintf(parameters, "xmin=%f\n", params->xmin);
+  fprintf(parameters, "xmax=%f\n", params->xmax);
+  fprintf(parameters, "ymin=%f\n", params->ymin);
+  fprintf(parameters, "ymax=%f\n", params->ymax);
+  fprintf(parameters, "zmin=%f\n", params->zmin);
+  fprintf(parameters, "zmax=%f\n", params->zmax);
+
+  fprintf(parameters, "\n\nGrid along x axis\n");
+  for (unsigned int i = 0; i < params->npx_resampled; i++)
+  {
+    fprintf(parameters, "%.4g  ", params->xcoord[i]);
+    if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+  }
+
+  fprintf(parameters, "\n\nGrid along y axis\n");
+  for (unsigned int i = 0; i < params->npy_resampled; i++)
+  {
+    fprintf(parameters, "%.4g  ", params->ycoord[i]);
+    if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+  }
+
+  fprintf(parameters, "\n\nGrid along z axis\n");
+  for (unsigned int i = 0; i < params->npz_resampled; i++)
+  {
+    fprintf(parameters, "%.4g  ", params->zcoord[i]);
+    if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+  }
+
+  fclose(parameters);
 
 
   return 0;

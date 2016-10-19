@@ -1,50 +1,18 @@
 
 #include "binning.h"
 
-_Binning::_Binning(aladyn_float * parts, Parameters * params, aladyn_float ** data_binned, std::string binx, std::string biny)
+_Binning::_Binning(aladyn_float * parts, Parameters * params, densityplot * plot)
 {
-  int bin_on_x = 0, bin_on_y = 0;
-  int whichbin_x = 0, whichbin_y = 0;
+  size_t bin_on_x = plot->get_x_column_to_bin(), bin_on_y = plot->get_y_column_to_bin();
+  size_t whichbin_x = 0, whichbin_y = 0;
   size_t ndv = params->ndv;
 
-  double min_x = 0.0, min_y = 0.0, max_x = 1.0, max_y = 1.0;
+  aladyn_float min_x = 0.0, min_y = 0.0, max_x = 1.0, max_y = 1.0;
 
-  if (binx == "x") bin_on_x = COLUMN_X; 
-  else if (binx == "y") bin_on_x = COLUMN_Y; 
-  else if (binx == "z") bin_on_x = COLUMN_Z; 
-  else if (binx == "px") bin_on_x = COLUMN_PX; 
-  else if (binx == "py") bin_on_x = COLUMN_PY; 
-  else if (binx == "pz") bin_on_x = COLUMN_PZ; 
-  else if (binx == "gamma") bin_on_x = COLUMN_GAMMA; 
-  else if (binx == "theta") bin_on_x = COLUMN_THETA; 
-  else if (binx == "E") bin_on_x = COLUMN_E; 
-  else if (binx == "thetaT") bin_on_x = COLUMN_THETAT; 
-  else if (binx == "ty") bin_on_x = COLUMN_TY; 
-  else if (binx == "tz") bin_on_x = COLUMN_TZ; 
-  else if (binx == "w") bin_on_x = COLUMN_W; 
-  else if (binx == "ch") bin_on_x = COLUMN_CH; 
-  else std::cerr << "Unrecognized x variable" << std::endl;
-
-  if (biny == "x") bin_on_y = COLUMN_X;
-  else if (biny == "y") bin_on_y = COLUMN_Y;
-  else if (biny == "z") bin_on_y = COLUMN_Z;
-  else if (biny == "px") bin_on_y = COLUMN_PX;
-  else if (biny == "py") bin_on_y = COLUMN_PY;
-  else if (biny == "pz") bin_on_y = COLUMN_PZ;
-  else if (biny == "gamma") bin_on_y = COLUMN_GAMMA;
-  else if (biny == "theta") bin_on_y = COLUMN_THETA;
-  else if (biny == "E") bin_on_y = COLUMN_E;
-  else if (biny == "thetaT") bin_on_y = COLUMN_THETAT;
-  else if (biny == "ty") bin_on_y = COLUMN_TY;
-  else if (biny == "tz") bin_on_y = COLUMN_TZ;
-  else if (biny == "w") bin_on_y = COLUMN_W;
-  else if (biny == "ch") bin_on_y = COLUMN_CH;
-  else std::cerr << "Unrecognized y variable" << std::endl;
-
-  min_x = params->get_min(bin_on_x);
-  max_x = params->get_max(bin_on_x);
-  min_y = params->get_min(bin_on_y);
-  max_y = params->get_max(bin_on_y);
+  min_x = plot->min_value_x;
+  max_x = plot->max_value_x;
+  min_y = plot->min_value_y;
+  max_y = plot->max_value_y;
 
   aladyn_float x, y, z, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   aladyn_float going_to_bin_on_x = 0., going_to_bin_on_y = 0.;
@@ -157,11 +125,11 @@ _Binning::_Binning(aladyn_float * parts, Parameters * params, aladyn_float ** da
     }
     else if (going_to_bin_on_x > max_x)
     {
-      whichbin_x = params->get_nbin(bin_on_x) + 2;
+      whichbin_x = plot->nbin_x + 2;
     }
     else
     {
-      whichbin_x = (int)(((going_to_bin_on_x - min_x) / params->get_size_(bin_on_x)) + 1.0);
+      whichbin_x = (int)(((going_to_bin_on_x - min_x) / plot->get_bin_size_x()) + 1.0);
     }
     if (going_to_bin_on_y < min_y)
     {
@@ -169,43 +137,26 @@ _Binning::_Binning(aladyn_float * parts, Parameters * params, aladyn_float ** da
     }
     else if (going_to_bin_on_y > max_x)
     {
-      whichbin_y = params->get_nbin(bin_on_y) + 2;
+      whichbin_y = plot->nbin_y + 2;
     }
     else
     {
-      whichbin_y = (int)(((going_to_bin_on_y - min_y) / params->get_size_(bin_on_y)) + 1.0);
+      whichbin_y = (int)(((going_to_bin_on_y - min_y) / plot->get_bin_size_y()) + 1.0);
     }
 
-    data_binned[whichbin_x][whichbin_y] += w;
+    plot->data[whichbin_x][whichbin_y] += w;
   }
 }
 
-_Binning::_Binning(aladyn_float * parts, Parameters * params, aladyn_float * data_binned, std::string binx)
+
+_Binning::_Binning(aladyn_float * parts, Parameters * params, histo * plot)
 {
-  int bin_on_x = 0;
-  int whichbin_x = 0;
+  size_t bin_on_x = plot->get_column_to_bin();
+  size_t whichbin_x = 0;
   size_t ndv = params->ndv;
-  double min_x = 0.0, max_x = 1.0;
-
-  if (binx == "x") bin_on_x = COLUMN_X;
-  else if (binx == "y") bin_on_x = COLUMN_Y;
-  else if (binx == "z") bin_on_x = COLUMN_Z;
-  else if (binx == "px") bin_on_x = COLUMN_PX;
-  else if (binx == "py") bin_on_x = COLUMN_PY;
-  else if (binx == "pz") bin_on_x = COLUMN_PZ;
-  else if (binx == "gamma") bin_on_x = COLUMN_GAMMA;
-  else if (binx == "theta") bin_on_x = COLUMN_THETA;
-  else if (binx == "E") bin_on_x = COLUMN_E;
-  else if (binx == "thetaT") bin_on_x = COLUMN_THETAT;
-  else if (binx == "ty") bin_on_x = COLUMN_TY;
-  else if (binx == "tz") bin_on_x = COLUMN_TZ;
-  else if (binx == "w") bin_on_x = COLUMN_W;
-  else if (binx == "ch") bin_on_x = COLUMN_CH;
-  else std::cerr << "Unrecognized x variable" << std::endl;
-
-  min_x = params->get_min(bin_on_x);
-  max_x = params->get_max(bin_on_x);
-
+  aladyn_float min_x = 0.0, max_x = 1.0;
+  min_x = plot->min_value;
+  max_x = plot->max_value;
 
   aladyn_float x, y, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   aladyn_float going_to_bin_on_x = 0.;
@@ -291,14 +242,14 @@ _Binning::_Binning(aladyn_float * parts, Parameters * params, aladyn_float * dat
     }
     else if (going_to_bin_on_x > max_x)
     {
-      whichbin_x = params->get_nbin(bin_on_x) + 2;
+      whichbin_x = plot->nbin + 2;
     }
     else
     {
-      whichbin_x = (int)(((going_to_bin_on_x - min_x) / params->get_size_(bin_on_x)) + 1.0);
+      whichbin_x = (int)(((going_to_bin_on_x - min_x) / plot->get_bin_size()) + 1.0);
     }
 
-    data_binned[whichbin_x] += w;
+    plot->data[whichbin_x] += w;
   }
 }
 

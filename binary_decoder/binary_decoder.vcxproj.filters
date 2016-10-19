@@ -60,9 +60,6 @@
     <ClCompile Include="grid_file_decoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="output.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="parameters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -86,10 +83,10 @@
     <ClInclude Include="grid_file_decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="output.h">
+    <ClInclude Include="phasespace_file_decoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="phasespace_file_decoder.h">
+    <ClInclude Include="parameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

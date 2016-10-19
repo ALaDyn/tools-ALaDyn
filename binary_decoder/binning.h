@@ -1,12 +1,12 @@
 #pragma once
 
-#include "binary_decoder.h"
+#include "parameters.h"
 
 
 struct _Binning
 {
-  _Binning(aladyn_float *, Parameters *, aladyn_float **, std::string, std::string);
-  _Binning(aladyn_float *, Parameters *, aladyn_float *, std::string);
+  _Binning::_Binning(aladyn_float *, Parameters *, densityplot *);
+  _Binning::_Binning(aladyn_float * , Parameters * , histo * );
 };
 
 

@@ -76,7 +76,6 @@
     <ClCompile Include="binning.cpp" />
     <ClCompile Include="filter.cpp" />
     <ClCompile Include="grid_file_decoder.cpp" />
-    <ClCompile Include="output.cpp" />
     <ClCompile Include="parameters.cpp" />
     <ClCompile Include="phasespace_file_decoder.cpp" />
     <ClCompile Include="swap_tools.cpp" />
@@ -86,7 +85,7 @@
     <ClInclude Include="binning.h" />
     <ClInclude Include="filter.h" />
     <ClInclude Include="grid_file_decoder.h" />
-    <ClInclude Include="output.h" />
+    <ClInclude Include="parameters.h" />
     <ClInclude Include="phasespace_file_decoder.h" />
     <ClInclude Include="swap_tools.h" />
   </ItemGroup>

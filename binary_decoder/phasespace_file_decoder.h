@@ -1,9 +1,8 @@
 #pragma once
 
-#include "binary_decoder.h"
+#include "parameters.h"
 #include "binning.h"
 #include "filter.h"
-#include "output.h"
 #include "swap_tools.h"
 
 
@@ -35,6 +34,7 @@ union double_as_two_float {
 
 
 
-int read_phase_space_file(Parameters * );
+int read_phasespace_file(Parameters *);
+int create_json_from_phasespace_file(Parameters * );
 
 

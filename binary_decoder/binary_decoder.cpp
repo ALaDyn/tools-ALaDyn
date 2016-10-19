@@ -1,4 +1,3 @@
-
 #include "binary_decoder.h"
 #include "grid_file_decoder.h"
 #include "phasespace_file_decoder.h"
@@ -8,15 +7,14 @@ int main(const int argc, const char *argv[])
 {
   Parameters params;
 
-  std::ostringstream bin_filename, dat_filename;
-  std::string forget_this_line, endianness, columns;
-  std::ifstream file_dat, file_bin;
+  std::string bin_filename, dat_filename, json_filename;
+  std::ifstream bin_file, dat_file, json_file;
 
-  std::cout << std::endl << "ALaDyn binary decoder v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
+  std::cout << "ALaDyn binary decoder v" << MAJOR_RELEASE << "." << MINOR_RELEASE << "." << BUGFIX_RELEASE << std::endl;
 
   if (argc > 1)
   {
-    if (!(strcmp(argv[1], "-help") &&  strcmp(argv[1], "-h") &&  strcmp(argv[1], "/help")  &&  strcmp(argv[1], "/h")) )
+    if (!(strcmp(argv[1], "-help") && strcmp(argv[1], "-h") && strcmp(argv[1], "/help") && strcmp(argv[1], "/h")))
     {
       params.man(argv[0]);
       exit(-1);
@@ -31,18 +29,19 @@ int main(const int argc, const char *argv[])
   else params.filebasename = std::string(argv[1]);
 
 
-  bin_filename << params.filebasename << ".bin";
-  dat_filename << params.filebasename << ".dat";
+  bin_filename = params.filebasename + ".bin";
+  dat_filename = params.filebasename + ".dat";
+  json_filename = params.filebasename + ".json";
 
-  file_bin.open(bin_filename.str().c_str(), std::ios::binary | std::ios::in);
-  if (file_bin.fail())
+  bin_file.open(bin_filename, std::ios::binary | std::ios::in);
+  if (bin_file.fail())
   {
-    bin_filename.str("");
-    bin_filename << params.filebasename << "_000.bin";
-    file_bin.open(bin_filename.str().c_str(), std::ios::binary | std::ios::in);
-    if (file_bin.fail())
+    bin_filename.clear();
+    bin_filename = params.filebasename + "_000.bin";
+    bin_file.open(bin_filename, std::ios::binary | std::ios::in);
+    if (bin_file.fail())
     {
-      std::cout << "Input file not found" << std::endl;
+      std::cerr << "Input file not found" << std::endl;
       exit(-2);
     }
     else params.multifile = true;
@@ -51,37 +50,50 @@ int main(const int argc, const char *argv[])
   if (params.multifile) std::cout << "Input files are " << params.filebasename << "_???.bin" << std::endl;
   else std::cout << "Input file is " << params.filebasename << ".bin" << std::endl;
   params.check_filename(params.filebasename.c_str());
-  file_bin.close();
+  bin_file.close();
   params.check_forced_version(argc, argv);
 
-  file_dat.open(dat_filename.str().c_str());
-  if (file_dat.fail())
+  dat_file.open(dat_filename);
+  if (dat_file.fail())
   {
+    std::cerr << "Unable to find " << params.filebasename << ".dat, using routines for aladyn v1" << std::endl;
     params.file_version = 1;
-    std::cout << "Unable to find " << params.filebasename << ".dat, using routines for aladyn v1" << std::endl;
 
-    if (params.we_dont_know_if_we_have_to_do_swap) params.ask_file_endianness();
+    if (params.we_dont_know_if_we_have_to_do_swap) {
+      std::cerr << "Unable to determine if swap is required, please add command line flag" << std::endl;
+      exit(-3);
+    }
 
     params.read_params_from_bin_file(params.filebasename.c_str());
 
-    if (params.we_dont_know_if_sim_is_2d) params.ask_file_dims();
+    if (params.we_dont_know_if_sim_is_2d) {
+      std::cerr << "Unable to determine if sim is 2D or not, please add command line flag" << std::endl;
+      exit(-4);
+    }
   }
   else
   {
     std::cout << "Found " << params.filebasename << ".dat, using new routines" << std::endl;
-    params.read_params_from_dat_file(file_dat);
+    params.read_params_from_dat_file(dat_file);
   }
-  file_dat.close();
+  dat_file.close();
 
   params.check_swap();
   params.parse_command_line();
-  params.check_params();
+
+  json_file.open(json_filename);
+  if (json_file.fail()) {
+    if (params.grid_file)            create_json_from_grid_file(&params);
+    else if (params.phasespace_file) create_json_from_phasespace_file(&params);
+  }
+  else json_file.close();
+  params.parse_json();
 
   if (params.grid_file)            read_grid_file(&params);
-  else if (params.phasespace_file) read_phase_space_file(&params);
+  else if (params.phasespace_file) read_phasespace_file(&params);
   else {
-    std::cout << "Unknown file name, I don't know what to do with it! Rename it or change tool!" << std::endl;
-    exit(-4);
+    std::cerr << "Unknown file name, I don't know what to do with it! Rename it or change tool!" << std::endl;
+    exit(-5);
   }
 
   return 0;
