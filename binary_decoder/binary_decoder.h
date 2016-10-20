@@ -11,7 +11,7 @@
 
 #define MAJOR_RELEASE  7
 #define MINOR_RELEASE  1
-#define BUGFIX_RELEASE 1
+#define BUGFIX_RELEASE 2
 
 typedef float aladyn_float;
 
@@ -31,6 +31,9 @@ typedef float aladyn_float;
 #include <cfloat>
 #include <ios>
 #include <cstdarg>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
+#include "jsoncons/json.hpp"
 
 #if (defined CINECA)
 #include <inttypes.h>
@@ -68,7 +71,6 @@ typedef float aladyn_float;
 #endif
 
 
-#define MAX_NUM_OF_PARTICLES_IN_MEMORY 10000000            // in reality we store double this number -1
 #define UMA_G                          1.660538921E-24     // from uma to grams
 #define SPEED_OF_LIGHT                 2.99792458E+10      // cm / s
 #define ME_G                           9.10938291E-28      // electron mass [g]
@@ -80,7 +82,6 @@ typedef float aladyn_float;
 //#define CHARGE                       4.80320425e-10      // statC  - official value
 #define CHARGE                         4.803262e-10        // statC  - Turchetti's value
 #define FORCE_PRINTF_BUFFER_SIZE       1024
-#define INVALID_COLUMN                -1
 #define COLUMN_X                       0
 #define COLUMN_Y                       1
 #define COLUMN_Z                       2

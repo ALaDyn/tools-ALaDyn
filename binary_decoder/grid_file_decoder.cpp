@@ -868,50 +868,53 @@ int create_json_from_grid_file(Parameters * params)
   std::cout << std::endl << "JSON ROUTINE - END READING: TOTAL " << fread_size / (1024. * 1024.) << " MB READ" << std::endl << std::flush;
 
   std::string json_filename;
-  std::FILE* parameters;
   json_filename = params->filebasename + ".json";
-  parameters = std::fopen(json_filename.c_str(), "wb");
-  printf("Writing parameters to file\n");
-  fprintf(parameters, "ncpu_x=%u\n", params->ncpu_x);
-  fprintf(parameters, "ncpu_y=%u\n", params->ncpu_y);
-  fprintf(parameters, "ncpu_z=%u\n", params->ncpu_z);
-  fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) params->npx_resampled);
-  fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) params->npy_resampled);
-  fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) params->npz_resampled);
-  fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) params->npx_resampled_per_cpu);
-  fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) params->npy_resampled_per_cpu);
-  fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) params->npz_resampled_per_cpu);
-  fprintf(parameters, "tnow=%f\n", params->tnow);
-  fprintf(parameters, "xmin=%f\n", params->xmin);
-  fprintf(parameters, "xmax=%f\n", params->xmax);
-  fprintf(parameters, "ymin=%f\n", params->ymin);
-  fprintf(parameters, "ymax=%f\n", params->ymax);
-  fprintf(parameters, "zmin=%f\n", params->zmin);
-  fprintf(parameters, "zmax=%f\n", params->zmax);
+  std::ofstream json_file;
+  json_file.open(json_filename);
+  if (json_file.fail()) std::cerr << "Unable to create .json file!" << std::endl;
 
-  fprintf(parameters, "\n\nGrid along x axis\n");
+  jsoncons::json parameters;
+
+  parameters["ncpu_x"] = params->ncpu_x;
+  parameters["ncpu_y"] = params->ncpu_y;
+  parameters["ncpu_z"] = params->ncpu_z;
+  parameters["npx_resampled"] = params->npx_resampled;
+  parameters["npy_resampled"] = params->npy_resampled;
+  parameters["npz_resampled"] = params->npz_resampled;
+  parameters["npx_resampled_per_cpu"] = params->npx_resampled_per_cpu;
+  parameters["npy_resampled_per_cpu"] = params->npy_resampled_per_cpu;
+  parameters["npz_resampled_per_cpu"] = params->npz_resampled_per_cpu;
+  parameters["tnow"] = params->tnow;
+  parameters["xmin"] = params->xmin;
+  parameters["xmax"] = params->xmax;
+  parameters["ymin"] = params->ymin;
+  parameters["ymax"] = params->ymax;
+  parameters["zmin"] = params->zmin;
+  parameters["zmax"] = params->zmax;
+
+  jsoncons::json grid_x = jsoncons::json::array();
   for (unsigned int i = 0; i < params->npx_resampled; i++)
   {
-    fprintf(parameters, "%.4g  ", params->xcoord[i]);
-    if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+    grid_x.add(params->xcoord[i]);
   }
+  parameters["grid_x"] = grid_x;
 
-  fprintf(parameters, "\n\nGrid along y axis\n");
+  jsoncons::json grid_y = jsoncons::json::array();
   for (unsigned int i = 0; i < params->npy_resampled; i++)
   {
-    fprintf(parameters, "%.4g  ", params->ycoord[i]);
-    if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+    grid_y.add(params->ycoord[i]);
   }
+  parameters["grid_y"] = grid_y;
 
-  fprintf(parameters, "\n\nGrid along z axis\n");
+  jsoncons::json grid_z = jsoncons::json::array();
   for (unsigned int i = 0; i < params->npz_resampled; i++)
   {
-    fprintf(parameters, "%.4g  ", params->zcoord[i]);
-    if (i > 0 && i % 10 == 0) fprintf(parameters, "\n");
+    grid_z.add(params->zcoord[i]);
   }
+  parameters["grid_z"] = grid_z;
 
-  fclose(parameters);
-
+  json_file << jsoncons::pretty_print(parameters) << std::endl;
+  std::cout << "fread_size = " << fread_size << std::endl << "json parameters file produced!" << std::endl;
 
   return 0;
 

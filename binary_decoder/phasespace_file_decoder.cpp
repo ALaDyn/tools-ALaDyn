@@ -16,7 +16,7 @@ int read_phasespace_file(Parameters * params)
   unsigned int val[2] = { 0, 0 };
   aladyn_float array_supporto8[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   aladyn_float array_supporto6[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
-  size_t max_number_of_particles_in_memory = MAX_NUM_OF_PARTICLES_IN_MEMORY;
+  const size_t max_number_of_particles_in_memory = 10000000;          // in reality we store double this number -1
 
   std::FILE *binary_vtk = NULL;
   std::FILE *binary_clean = NULL;
@@ -39,7 +39,6 @@ int read_phasespace_file(Parameters * params)
   aladyn_float *parts = NULL;
   std::string bin_filename;
   std::string dat_filename;
-  std::string json_filename;
   std::string vtk_filename;
   std::string clean_bin_filename;
   std::string ppg_filename;
@@ -67,7 +66,6 @@ int read_phasespace_file(Parameters * params)
   clean_bin_filename = params->filebasename + "_clean.bin";
   bin_filename = params->filebasename + ".bin";
   dat_filename = params->filebasename + ".dat";
-  json_filename = params->filebasename + ".json";
 
   if (!params->multifile) file_in = fopen(bin_filename.c_str(), "rb");
 
@@ -235,135 +233,6 @@ int read_phasespace_file(Parameters * params)
         }
 
         _Filter(params, parts, val, _Filter::build_filter(params));
-
-        if (params->out_json)
-        {
-          for (unsigned int i = 0; i < val[0]; i++)
-          {
-            if (params->sim_is_2d)
-            {
-              x = *(parts + i*params->ndv);
-              y = *(parts + i*params->ndv + 1);
-              px = *(parts + i*params->ndv + 2);
-              py = *(parts + i*params->ndv + 3);
-              if (params->file_has_weight && !params->overwrite_weight)
-                w = *(parts + i*params->ndv + 4);
-              else
-                w = params->overwrite_weight_value;
-              if (params->file_version >= 3 && !params->overwrite_charge)
-                ch = *(parts + i*params->ndv + 5);
-              else
-                ch = params->overwrite_charge_value;
-              gamma = (aladyn_float)(sqrt(1. + px*px + py*py) - 1.);       //gamma
-              theta = (aladyn_float)(atan2(py, px)*180. / M_PI);       //theta
-              thetaT = (aladyn_float)atan(sqrt((py*py) / (px*px)));
-              E = (aladyn_float)(gamma*params->mass_MeV); //energia
-              if (px > 0) ty = py / px;
-              else ty = 0.0;
-              if (x < estremi_min[0]) estremi_min[0] = x;
-              if (x > estremi_max[0]) estremi_max[0] = x;
-              if (y < estremi_min[1]) estremi_min[1] = y;
-              if (y > estremi_max[1]) estremi_max[1] = y;
-              estremi_min[2] = 0., estremi_max[2] = 1.;
-              if (px < estremi_min[3]) estremi_min[3] = px;
-              if (px > estremi_max[3]) estremi_max[3] = px;
-              if (py < estremi_min[4]) estremi_min[4] = py;
-              if (py > estremi_max[4]) estremi_max[4] = py;
-              estremi_min[5] = 0., estremi_max[5] = 1.;
-              if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-              if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-              if (theta < estremi_min[7]) estremi_min[7] = theta;
-              if (theta > estremi_max[7]) estremi_max[7] = theta;
-              if (E < estremi_min[8]) estremi_min[8] = E;
-              if (E > estremi_max[8]) estremi_max[8] = E;
-              if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
-              if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
-              if (ty < estremi_min[10]) estremi_min[10] = ty;
-              if (ty > estremi_max[10]) estremi_max[10] = ty;
-              estremi_min[11] = -1., estremi_max[11] = 1.;
-              if (w < estremi_min[12]) estremi_min[12] = w;
-              if (w > estremi_max[12]) estremi_max[12] = w;
-              if (ch < estremi_min[13]) estremi_min[13] = ch;
-              if (ch > estremi_max[13]) estremi_max[13] = ch;
-            }
-            else
-            {
-              x = *(parts + i*params->ndv);
-              y = *(parts + i*params->ndv + 1);
-              z = *(parts + i*params->ndv + 2);
-              px = *(parts + i*params->ndv + 3);
-              py = *(parts + i*params->ndv + 4);
-              pz = *(parts + i*params->ndv + 5);
-              if (params->file_has_weight && !params->overwrite_weight)
-                w = *(parts + i*params->ndv + 6);
-              else
-                w = params->overwrite_weight_value;
-              if (params->file_version >= 3 && !params->overwrite_charge)
-                ch = *(parts + i*params->ndv + 7);
-              else
-                ch = params->overwrite_charge_value;
-              gamma = (aladyn_float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);     //gamma
-              theta = (aladyn_float)(atan2(sqrt(py*py + pz*pz), px)*180. / M_PI);  //theta nb: py e pz sono quelli trasversi in ALaDyn!
-              thetaT = (aladyn_float)atan(sqrt((py*py + pz*pz) / (px*px)));
-              E = (aladyn_float)(gamma*params->mass_MeV);   //energia
-              if (px > 0)
-              {
-                ty = py / px;
-                tz = pz / px;
-              }
-              else
-              {
-                ty = 0.0;
-                tz = 0.0;
-              }
-              if (x < estremi_min[0]) estremi_min[0] = x;
-              if (x > estremi_max[0]) estremi_max[0] = x;
-              if (y < estremi_min[1]) estremi_min[1] = y;
-              if (y > estremi_max[1]) estremi_max[1] = y;
-              if (z < estremi_min[2]) estremi_min[2] = z;
-              if (z > estremi_max[2]) estremi_max[2] = z;
-              if (px < estremi_min[3]) estremi_min[3] = px;
-              if (px > estremi_max[3]) estremi_max[3] = px;
-              if (py < estremi_min[4]) estremi_min[4] = py;
-              if (py > estremi_max[4]) estremi_max[4] = py;
-              if (pz < estremi_min[5]) estremi_min[5] = pz;
-              if (pz > estremi_max[5]) estremi_max[5] = pz;
-              if (gamma < estremi_min[6]) estremi_min[6] = gamma;
-              if (gamma > estremi_max[6]) estremi_max[6] = gamma;
-              if (theta < estremi_min[7]) estremi_min[7] = theta;
-              if (theta > estremi_max[7]) estremi_max[7] = theta;
-              if (E < estremi_min[8]) estremi_min[8] = E;
-              if (E > estremi_max[8]) estremi_max[8] = E;
-              if (thetaT < estremi_min[9]) estremi_min[9] = thetaT;
-              if (thetaT > estremi_max[9]) estremi_max[9] = thetaT;
-              if (ty < estremi_min[10]) estremi_min[10] = ty;
-              if (ty > estremi_max[10]) estremi_max[10] = ty;
-              if (tz < estremi_min[11]) estremi_min[11] = tz;
-              if (tz > estremi_max[11]) estremi_max[11] = tz;
-              if (w < estremi_min[12]) estremi_min[12] = w;
-              if (w > estremi_max[12]) estremi_max[12] = w;
-              if (ch < estremi_min[13]) estremi_min[13] = ch;
-              if (ch > estremi_max[13]) estremi_max[13] = ch;
-            }
-            em_x += (double)(x*w);
-            em_y += (double)(y*w);
-            em_z += (double)(z*w);
-            em_x2 += (double)((x*x)*w);
-            em_y2 += (double)((y*y)*w);
-            em_z2 += (double)((z*z)*w);
-            em_px += (double)(px*w);
-            em_py += (double)(py*w);
-            em_pz += (double)(pz*w);
-            em_px2 += (double)((px*px)*w);
-            em_py2 += (double)((py*py)*w);
-            em_pz2 += (double)((pz*pz)*w);
-            em_xpx += (double)((x*px)*w);
-            em_ypy += (double)((y*py)*w);
-            em_zpz += (double)((z*pz)*w);
-            peso_accumulato += w;
-            carica_accumulata += ch;
-          }
-        }
 
         for (auto histogram : params->histograms) {
           if (histogram.enabled) _Binning(parts, params, &histogram);
@@ -610,89 +479,6 @@ int read_phasespace_file(Parameters * params)
     conta_processori++;
   }
 
-
-  if (params->out_json)
-  {
-    em_x /= (double)peso_accumulato;
-    em_y /= (double)peso_accumulato;
-    em_z /= (double)peso_accumulato;
-    em_px /= (double)peso_accumulato;
-    em_py /= (double)peso_accumulato;
-    em_pz /= (double)peso_accumulato;
-    em_x2 /= (double)peso_accumulato;
-    em_y2 /= (double)peso_accumulato;
-    em_z2 /= (double)peso_accumulato;
-    em_px2 /= (double)peso_accumulato;
-    em_py2 /= (double)peso_accumulato;
-    em_pz2 /= (double)peso_accumulato;
-    em_xpx /= (double)peso_accumulato;
-    em_ypy /= (double)peso_accumulato;
-    em_zpz /= (double)peso_accumulato;
-
-    emittance_x = sqrt((em_x2 - em_x*em_x)*(em_px2 - em_px*em_px) - (em_xpx - em_x*em_px)*(em_xpx - em_x*em_px));
-    emittance_y = sqrt((em_y2 - em_y*em_y)*(em_py2 - em_py*em_py) - (em_ypy - em_y*em_py)*(em_ypy - em_y*em_py));
-    emittance_z = sqrt((em_z2 - em_z*em_z)*(em_pz2 - em_pz*em_pz) - (em_zpz - em_z*em_pz)*(em_zpz - em_z*em_pz));
-
-    parameters = fopen(json_filename.c_str(), "wb");
-    printf("\nWriting the parameters file\n");
-    fprintf(parameters, "ncpu_x=%i\n", params->ncpu_x);
-    fprintf(parameters, "ncpu_y=%i\n", params->ncpu_y);
-    fprintf(parameters, "ncpu_z=%i\n", params->ncpu_z);
-    fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) params->npx_resampled);
-    fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) params->npy_resampled);
-    fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) params->npz_resampled);
-    fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) params->npx_resampled_per_cpu);
-    fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) params->npy_resampled_per_cpu);
-    fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) params->npz_resampled_per_cpu);
-    fprintf(parameters, "tnow=%f\n", params->tnow);
-    fprintf(parameters, "xmin=%f\n", params->xmin);
-    fprintf(parameters, "xmax=%f\n", params->xmax);
-    fprintf(parameters, "ymin=%f\n", params->ymin);
-    fprintf(parameters, "ymax=%f\n", params->ymax);
-    fprintf(parameters, "zmin=%f\n", params->zmin);
-    fprintf(parameters, "zmax=%f\n", params->zmax);
-    ////////////////////////////////////////////////////////////////////////////
-    fprintf(parameters, "rms_emittance_x=%g\n", emittance_x);    //massa parts su massa elettrone
-    fprintf(parameters, "rms_emittance_y=%g\n", emittance_y);    //massa parts su massa elettrone
-    fprintf(parameters, "rms_emittance_z=%g\n", emittance_z);    //massa parts su massa elettrone
-                                                                 ////////////////////////////////////////////////////////////////////////////
-    fclose(parameters);
-
-    Estremi_out.open(json_filename, std::ios::app);
-    if (Estremi_out.fail()) printf("\nunable to create .extremes file");
-    Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
-    Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
-    Estremi_out << "YMIN = " << estremi_min[1] << std::endl;
-    Estremi_out << "YMAX = " << estremi_max[1] << std::endl;
-    Estremi_out << "ZMIN = " << estremi_min[2] << std::endl;
-    Estremi_out << "ZMAX = " << estremi_max[2] << std::endl;
-    Estremi_out << "PXMIN = " << estremi_min[3] << std::endl;
-    Estremi_out << "PXMAX = " << estremi_max[3] << std::endl;
-    Estremi_out << "PYMIN = " << estremi_min[4] << std::endl;
-    Estremi_out << "PYMAX = " << estremi_max[4] << std::endl;
-    Estremi_out << "PZMIN = " << estremi_min[5] << std::endl;
-    Estremi_out << "PZMAX = " << estremi_max[5] << std::endl;
-    Estremi_out << "GAMMAMIN = " << estremi_min[6] << std::endl;
-    Estremi_out << "GAMMAMAX = " << estremi_max[6] << std::endl;
-    Estremi_out << "THETAMIN = " << estremi_min[7] << std::endl;
-    Estremi_out << "THETAMAX = " << estremi_max[7] << std::endl;
-    Estremi_out << "THETARADMIN = " << estremi_min[9] << std::endl;
-    Estremi_out << "THETARADMAX = " << estremi_max[9] << std::endl;
-    Estremi_out << "EMIN = " << estremi_min[8] << std::endl;
-    Estremi_out << "EMAX = " << estremi_max[8] << std::endl;
-    Estremi_out << "TYMIN = " << estremi_min[10] << std::endl;
-    Estremi_out << "TYMAX = " << estremi_max[10] << std::endl;
-    Estremi_out << "TZMIN = " << estremi_min[11] << std::endl;
-    Estremi_out << "TZMAX = " << estremi_max[11] << std::endl;
-    Estremi_out << "WMIN = " << estremi_min[12] << std::endl;
-    Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
-    Estremi_out << "CHMIN = " << estremi_min[12] << std::endl;
-    Estremi_out << "CHMAX = " << estremi_max[12] << std::endl;
-    Estremi_out << "collected_weight = " << peso_accumulato << std::endl;
-    Estremi_out << "collected_charge = " << carica_accumulata << std::endl;
-    Estremi_out.close();
-  }
-
   for (auto histogram : params->histograms) {
     if (histogram.enabled) histogram.write_binned_data();
   }
@@ -751,7 +537,7 @@ int create_json_from_phasespace_file(Parameters * params)
   double carica_accumulata = 0.0;
   size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0, dimensione_array_parts = 0;
   unsigned int val[2] = { 0, 0 };
-  size_t max_number_of_particles_in_memory = MAX_NUM_OF_PARTICLES_IN_MEMORY;
+  const size_t max_number_of_particles_in_memory = 10000000;          // in reality we store double this number -1
 
   unsigned int conta_processori = 0;
 
@@ -1036,70 +822,70 @@ int create_json_from_phasespace_file(Parameters * params)
   emittance_z = sqrt((em_z2 - em_z*em_z)*(em_pz2 - em_pz*em_pz) - (em_zpz - em_z*em_pz)*(em_zpz - em_z*em_pz));
 
 
-  FILE* parameters;
-  parameters = fopen(json_filename.c_str(), "wb");
-  printf("\nWriting the parameters file\n");
-  fprintf(parameters, "ncpu_x=%i\n", params->ncpu_x);
-  fprintf(parameters, "ncpu_y=%i\n", params->ncpu_y);
-  fprintf(parameters, "ncpu_z=%i\n", params->ncpu_z);
-  fprintf(parameters, "npx_resampled=%llu\n", (unsigned long long int) params->npx_resampled);
-  fprintf(parameters, "npy_resampled=%llu\n", (unsigned long long int) params->npy_resampled);
-  fprintf(parameters, "npz_resampled=%llu\n", (unsigned long long int) params->npz_resampled);
-  fprintf(parameters, "npx_resampled_per_cpu=%llu\n", (unsigned long long int) params->npx_resampled_per_cpu);
-  fprintf(parameters, "npy_resampled_per_cpu=%llu\n", (unsigned long long int) params->npy_resampled_per_cpu);
-  fprintf(parameters, "npz_resampled_per_cpu=%llu\n", (unsigned long long int) params->npz_resampled_per_cpu);
-  fprintf(parameters, "tnow=%f\n", params->tnow);
-  fprintf(parameters, "xmin=%f\n", params->xmin);
-  fprintf(parameters, "xmax=%f\n", params->xmax);
-  fprintf(parameters, "ymin=%f\n", params->ymin);
-  fprintf(parameters, "ymax=%f\n", params->ymax);
-  fprintf(parameters, "zmin=%f\n", params->zmin);
-  fprintf(parameters, "zmax=%f\n", params->zmax);
-  ////////////////////////////////////////////////////////////////////////////
-  fprintf(parameters, "rms_emittance_x=%g\n", emittance_x);    //massa parts su massa elettrone
-  fprintf(parameters, "rms_emittance_y=%g\n", emittance_y);    //massa parts su massa elettrone
-  fprintf(parameters, "rms_emittance_z=%g\n", emittance_z);    //massa parts su massa elettrone
-                                                               ////////////////////////////////////////////////////////////////////////////
-  fclose(parameters);
+  std::ofstream json_file;
+  json_file.open(json_filename);
+  if (json_file.fail()) std::cerr << "Unable to create .json file!" << std::endl;
 
-  std::ofstream Estremi_out;
-  Estremi_out.open(json_filename, std::ios::app);
-  if (Estremi_out.fail()) printf("\nunable to create .extremes file");
-  Estremi_out << "XMIN = " << estremi_min[0] << std::endl;
-  Estremi_out << "XMAX = " << estremi_max[0] << std::endl;
-  Estremi_out << "YMIN = " << estremi_min[1] << std::endl;
-  Estremi_out << "YMAX = " << estremi_max[1] << std::endl;
-  Estremi_out << "ZMIN = " << estremi_min[2] << std::endl;
-  Estremi_out << "ZMAX = " << estremi_max[2] << std::endl;
-  Estremi_out << "PXMIN = " << estremi_min[3] << std::endl;
-  Estremi_out << "PXMAX = " << estremi_max[3] << std::endl;
-  Estremi_out << "PYMIN = " << estremi_min[4] << std::endl;
-  Estremi_out << "PYMAX = " << estremi_max[4] << std::endl;
-  Estremi_out << "PZMIN = " << estremi_min[5] << std::endl;
-  Estremi_out << "PZMAX = " << estremi_max[5] << std::endl;
-  Estremi_out << "GAMMAMIN = " << estremi_min[6] << std::endl;
-  Estremi_out << "GAMMAMAX = " << estremi_max[6] << std::endl;
-  Estremi_out << "THETAMIN = " << estremi_min[7] << std::endl;
-  Estremi_out << "THETAMAX = " << estremi_max[7] << std::endl;
-  Estremi_out << "THETARADMIN = " << estremi_min[9] << std::endl;
-  Estremi_out << "THETARADMAX = " << estremi_max[9] << std::endl;
-  Estremi_out << "EMIN = " << estremi_min[8] << std::endl;
-  Estremi_out << "EMAX = " << estremi_max[8] << std::endl;
-  Estremi_out << "TYMIN = " << estremi_min[10] << std::endl;
-  Estremi_out << "TYMAX = " << estremi_max[10] << std::endl;
-  Estremi_out << "TZMIN = " << estremi_min[11] << std::endl;
-  Estremi_out << "TZMAX = " << estremi_max[11] << std::endl;
-  Estremi_out << "WMIN = " << estremi_min[12] << std::endl;
-  Estremi_out << "WMAX = " << estremi_max[12] << std::endl;
-  Estremi_out << "CHMIN = " << estremi_min[12] << std::endl;
-  Estremi_out << "CHMAX = " << estremi_max[12] << std::endl;
-  Estremi_out << "collected_weight = " << peso_accumulato << std::endl;
-  Estremi_out << "collected_charge = " << carica_accumulata << std::endl;
-  Estremi_out.close();
+  jsoncons::json parameters;
+
+  parameters["ncpu_x"] = params->ncpu_x;
+  parameters["ncpu_y"] = params->ncpu_y;
+  parameters["ncpu_z"] = params->ncpu_z;
+  parameters["npx_resampled"] = params->npx_resampled;
+  parameters["npy_resampled"] = params->npy_resampled;
+  parameters["npz_resampled"] = params->npz_resampled;
+  parameters["npx_resampled_per_cpu"] = params->npx_resampled_per_cpu;
+  parameters["npy_resampled_per_cpu"] = params->npy_resampled_per_cpu;
+  parameters["npz_resampled_per_cpu"] = params->npz_resampled_per_cpu;
+  parameters["tnow"] = params->tnow;
+  parameters["xmin"] = params->xmin;
+  parameters["xmax"] = params->xmax;
+  parameters["ymin"] = params->ymin;
+  parameters["ymax"] = params->ymax;
+  parameters["zmin"] = params->zmin;
+  parameters["zmax"] = params->zmax;
+
+  jsoncons::json dump_analysis;
+
+  dump_analysis["rms_emittance_x"] = emittance_x;
+  dump_analysis["rms_emittance_y"] = emittance_y;
+  dump_analysis["rms_emittance_z"] = emittance_z;
+  dump_analysis["XMIN"] = estremi_min[0];
+  dump_analysis["XMAX"] = estremi_max[0];
+  dump_analysis["YMIN"] = estremi_min[1];
+  dump_analysis["YMAX"] = estremi_max[1];
+  dump_analysis["ZMIN"] = estremi_min[2];
+  dump_analysis["ZMAX"] = estremi_max[2];
+  dump_analysis["PXMIN"] = estremi_min[3];
+  dump_analysis["PXMAX"] = estremi_max[3];
+  dump_analysis["PYMIN"] = estremi_min[4];
+  dump_analysis["PYMAX"] = estremi_max[4];
+  dump_analysis["PZMIN"] = estremi_min[5];
+  dump_analysis["PZMAX"] = estremi_max[5];
+  dump_analysis["GAMMAMIN"] = estremi_min[6];
+  dump_analysis["GAMMAMAX"] = estremi_max[6];
+  dump_analysis["THETAMIN"] = estremi_min[7];
+  dump_analysis["THETAMAX"] = estremi_max[7];
+  dump_analysis["THETARADMIN"] = estremi_min[9];
+  dump_analysis["THETARADMAX"] = estremi_max[9];
+  dump_analysis["EMIN"] = estremi_min[8];
+  dump_analysis["EMAX"] = estremi_max[8];
+  dump_analysis["TYMIN"] = estremi_min[10];
+  dump_analysis["TYMAX"] = estremi_max[10];
+  dump_analysis["TZMIN"] = estremi_min[11];
+  dump_analysis["TZMAX"] = estremi_max[11];
+  dump_analysis["WMIN"] = estremi_min[12];
+  dump_analysis["WMAX"] = estremi_max[12];
+  dump_analysis["CHMIN"] = estremi_min[12];
+  dump_analysis["CHMAX"] = estremi_max[12];
+  dump_analysis["collected_weight"] = peso_accumulato;
+  dump_analysis["collected_charge"] = carica_accumulata;
+
+  json_file << jsoncons::pretty_print(parameters) << std::endl << jsoncons::pretty_print(dump_analysis) << std::endl;
 
   if (!params->multifile) fclose(file_in);
 
-  printf("\nfread_size=%lu\nEND", (unsigned long)fread_size);
+  std::cout << "fread_size = " << fread_size << std::endl << "json parameters file produced!" << std::endl;
 
   return 0;
 }

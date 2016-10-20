@@ -1,9 +1,6 @@
 
 #include "parameters.h"
 #include "swap_tools.h"
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-#include "jsoncons/json.hpp"
 
 
 std::string histo::get_filename_out() {
