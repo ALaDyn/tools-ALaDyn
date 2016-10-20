@@ -953,7 +953,7 @@ void Parameters::parse_json() {
 
   jsoncons::json jsonpar;
   try {
-    jsoncons::json jsonpar = jsoncons::json::parse_file(json_filename);
+    jsonpar = jsoncons::json::parse_file(json_filename);
   }
   catch (std::exception &e) {
     std::cerr << "Exception found: " << e.what() << std::endl;

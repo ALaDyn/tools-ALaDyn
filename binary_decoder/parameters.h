@@ -58,7 +58,7 @@ typedef struct Parameters {
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   size_t npx_resampled, npy_resampled, npz_resampled, npx_resampled_per_cpu, npy_resampled_per_cpu, npz_resampled_per_cpu;
   size_t header_size_bytes;
-  size_t nptot;
+  long long int nptot;
   int endianness;
   bool fixed_aladyn_version;
   bool multifile;
