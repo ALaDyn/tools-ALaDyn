@@ -1,7 +1,7 @@
 
 #include "binning.h"
 
-_Binning::_Binning(aladyn_float * parts, Parameters * params, densityplot * plot)
+_Binning::_Binning(aladyn_float * parts, size_t npart, Parameters * params, densityplot * plot)
 {
   size_t bin_on_x = plot->get_x_column_to_bin(), bin_on_y = plot->get_y_column_to_bin();
   size_t whichbin_x = 0, whichbin_y = 0;
@@ -16,7 +16,7 @@ _Binning::_Binning(aladyn_float * parts, Parameters * params, densityplot * plot
 
   aladyn_float x, y, z, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   aladyn_float going_to_bin_on_x = 0., going_to_bin_on_y = 0.;
-  for (int i = 0; i < params->nparts; i++)
+  for (int i = 0; i < npart; i++)
   {
     if (params->sim_is_2d)
     {
@@ -149,7 +149,7 @@ _Binning::_Binning(aladyn_float * parts, Parameters * params, densityplot * plot
 }
 
 
-_Binning::_Binning(aladyn_float * parts, Parameters * params, histo * plot)
+_Binning::_Binning(aladyn_float * parts, size_t npart, Parameters * params, histo * plot)
 {
   size_t bin_on_x = plot->get_column_to_bin();
   size_t whichbin_x = 0;
@@ -160,7 +160,7 @@ _Binning::_Binning(aladyn_float * parts, Parameters * params, histo * plot)
 
   aladyn_float x, y, px, py, pz, w, ch, gamma, theta, thetaT, E, ty, tz;
   aladyn_float going_to_bin_on_x = 0.;
-  for (int i = 0; i < params->nparts; i++)
+  for (int i = 0; i < npart; i++)
   {
     if (params->sim_is_2d)
     {

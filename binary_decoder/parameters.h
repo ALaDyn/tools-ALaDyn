@@ -13,7 +13,7 @@ typedef struct histo {
   aladyn_float get_bin_size();
   size_t get_column_to_bin();
   bool enabled;
-  aladyn_float *data = new aladyn_float[nbin + 3];
+  aladyn_float *data;
   void write_binned_data();
   std::string get_filename_out();
 } histo;
@@ -31,7 +31,7 @@ typedef struct densityplot {
   size_t get_x_column_to_bin();
   size_t get_y_column_to_bin();
   bool enabled;
-  aladyn_float **data = new aladyn_float*[nbin_x + 3];
+  aladyn_float **data;
   void write_binned_data();
   std::string get_filename_out();
 } densityplot;
@@ -54,7 +54,6 @@ typedef struct Parameters {
   bool out_ppg, out_json, out_csv, out_xyze, out_cutx, out_cuty, out_cutz, out_grid2d, out_clean_bin, out_lineoutx, out_vtk, out_vtk_nostretch;
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
   unsigned int ndv, resampling_factor;
-  size_t nparts;
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;
   size_t npx_resampled, npy_resampled, npz_resampled, npx_resampled_per_cpu, npy_resampled_per_cpu, npz_resampled_per_cpu;
   size_t header_size_bytes;

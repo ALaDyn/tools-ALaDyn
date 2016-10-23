@@ -236,10 +236,10 @@ int read_phasespace_file(Parameters * params)
         _Filter(params, parts, val, _Filter::build_filter(params));
 
         for (auto histogram : params->histograms) {
-          if (histogram.enabled) _Binning(parts, params, &histogram);
+          if (histogram.enabled) _Binning(parts, val[0], params, &histogram);
         }
         for (auto densityplot : params->densityplots) {
-          if (densityplot.enabled) _Binning(parts, params, &densityplot);
+          if (densityplot.enabled) _Binning(parts, val[0], params, &densityplot);
         }
 
         if (params->out_ppg)
