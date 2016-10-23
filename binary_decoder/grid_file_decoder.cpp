@@ -12,13 +12,13 @@ int read_grid_file(Parameters * params)
   int fortran_buff;
   int header_size = 3;
   int * header = new int[header_size];
-  aladyn_float *buffer = NULL;
-  aladyn_float *x_lineout = NULL;
+  aladyn_float *buffer = nullptr;
+  aladyn_float *x_lineout = nullptr;
   std::string params_filename;
   std::string grid_filename;
-  std::FILE *file_in = NULL;
-  std::FILE *parameters = NULL;
-  std::FILE *clean_fields = NULL;
+  std::FILE *file_in = nullptr;
+  std::FILE *parameters = nullptr;
+  std::FILE *clean_fields = nullptr;
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
@@ -47,7 +47,7 @@ int read_grid_file(Parameters * params)
     bin_filename.str("");
     bin_filename << params->filebasename << ".bin";
     file_in = fopen(bin_filename.str().c_str(), "rb");
-    if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
+    if (file_in == nullptr) std::cout << "Unable to open file!" << std::endl;
     else std::cout << "File opened to read data!" << std::endl;
 
     /*skip header*/
@@ -93,7 +93,7 @@ int read_grid_file(Parameters * params)
             /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
 
           delete[] buffer;
-          buffer = NULL;
+          buffer = nullptr;
         }
       }
     }
@@ -148,7 +148,7 @@ int read_grid_file(Parameters * params)
       bin_filename.str("");
       bin_filename << params->filebasename << "_" << std::setfill('0') << std::setw(3) << multifile_index << ".bin";
       file_in = fopen(bin_filename.str().c_str(), "rb");
-      if (file_in == NULL)
+      if (file_in == nullptr)
       {
         std::cout << "End of files!" << std::endl;
         break;
@@ -191,7 +191,7 @@ int read_grid_file(Parameters * params)
             /*       */[i + (ipx * params->npx_resampled_per_cpu)] =
               /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
             delete[] buffer;
-            buffer = NULL;
+            buffer = nullptr;
           }
         }
       }
@@ -683,8 +683,8 @@ int create_json_from_grid_file(Parameters * params)
   int fortran_buff;
   int header_size = 3;
   int * header = new int[header_size];
-  aladyn_float *buffer = NULL;
-  std::FILE *file_in = NULL;
+  aladyn_float *buffer = nullptr;
+  std::FILE *file_in = nullptr;
   size_t fread_size = 0;
   size_t allocated_size = 0;
 
@@ -712,7 +712,7 @@ int create_json_from_grid_file(Parameters * params)
     bin_filename.str("");
     bin_filename << params->filebasename << ".bin";
     file_in = fopen(bin_filename.str().c_str(), "rb");
-    if (file_in == NULL) std::cout << "Unable to open file!" << std::endl;
+    if (file_in == nullptr) std::cout << "Unable to open file!" << std::endl;
     else std::cout << "File opened to read data!" << std::endl;
 
     /*skip header*/
@@ -758,7 +758,7 @@ int create_json_from_grid_file(Parameters * params)
             /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
 
           delete[] buffer;
-          buffer = NULL;
+          buffer = nullptr;
         }
       }
     }
@@ -813,7 +813,7 @@ int create_json_from_grid_file(Parameters * params)
       bin_filename.str("");
       bin_filename << params->filebasename << "_" << std::setfill('0') << std::setw(3) << multifile_index << ".bin";
       file_in = fopen(bin_filename.str().c_str(), "rb");
-      if (file_in == NULL)
+      if (file_in == nullptr)
       {
         std::cout << "End of files!" << std::endl;
         break;
@@ -856,7 +856,7 @@ int create_json_from_grid_file(Parameters * params)
             /*       */[i + (ipx * params->npx_resampled_per_cpu)] =
               /*     */ buffer[i + j*header[0] + k*header[0] * header[1]];
             delete[] buffer;
-            buffer = NULL;
+            buffer = nullptr;
           }
         }
       }

@@ -329,7 +329,7 @@ aladyn_float * _Filter::build_filter(Parameters * params)
       index[counter++] = i;
   }
   index[counter] = -1;
-  if (!counter) return (aladyn_float *)NULL;
+  if (!counter) return (aladyn_float *)nullptr;
   my_args = new char *[ENABLED_FILTERS + 1], my_args[ENABLED_FILTERS] = 0;
   my_vals = new aladyn_float[ENABLED_FILTERS + 1];
   for (int i = 0; i < counter; ++i)
@@ -378,7 +378,7 @@ aladyn_float * _Filter::build_filter(const char *p, ...)
   {
     val = (aladyn_float)va_arg(app, double);
     find_filter(buff, val, all_vals);
-    if (!all_vals) return (aladyn_float*)NULL;
+    if (!all_vals) return (aladyn_float*)nullptr;
     z = va_arg(app, char *);
     if (!z) break;
     strcpy(buff, z);
@@ -394,7 +394,7 @@ void _Filter::find_filter(char *b, aladyn_float v, aladyn_float *& V)
   for (i = 0; i < ENABLED_FILTERS; ++i) if (!strcasecmp(b, descr[i])) break;
   if (i >= ENABLED_FILTERS)
   {
-    V = (aladyn_float*)NULL; // non è detto che sia la cosa migliore da farsi
+    V = (aladyn_float*)nullptr; // non è detto che sia la cosa migliore da farsi
     return;
   }
   V[i] = v;

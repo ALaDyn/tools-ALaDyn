@@ -243,13 +243,13 @@ void Parameters::man(const char argv[]) {
 
 void Parameters::read_params_from_bin_file(const char * filename)
 {
-  std::FILE * file_in = NULL;
+  std::FILE * file_in = nullptr;
   int fortran_buff;
   size_t fread_size = 0;
   int nparams;
 
   file_in = fopen(filename, "rb");
-  if (file_in == NULL) std::cerr << "Unable to open file!" << std::endl;
+  if (file_in == nullptr) std::cerr << "Unable to open file!" << std::endl;
   else std::cout << "File opened to read parameters!" << std::endl;
 
   fread_size += std::fread(&fortran_buff, sizeof(int), 1, file_in);

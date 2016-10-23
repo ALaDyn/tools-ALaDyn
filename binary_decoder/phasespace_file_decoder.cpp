@@ -5,25 +5,26 @@
 int read_phasespace_file(Parameters * params)
 {
   size_t phasespace_size = 14; // x, y, z, px, py, pz, gamma, theta, thetaT, E, ty, tz, w, ch
-  std::FILE *file_in = NULL;
+  std::FILE *file_in = nullptr;
   int multifile_index = 0;
   int contatori[] = { 0, 0, 0 };
   aladyn_float zero = 0.0f;
   long long parts_accumulate = 0;
   double peso_accumulato = 0.0;
   double carica_accumulata = 0.0;
-  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0, dimensione_array_parts = 0;
+  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0;
+  long long dimensione_array_parts = 0;
   unsigned int val[2] = { 0, 0 };
   aladyn_float array_supporto8[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   aladyn_float array_supporto6[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   const size_t max_number_of_particles_in_memory = 10000000;          // in reality we store double this number -1
 
-  std::FILE *binary_vtk = NULL;
-  std::FILE *binary_clean = NULL;
-  std::FILE *ascii_propaga = NULL;
-  std::FILE *ascii_xyze = NULL;
-  std::FILE *ascii_csv = NULL;
-  std::FILE *parameters = NULL;
+  std::FILE *binary_vtk = nullptr;
+  std::FILE *binary_clean = nullptr;
+  std::FILE *ascii_propaga = nullptr;
+  std::FILE *ascii_xyze = nullptr;
+  std::FILE *ascii_csv = nullptr;
+  std::FILE *parameters = nullptr;
   std::ofstream Estremi_out;
   unsigned int conta_processori = 0;
 
@@ -33,10 +34,10 @@ int read_phasespace_file(Parameters * params)
   aladyn_float x = 0.0, y = 0.0, z = 0.0, px = 0.0, py = 0.0, pz = 0.0, ptot = 0.0;
   aladyn_float ch = 0.0, w = 0.0;
   aladyn_float gamma = 0.0, theta = 0.0, thetaT = 0.0, E = 0.0, ty = 0.0, tz = 0.0;
-  double *estremi_min = NULL, *estremi_max = NULL;
+  double *estremi_min = nullptr, *estremi_max = nullptr;
 
   short buffshort[2] = { 0, 0 };
-  aladyn_float *parts = NULL;
+  aladyn_float *parts = nullptr;
   std::string bin_filename;
   std::string dat_filename;
   std::string vtk_filename;
@@ -175,7 +176,7 @@ int read_phasespace_file(Parameters * params)
       memset(&bin_filename[0], 0, sizeof(bin_filename));
       bin_filename = params->filebasename + "_" + std::to_string(multifile_index) + ".bin";
 
-      if ((file_in = fopen(bin_filename.c_str(), "rb")) == NULL)
+      if ((file_in = fopen(bin_filename.c_str(), "rb")) == nullptr)
       {
         printf("End of files! \n");
         break;
@@ -472,7 +473,7 @@ int read_phasespace_file(Parameters * params)
         }
         parts_accumulate += val[0];
         delete[] parts;
-        parts = NULL;
+        parts = nullptr;
       }
     }
     multifile_index++;
@@ -528,14 +529,15 @@ int read_phasespace_file(Parameters * params)
 
 int create_json_from_phasespace_file(Parameters * params)
 {
-  std::FILE *file_in = NULL;
+  std::FILE *file_in = nullptr;
   int multifile_index = 0;
   int contatori[] = { 0, 0, 0 };
   aladyn_float zero = 0.0f;
   long long parts_accumulate = 0;
   double peso_accumulato = 0.0;
   double carica_accumulata = 0.0;
-  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0, dimensione_array_parts = 0;
+  size_t dim_file_in_bytes = 0, num_of_floats_in_file = 0, num_of_particles_in_file = 0, num_of_passes = 0, num_residual_particles = 0;
+  long long dimensione_array_parts = 0;
   unsigned int val[2] = { 0, 0 };
   const size_t max_number_of_particles_in_memory = 10000000;          // in reality we store double this number -1
 
@@ -550,7 +552,7 @@ int create_json_from_phasespace_file(Parameters * params)
   double em_x2 = 0.0, em_x = 0.0, em_y2 = 0.0, em_y = 0.0, em_z2 = 0.0, em_z = 0.0;
   double em_px2 = 0.0, em_px = 0.0, em_py2 = 0.0, em_py = 0.0, em_pz2 = 0.0, em_pz = 0.0, em_xpx = 0.0, em_ypy = 0.0, em_zpz = 0.0;
   short buffshort[2] = { 0, 0 };
-  aladyn_float *parts = NULL;
+  aladyn_float *parts = nullptr;
 
   size_t fread_size = 0;
   double *estremi_min, *estremi_max;
@@ -574,7 +576,7 @@ int create_json_from_phasespace_file(Parameters * params)
     {
       if (conta_processori >= params->ncpu) break;
       if (conta_processori == 0) {
-        /*skip header*/
+        /*we are at the beginning of the file, so skip header*/
         std::fseek(file_in, (long)params->header_size_bytes, SEEK_SET);
       }
 
@@ -604,7 +606,6 @@ int create_json_from_phasespace_file(Parameters * params)
 #else
       printf("proc number \t %i \t npart=%i \r", conta_processori, npart_loc);
 #endif
-      fflush(stdout);
       num_of_passes = 1;
     }
     else  //we do have multifiles i.e. Prpout00_000.bin
@@ -612,7 +613,7 @@ int create_json_from_phasespace_file(Parameters * params)
       memset(&bin_filename[0], 0, sizeof(bin_filename));
       bin_filename = params->filebasename + "_" + std::to_string(multifile_index) + ".bin";
 
-      if ((file_in = fopen(bin_filename.c_str(), "rb")) == NULL)
+      if ((file_in = fopen(bin_filename.c_str(), "rb")) == nullptr)
       {
         printf("End of files! \n");
         break;
@@ -623,7 +624,6 @@ int create_json_from_phasespace_file(Parameters * params)
       num_of_floats_in_file = (dim_file_in_bytes / sizeof(aladyn_float));
       num_of_particles_in_file = (int)(num_of_floats_in_file / params->ndv);
       printf("File %s_%.3i.bin has %llu particles\n", params->filebasename.c_str(), multifile_index, (unsigned long long int) num_of_particles_in_file);
-      fflush(stdout);
       num_of_passes = (int)((aladyn_float)(num_of_particles_in_file) / (aladyn_float)(max_number_of_particles_in_memory)) + 1;
       num_residual_particles = num_of_particles_in_file % max_number_of_particles_in_memory;
       dimensione_array_parts = std::min(max_number_of_particles_in_memory, num_of_particles_in_file);
@@ -638,7 +638,6 @@ int create_json_from_phasespace_file(Parameters * params)
 
     if (val[0] > 0)
     {
-      fflush(stdout);
       for (size_t h = 0; h < num_of_passes; h++)
       {
         if (num_of_passes > 1) printf("File is very big, will be splitted in multiple readings: step %llu of %llu\n", (unsigned long long int) (h + 1), (unsigned long long int) num_of_passes);
@@ -668,8 +667,6 @@ int create_json_from_phasespace_file(Parameters * params)
           fread_size = std::fread(parts, sizeof(aladyn_float), val[0] * params->ndv, file_in);
           if (params->we_have_to_do_swap) swap_endian_f(parts, (size_t)val[0] * params->ndv);
         }
-
-        _Filter(params, parts, val, _Filter::build_filter(params));
 
         for (unsigned int i = 0; i < val[0]; i++)
         {
@@ -796,8 +793,13 @@ int create_json_from_phasespace_file(Parameters * params)
           peso_accumulato += w;
           carica_accumulata += ch;
         }
+        parts_accumulate += val[0];
+        delete[] parts;
+        parts = nullptr;
       }
     }
+    multifile_index++;
+    conta_processori++;
   }
 
 
@@ -820,7 +822,6 @@ int create_json_from_phasespace_file(Parameters * params)
   emittance_x = sqrt((em_x2 - em_x*em_x)*(em_px2 - em_px*em_px) - (em_xpx - em_x*em_px)*(em_xpx - em_x*em_px));
   emittance_y = sqrt((em_y2 - em_y*em_y)*(em_py2 - em_py*em_py) - (em_ypy - em_y*em_py)*(em_ypy - em_y*em_py));
   emittance_z = sqrt((em_z2 - em_z*em_z)*(em_pz2 - em_pz*em_pz) - (em_zpz - em_z*em_pz)*(em_zpz - em_z*em_pz));
-
 
   std::ofstream json_file;
   json_file.open(json_filename);
@@ -881,11 +882,20 @@ int create_json_from_phasespace_file(Parameters * params)
   dump_analysis["collected_weight"] = peso_accumulato;
   dump_analysis["collected_charge"] = carica_accumulata;
 
-  json_file << jsoncons::pretty_print(parameters) << std::endl << jsoncons::pretty_print(dump_analysis) << std::endl;
+  jsoncons::json report;
+  report["parameters"] = parameters;
+  report["dump_analysis"] = dump_analysis;
+
+  json_file << jsoncons::pretty_print(report) << std::endl;
 
   if (!params->multifile) fclose(file_in);
 
   std::cout << "fread_size = " << fread_size << std::endl << "json parameters file produced!" << std::endl;
+
+  delete[] estremi_min;
+  estremi_min = nullptr;
+  delete[] estremi_max;
+  estremi_max = nullptr;
 
   return 0;
 }

@@ -73,7 +73,7 @@ int main(const int argc, const char *argv[])
   }
   else
   {
-    std::cout << "Found " << params.filebasename << ".dat, using new routines" << std::endl;
+    std::cout << "Found " << params.filebasename << ".dat" << std::endl;
     params.read_params_from_dat_file(dat_file);
   }
   dat_file.close();
