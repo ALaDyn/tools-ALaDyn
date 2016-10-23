@@ -3,6 +3,10 @@
 #include "phasespace_file_decoder.h"
 
 
+// test1: binary_decoder.exe H1pout09 -histogram x 30 35 100 -densityplot x 30 35 100 E 0 30 300 -dump_ppg -dump_csv -dump_clean -dump_xyzE
+// test2: binary_decoder.exe H1dnout09 -dump_lineoutx -dump_gnuplot -dump_vtk -dump_vtk_nostretch
+
+
 int main(const int argc, const char *argv[])
 {
   Parameters params;

@@ -51,7 +51,7 @@ typedef struct Parameters {
   bool we_dont_know_if_file_has_charge;
   bool we_have_to_do_swap;
   bool we_dont_know_if_we_have_to_do_swap;
-  bool out_ppg, out_json, out_csv, out_xyze, out_cutx, out_cuty, out_cutz, out_grid2d, out_clean_bin, out_lineoutx, out_vtk, out_vtk_nostretch;
+  bool out_ppg, out_csv, out_xyze, out_cutx, out_cuty, out_cutz, out_grid2d, out_clean_bin, out_lineoutx, out_vtk, out_vtk_nostretch;
   unsigned int ncpu_x, ncpu_y, ncpu_z, ncpu;
   unsigned int ndv, resampling_factor;
   size_t npx, npy, npz, npx_per_cpu, npy_per_cpu, npz_per_cpu;
@@ -62,7 +62,7 @@ typedef struct Parameters {
   bool fixed_aladyn_version;
   bool multifile;
   bool stretched_grid;  //nb: the tools assumes that, if a grid if found anywhere (inside the .dat file or at the end of the .bin file), then it is stretched, even if it's not
-  int stretched_along_x;
+  bool stretched_along_x;
   aladyn_float mass_MeV;
   int endian_file, endian_machine;
   aladyn_float tnow, xmin, xmax, ymin, ymax, zmin, zmax;

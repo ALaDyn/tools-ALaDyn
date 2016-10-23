@@ -74,8 +74,8 @@ int read_grid_file(Parameters * params)
             printf("header[] = [%i,%i,%i], parameters[] = [%llu,%llu,%llu]\n", header[0], header[1], header[2], (unsigned long long int) params->npx_resampled_per_cpu, (unsigned long long int) params->npy_resampled_per_cpu, (unsigned long long int) params->npz_resampled_per_cpu);
           }
 
-          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
-          fflush(stdout);
+          if (params->npz_resampled_per_cpu != 0) printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+          else printf("header[] = {%i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
 
           buffer = new aladyn_float[header[0] * header[1] * header[2]];
           if (params->file_version == 1 || params->file_version == 2) fread_size += sizeof(int)*std::fread(&fortran_buff, sizeof(int), 1, file_in);
@@ -175,7 +175,8 @@ int read_grid_file(Parameters * params)
               std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 #endif
 
-            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+            if (params->npz_resampled_per_cpu != 0) printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+            else printf("file %i, header[] = {%i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
             fflush(stdout);
 
             buffer = new aladyn_float[header[0] * header[1] * header[2]];
@@ -227,7 +228,7 @@ int read_grid_file(Parameters * params)
       {
         fprintf(clean_fields, "%.4g %.4g %.4g\n", params->xcoord[i], params->ycoord[j], field[0][j][i]);
       }
-      printf("grid[y] = {%llu/%llu}\r", (unsigned long long int) j, (unsigned long long int) params->npy_resampled);
+      printf("grid[y] = {%llu/%llu}\r", (unsigned long long int) j + 1, (unsigned long long int) params->npy_resampled);
     }
     fclose(clean_fields);
     printf("\nASCII FILE COMPLETED\n");
@@ -360,7 +361,7 @@ int read_grid_file(Parameters * params)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", params->xcoord[i], params->ycoord[j], field[k][j][i]);
         }
-        printf("grid[y] = {%llu/%llu}\r", (unsigned long long int) j, (unsigned long long int) params->npy_resampled);
+        printf("grid[y] = {%llu/%llu}\r", (unsigned long long int) j + 1, (unsigned long long int) params->npy_resampled);
       }
       fclose(clean_fields);
       printf("\nASCII FILE COMPLETED\n");
@@ -419,7 +420,7 @@ int read_grid_file(Parameters * params)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", params->xcoord[i], params->zcoord[k], field[k][j][i]);
         }
-        printf("grid[z] = {%llu/%llu}\r", (unsigned long long int) k, (unsigned long long int) params->npz_resampled);
+        printf("grid[z] = {%llu/%llu}\r", (unsigned long long int) k + 1, (unsigned long long int) params->npz_resampled);
       }
       fclose(clean_fields);
       printf("\nASCII FILE COMPLETED\n");
@@ -478,7 +479,7 @@ int read_grid_file(Parameters * params)
         {
           fprintf(clean_fields, "%.4g %.4g %.4g\n", params->ycoord[j], params->zcoord[k], field[k][j][i]);
         }
-        printf("grid[z] = {%llu/%llu}\r", (unsigned long long int) k, (unsigned long long int) params->npz_resampled);
+        printf("grid[z] = {%llu/%llu}\r", (unsigned long long int) k + 1, (unsigned long long int) params->npz_resampled);
       }
       fclose(clean_fields);
       printf("\nASCII FILE COMPLETED\n");
@@ -620,57 +621,16 @@ int read_grid_file(Parameters * params)
     fprintf(clean_fields, "SPACING %f %f %f\n",
       params->xcoord[params->npx_resampled / 2] - params->xcoord[params->npx_resampled / 2 - 1],
       params->ycoord[params->npy_resampled / 2] - params->ycoord[params->npy_resampled / 2 - 1],
-      params->zcoord[params->npz_resampled / 2] - params->zcoord[params->npz_resampled / 2 - 1]);
+      (params->npz_resampled > 1) ? (params->zcoord[params->npz_resampled / 2] - params->zcoord[params->npz_resampled / 2 - 1]) : 0.0f);
     fprintf(clean_fields, "POINT_DATA %lu\n", (long)(npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z));
     fprintf(clean_fields, "SCALARS %s aladyn_float 1\n", params->filebasename.substr(0, 4).c_str());
     fprintf(clean_fields, "LOOKUP_TABLE default\n");
     fwrite((void*)field_non_stretchato, sizeof(aladyn_float), npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z, clean_fields);
 
-
-
-
-    /******************************************************************************
-    //////// DATASET RECTILINEAR_GRID VERSION    ////////
-
-    aladyn_float *x_coordinates, *y_coordinates, *z_coordinates;
-    x_coordinates=new aladyn_float[npunti_non_stretchati_x];
-    y_coordinates=new aladyn_float[npunti_non_stretchati_y];
-    z_coordinates=new aladyn_float[npunti_non_stretchati_z];
-    for (int i = inizio_punti_non_stretchati_x; i < fine_punti_non_stretchati_x; i++) x_coordinates[i] = params->xcoord[i];
-    for (int i = inizio_punti_non_stretchati_y; i < fine_punti_non_stretchati_y; i++) y_coordinates[i] = params->ycoord[i];
-    for (int i = inizio_punti_non_stretchati_z; i < fine_punti_non_stretchati_z; i++) z_coordinates[i] = params->zcoord[i];
-    if(params->endian_machine == 0)
-    {
-    swap_endian_f(x_coordinates,npunti_non_stretchati_x);
-    swap_endian_f(y_coordinates,npunti_non_stretchati_y);
-    swap_endian_f(z_coordinates,npunti_non_stretchati_z);
-    }
-
-    sprintf(grid_filename,"%s_out.vtk",params->filebasename);
-    clean_fields=fopen(grid_filename, "wb");
-    printf("\nWriting the fields file\n");
-    fprintf(clean_fields,"# vtk DataFile Version 2.0\n");
-    fprintf(clean_fields,"titolo mio\n");
-    fprintf(clean_fields,"BINARY\n");
-    fprintf(clean_fields,"DATASET RECTILINEAR_GRID\n");
-    fprintf(clean_fields,"DIMENSIONS %i %i %i\n",npunti_non_stretchati_x, npunti_non_stretchati_y, npunti_non_stretchati_z);
-    fprintf(clean_fields,"X_COORDINATES %i aladyn_float\n",npunti_non_stretchati_x);
-    fwrite((void*)x_coordinates,sizeof(aladyn_float),npunti_non_stretchati_x,clean_fields);
-    fprintf(clean_fields,"Y_COORDINATES %i aladyn_float\n",npunti_non_stretchati_y);
-    fwrite((void*)y_coordinates,sizeof(aladyn_float),npunti_non_stretchati_y,clean_fields);
-    fprintf(clean_fields,"Z_COORDINATES %i aladyn_float\n",npunti_non_stretchati_z);
-    fwrite((void*)z_coordinates,sizeof(aladyn_float),npunti_non_stretchati_z,clean_fields);
-    fprintf(clean_fields,"POINT_DATA %i\n",npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z);
-    fprintf(clean_fields,"SCALARS %s aladyn_float 1\n",params->support_label);
-    fprintf(clean_fields,"LOOKUP_TABLE default\n");
-    fwrite((void*)field_non_stretchato,sizeof(aladyn_float),npunti_non_stretchati_x*npunti_non_stretchati_y*npunti_non_stretchati_z,clean_fields);
-    ******************************************************************************/
-
     fclose(clean_fields);
   }
 
   return 0;
-
 }
 
 
@@ -739,7 +699,8 @@ int create_json_from_grid_file(Parameters * params)
             printf("header[] = [%i,%i,%i], parameters[] = [%llu,%llu,%llu]\n", header[0], header[1], header[2], (unsigned long long int) params->npx_resampled_per_cpu, (unsigned long long int) params->npy_resampled_per_cpu, (unsigned long long int) params->npz_resampled_per_cpu);
           }
 
-          printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+          if (params->npz_resampled_per_cpu != 0) printf("header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+          else printf("header[] = {%i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
           fflush(stdout);
 
           buffer = new aladyn_float[header[0] * header[1] * header[2]];
@@ -840,7 +801,8 @@ int create_json_from_grid_file(Parameters * params)
               std::cout << "WARNING: unexpected number of points in this chunk!" << std::endl << std::flush;
 #endif
 
-            printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+            if (params->npz_resampled_per_cpu != 0) printf("file %i, header[] = {%i/%llu, %i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, header[2], (unsigned long long int) params->npz_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
+            else printf("file %i, header[] = {%i/%llu, %i/%llu}, cpu[] = {%u/%u, %u/%u, %u/%u}\r", multifile_index, header[0], (unsigned long long int) params->npx_resampled_per_cpu, header[1], (unsigned long long int) params->npy_resampled_per_cpu, ipx + 1, params->ncpu_x, ipy + 1, params->ncpu_y, ipz + 1, params->ncpu_z);
             fflush(stdout);
 
             buffer = new aladyn_float[header[0] * header[1] * header[2]];

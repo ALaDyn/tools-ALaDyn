@@ -72,7 +72,6 @@ int read_phasespace_file(Parameters * params)
 
   if (params->out_vtk)
   {
-    printf("\nENABLED .vtk FILE\n");
     binary_vtk = fopen(vtk_filename.c_str(), "wb");
 
     // Scrittura primo Header VTK e memorizzazione sua dimensione in contatori[0]
@@ -106,31 +105,21 @@ int read_phasespace_file(Parameters * params)
     }
   }
 
-  if (params->out_clean_bin)
-  {
-    printf("\nENABLED CLEAN .bin FILE\n");
+  if (params->out_clean_bin) {
     binary_clean = fopen(clean_bin_filename.c_str(), "wb");
   }
 
-  if (params->out_ppg)
-  {
-    printf("\nENABLED .txt FILE FOR PROPAGA\n");
+  if (params->out_ppg) {
     ascii_propaga = fopen(ppg_filename.c_str(), "wb");
   }
 
-  if (params->out_xyze)
-  {
-    printf("\nENABLED .txt FILE WITH x, y, z, E\n");
+  if (params->out_xyze) {
     ascii_xyze = fopen(xyze_filename.c_str(), "wb");
   }
 
-  if (params->out_csv)
-  {
-    printf("\nENABLED .csv FILE FOR PARAVIEW\n");
+  if (params->out_csv) {
     ascii_csv = fopen(csv_filename.c_str(), "wb");
   }
-
-  fflush(stdout);
 
   while (1)
   {
@@ -164,9 +153,9 @@ int read_phasespace_file(Parameters * params)
       val[0] = (unsigned int)npart_loc;
       val[1] = (unsigned int)params->ndv;
 #ifdef ENABLE_DEBUG
-      printf("proc number \t %i \t npart=%i \n", conta_processori, npart_loc);
+      printf("proc number \t %i/%u \t npart=%i \n", conta_processori + 1, params->ncpu, npart_loc);
 #else
-      printf("proc number \t %i \t npart=%i \r", conta_processori, npart_loc);
+      printf("proc number \t %i/%u \t npart=%i \r", conta_processori + 1, params->ncpu, npart_loc);
 #endif
       fflush(stdout);
       num_of_passes = 1;
@@ -237,7 +226,7 @@ int read_phasespace_file(Parameters * params)
 
         for (auto histogram : params->histograms) {
           if (histogram.enabled) _Binning(parts, val[0], params, &histogram);
-        }
+      }
         for (auto densityplot : params->densityplots) {
           if (densityplot.enabled) _Binning(parts, val[0], params, &densityplot);
         }
@@ -474,11 +463,11 @@ int read_phasespace_file(Parameters * params)
         parts_accumulate += val[0];
         delete[] parts;
         parts = nullptr;
-      }
     }
+  }
     multifile_index++;
     conta_processori++;
-  }
+}
 
   for (auto histogram : params->histograms) {
     if (histogram.enabled) histogram.write_binned_data();
@@ -520,7 +509,7 @@ int read_phasespace_file(Parameters * params)
 
   if (!params->multifile) fclose(file_in);
 
-  printf("\nfread_size=%lu\nEND", (unsigned long)fread_size);
+  printf("fread_size=%lu\nEND", (unsigned long)fread_size);
 
   return 0;
 }
@@ -792,15 +781,15 @@ int create_json_from_phasespace_file(Parameters * params)
           em_zpz += (double)((z*pz)*w);
           peso_accumulato += w;
           carica_accumulata += ch;
-        }
+      }
         parts_accumulate += val[0];
         delete[] parts;
         parts = nullptr;
-      }
     }
+  }
     multifile_index++;
     conta_processori++;
-  }
+}
 
 
   em_x /= (double)peso_accumulato;

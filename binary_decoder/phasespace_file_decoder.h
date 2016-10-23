@@ -35,6 +35,6 @@ union double_as_two_float {
 
 
 int read_phasespace_file(Parameters *);
-int create_json_from_phasespace_file(Parameters * );
+int create_json_from_phasespace_file(Parameters *);
 
 

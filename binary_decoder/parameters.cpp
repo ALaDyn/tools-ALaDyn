@@ -188,7 +188,7 @@ Parameters::Parameters() {
   header_size_bytes = 0;
   subsample = 1;
   span = 5;
-  ncpu_x = ncpu_y = ncpu_z = ncpu = 0;
+  ncpu_x = ncpu_y = ncpu_z = ncpu = 1;
   nptot = ndv = 0;
   we_dont_know_file_version = true;
   we_dont_know_if_sim_is_2d = true;
@@ -199,16 +199,16 @@ Parameters::Parameters() {
   we_dont_know_if_file_has_charge = true;
   we_have_to_do_swap = false;
   we_dont_know_if_we_have_to_do_swap = true;
-  out_ppg = out_json = out_csv = out_xyze = out_cutx = out_cuty = out_cutz = out_grid2d = out_clean_bin = out_lineoutx = out_vtk = out_vtk_nostretch = false;
-  npx = npy = npz = npx_per_cpu = npy_per_cpu = npz_per_cpu = 0;
-  npx_resampled = npy_resampled = npz_resampled = npx_resampled_per_cpu = npy_resampled_per_cpu = npz_resampled_per_cpu = 0;
+  out_ppg = out_csv = out_xyze = out_cutx = out_cuty = out_cutz = out_grid2d = out_clean_bin = out_lineoutx = out_vtk = out_vtk_nostretch = false;
+  npx = npy = npz = npx_per_cpu = npy_per_cpu = npz_per_cpu = 1;
+  npx_resampled = npy_resampled = npz_resampled = npx_resampled_per_cpu = npy_resampled_per_cpu = npz_resampled_per_cpu = 1;
   resampling_factor = 0;
   endianness = 0;
   file_version = 0; // initialized to an invalid file version
   fixed_aladyn_version = false;
   multifile = false;
   stretched_grid = true;
-  stretched_along_x = 1;
+  stretched_along_x = true;
   mass_MeV = 0.;
   tnow = 0.0;
   xmin = ymin = zmin = 0.0;
@@ -229,7 +229,7 @@ void Parameters::man(const char argv[]) {
   std::cerr << "Example: " << argv[0] << " Edenout01 -densityplot E 0.0 30.0 60 thetaT 0 0.20 20" << std::endl;
   std::cerr << "----------Full argument list------------------- " << std::endl;
   std::cerr << "-swap/-noswap (force endianess swap/noswap) -force_v1 -force_v2 -force_v3 -force_v4 (force specific file format)" << std::endl;
-  std::cerr << "-dump_ppg -dump_csv -dump_clean -dump_xyzE -find_minxmax" << std::endl;
+  std::cerr << "-dump_ppg -dump_csv -dump_clean -dump_xyzE " << std::endl;
   std::cerr << "-dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
   std::cerr << "-dump_vtk -dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
   std::cerr << "(use -no_stretch_x if the grid is not stretched along x axis)" << std::endl;
@@ -826,7 +826,7 @@ void Parameters::parse_command_line()
     else if (argv[i] == "-no_stretch_x")
     {
       std::cout << "Assuming the grid is NOT stretched along x axis.\n";
-      stretched_along_x = 0;
+      stretched_along_x = false;
     }
     else if (argv[i] == "-dump_cutx")
     {
@@ -906,11 +906,6 @@ void Parameters::parse_command_line()
     {
       std::cout << "You asked to have a unique, clean binary file as the output" << std::endl;
       out_clean_bin = 1;
-    }
-    else if (argv[i] == "-dump_json")
-    {
-      std::cout << "You asked to write the simulation parameters file" << std::endl;
-      out_json = 1;
     }
     else if (argv[i] == "-weight")
     {
