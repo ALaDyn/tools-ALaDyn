@@ -689,7 +689,11 @@ void Parameters::check_filename(const char *filename_in) {
     std::string filename = filename_in;
     std::transform(filename.begin(), filename.end(), filename.begin(), ::tolower);
     if (boost::starts_with(filename, local_support_label)) {
-      mass_MeV = (aladyn_float)MP_MEV; // fix_wrong!!!!
+      if (boost::starts_with(filename, "e")) mass_MeV = (aladyn_float)ME_MEV;
+      else if (boost::starts_with(filename, "p")) mass_MeV = (aladyn_float)MP_MEV;
+      else if (boost::starts_with(filename, "h1") || boost::starts_with(filename, "hi")) mass_MeV = (aladyn_float)(27.0*MP_MEV); //fix wrong
+      else if (boost::starts_with(filename, "h2") || boost::starts_with(filename, "li")) mass_MeV = (aladyn_float)(12.0*MP_MEV); //fix wrong
+      else mass_MeV = 1.0; //fix wrong
       phasespace_file = true;
       return;
     }

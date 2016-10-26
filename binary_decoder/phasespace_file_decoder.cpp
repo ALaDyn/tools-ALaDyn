@@ -212,12 +212,6 @@ int read_phasespace_file(Parameters * params)
           if (h == num_of_passes - 1 && num_of_passes > 1) dimensione_array_parts = num_residual_particles;
           parts = new aladyn_float[dimensione_array_parts*params->ndv];
           val[0] = (unsigned int)dimensione_array_parts;
-#ifdef ENABLE_DEBUG
-          printf("npart_loc = %i\t\t ndv=%i\n", val[0], params->ndv);
-#else
-          printf("npart_loc = %i\t\t ndv=%i\r", val[0], params->ndv);
-#endif
-          fflush(stdout);
           fread_size = std::fread(parts, sizeof(aladyn_float), val[0] * params->ndv, file_in);
           if (params->we_have_to_do_swap) swap_endian_f(parts, (size_t)val[0] * params->ndv);
         }
@@ -226,7 +220,7 @@ int read_phasespace_file(Parameters * params)
 
         for (auto histogram : params->histograms) {
           if (histogram.enabled) _Binning(parts, val[0], params, &histogram);
-      }
+        }
         for (auto densityplot : params->densityplots) {
           if (densityplot.enabled) _Binning(parts, val[0], params, &densityplot);
         }
@@ -282,10 +276,12 @@ int read_phasespace_file(Parameters * params)
             for (unsigned int i = 0; i < val[0]; i++)
             {
               x = parts[i*params->ndv + 1] * ((aladyn_float)1.e-4);
+              y = 0.0;
               z = parts[i*params->ndv + 0] * ((aladyn_float)1.e-4);
               px = parts[i*params->ndv + 3];
+              py = 0.0;
               pz = parts[i*params->ndv + 2];
-              gamma = (aladyn_float)(sqrt(1. + px*px + py*py) - 1.);
+              gamma = (aladyn_float)(sqrt(1. + px*px + py*py + pz*pz) - 1.);
               E = (aladyn_float)(gamma*params->mass_MeV);
               if (i % params->subsample == 0) fprintf(ascii_xyze, "%e %e %e\n", x, z, E);
             }
@@ -463,11 +459,11 @@ int read_phasespace_file(Parameters * params)
         parts_accumulate += val[0];
         delete[] parts;
         parts = nullptr;
+      }
     }
-  }
     multifile_index++;
     conta_processori++;
-}
+  }
 
   for (auto histogram : params->histograms) {
     if (histogram.enabled) histogram.write_binned_data();
@@ -509,7 +505,7 @@ int read_phasespace_file(Parameters * params)
 
   if (!params->multifile) fclose(file_in);
 
-  printf("fread_size=%lu\nEND", (unsigned long)fread_size);
+  std::cout << std::endl << "fread_size = " << fread_size << std::endl << "END!" << std::endl;
 
   return 0;
 }
@@ -591,9 +587,9 @@ int create_json_from_phasespace_file(Parameters * params)
       val[0] = (unsigned int)npart_loc;
       val[1] = (unsigned int)params->ndv;
 #ifdef ENABLE_DEBUG
-      printf("proc number \t %i \t npart=%i \n", conta_processori, npart_loc);
+      printf("proc number \t %i/%u \t npart=%i \n", conta_processori + 1, params->ncpu, npart_loc);
 #else
-      printf("proc number \t %i \t npart=%i \r", conta_processori, npart_loc);
+      printf("proc number \t %i/%u \t npart=%i \r", conta_processori + 1, params->ncpu, npart_loc);
 #endif
       num_of_passes = 1;
     }
@@ -647,12 +643,6 @@ int create_json_from_phasespace_file(Parameters * params)
           if (h == num_of_passes - 1 && num_of_passes > 1) dimensione_array_parts = num_residual_particles;
           parts = new aladyn_float[dimensione_array_parts*params->ndv];
           val[0] = (unsigned int)dimensione_array_parts;
-#ifdef ENABLE_DEBUG
-          printf("npart_loc = %i\t\t ndv=%i\n", val[0], params->ndv);
-#else
-          printf("npart_loc = %i\t\t ndv=%i\r", val[0], params->ndv);
-#endif
-          fflush(stdout);
           fread_size = std::fread(parts, sizeof(aladyn_float), val[0] * params->ndv, file_in);
           if (params->we_have_to_do_swap) swap_endian_f(parts, (size_t)val[0] * params->ndv);
         }
@@ -781,15 +771,15 @@ int create_json_from_phasespace_file(Parameters * params)
           em_zpz += (double)((z*pz)*w);
           peso_accumulato += w;
           carica_accumulata += ch;
-      }
+        }
         parts_accumulate += val[0];
         delete[] parts;
         parts = nullptr;
+      }
     }
-  }
     multifile_index++;
     conta_processori++;
-}
+  }
 
 
   em_x /= (double)peso_accumulato;
@@ -879,7 +869,7 @@ int create_json_from_phasespace_file(Parameters * params)
 
   if (!params->multifile) fclose(file_in);
 
-  std::cout << "fread_size = " << fread_size << std::endl << "json parameters file produced!" << std::endl;
+  std::cout << std::endl << "fread_size = " << fread_size << std::endl << "json parameters file produced!" << std::endl;
 
   delete[] estremi_min;
   estremi_min = nullptr;
