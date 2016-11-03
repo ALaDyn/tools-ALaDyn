@@ -1,7 +1,7 @@
 #!/usr/bin/python
 ######################################################################
 # Name:         read_ALaDyn_Particles.py
-# Author:       C Gatti and A Marocchino      
+# Author:       C Gatti and A Marocchino
 # Date:         2014-06-11
 # Purpose:      reads dued binary from output
 # Source:       python
@@ -33,8 +33,8 @@ file_name = sys.argv[1]
 
 f  = open(file_name,'rb')
 
-X=[]  
-Y=[] 
+X=[]
+Y=[]
 Z=[]
 Px=[]
 Py=[]
@@ -63,7 +63,7 @@ while True:
             W.append(vars[6])
             Q.append(vars[7])
     except:
-            pass    
+            pass
    #     pass
     #pass
 f.close()
@@ -83,10 +83,5 @@ plt.imshow(H)
 plt.draw()
 
 
-while True:
-    pass
-
-
-
-
-
+# while True:
+#     pass
