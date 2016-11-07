@@ -29,8 +29,8 @@ PRODUCTION=true
 #preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
 preplasmas=0.0
 
-#densities=$(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}')
-densities=1.0
+#foam_densities=$(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}')
+foam_densities=1.0
 
 #ramps=$(awk 'BEGIN{for(i=0.25;i<=0.75;i+=0.25)print i}')
 ramps=0.0
@@ -39,12 +39,17 @@ ramps=0.0
 #centrals=0.5
 centrals=(2.0 4.0 8.0)
 
+#bulk_densities=$(awk 'BEGIN{for(i=80.0;i<=120.0;i+=10.0)print i}')
+bulk_densities=100.0
+
 #contams=$(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}')
 contams=0.08
 
 #angles=$(awk 'BEGIN{for(i=5.0;i<=15.0;i+=5.0)print i}')
 angles=0.0
 
+#laser_lengths=$(awk 'BEGIN{for(i=20.0;i<=40.0;i+=5.0)print i}')
+laser_lengths=40.0
 
 
 
@@ -59,25 +64,29 @@ angles=0.0
 
 for pre in ${preplasmas[*]}
 do
-for dens in ${densities[*]}
+for f_dens in ${foam_densities[*]}
 do
 for ramp in ${ramps[*]}
 do
 for central in ${centrals[*]}
 do
+for c_dens in ${bulk_densities[*]}
+do
 for contam in ${contams[*]}
 do
 for angle in ${angles[*]}
+do
+for l_length in ${laser_lengths[*]}
 do
 
 echo "${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}" >> sim_da_fare.txt
 INPUTFILE=input.nml
 
 if [ "$1" = "0" ] ; then
-mkdir ${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+mkdir ${angle}_pre_${pre}_den_${f_dens}_ramp_${ramp}_cent_${central}_cont_${contam}
 fi
 
-cd ${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+cd ${angle}_pre_${pre}_den_${f_dens}_ramp_${ramp}_cent_${central}_cont_${contam}
 
 if [ "$1" = "0" ] ; then
 cp ../${JOBFILE} .
@@ -223,9 +232,9 @@ fi
 
 
 #### t0, xc, wx, wy, a0,lam0 ## tutti in micrometri
-POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER=16.5
-DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO=16.5
-LUNGHEZZA_LASER_TOTALE=33.0
+POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER=$(bc -l <<< "scale=2;(30.0/2)")
+DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO=$(bc -l <<< "scale=2;(30.0/2)")
+LUNGHEZZA_LASER_TOTALE=${l_length}
 WAIST_LASER=6.2
 PARAMETRO_ADIMENSIONALE_LASER_A0=3.0
 LUNGHEZZA_ONDA_LASER=0.8
@@ -253,8 +262,8 @@ INTERWIRE_DISTANCE=0.0
 
 
 #### n/nc, n1/nc,n2/nc (tutte le densita' sono quindi rapportate alla densita' critica)
-DENSITA_ELETTRONI_LAYER_FRONTALE=${dens}
-DENSITA_ELETTRONI_LAYER_CENTRALE=100.0
+DENSITA_ELETTRONI_LAYER_FRONTALE=${f_dens}
+DENSITA_ELETTRONI_LAYER_CENTRALE=${c_dens}
 DENSITA_ELETTRONI_LAYER_POSTERIORE=10.0
 
 
@@ -575,7 +584,7 @@ done
 done
 done
 done
-
-
+done
+done
 
 
