@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   int Xres = 1280;
   int Yres = 720;
   char image_type[] = "png";
-  int colonna_x = 1, colonna_y = 2;
+  int colonna_x = 1, colonna_y = 26;
   bool scan = false, func = false, gnuplot = false;
   int inputfile_position = 0;
   std::string riga;
@@ -192,7 +192,7 @@ int main(int argc, char* argv[])
     fprintf(outfile, "#!/gnuplot\n");
     fprintf(outfile, "FILE_IN='%s'\n", argv[inputfile_position]);
     fprintf(outfile, "FILE_OUT='%s.%s'\n", argv[inputfile_position], image_type);
-    fprintf(outfile, "set terminal %s truecolor enhanced size %i,%i\n", image_type, Xres, Yres);
+    fprintf(outfile, "set terminal %scairo enhanced size %i,%i\n", image_type, Xres, Yres);
     fprintf(outfile, "set output FILE_OUT\n");
     fprintf(outfile, "a = %g\n", fit_a1);
     fprintf(outfile, "b = %g\n", fit_b1);

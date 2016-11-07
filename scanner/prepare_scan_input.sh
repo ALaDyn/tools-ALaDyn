@@ -36,13 +36,14 @@ densities=1.0
 ramps=0.0
 
 #centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
-centrals=2.0
+#centrals=0.5
+centrals=(2.0 4.0 8.0)
 
 #contams=$(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}')
 contams=0.08
 
-angles=$(awk 'BEGIN{for(i=5.0;i<=15.0;i+=5.0)print i}')
-#angles=0.0
+#angles=$(awk 'BEGIN{for(i=5.0;i<=15.0;i+=5.0)print i}')
+angles=0.0
 
 
 
@@ -56,17 +57,17 @@ angles=$(awk 'BEGIN{for(i=5.0;i<=15.0;i+=5.0)print i}')
 ###############################
 
 
-for pre in $preplasmas
+for pre in ${preplasmas[*]}
 do
-for dens in $densities
+for dens in ${densities[*]}
 do
-for ramp in $ramps
+for ramp in ${ramps[*]}
 do
-for central in $centrals
+for central in ${centrals[*]}
 do
-for contam in $contams
+for contam in ${contams[*]}
 do
-for angle in $angles
+for angle in ${angles[*]}
 do
 
 echo "${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}" >> sim_da_fare.txt
@@ -82,7 +83,7 @@ if [ "$1" = "0" ] ; then
 cp ../${JOBFILE} .
 fi
 
-NCPU=64
+NCPU=256
 CREA_FILE_DUMP=1
 
 
@@ -93,15 +94,17 @@ CREA_FILE_DUMP=1
 ## nb2: se si abilita lo stretching, il numero di punti in y e z deve anche essere divisibile per 6, dato che la
 ##      zona di stretching e' definita come 1/6 dei punti totali
 ## nb3: per ora e' meglio mettere in z un numero di punti uguale a quello in y, a meno che non si metta 1 per le simulazioni 2D
-#NUMERO_PUNTI_GRIGLIA_X=3072
-#NUMERO_PUNTI_GRIGLIA_Y=1536
-NUMERO_PUNTI_GRIGLIA_X=7168
-NUMERO_PUNTI_GRIGLIA_Y=7168
+
+NUMERO_PUNTI_GRIGLIA_X=14336
+NUMERO_PUNTI_GRIGLIA_Y=14336
+
+#NUMERO_PUNTI_GRIGLIA_X=7168
+#NUMERO_PUNTI_GRIGLIA_Y=7168
 ##NB: mettere il seguente numero ad 1 per fare simulazioni 2D
 NUMERO_PUNTI_GRIGLIA_Z=1
 
 #NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=1500
-NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=7000
+NUMERO_PUNTI_GRIGLIA_TRASVERSALI_OCCUPATI_DAL_PLASMA=14000
 
 
 ##nb: ricordarsi di risolvere la skin depth
