@@ -124,7 +124,13 @@ def output_exists(path,quantity,frame):
 			return False	
 
 			###---###	
+	if quantity == 'phasespace':
+		if os.path.isfile(os.path.join(path,'Elpout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
 	
+
 	if quantity == 'E':
 		if os.path.isfile(os.path.join(path,'Exfout'+('%2.2i'%frame)+'.bin')) == True \
 		and \
