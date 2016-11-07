@@ -232,8 +232,8 @@ fi
 
 
 #### t0, xc, wx, wy, a0,lam0 ## tutti in micrometri
-POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER=$(bc -l <<< "scale=2;(30.0/2)")
-DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO=$(bc -l <<< "scale=2;(30.0/2)")
+POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER=$(bc -l <<< "scale=2;(${l_length}/2)")
+DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO=$(bc -l <<< "scale=2;(${l_length}/2)")
 LUNGHEZZA_LASER_TOTALE=${l_length}
 WAIST_LASER=6.2
 PARAMETRO_ADIMENSIONALE_LASER_A0=3.0
