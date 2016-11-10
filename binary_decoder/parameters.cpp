@@ -163,6 +163,8 @@ Parameters::Parameters() {
   phasespace_file_labels.push_back("h2p");
   phasespace_file_labels.push_back("lip");
   phasespace_file_labels.push_back("elp");
+  grid_file_labels.push_back("ienv");
+  grid_file_labels.push_back("renv");
   grid_file_labels.push_back("pren");
   grid_file_labels.push_back("pden");
   grid_file_labels.push_back("hidn");
