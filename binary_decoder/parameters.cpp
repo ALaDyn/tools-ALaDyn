@@ -891,7 +891,7 @@ void Parameters::parse_command_line()
       std::cout << "You asked to rewrite the 2D grid in ASCII format for gnuplot" << std::endl;
       out_grid2d = 1;
     }
-    else if (argv[i] == "-dump_propaga")
+    else if (argv[i] == "-dump_ppg")
     {
       std::cout << "You asked to have a .ppg dump of the input phase space" << std::endl;
       out_ppg = 1;
