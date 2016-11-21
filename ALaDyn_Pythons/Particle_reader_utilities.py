@@ -1,7 +1,7 @@
 #!/usr/bin/python
 ######################################################################
 # Name:         Particles_reader_utility.py
-# Author:       A Marocchino      
+# Author:       A Marocchino
 # Date:         2014-06-18
 # Purpose:      reads dued binary from output
 # Source:       python
@@ -17,7 +17,7 @@ import numpy as np
 
 # - #
 def read_particle_phasespace_bycomponent(dir_path,file_name,component):
-	
+
 
 	path     = os.path.join(dir_path,file_name)
 	f        = open(path,'rb')
@@ -29,7 +29,7 @@ def read_particle_phasespace_bycomponent(dir_path,file_name,component):
 			#print "End of File"
 			break
 		vars=[]
-		
+
 		try:
 			pass
 			for i in range(0,Np[0]):
@@ -41,12 +41,12 @@ def read_particle_phasespace_bycomponent(dir_path,file_name,component):
 				if(component == 'Py'): 	cmp.append(vars[4])
 				if(component == 'Pz'): 	cmp.append(vars[5])
 				if(component == 'W'): 	cmp.append(vars[6])
-				if(component == 'Q'): 	cmp.append(vars[7])					
+				if(component == 'Q'): 	cmp.append(vars[7])
 		except:
-			pass	
+			pass
 	f.close()
 
-	return cmp
+	return np.array(cmp)
 
 #- folder structure for outputs -#
 def	generate_folder_phasespace(path):

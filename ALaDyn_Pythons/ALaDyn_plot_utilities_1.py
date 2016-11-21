@@ -36,7 +36,7 @@ def	generate_folder_output_structure(path,savedata):
 	
 	directory_rho = os.path.join(directory,'rho')
 	directory_ionization   = os.path.join(directory,'ionization')
-	directory_Energy_Density = os.path.join(directory, 'Ene_Den')
+	directory_Energy_Density = os.path.join(directory, 'EneDen')
 	directory_E   = os.path.join(directory,'E_field')
 	directory_B   = os.path.join(directory,'B_field')
 	

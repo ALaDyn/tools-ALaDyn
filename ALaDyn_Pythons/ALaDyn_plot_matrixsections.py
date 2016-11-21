@@ -84,7 +84,7 @@ if __name__ == '__main__':
 			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			np.savetxt( os.path.join(path_write,'data','ionization',('ionization_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
 
-		if output_exists(path_read,'Energy_density',i) == True:
+		if output_exists(path_read,'EneDen',i) == True:
             		print 'energy density --- frame >>> ',i
             		ED,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Elenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
             		np.savetxt( os.path.join(path_write,'data','EneDen',('Energy_Density'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),ED.transpose(),fmt='%15.14e')
