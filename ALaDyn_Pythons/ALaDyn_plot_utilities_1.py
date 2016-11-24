@@ -1,7 +1,7 @@
 #!/usr/bin/python
 ######################################################################
 # Name:         ALaDyn_plot_section.py
-# Author:       
+# Author:
 # Date:			2014-02-18
 # Purpose:      it nests into 'ALaDyn_read_binary' to plot sections
 # Source:       python
@@ -9,6 +9,9 @@
 
 ### loading shell commands
 import os, os.path, glob, sys, shutil, time, datetime, re
+import matplotlib.pyplot as plt
+import matplotlib.colors as colors
+import numpy as np
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
@@ -16,7 +19,11 @@ import os, os.path, glob, sys, shutil, time, datetime, re
 ### --- ###
 
 
-
+def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+        cmap(np.linspace(minval, maxval, n)))
+    return new_cmap
 
 #- get last output number
 def last_output(path):
@@ -33,35 +40,35 @@ def	generate_folder_output_structure(path,savedata):
 	directory = os.path.join(path,'plots')
 	if not os.path.exists( directory ):
 		os.makedirs(directory)
-	
+
 	directory_rho = os.path.join(directory,'rho')
 	directory_ionization   = os.path.join(directory,'ionization')
 	directory_Energy_Density = os.path.join(directory, 'EneDen')
 	directory_E   = os.path.join(directory,'E_field')
 	directory_B   = os.path.join(directory,'B_field')
-	
+
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
 	if not os.path.exists( directory_E ):
 		os.makedirs(directory_E)
 	if not os.path.exists( directory_B ):
 		os.makedirs(directory_B)
-		
+
 					###---###
 	if not os.path.exists( directory_ionization ):
 		os.makedirs(directory_ionization)
 					###---###
 	if not os.path.exists( directory_Energy_Density ):
 		os.makedirs(directory_Energy_Density)
-	
+
 	if (savedata == 'True'):
 		directory = os.path.join(path,'data')
 		if not os.path.exists( directory ):
 			os.makedirs(directory)
-	
+
 		directory_rho 		 = os.path.join(directory,'rho')
 		directory_ionization     = os.path.join(directory,'ionization')
-		directory_Energy_Density = os.path.join(directory, 'EneDen')	
+		directory_Energy_Density = os.path.join(directory, 'EneDen')
 		directory_E   		 = os.path.join(directory,'E_field')
 		directory_B   		 = os.path.join(directory,'B_field')
 		directory_moving_window  = os.path.join(directory,'Moving_window_axes')
@@ -76,7 +83,7 @@ def	generate_folder_output_structure(path,savedata):
 		if not os.path.exists( directory_E ):
 			os.makedirs(directory_E)
 		if not os.path.exists( directory_B ):
-			os.makedirs(directory_B)	
+			os.makedirs(directory_B)
 		if not os.path.exists( directory_moving_window ):
 			os.makedirs( directory_moving_window )
 
@@ -87,13 +94,13 @@ def figure_dimension_inch(x,y,z,scale_factor):
 	dx = max(x) - min(x)
 	dy = max(y) - min(y)
 	dz = max(z) - min(z)
-	
+
 	standard_size_x = 6.5
 	standard_size_z = 3.0
-	
+
 	size_x = scale_factor*standard_size_x
 	size_z = size_x * dz/dx + 1.5
-	
+
 	return size_x, size_z
 
 
@@ -106,7 +113,7 @@ def output_exists(path,quantity,frame):
 			return True
 		else:
 			return False
-			
+
 			###---###
 
 	if quantity == 'ionization':
@@ -121,15 +128,15 @@ def output_exists(path,quantity,frame):
 		if os.path.isfile(os.path.join(path,'Elenout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:
-			return False	
+			return False
 
-			###---###	
+			###---###
 	if quantity == 'phasespace':
 		if os.path.isfile(os.path.join(path,'Elpout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:
 			return False
-	
+
 
 	if quantity == 'E':
 		if os.path.isfile(os.path.join(path,'Exfout'+('%2.2i'%frame)+'.bin')) == True \
@@ -162,20 +169,20 @@ def output_exists(path,quantity,frame):
 			return True
 		else:
 			return False
-			
-			
+
+
 	if quantity == 'Moving_window_axes':
 # 		print os.path.join(path,'data','Moving_window_axes',('moving_window_axes_'+('%2.2i'%frame)+'.dat')
 # 		window_data_file = os.path.join(path,'data','Moving_window_axes',('moving_window_axes_'+('%2.2i'%frame)+'.dat')
 # 		print window_data_file
-		# 
+		#
 		if os.path.isfile(os.path.join(path,'Bdenout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:
 			return False
-	
-			
-			
+
+
+
 #- folder structure for VTS outputs -#
 def	generate_folder_vts(path):
 	directory = os.path.join(path,'VTS_files')
