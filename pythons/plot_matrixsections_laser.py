@@ -11,7 +11,7 @@
 import os, os.path, glob, sys, shutil
 ###>>>
 home_path = os.path.expanduser('~')
-sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
+sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *

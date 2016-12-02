@@ -11,11 +11,11 @@
 import os, os.path, glob, sys, shutil
 ###>>>
 home_path = os.path.expanduser('~')
-sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
+sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *
-from ALaDyn_plot_utilities_1 import *
+from utilities_1 import *
 from ALaDyn_plot_utilities_density import *
 from ALaDyn_plot_utilities_Efield import *
 from ALaDyn_plot_utilities_Bfield import *
@@ -84,10 +84,10 @@ if __name__ == '__main__':
 			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			np.savetxt( os.path.join(path_write,'data','ionization',('ionization_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
 
-		if output_exists(path_read,'EneDen',i) == True:
+		if output_exists(path_read,'Energy_density',i) == True:
             		print 'energy density --- frame >>> ',i
             		ED,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Elenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
-            		np.savetxt( os.path.join(path_write,'data','EneDen',('Energy_Density'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),ED.transpose(),fmt='%15.14e')
+            		np.savetxt( os.path.join(path_write,'data','Energy_density',('Energy_Density'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),ED.transpose(),fmt='%15.14e')
 
 		if output_exists(path_read,'E',i) == True:
 			print 'E --- frame >>> ',i

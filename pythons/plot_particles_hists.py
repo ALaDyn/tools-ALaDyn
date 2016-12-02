@@ -1,7 +1,7 @@
 #!/usr/bin/python
 ######################################################################
 # Name:         ALaDyn_Particles_hists.py
-# Author:       A Marocchino      
+# Author:       A Marocchino
 # Date:         2014-06-18
 # Purpose:      reads dued binary from PDBunch* and plots hists
 # Source:       python
@@ -15,8 +15,7 @@ import numpy as np
 import pylab as pyl
 import matplotlib.pyplot as plt
 ###>>>
-home_path = os.path.expanduser('~')
-sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
+sys.path.append(os.path.join(os.path.expanduser('~'),'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ###>>>
 ### --- ###
 from Particle_reader_utilities import *
@@ -35,7 +34,7 @@ nbins = int(sys.argv[1])
 
 #--- *** ---#
 if __name__ == '__main__':
-	
+
 	#-path
 	path = os.getcwd()
 	#-folder output structure
@@ -51,7 +50,7 @@ if __name__ == '__main__':
 				X, Y, Z, Px, Py, Pz, W = read_particle_phasespace( os.path.join(root_dir,file) )
 				X=np.array(X);    Y=np.array(Y);   Z=np.array(Z)
 				Px=np.array(Px); Py=np.array(Py); Pz=np.array(Pz)
-				
+
 				H, xedges, pxedges = np.histogram2d(X, Px, bins=(nbins, nbins))
 				K, yedges, pyedges = np.histogram2d(Y, Py, bins=(nbins, nbins))
 				L, zedges, pzedges = np.histogram2d(Z, Pz, bins=(nbins, nbins))
@@ -65,8 +64,8 @@ if __name__ == '__main__':
 				#ax2.xlabel('y'); ax2.ylabel('Py')
 				ax3 = fig.add_subplot(2,3,3)
 				ax3.contourf(0.5*(zedges[0:nbins]+zedges[1:nbins+1]), 0.5*(pzedges[0:nbins]+pzedges[1:nbins+1]), L.T,100,linewidths=.001)
-				#ax3.xlabel('z'); ax3.ylabel('Pz')			
-			
+				#ax3.xlabel('z'); ax3.ylabel('Pz')
+
 				ax4 = fig.add_subplot(2,3,4)
 				ax4.scatter(X[range(0,len(X),10)],Px[range(0,len(Px),10)],s=.1,edgecolors='None')
 				#ax4.xlabel('x'); ax4.ylabel('Px')
@@ -77,9 +76,8 @@ if __name__ == '__main__':
 				ax6.scatter(Z[range(0,len(Z),10)],Pz[range(0,len(Pz),10)],s=.1,edgecolors='None')
 				#ax6.xlabel('z'); ax6.ylabel('Pz')
 
-			
+
 				plt.axis('tight')
 				name_output =  'phasespace_bunch_' + str(file[7]) + '_' + str(file[9:11])+ '.png'
 				plt.savefig( os.path.join(path,'data','phasespace',name_output) )
 				plt.close(fig)
-

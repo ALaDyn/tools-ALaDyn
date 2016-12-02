@@ -29,21 +29,21 @@ from ALaDyn_plot_utilities_1 import *
 def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,sliceposition_x,sliceposition_y,sliceposition_z,magnification_fig,savedata):
 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 
-	
+
 	file_name = 'Bdenout'+s+'.bin'
 	matrix,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 	file_name = 'Edenout'+s+'.bin'
 	matrix2,  x,y,z = read_ALaDyn_bin(path,file_name,'grid')
 
 
-	
 
 
 
 
 
 
-	
+
+
 	#- cut & sign
 	matrix = np.abs( matrix )
 	matrix2 = np.abs( matrix2 )
@@ -71,7 +71,7 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 
 	p = matrix.shape
 	x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
-	
+
 	sizeX, sizeZ = figure_dimension_inch(x,y,z,magnification_fig)
 
 	levs_lin = np.linspace(      rho_min ,      rho_max ,isolines)
@@ -91,14 +91,14 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,z,matrix[:,y2,:].T,levs_lin, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'rho_Bunch_XZ_lin_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))
 # 	contourf(y,z,matrix[x2,:,:].T,levs_lin, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'rho_Bunch_YZ_lin_'+s+'.png'
@@ -108,21 +108,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 
 
 	#- Plot Edenout -#
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,y,matrix2[:,:,z2].T,levs_lin, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'rho_Background_XY_lin_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,z,matrix2[:,y2,:].T,levs_lin, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'rho_Background_XZ_lin_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))
 # 	contourf(y,z,matrix2[x2,:,:].T,levs_lin, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'rho_Background_YZ_lin_'+s+'.png'
@@ -132,21 +132,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 
 
 	#- Plot Bdenout+Edenout -#
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,levs_lin, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'rho_tot_XY_lin_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,z,matrix[:,y2,:].T + matrix2[:,y2,:].T,levs_lin, linewidths = 0.00001)
 	axis('tight')
 	name_output = 'rho_tot_XZ_lin_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-# 	fig = figure(1, figsize=(sizeX, sizeX))	
+# 	fig = figure(1, figsize=(sizeX, sizeX))
 # 	contourf(y,z,matrix[x2,:,:].T - matrix2[x2,:,:].T,levs_lin, linewidths = 0.00001)
 #	axis('tight')
 # 	name_output = 'rho_tot_YZ_lin_'+s+'.png'
@@ -173,14 +173,14 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,z,matrix[:,y2,:].T,levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Bunch_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))
 # 	contourf(y,z,matrix[x2,:,:].T, levs_log, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_Bunch_YZ_log_'+s+'.png'
@@ -190,21 +190,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 
 
 	#- Plot Edenout -#
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,y,matrix2[:,:,z2].T, levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Background_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,z,matrix2[:,y2,:].T, levs_log, norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_Background_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-# 	fig = figure(1, figsize=(sizeZ, sizeZ))	
+# 	fig = figure(1, figsize=(sizeZ, sizeZ))
 # 	contourf(y,z,matrix2[x2,:,:].T, levs_log, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_Background_YZ_log_'+s+'.png'
@@ -214,21 +214,21 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 
 
 	#- Plot Bdenout+Edenout -#
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,y,matrix[:,:,z2].T + matrix2[:,:,z2].T,levs_log , norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_tot_XY_log_'+s+'.png'
 	savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-	fig = figure(1, figsize=(sizeX, sizeZ))	
+	fig = figure(1, figsize=(sizeX, sizeZ))
 	contourf(x,z,matrix[:,y2,:].T + matrix2[:,y2,:].T,levs_log , norm=colors.LogNorm())
 	axis('tight')
 	name_output = 'rho_tot_XZ_log_'+s+'.png'
 	fig.savefig( os.path.join(path,'plots','rho',name_output) )
 	close(fig)
 
-# 	fig = figure(1, figsize=(sizeX, sizeX))	
+# 	fig = figure(1, figsize=(sizeX, sizeX))
 # 	contourf(y,z,matrix[x2,:,:].T + matrix2[x2,:,:].T, levs_log, norm=colors.LogNorm())
 #	axis('tight')
 # 	name_output = 'rho_tot_YZ_log_'+s+'.png'
@@ -239,9 +239,9 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 
     #----- Save density sections data -----#
 	if (savedata == 'True'):
-    	
+
 		print 'saving rho data'
-    	
+
 		rho_b = matrix
 		rho_w = matrix2
 
@@ -253,10 +253,8 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 		p = rho.shape
 		x2=p[0]/2+sliceposition_x; y2=p[1]/2+sliceposition_y; z2=p[2]/2+sliceposition_z;
 
-	
+
 		np.savetxt( os.path.join(path,'data','rho',('rho_section_'+('%2.2i'%frame)+'.dat')),rho[:,:,z2].T,fmt='%15.14e')
 		np.savetxt( os.path.join(path,'data','rho',('rho_bunch_section_'+('%2.2i'%frame)+'.dat')),rho_b[:,:,z2].T,fmt='%15.14e')
 # 		np.savetxt( 'rho_section_'+('%2.2i'%frame)+'.dat' ,rho[:,:,z2].T,fmt='%15.14e')
 # 		np.savetxt( 'rho_b_section_'+('%2.2i'%frame)+'.dat' ,rho_b[:,:,z2].T,fmt='%15.14e')
-
-

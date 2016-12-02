@@ -12,10 +12,6 @@ import os, os.path, glob, sys, shutil, time, datetime, re
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import numpy as np
-###>>>
-# home_path = os.path.expanduser('~')
-# sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
-###>>>
 ### --- ###
 
 
@@ -43,7 +39,7 @@ def	generate_folder_output_structure(path,savedata):
 
 	directory_rho = os.path.join(directory,'rho')
 	directory_ionization   = os.path.join(directory,'ionization')
-	directory_Energy_Density = os.path.join(directory, 'EneDen')
+	directory_Energy_Density = os.path.join(directory, 'Energy_density')
 	directory_E   = os.path.join(directory,'E_field')
 	directory_B   = os.path.join(directory,'B_field')
 
@@ -68,10 +64,10 @@ def	generate_folder_output_structure(path,savedata):
 
 		directory_rho 		 = os.path.join(directory,'rho')
 		directory_ionization     = os.path.join(directory,'ionization')
-		directory_Energy_Density = os.path.join(directory, 'EneDen')
+		directory_Energy_Density = os.path.join(directory, 'Energy_density')
 		directory_E   		 = os.path.join(directory,'E_field')
 		directory_B   		 = os.path.join(directory,'B_field')
-		directory_moving_window  = os.path.join(directory,'Moving_window_axes')
+		directory_moving_window  = os.path.join(directory,'axes')
 
 
 		if not os.path.exists( directory_rho ):
@@ -124,7 +120,7 @@ def output_exists(path,quantity,frame):
 
 			###---###
 
-	if quantity == 'EneDen':
+	if quantity == 'Energy_density':
 		if os.path.isfile(os.path.join(path,'Elenout'+('%2.2i'%frame)+'.bin')) == True:
 			return True
 		else:

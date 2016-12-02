@@ -14,8 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 ###>>>
-home_path = os.path.expanduser('~')
-sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
+sys.path.append(os.path.join(os.path.expanduser('~'),'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ###>>>
 from read_ALaDyn_bin import *
 from ALaDyn_plot_utilities_1 import *
@@ -59,28 +58,3 @@ if k_input is '1':
 	cleaned       = to_clean[:,to_save].transpose()
 	print cleaned.shape
 	np.savetxt( os.path.join(path, os.path.splitext(file_to_clean)[0]+'_cleaned'+os.path.splitext(file_to_clean)[1] ), cleaned )
-	
-# 	fig = plt.figure(1)
-# 	ax  = plt.subplot(111) #matplotlib.pyplot.subplot(111)
-# 	ax.plot( cleaned[0,:], cleaned[7,:], 'o') #, markersize=5.0)
-# 	ax.grid()
-# 	plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

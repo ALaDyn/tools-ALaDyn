@@ -11,10 +11,7 @@
 import os, os.path, glob, sys, shutil, base64
 import numpy as np
 ###>>>
-###>>>
-home_path = os.path.expanduser('~')
-sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
-###>>>
+sys.path.append(os.path.join(os.path.expanduser('~'),'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ### --- ###
 from read_ALaDyn_bin import *
 ### --- ###
@@ -31,7 +28,7 @@ def matrix2vector( M ):
 	if len(s) == 2:
 		for i in range(0,s[0]):
 			for j in range(0,s[1]):
-				v.append(M[i,j])	
+				v.append(M[i,j])
 	return v
 
 def matrix2vectorField( M1, M2, M3):
@@ -65,7 +62,7 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
  	file_name 		= 'Edenout'+sf+'.bin'
  	rhobck, x,y,z	= read_ALaDyn_bin(path,file_name,'grid')
  	rhobck			= np.abs( rhobck )
- 	
+
  	#- matrix shaving
  	if cell_cut > 0:
 	 	rhobunch = rhobunch[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
@@ -74,9 +71,9 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
  		Z        = Z[cell_cut:-cell_cut]
  	#-
  	size 			= rhobunch.shape
- 	#- 
+ 	#-
 
- 	
+
 	#- writing vts header
 	f = open(os.path.join(path,'VTS_files','ALaDyn_output_'+sf+'.vts'),'w+')
 	f.write('<?xml version="1.0"?>' + '\n')
@@ -151,9 +148,9 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 	 	Exb = Exb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
 	 	Eyb = Eyb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
 	 	Ezb = Ezb[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
- 	#- 
+ 	#-
 
-	
+
 	#- E-field bunch
 	f.write('<DataArray type="Float32" Name="E_bunch" NumberOfComponents="3" format="binary"> \n')
 	mesh = matrix2vectorField(Exb,Eyb,Ezb)
@@ -193,9 +190,9 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 	 	Bx  = Bx[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
 	 	By  = By[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
 	 	Bz  = Bz[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
- 	#- 
+ 	#-
 
-	
+
 	#- B-field bunch
 # 	f.write('<DataArray type="Float32" Name="B_bunch" NumberOfComponents="3" format="binary"> \n')
 # 	mesh = matrix2vectorField(Bxb,Byb,Bzb)
@@ -226,7 +223,7 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 
 
 
-		
+
 # 	frame = 0
 # 	s='%2.2i'%frame 				#conversion to 2-character-long-string
 # 	file_name = 'Bdenout'+s+'.bin'
@@ -237,9 +234,9 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 # 	matrix = np.abs( matrix )
 # # 	matrix2 = np.abs( matrix2 )
 # 	size = matrix.shape
-	
 
-	
+
+
 
 	#- writing vts header
 # 	f = open('test.vts','w+')
@@ -259,7 +256,7 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 #  				buffer.append(1./float(NJ)*(float(j)-1.))
 #  				buffer.append(1./float(NI)*(float(i)-1.))
 #  				buffer.append(1./float(NK)*(float(k)-1.))
-# 
+#
 # 	s = base64.b64encode(np.array(buffer,dtype=np.float32))
 #  	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
 #  	f.write(s)
@@ -278,20 +275,20 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 # 			for k in range(0,NK+1):
 # 				buffer.append(n*1.)
 # 				n+=1
-# 
+#
 # 	s = base64.b64encode(np.array(buffer,dtype=np.float32))
 #  	f.write(base64.b64encode(np.array(len(s),dtype=np.int32)))
 #  	f.write(s)
 # # 	for item in buffer:
-# # 		f.write(str(item)+'\n')	
+# # 		f.write(str(item)+'\n')
 # 	f.write('</DataArray> \n')
 # 	f.write('</PointData> \n')
-	
-	
-	
+
+
+
 # 	f.write('<CellData> \n')
 # 	f.write('<DataArray type="Float32" Name="rho" format="ascii"> \n')
-# 
+#
 # 	buffer=[]
 # 	n=0
 # 	for i in range(0,NI):
@@ -299,10 +296,10 @@ def write_vts(path,frame,X,Y,Z,cell_cut):
 # 			for k in range(0,NK):
 # 				buffer.append(str(n*1.))
 # 				n+=1
-# 	
+#
 # 	for item in buffer:
 # 		f.write(str(item)+'\n')
-# 	
+#
 # 	f.write('</DataArray> \n')
 
 # 	f.write('</CellData> \n')
@@ -326,7 +323,7 @@ def write_density_vts(path,frame,X,Y,Z,cell_cut):
  	file_name 		= 'Edenout'+sf+'.bin'
  	rhobck, x,y,z	= read_ALaDyn_bin(path,file_name,'grid')
  	rhobck			= np.abs( rhobck )
- 	
+
  	#- matrix shaving
  	if cell_cut > 0:
 	 	rhobunch = rhobunch[:,cell_cut:-cell_cut,cell_cut:-cell_cut]
@@ -335,9 +332,9 @@ def write_density_vts(path,frame,X,Y,Z,cell_cut):
  		Z        = Z[cell_cut:-cell_cut]
  	#-
  	size 			= rhobunch.shape
- 	#- 
+ 	#-
 
- 	
+
 	#- writing vts header
 		#total
 	f_total = open(os.path.join(path,'VTS_files','ALaDyn_rho_'+sf+'.vts'),'w+')
@@ -368,7 +365,7 @@ def write_density_vts(path,frame,X,Y,Z,cell_cut):
 				mesh.append( Y[j] )
 				mesh.append( Z[k] )
 				mesh.append( X[i] )
-	
+
 	#- Writing MESH -#
 		#it's the same for the whole 3 cases
 		#total
@@ -489,9 +486,9 @@ def write_E_vts(path,frame,X,Y,Z,cell_cut):
  		Z        = Z[cell_cut:-cell_cut]
  	#-
  	size = Ex.shape
- 	#- 
+ 	#-
 
- 	
+
 	#- writing vts header
 	f = open(os.path.join(path,'VTS_files','ALaDyn_E_'+sf+'.vts'),'w+')
 	f.write('<?xml version="1.0"?>' + '\n')
@@ -659,9 +656,9 @@ def write_B_vts(path,frame,X,Y,Z,cell_cut):
  		Z        = Z[cell_cut:-cell_cut]
  	#-
  	size = Bx.shape
- 	#- 
+ 	#-
 
- 	
+
 	#- writing vts header
 	f = open(os.path.join(path,'VTS_files','ALaDyn_B_'+sf+'.vts'),'w+')
 	f.write('<?xml version="1.0"?>' + '\n')
@@ -732,7 +729,7 @@ def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut,sliceposition_y):
 
 	#-original size
 	sizeO = rhobunch.shape
- 	
+
  	#- matrix shaving
  	if cell_cut > 0:
 	 	rhobunch = rhobunch[:, sizeO[1]/2+sliceposition_y, cell_cut:-cell_cut]
@@ -746,9 +743,9 @@ def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut,sliceposition_y):
  		Z        = Z[:]
  	#-
  	size 		 = rhobunch.shape
- 	#- 
+ 	#-
 
- 	
+
 	#- writing vts header
 	f = open(os.path.join(path,'VTS_files','ALaDyn_section_longitudinal_output_'+sf+'.vts'),'w+')
 	f.write('<?xml version="1.0"?>' + '\n')
@@ -829,9 +826,9 @@ def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut,sliceposition_y):
 	 	Exb = Exb[:,sizeO[1]/2,:]
 	 	Eyb = Eyb[:,sizeO[1]/2,:]
 	 	Ezb = Ezb[:,sizeO[1]/2,:]
- 	#- 
+ 	#-
 
-	
+
 	#- E-field bunch
 	f.write('<DataArray type="Float32" Name="E_bunch" NumberOfComponents="3" format="binary"> \n')
 	mesh = matrix2vectorField(Exb,Eyb,Ezb)
@@ -896,9 +893,9 @@ def write_vts_section_longitudinal(path,frame,X,Y,Z,cell_cut,sliceposition_y):
 	 	Bx  = Bx[:,sizeO[1]/2,:]
 	 	By  = By[:,sizeO[1]/2,:]
 	 	Bz  = Bz[:,sizeO[1]/2,:]
- 	#- 
+ 	#-
 
-	
+
 	#- B-field bunch
 # 	f.write('<DataArray type="Float32" Name="B_bunch" NumberOfComponents="3" format="binary"> \n')
 # 	mesh = matrix2vectorField(Bxb,Byb,Bzb)
