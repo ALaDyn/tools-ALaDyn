@@ -55,81 +55,81 @@ for i in range(frame_begin, frame_end + 1 ):
 		gamma_selected = np.full((number_of_particles), True, dtype=bool)
 		W_selected = np.full((number_of_particles), True, dtype=bool)
 
-			if(gamma_threshold>-1.):
-				Px = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Px')
-				gamma = 1.+Px**2
-				del Px
-				Py = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Py')
-				gamma = gamma+Py**2
-				del Py
-				Pz = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Pz')
-				gamma = gamma+Pz**2
-				del Pz
-				gamma=np.array(np.sqrt(gamma))
-				gamma_selected = (gamma>gamma_threshold)
-				del gamma
-
-			if(W_threshold>-1.):
-				W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
-				W_selected = (W<=W_threshold)
-
-			p_selected = (gamma_selected & W_selected)
-
+		if(gamma_threshold>-1.):
 			Px = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Px')
-			Px = Px[p_selected]
+			gamma = 1.+Px**2
+			del Px
 			Py = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Py')
-			Py = Py[p_selected]
+			gamma = gamma+Py**2
+			del Py
 			Pz = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Pz')
-			Pz = Pz[p_selected]
-			X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
-			X = X[p_selected]
-			Y = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Y')
-			Y = Y[p_selected]
-			Z = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Z')
-			Z = Z[p_selected]
+			gamma = gamma+Pz**2
+			del Pz
+			gamma=np.array(np.sqrt(gamma))
+			gamma_selected = (gamma>gamma_threshold)
+			del gamma
 
-			gamma = np.array(np.sqrt(1. + Px**2 + Py**2 + Pz**2))
+		if(W_threshold>-1.):
+			W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
+			W_selected = (W<=W_threshold)
 
-			en_spread = np.std(gamma)/np.mean(gamma)
-			emittance_y = np.sqrt( np.std(Y)**2*np.std(Py)**2-np.cov(Y,Py)[0][1]**2)/np.mean(gamma);
-			emittance_z = np.sqrt( np.std(Z)**2*np.std(Pz)**2-np.cov(X,Pz)[0][1]**2)/np.mean(gamma);
-			Charge = 1536.*0.02*1.6e-7*len(X);
+		p_selected = (gamma_selected & W_selected)
 
-			print 'Energy spread: ', en_spread*100 ,'%'
-			print 'Normalized Emittance Y: ', ('%3.2e' % emittance_y), 'mm-mrad'
-			print 'Normalized Emittance Z: ', ('%3.2e' % emittance_z), 'mm-mrad'
-			print 'Charge:',('%3.2e' % Charge), 'pC'
+		Px = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Px')
+		Px = Px[p_selected]
+		Py = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Py')
+		Py = Py[p_selected]
+		Pz = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Pz')
+		Pz = Pz[p_selected]
+		X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
+		X = X[p_selected]
+		Y = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Y')
+		Y = Y[p_selected]
+		Z = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Z')
+		Z = Z[p_selected]
 
-			plt.figure()
-			#fig=plt.figure()
-			#ax=fig.add_subplot(111,projection='3d')
-			#ax.scatter(X,Y,Z,s=.05,edgecolors='None')
-			#ax.set_xlabel('X')
-			#ax.set_xlabel('Y')
-			#ax.set_xlabel('Z')
-			plt.subplot(311)
-			plt.scatter(X,Px,s=.1,edgecolors='None')
-			#plt.scatter(X,Y,Z,s=.1,edgecolors='None')
-			#plt.xlabel(r'$X (\mu m) $');plt.ylabel(r'$Z (\mu m)$')
-			plt.xlabel(r'$X (\mu m) $',fontsize=24);plt.ylabel(r'$P_x/mc$',fontsize=24)
-			#plt.text(90,327, r'$Energy spread = 20,2% $',size=18,ha='left',va='top')
-			plt.subplot(312)
-			#       plt.scatter(Y,Z,s=.1,edgecolors='None')
-			#       plt.xlabel(r'$Y (\mu m) $');plt.ylabel(r'$Z (\mu m)$')
-			plt.scatter(Y,Py,s=.1,edgecolors='None')
-			plt.xlabel(r'$Y (\mu m)$',fontsize=24);plt.ylabel(r'$P_y/mc$',fontsize=24)
-			plt.subplot(313)
-			#       plt.scatter(X,Y,s=.1,edgecolors='None')
-			#      plt.xlabel(r'$X (\mu m) $');plt.ylabel(r'$Y (\mu m)$')
-			#plt.scatter(Pz,Py,s=.1,edgecolors='None')
-			#plt.xlabel('Pz/mc');plt.ylabel('Py/mc')
-			#plt.subplot(313)
-			plt.hist(gamma*0.511,100)
-			#       plt.hist(gamma[gamma_selected],50)
-			plt.xlabel('$Energy (MeV)$',fontsize=24);plt.ylabel('$dN/dE$',fontsize=24);
-			#       plt.axis('tight')
-			name_output = 'Phsp_enspect'+'_'+('%2.2i'%i)+'.png'
-			#name_output =  '3Dplot' + '_' +('%2.2i'%i)+ '.png'
-			plt.savefig( os.path.join(path_write,'data','phasespace',name_output) )
-			# plt.close()
-			plt.show()
+		gamma = np.array(np.sqrt(1. + Px**2 + Py**2 + Pz**2))
+
+		en_spread = np.std(gamma)/np.mean(gamma)
+		emittance_y = np.sqrt( np.std(Y)**2*np.std(Py)**2-np.cov(Y,Py)[0][1]**2)/np.mean(gamma);
+		emittance_z = np.sqrt( np.std(Z)**2*np.std(Pz)**2-np.cov(X,Pz)[0][1]**2)/np.mean(gamma);
+		Charge = 1536.*0.02*1.6e-7*len(X);
+
+		print 'Energy spread: ', en_spread*100 ,'%'
+		print 'Normalized Emittance Y: ', ('%3.2e' % emittance_y), 'mm-mrad'
+		print 'Normalized Emittance Z: ', ('%3.2e' % emittance_z), 'mm-mrad'
+		print 'Charge:',('%3.2e' % Charge), 'pC'
+
+		plt.figure()
+		#fig=plt.figure()
+		#ax=fig.add_subplot(111,projection='3d')
+		#ax.scatter(X,Y,Z,s=.05,edgecolors='None')
+		#ax.set_xlabel('X')
+		#ax.set_xlabel('Y')
+		#ax.set_xlabel('Z')
+		plt.subplot(311)
+		plt.scatter(X,Px,s=.1,edgecolors='None')
+		#plt.scatter(X,Y,Z,s=.1,edgecolors='None')
+		#plt.xlabel(r'$X (\mu m) $');plt.ylabel(r'$Z (\mu m)$')
+		plt.xlabel(r'$X (\mu m) $',fontsize=24);plt.ylabel(r'$P_x/mc$',fontsize=24)
+		#plt.text(90,327, r'$Energy spread = 20,2% $',size=18,ha='left',va='top')
+		plt.subplot(312)
+		#       plt.scatter(Y,Z,s=.1,edgecolors='None')
+		#       plt.xlabel(r'$Y (\mu m) $');plt.ylabel(r'$Z (\mu m)$')
+		plt.scatter(Y,Py,s=.1,edgecolors='None')
+		plt.xlabel(r'$Y (\mu m)$',fontsize=24);plt.ylabel(r'$P_y/mc$',fontsize=24)
+		plt.subplot(313)
+		#       plt.scatter(X,Y,s=.1,edgecolors='None')
+		#      plt.xlabel(r'$X (\mu m) $');plt.ylabel(r'$Y (\mu m)$')
+		#plt.scatter(Pz,Py,s=.1,edgecolors='None')
+		#plt.xlabel('Pz/mc');plt.ylabel('Py/mc')
+		#plt.subplot(313)
+		plt.hist(gamma*0.511,100)
+		#       plt.hist(gamma[gamma_selected],50)
+		plt.xlabel('$Energy (MeV)$',fontsize=24);plt.ylabel('$dN/dE$',fontsize=24);
+		#       plt.axis('tight')
+		name_output = 'Phsp_enspect'+'_'+('%2.2i'%i)+'.png'
+		#name_output =  '3Dplot' + '_' +('%2.2i'%i)+ '.png'
+		plt.savefig( os.path.join(path_write,'data','phasespace',name_output) )
+		# plt.close()
+		plt.show()
