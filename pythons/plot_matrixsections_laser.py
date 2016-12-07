@@ -15,12 +15,12 @@ sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons')
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *
-from ALaDyn_plot_utilities_1 import *
-from ALaDyn_plot_utilities_density import *
-from ALaDyn_plot_utilities_Efield import *
-from ALaDyn_plot_utilities_Bfield import *
-from ALaDyn_plot_utilities_ionization import *
-from ALaDyn_plot_utilities_axes import *
+from utilities_1 import *
+from utility_density import *
+from utility_Efield import *
+from utility_Bfield import *
+from utility_ionization import *
+from utility_axes import *
 
 
 ### --- ###
@@ -77,9 +77,9 @@ if __name__ == '__main__':
 		K,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,slice_position)
 		K = reduce_matrix_dimension(K,cell_to_cut)
 		np.savetxt( os.path.join(path_write,'data','rho',('rho_section_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),np.abs(K.transpose()),fmt='%15.14e')
-		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
-		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
-		np.savetxt( os.path.join(path_write,'data','Moving_window_axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
+		np.savetxt( os.path.join(path_write,'data','axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 		#clear variable:
 		del K
 

@@ -17,7 +17,7 @@ sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons')
 ###>>>
 ### --- ###
 from read_ALaDyn_bin import *
-from ALaDyn_plot_utilities_1 import *
+from utilities_1 import *
 
 ### --- ###
 
