@@ -98,6 +98,7 @@ for i in range(frame_begin, frame_end + 1 ):
 		print 'Energy spread: ', en_spread ,'%'
 		print 'Normalized Emittance Y: ', (round(emittance_y,2)), 'mm-mrad'
 		print 'Normalized Emittance Z: ', (round(emittance_z,2)), 'mm-mrad'
+		print 'Mean Energy: ', round(np.mean(gamma)*0.51,1), 'MeV' 
 		print 'Charge:',('%3.2e' % Charge), 'pC'
 
 		plt.figure(figsize=(20,10))
@@ -114,7 +115,8 @@ for i in range(frame_begin, frame_end + 1 ):
 		A=str(en_spread)
 		B=str(round(np.sqrt(emittance_y**2+emittance_z**2),2))
 		C=str(round(Charge,1))
-		plt.annotate('Energy spread   = '+A+' %'+'\n'+'Emittance         = '+B+r'$\mu m$'+'\n'+'Injected Charge = '+C+r' $pC$', xy=(max(X),max(Px)),bbox=dict(boxstyle="square",fc="w"),fontsize=20)
+		D=str(round(np.mean(gamma)*0.51,1))
+		plt.annotate('Energy spread   = '+A+' %'+'\n'+'Emittance         = '+B+r'$\mu m$'+'\n'+'Injected Charge = '+C+r' $pC$'+'Mean Energy = '+D+'MeV', xy=(max(X),max(Px)),bbox=dict(boxstyle="square",fc="w"),fontsize=20)
 		#plt.annotate('Emittance       = '+B+' mm-mrad', xy=(max(X),0.8*max(Px)),fontsize=18)
                 #plt.annotate('Injected Charge = '+C+' pC', xy=(max(X),0.6*max(Px)),fontsize=18)
 		
@@ -138,6 +140,6 @@ for i in range(frame_begin, frame_end + 1 ):
 		plt.subplots_adjust(left=0.08,right=0.8,hspace=0.45)
 		name_output = 'Phsp_enspect'+'_'+('%2.2i'%i)+'.png'
 		#name_output =  '3Dplot' + '_' +('%2.2i'%i)+ '.png'
-		#plt.savefig( os.path.join(path_write,'data','phasespace',name_output) )
+		plt.savefig( os.path.join(path_write,'data','phasespace',name_output) )
 		#plt.close()
 		#plt.show()
