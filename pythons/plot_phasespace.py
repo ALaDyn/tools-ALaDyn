@@ -90,17 +90,18 @@ for i in range(frame_begin, frame_end + 1 ):
 
 		gamma = np.array(np.sqrt(1. + Px**2 + Py**2 + Pz**2))
 
-		en_spread = np.std(gamma)/np.mean(gamma)
-		emittance_y = np.sqrt( np.std(Y)**2*np.std(Py)**2-np.cov(Y,Py)[0][1]**2)/np.mean(gamma);
-		emittance_z = np.sqrt( np.std(Z)**2*np.std(Pz)**2-np.cov(X,Pz)[0][1]**2)/np.mean(gamma);
+		en_spread = round(np.std(gamma)/np.mean(gamma)*100,1)
+		emittance_y = np.sqrt( np.std(Y)**2*np.std(Py)**2-np.cov(Y,Py)[0][1]**2);
+		emittance_z = np.sqrt( np.std(Z)**2*np.std(Pz)**2-np.cov(X,Pz)[0][1]**2);
 		Charge = 1536.*0.02*1.6e-7*len(X);
 
-		print 'Energy spread: ', en_spread*100 ,'%'
-		print 'Normalized Emittance Y: ', ('%3.2e' % emittance_y), 'mm-mrad'
-		print 'Normalized Emittance Z: ', ('%3.2e' % emittance_z), 'mm-mrad'
+		print 'Energy spread: ', en_spread ,'%'
+		print 'Normalized Emittance Y: ', (round(emittance_y,2)), 'mm-mrad'
+		print 'Normalized Emittance Z: ', (round(emittance_z,2)), 'mm-mrad'
+		print 'Mean Energy: ', round(np.mean(gamma)*0.51,1), 'MeV' 
 		print 'Charge:',('%3.2e' % Charge), 'pC'
 
-		plt.figure()
+		plt.figure(figsize=(20,10))
 		#fig=plt.figure()
 		#ax=fig.add_subplot(111,projection='3d')
 		#ax.scatter(X,Y,Z,s=.05,edgecolors='None')
@@ -111,13 +112,21 @@ for i in range(frame_begin, frame_end + 1 ):
 		plt.scatter(X,Px,s=.1,edgecolors='None')
 		#plt.scatter(X,Y,Z,s=.1,edgecolors='None')
 		#plt.xlabel(r'$X (\mu m) $');plt.ylabel(r'$Z (\mu m)$')
-		plt.xlabel(r'$X (\mu m) $',fontsize=24);plt.ylabel(r'$P_x/mc$',fontsize=24)
+		A=str(en_spread)
+		B=str(round(np.sqrt(emittance_y**2+emittance_z**2),2))
+		C=str(round(Charge,1))
+		D=str(round(np.mean(gamma)*0.51,1))
+		plt.annotate('Energy spread   = '+A+' %'+'\n'+'Emittance         = '+B+r'$\mu m$'+'\n'+'Injected Charge = '+C+r' $pC$'+'Mean Energy = '+D+'MeV', xy=(max(X),max(Px)),bbox=dict(boxstyle="square",fc="w"),fontsize=20)
+		#plt.annotate('Emittance       = '+B+' mm-mrad', xy=(max(X),0.8*max(Px)),fontsize=18)
+                #plt.annotate('Injected Charge = '+C+' pC', xy=(max(X),0.6*max(Px)),fontsize=18)
+		
+		plt.xlabel(r'$X (\mu m) $',fontsize=24,fontweight='bold');plt.ylabel(r'$P_x/mc$',fontsize=24,fontweight='bold')
 		#plt.text(90,327, r'$Energy spread = 20,2% $',size=18,ha='left',va='top')
 		plt.subplot(312)
 		#       plt.scatter(Y,Z,s=.1,edgecolors='None')
 		#       plt.xlabel(r'$Y (\mu m) $');plt.ylabel(r'$Z (\mu m)$')
 		plt.scatter(Y,Py,s=.1,edgecolors='None')
-		plt.xlabel(r'$Y (\mu m)$',fontsize=24);plt.ylabel(r'$P_y/mc$',fontsize=24)
+		plt.xlabel(r'$Y (\mu m)$',fontsize=24,fontweight='bold');plt.ylabel(r'$P_y/mc$',fontsize=24,fontweight='bold')
 		plt.subplot(313)
 		#       plt.scatter(X,Y,s=.1,edgecolors='None')
 		#      plt.xlabel(r'$X (\mu m) $');plt.ylabel(r'$Y (\mu m)$')
@@ -126,10 +135,11 @@ for i in range(frame_begin, frame_end + 1 ):
 		#plt.subplot(313)
 		plt.hist(gamma*0.511,100)
 		#       plt.hist(gamma[gamma_selected],50)
-		plt.xlabel('$Energy (MeV)$',fontsize=24);plt.ylabel('$dN/dE$',fontsize=24);
+		plt.xlabel('$Energy (MeV)$',fontsize=24,fontweight='bold');plt.ylabel('$dN/dE$',fontsize=24,fontweight='bold');
 		#       plt.axis('tight')
+		plt.subplots_adjust(left=0.08,right=0.8,hspace=0.45)
 		name_output = 'Phsp_enspect'+'_'+('%2.2i'%i)+'.png'
 		#name_output =  '3Dplot' + '_' +('%2.2i'%i)+ '.png'
 		plt.savefig( os.path.join(path_write,'data','phasespace',name_output) )
-		# plt.close()
-		plt.show()
+		#plt.close()
+		#plt.show()
