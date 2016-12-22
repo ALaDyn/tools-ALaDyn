@@ -38,6 +38,7 @@ def	generate_folder_output_structure(path,savedata):
 		os.makedirs(directory)
 
 	directory_rho = os.path.join(directory,'rho')
+	directory_jx = os.path.join(directory,'jx')
 	directory_ionization   = os.path.join(directory,'ionization')
 	directory_Energy_Density = os.path.join(directory, 'Energy_density')
 	directory_E   = os.path.join(directory,'E_field')
@@ -45,6 +46,8 @@ def	generate_folder_output_structure(path,savedata):
 
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
+	if not os.path.exists( directory_jx ):
+		os.makedirs(directory_jx)		
 	if not os.path.exists( directory_E ):
 		os.makedirs(directory_E)
 	if not os.path.exists( directory_B ):
@@ -63,6 +66,7 @@ def	generate_folder_output_structure(path,savedata):
 			os.makedirs(directory)
 
 		directory_rho 		 = os.path.join(directory,'rho')
+		directory_jx 		 = os.path.join(directory,'jx')
 		directory_ionization     = os.path.join(directory,'ionization')
 		directory_Energy_Density = os.path.join(directory, 'Energy_density')
 		directory_E   		 = os.path.join(directory,'E_field')
@@ -72,6 +76,8 @@ def	generate_folder_output_structure(path,savedata):
 
 		if not os.path.exists( directory_rho ):
 			os.makedirs(directory_rho)
+		if not os.path.exists( directory_jx ):
+			os.makedirs(directory_jx)
 		if not os.path.exists( directory_ionization ):
 			os.makedirs( directory_ionization )
 		if not os.path.exists( directory_Energy_Density ):
@@ -109,7 +115,13 @@ def output_exists(path,quantity,frame):
 			return True
 		else:
 			return False
-
+	if quantity == 'jx':
+		if os.path.isfile(os.path.join(path,'Jxbout'+('%2.2i'%frame)+'.bin')) == True \
+		and \
+		os.path.isfile(os.path.join(path,'Jxfout'+('%2.2i'%frame)+'.bin')) == True:
+			return True
+		else:
+			return False
 			###---###
 
 	if quantity == 'ionization':
