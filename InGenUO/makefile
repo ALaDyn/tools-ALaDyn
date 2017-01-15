@@ -3,7 +3,7 @@ FILES = InGenUO.cpp
 
 EXES = $(addsuffix .exe, $(basename $(FILES)))
 
-OPT = -std=c++11 -I.
+OPT = -std=c++11 -I../ext/jsoncons/src
 
 
 all: $(EXES)

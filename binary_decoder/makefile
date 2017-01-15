@@ -1,6 +1,6 @@
 EXE      = binary_decoder.exe
 OPT      = -std=c++11
-
+INC_PATH = ../ext/jsoncons/src/
 OBJECTS  = binning.o filter.o binary_decoder.o grid_file_decoder.o phasespace_file_decoder.o parameters.o swap_tools.o
 
 all: $(EXE)
@@ -20,25 +20,25 @@ $(EXE): $(OBJECTS)
 
 
 parameters.o: parameters.cpp parameters.h binary_decoder.h
-	$(CXX) $(OPT) -I. -c parameters.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c parameters.cpp
 
 binning.o: binning.cpp binning.h parameters.o binary_decoder.h
-	$(CXX) $(OPT) -I. -c binning.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c binning.cpp
 
 filter.o: filter.cpp filter.h parameters.o binary_decoder.h
-	$(CXX) $(OPT) -I. -c filter.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c filter.cpp
 
 swap_tools.o: swap_tools.cpp swap_tools.h binary_decoder.h
-	$(CXX) $(OPT) -I. -c swap_tools.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c swap_tools.cpp
 
 grid_file_decoder.o: grid_file_decoder.cpp grid_file_decoder.h binary_decoder.h parameters.h swap_tools.o parameters.o
-	$(CXX) $(OPT) -I. -c grid_file_decoder.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c grid_file_decoder.cpp
 
 phasespace_file_decoder.o: phasespace_file_decoder.cpp phasespace_file_decoder.h binary_decoder.h parameters.h swap_tools.o parameters.o binning.o filter.o
-	$(CXX) $(OPT) -I. -c phasespace_file_decoder.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c phasespace_file_decoder.cpp
 
 binary_decoder.o: binary_decoder.cpp binary_decoder.h parameters.h phasespace_file_decoder.o grid_file_decoder.o
-	$(CXX) $(OPT) -I. -c binary_decoder.cpp
+	$(CXX) $(OPT) -I$(INC_PATH) -c binary_decoder.cpp
 
 clean:
 	rm -f $(OBJECTS)
