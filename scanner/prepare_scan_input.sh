@@ -11,9 +11,8 @@ then
  exit
 fi
 
-#MATERIAL="CH2"
-#MATERIAL="CD2"
-MATERIAL="AL"
+MATERIAL="CH2"
+#MATERIAL="AL"
 
 HPC="cnaf"
 #HPC="galileo"
@@ -26,30 +25,33 @@ PRODUCTION=true
 
 
 
-#preplasmas=$(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}')
+#preplasmas=($(awk 'BEGIN{for(i=1.0;i<=3.0;i+=1.0)print i}'))
 preplasmas=0.0
 
-#foam_densities=$(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}')
+#foam_densities=($(awk 'BEGIN{for(i=0.5;i<=3.0;i+=0.5)print i}'))
 foam_densities=1.0
 
-#ramps=$(awk 'BEGIN{for(i=0.25;i<=0.75;i+=0.25)print i}')
+#ramps=($(awk 'BEGIN{for(i=0.25;i<=0.75;i+=0.25)print i}'))
 ramps=0.0
 
-#centrals=$(awk 'BEGIN{for(i=2.0;i<=4.0;i+=1.0)print i}')
+centrals=($(awk 'BEGIN{for(i=2.5;i<=7.5;i+=2.5)print i}'))
 #centrals=0.5
-centrals=(2.0 4.0 8.0)
+#centrals=(2.0 4.0 8.0)
 
-#bulk_densities=$(awk 'BEGIN{for(i=80.0;i<=120.0;i+=10.0)print i}')
+#bulk_densities=($(awk 'BEGIN{for(i=20.0;i<=120.0;i+=20.0)print i}'))
 bulk_densities=100.0
 
-#contams=$(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}')
-contams=0.08
+#contams=($(awk 'BEGIN{for(i=0.05;i<=0.1;i+=0.01)print i}'))
+contams=0.1
 
-#angles=$(awk 'BEGIN{for(i=5.0;i<=15.0;i+=5.0)print i}')
-angles=0.0
+angles=($(awk 'BEGIN{for(i=0.0;i<=30.0;i+=15.0)print i}'))
+#angles=0.0
 
-#laser_lengths=$(awk 'BEGIN{for(i=20.0;i<=40.0;i+=5.0)print i}')
-laser_lengths=40.0
+laser_anotes=($(awk 'BEGIN{for(i=10.0;i<=30.0;i+=10.0)print i}'))
+#laser_anotes=17.0
+
+laser_lengths=($(awk 'BEGIN{for(i=25.0;i<=30.0;i+=5.0)print i}'))
+#laser_lengths=40.0
 
 
 
@@ -76,24 +78,27 @@ for contam in ${contams[*]}
 do
 for angle in ${angles[*]}
 do
+for anote in ${laser_anotes[*]}
+do
 for l_length in ${laser_lengths[*]}
 do
 
-echo "${angle}_pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam}" >> sim_da_fare.txt
+echo "${angle}_${pre}_${f_dens}_${ramp}_${central}_${c_dens}_${contam}_${anote}_${l_length}" >> sim_da_fare.txt
 INPUTFILE=input.nml
 
-if [ "$1" = "0" ] ; then
-mkdir ${angle}_pre_${pre}_den_${f_dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+if [ "$1" = "0" ]
+	then
+mkdir "${angle}_${pre}_${f_dens}_${ramp}_${central}_${c_dens}_${contam}_${anote}_${l_length}"
 fi
 
-cd ${angle}_pre_${pre}_den_${f_dens}_ramp_${ramp}_cent_${central}_cont_${contam}
+cd "${angle}_${pre}_${f_dens}_${ramp}_${central}_${c_dens}_${contam}_${anote}_${l_length}" || return
 
 if [ "$1" = "0" ] ; then
 cp ../${JOBFILE} .
 fi
 
-NCPU=256
-CREA_FILE_DUMP=1
+NCPU=32
+CREA_FILE_DUMP=0
 
 
 ##### nx, ny,nz
@@ -134,9 +139,6 @@ BOUNDARY_X=0
 BOUNDARY_Y=0
 BOUNDARY_Z=0
 
-## DA DOCUMENTARE
-IBEAM=1
-
 ##NB: per il seguente dato, 0=algoritmo standard, 1=conservazione carica, 2=conservazione energia
 ALGORITMO_INTEGRAZIONE=0
 
@@ -145,18 +147,7 @@ ALGORITMO_INTEGRAZIONE=0
 ##NB: per il seguente dato, 1=polarizzato p, 2=polarizzato s, 3=polarizzato circolarmente
 LASER_MODEL=1
 
-
 ##NB: per il seguente dato, ecco le chiamate effettuate nel codice
-# case(1)
-#  call one_layer_multisp(ny_targ,xf0)  !e+Z1+Z2
-# case(3)
-#  call preplasma_multisp(ny_targ,xf0) !foam+ high Z +H coating
-# case(4)
-#  call multi_layer_multisp(ny_targ,xf0) !foam+ high Z +H coating
-# case(5)
-#  call one_layer_nano_wires(ny_targ,xf0) !foam+ high Z +H coating mass lim
-# case(6)
-#  call one_layer_nano_tubes(ny_targ,xf0)  ! (e+ (Z,A) ions now nsp=2
 if [ "$MATERIAL" = "CH2" ] ; then
 PLASMA_MODEL=1
 else
@@ -235,8 +226,8 @@ fi
 POSIZIONE_INIZIALE_PICCO_IMPULSO_LASER=$(bc -l <<< "scale=2;(${l_length}/2)")
 DISTANZA_INIZIALE_PICCO_IMPULSO_LASER_DAL_FUOCO=$(bc -l <<< "scale=2;(${l_length}/2)")
 LUNGHEZZA_LASER_TOTALE=${l_length}
-WAIST_LASER=6.2
-PARAMETRO_ADIMENSIONALE_LASER_A0=3.0
+WAIST_LASER=3.0
+PARAMETRO_ADIMENSIONALE_LASER_A0=${anote}
 LUNGHEZZA_ONDA_LASER=0.8
 
 
@@ -270,7 +261,7 @@ DENSITA_ELETTRONI_LAYER_POSTERIORE=10.0
 #### nf, nd, npv, end_p
 ####
 NUMERO_OUTPUT_CAMPI=1
-NUMERO_OUTPUT_DENSITA_GRIGLIA=4
+NUMERO_OUTPUT_DENSITA_GRIGLIA=3
 NUMERO_OUTPUT_SPAZIOFASI_PARTICELLE=0
 NUMERO_OUTPUT_SPAZIOFASI_BUNCH=0
 
@@ -391,13 +382,13 @@ a0=${PARAMETRO_ADIMENSIONALE_LASER_A0}
 lam0=${LUNGHEZZA_ONDA_LASER}
 
 
-lpx_1=`echo "${SPESSORE_LAYER_FRONTALE}*1.0" | bc -l`
-lpx_2=`echo "${SPESSORE_RAMPA_LAYER_FRONTALE_LAYER_CENTRALE}*1.0" | bc -l`
-lpx_3=`echo "${SPESSORE_LAYER_CENTRALE}*1.0" | bc -l`
-lpx_4=`echo "${SPESSORE_RAMPA_LAYER_CENTRALE_LAYER_POSTERIORE}*1.0" | bc -l`
-lpx_5=`echo "${SPESSORE_LAYER_POSTERIORE}*1.0" | bc -l`
-lpx_6=`echo "${ANGOLO_ROTAZIONE_LASER}*1.0" | bc -l`
-lpx_7=`echo "${OFFSET_FINE_LASER_INIZIO_TARGHETTA}*1.0" | bc -l`
+lpx_1=$(echo "${SPESSORE_LAYER_FRONTALE}*1.0" | bc -l)
+lpx_2=$(echo "${SPESSORE_RAMPA_LAYER_FRONTALE_LAYER_CENTRALE}*1.0" | bc -l)
+lpx_3=$(echo "${SPESSORE_LAYER_CENTRALE}*1.0" | bc -l)
+lpx_4=$(echo "${SPESSORE_RAMPA_LAYER_CENTRALE_LAYER_POSTERIORE}*1.0" | bc -l)
+lpx_5=$(echo "${SPESSORE_LAYER_POSTERIORE}*1.0" | bc -l)
+lpx_6=$(echo "${ANGOLO_ROTAZIONE_LASER}*1.0" | bc -l)
+lpx_7=$(echo "${OFFSET_FINE_LASER_INIZIO_TARGHETTA}*1.0" | bc -l)
 
 lpy_1=${WIRE_SIZE}
 lpy_2=${INTERWIRE_DISTANCE}
@@ -435,136 +426,137 @@ npe_yz=${NCPU}
 
 
  if [ ! -f ./dumpRestart/dumpout000001.bin ] && [ "$1" = "1" ] ; then
-   echo "Missing dump files! Aborting submitting pre_${pre}_den_${dens}_ramp_${ramp}_cent_${central}_cont_${contam} !"
+   echo "Missing dump files! Aborting submitting ${angle}_${pre}_${f_dens}_${ramp}_${central}_${c_dens}_${contam}_${anote}_${l_length} !"
    cd ..
    continue
  fi
 
  if [ "$1" = "1" ] ; then
-  mv $INPUTFILE $INPUTFILE.old$PREVIOUS_STEP
+  mv $INPUTFILE "$INPUTFILE.old$PREVIOUS_STEP"
  fi
 
  rm -f ${INPUTFILE}
  touch ${INPUTFILE}
 
+{
+ printf '&GRID\n'
+ printf ' nx = %s,\n' "$nx"
+ printf ' ny = %s,\n' "$ny"
+ printf ' nz = %s,\n' "$nz"
+ printf ' ny_targ = %s,\n' "${ny_targ}"
+ printf ' k0 = %s,\n' "$k0"
+ printf ' yx_rat = %s,\n' "${yx_rat}"
+ printf ' zx_rat = %s\n' "${yx_rat}"
+ printf '/'
+ printf '\n\n'
 
- printf '&GRID\n' >> ${INPUTFILE}
- printf ' nx = %s,\n' "$nx" >> ${INPUTFILE}
- printf ' ny = %s,\n' "$ny" >> ${INPUTFILE}
- printf ' nz = %s,\n' "$nz" >> ${INPUTFILE}
- printf ' ny_targ = %s,\n' "${ny_targ}" >> ${INPUTFILE}
- printf ' k0 = %s,\n' "$k0" >> ${INPUTFILE}
- printf ' yx_rat = %s,\n' "${yx_rat}" >> ${INPUTFILE}
- printf ' zx_rat = %s\n' "${yx_rat}" >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
+ printf '&SIMULATION\n'
+ printf ' lpf_ord = %s,\n' "${lpf_ord}"
+ printf ' der_ord = %s,\n' "${der_ord}"
+ printf ' str_flag = %s,\n' "${str_flag}"
+ printf ' iform = %s,\n' "$iform"
+ printf ' model_id = %s,\n' "${model_id}"
+ printf ' dmodel_id = %s,\n' "${dmodel_id}"
+ printf ' ibx = %s,\n' "$ibx"
+ printf ' iby = %s,\n' "$iby"
+ printf ' ibz = %s,\n' "$ibz"
+ printf ' ibeam = %s\n' "$ibeam"
+ printf '/'
+ printf '\n\n'
 
- printf '&SIMULATION\n' >> ${INPUTFILE}
- printf ' lpf_ord = %s,\n' "${lpf_ord}" >> ${INPUTFILE}
- printf ' der_ord = %s,\n' "${der_ord}" >> ${INPUTFILE}
- printf ' str_flag = %s,\n' "${str_flag}" >> ${INPUTFILE}
- printf ' iform = %s,\n' "$iform" >> ${INPUTFILE}
- printf ' model_id = %s,\n' "${model_id}" >> ${INPUTFILE}
- printf ' dmodel_id = %s,\n' "${dmodel_id}" >> ${INPUTFILE}
- printf ' ibx = %s,\n' "$ibx" >> ${INPUTFILE}
- printf ' iby = %s,\n' "$iby" >> ${INPUTFILE}
- printf ' ibz = %s,\n' "$ibz" >> ${INPUTFILE}
- printf ' ibeam = %s\n' "$ibeam" >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
+ printf '&TARGET_DESCRIPTION\n'
+ printf ' nsp = %s,\n' "$nsp"
+ printf ' nsb = %s,\n' "$nsb"
+ printf ' ionz_lev = %s,\n' "${ionz_lev}"
+ printf ' ionz_model = %s,\n' "${ionz_model}"
+ printf ' ion_min(1) = %s,\n' "${Z1_ion}"
+ printf ' ion_min(2) = %s,\n' "${Z2_ion}"
+ printf ' ion_min(3) = 1,\n'
+ printf ' ion_max(1) = %s,\n' "${Z1_max}"
+ printf ' ion_max(2) = %s,\n' "${Z2_max}"
+ printf ' ion_max(3) = 1,\n'
+ printf ' atomic_number(1) = %s,\n' "${A1_ion}"
+ printf ' atomic_number(2) = %s,\n' "${A2_ion}"
+ printf ' atomic_number(3) = 1,\n'
+ printf ' mass_number(1) = %s,\n' "${M1_ion}"
+ printf ' mass_number(2) = %s,\n' "${M2_ion}"
+ printf ' mass_number(3) = 1.0,\n'
+ printf ' t0_pl(1) = %s,\n' "${t0_pl_1}"
+ printf ' t0_pl(2) = %s,\n' "${t0_pl_2}"
+ printf ' t0_pl(3) = %s,\n' "${t0_pl_3}"
+ printf ' t0_pl(4) = %s,\n' "${t0_pl_4}"
+ printf ' np_per_xc(1) = %s,\n' "${np_per_xc_1}"
+ printf ' np_per_xc(2) = %s,\n' "${np_per_xc_2}"
+ printf ' np_per_xc(3) = %s,\n' "${np_per_xc_3}"
+ printf ' np_per_xc(4) = %s,\n' "${np_per_xc_4}"
+ printf ' np_per_xc(5) = %s,\n' "${np_per_xc_5}"
+ printf ' np_per_xc(6) = %s,\n' "${np_per_xc_6}"
+ printf ' np_per_yc(1) = %s,\n' "${np_per_yc_1}"
+ printf ' np_per_yc(2) = %s,\n' "${np_per_yc_2}"
+ printf ' np_per_yc(3) = %s,\n' "${np_per_yc_3}"
+ printf ' np_per_yc(4) = %s,\n' "${np_per_yc_4}"
+ printf ' np_per_yc(5) = %s,\n' "${np_per_yc_5}"
+ printf ' np_per_yc(6) = %s,\n' "${np_per_yc_6}"
+ printf ' lpx(1) = %s,\n' "$lpx_1"
+ printf ' lpx(2) = %s,\n' "$lpx_2"
+ printf ' lpx(3) = %s,\n' "$lpx_3"
+ printf ' lpx(4) = %s,\n' "$lpx_4"
+ printf ' lpx(5) = %s,\n' "$lpx_5"
+ printf ' lpx(6) = %s,\n' "$lpx_6"
+ printf ' lpx(7) = %s,\n' "$lpx_7"
+ printf ' lpy(1) = %s,\n' "$lpy_1"
+ printf ' lpy(2) = %s,\n' "$lpy_2"
+ printf ' n_over_nc = %s,\n' "${n_over_nc}"
+ printf ' n1_over_n = %s,\n' "${n1_over_n}"
+ printf ' n2_over_n = %s\n' "${n2_over_n}"
+ printf '/'
+ printf '\n\n'
 
- printf '&TARGET_DESCRIPTION\n' >> ${INPUTFILE}
- printf ' nsp = %s,\n' "$nsp" >> ${INPUTFILE}
- printf ' nsb = %s,\n' "$nsb" >> ${INPUTFILE}
- printf ' ionz_lev = %s,\n' "${ionz_lev}" >> ${INPUTFILE}
- printf ' ionz_model = %s,\n' "${ionz_model}" >> ${INPUTFILE}
- printf ' ion_min(1) = %s,\n' "${Z1_ion}" >> ${INPUTFILE}
- printf ' ion_min(2) = %s,\n' "${Z2_ion}" >> ${INPUTFILE}
- printf ' ion_min(3) = 1,\n' >> ${INPUTFILE}
- printf ' ion_max(1) = %s,\n' "${Z1_max}" >> ${INPUTFILE}
- printf ' ion_max(2) = %s,\n' "${Z2_max}" >> ${INPUTFILE}
- printf ' ion_max(3) = 1,\n' >> ${INPUTFILE}
- printf ' atomic_number(1) = %s,\n' "${A1_ion}" >> ${INPUTFILE}
- printf ' atomic_number(2) = %s,\n' "${A2_ion}" >> ${INPUTFILE}
- printf ' atomic_number(3) = 1,\n' >> ${INPUTFILE}
- printf ' mass_number(1) = %s,\n' "${M1_ion}" >> ${INPUTFILE}
- printf ' mass_number(2) = %s,\n' "${M2_ion}" >> ${INPUTFILE}
- printf ' mass_number(3) = 1.0,\n' >> ${INPUTFILE}
- printf ' t0_pl(1) = %s,\n' "${t0_pl_1}" >> ${INPUTFILE}
- printf ' t0_pl(2) = %s,\n' "${t0_pl_2}" >> ${INPUTFILE}
- printf ' t0_pl(3) = %s,\n' "${t0_pl_3}" >> ${INPUTFILE}
- printf ' t0_pl(4) = %s,\n' "${t0_pl_4}" >> ${INPUTFILE}
- printf ' np_per_xc(1) = %s,\n' "${np_per_xc_1}" >> ${INPUTFILE}
- printf ' np_per_xc(2) = %s,\n' "${np_per_xc_2}" >> ${INPUTFILE}
- printf ' np_per_xc(3) = %s,\n' "${np_per_xc_3}" >> ${INPUTFILE}
- printf ' np_per_xc(4) = %s,\n' "${np_per_xc_4}" >> ${INPUTFILE}
- printf ' np_per_xc(5) = %s,\n' "${np_per_xc_5}" >> ${INPUTFILE}
- printf ' np_per_xc(6) = %s,\n' "${np_per_xc_6}" >> ${INPUTFILE}
- printf ' np_per_yc(1) = %s,\n' "${np_per_yc_1}" >> ${INPUTFILE}
- printf ' np_per_yc(2) = %s,\n' "${np_per_yc_2}" >> ${INPUTFILE}
- printf ' np_per_yc(3) = %s,\n' "${np_per_yc_3}" >> ${INPUTFILE}
- printf ' np_per_yc(4) = %s,\n' "${np_per_yc_4}" >> ${INPUTFILE}
- printf ' np_per_yc(5) = %s,\n' "${np_per_yc_5}" >> ${INPUTFILE}
- printf ' np_per_yc(6) = %s,\n' "${np_per_yc_6}" >> ${INPUTFILE}
- printf ' lpx(1) = %s,\n' "$lpx_1" >> ${INPUTFILE}
- printf ' lpx(2) = %s,\n' "$lpx_2" >> ${INPUTFILE}
- printf ' lpx(3) = %s,\n' "$lpx_3" >> ${INPUTFILE}
- printf ' lpx(4) = %s,\n' "$lpx_4" >> ${INPUTFILE}
- printf ' lpx(5) = %s,\n' "$lpx_5" >> ${INPUTFILE}
- printf ' lpx(6) = %s,\n' "$lpx_6" >> ${INPUTFILE}
- printf ' lpx(7) = %s,\n' "$lpx_7" >> ${INPUTFILE}
- printf ' lpy(1) = %s,\n' "$lpy_1" >> ${INPUTFILE}
- printf ' lpy(2) = %s,\n' "$lpy_2" >> ${INPUTFILE}
- printf ' n_over_nc = %s,\n' "${n_over_nc}" >> ${INPUTFILE}
- printf ' n1_over_n = %s,\n' "${n1_over_n}" >> ${INPUTFILE}
- printf ' n2_over_n = %s\n' "${n2_over_n}" >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
+ printf '&LASER\n'
+ printf ' t0_lp = %s,\n' "$t0_lp"
+ printf ' xc_lp = %s,\n' "$xc_lp"
+ printf ' w0_x = %s,\n' "$w0_x"
+ printf ' w0_y = %s,\n' "$w0_y"
+ printf ' a0 = %s,\n' "$a0"
+ printf ' lam0 = %s\n' "$lam0"
+ printf '/'
+ printf '\n\n'
 
- printf '&LASER\n' >> ${INPUTFILE}
- printf ' t0_lp = %s,\n' "$t0_lp" >> ${INPUTFILE}
- printf ' xc_lp = %s,\n' "$xc_lp" >> ${INPUTFILE}
- printf ' w0_x = %s,\n' "$w0_x" >> ${INPUTFILE}
- printf ' w0_y = %s,\n' "$w0_y" >> ${INPUTFILE}
- printf ' a0 = %s,\n' "$a0" >> ${INPUTFILE}
- printf ' lam0 = %s\n' "$lam0" >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
+ printf '&MOVING_WINDOW\n'
+ printf ' w_sh = %s,\n' "${w_sh}"
+ printf ' wi_time = %s,\n' "${wi_time}"
+ printf ' wf_time = %s,\n' "${wf_time}"
+ printf ' w_speed = %s\n' "${w_speed}"
+ printf '/'
+ printf '\n\n'
 
- printf '&MOVING_WINDOW\n' >> ${INPUTFILE}
- printf ' w_sh = %s,\n' "${w_sh}" >> ${INPUTFILE}
- printf ' wi_time = %s,\n' "${wi_time}" >> ${INPUTFILE}
- printf ' wf_time = %s,\n' "${wf_time}" >> ${INPUTFILE}
- printf ' w_speed = %s\n' "${w_speed}" >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
+ printf '&OUTPUT\n'
+ printf ' nouts = %s,\n' "$nouts"
+ printf ' iene = %s,\n' "$iene"
+ printf ' nvout = %s,\n' "$nvout"
+ printf ' nden = %s,\n' "$nden"
+ printf ' npout = %s,\n' "$npout"
+ printf ' nbout = %s,\n' "$nbout"
+ printf ' jump = %s,\n' "$jump"
+ printf ' pjump = %s,\n' "$pjump"
+ printf ' xp0_out = %s,\n' "${xp0_out}"
+ printf ' xp1_out = %s,\n' "${xp1_out}"
+ printf ' yp_out = %s,\n' "${yp_out}"
+ printf ' tmax = %s,\n' "$tmax"
+ printf ' cfl = %s,\n' "$cfl"
+ printf ' new_sim = %s,\n' "${new_sim}"
+ printf ' id_new = %s,\n' "${id_new}"
+ printf ' dump = %s\n' "$dump"
+ printf '/'
+ printf '\n\n'
 
- printf '&OUTPUT\n' >> ${INPUTFILE}
- printf ' nouts = %s,\n' "$nouts" >> ${INPUTFILE}
- printf ' iene = %s,\n' "$iene" >> ${INPUTFILE}
- printf ' nvout = %s,\n' "$nvout" >> ${INPUTFILE}
- printf ' nden = %s,\n' "$nden" >> ${INPUTFILE}
- printf ' npout = %s,\n' "$npout" >> ${INPUTFILE}
- printf ' nbout = %s,\n' "$nbout" >> ${INPUTFILE}
- printf ' jump = %s,\n' "$jump" >> ${INPUTFILE}
- printf ' pjump = %s,\n' "$pjump" >> ${INPUTFILE}
- printf ' xp0_out = %s,\n' "${xp0_out}" >> ${INPUTFILE}
- printf ' xp1_out = %s,\n' "${xp1_out}" >> ${INPUTFILE}
- printf ' yp_out = %s,\n' "${yp_out}" >> ${INPUTFILE}
- printf ' tmax = %s,\n' "$tmax" >> ${INPUTFILE}
- printf ' cfl = %s,\n' "$cfl" >> ${INPUTFILE}
- printf ' new_sim = %s,\n' "${new_sim}" >> ${INPUTFILE}
- printf ' id_new = %s,\n' "${id_new}" >> ${INPUTFILE}
- printf ' dump = %s\n' "$dump" >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
-
- printf '&MPIPARAMS\n' >> ${INPUTFILE}
- printf ' nprocx = 1,\n' >> ${INPUTFILE}
- printf ' nprocy = %s,\n' "${npe_yz}" >> ${INPUTFILE}
- printf ' nprocz = 1\n' >> ${INPUTFILE}
- printf '/' >> ${INPUTFILE}
- printf '\n\n' >> ${INPUTFILE}
+ printf '&MPIPARAMS\n'
+ printf ' nprocx = 1,\n'
+ printf ' nprocy = %s,\n' "${npe_yz}"
+ printf ' nprocz = 1\n'
+ printf '/'
+ printf '\n\n'
+} >> ${INPUTFILE}
 
  if [ "$PRODUCTION" = "true" ] ; then
   if [ "$HPC" = "cnaf" ] ; then
@@ -578,6 +570,7 @@ npe_yz=${NCPU}
 
 cd ..
 
+done
 done
 done
 done
