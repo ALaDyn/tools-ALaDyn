@@ -52,6 +52,8 @@ int main(int argc, char* argv[])
     std::cerr << "Please write on command line the input file (x,y), in which columns we will find the data and the working mode!" << std::endl;
     std::cerr << "-x N means that the x data will be in the N column of the file" << std::endl;
     std::cerr << "-y M means that the y data will be in the M column of the file" << std::endl;
+    std::cerr << "-min A means that the x data will be discarded if lower than A" << std::endl;
+    std::cerr << "-max B means that the x data will be discarded if higher than B" << std::endl;
     std::cerr << "-scan to write on the output, on a single line and without the newline at the end, just the fitting parameters" << std::endl;
     std::cerr << "-func to write on the output the fitting functions" << std::endl;
     std::cerr << "-gnuplot to write on the output the gnuplot script useful to plot the input file including the fitting curve" << std::endl;
