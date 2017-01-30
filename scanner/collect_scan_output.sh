@@ -6,29 +6,21 @@ SCANNER=$HOME/bin/scan-columns.exe
 BILINEAR_FILTER=$HOME/bin/interpolate_scan_results.exe
 GNUPLOT=$(which gnuplot)
 
-SIMULATION_FOLDERS=($(find . -mindepth 1 -maxdepth 1 -type d))
-#SIMULATION_FOLDERS=($(find . -mindepth 1 -maxdepth 1 -type d -name "${SIM_HEADER}*"))
-column_values=(0 15 30)
+SIMULATION_FOLDERS=($(find . -mindepth 1 -maxdepth 1 -name "*_*_*_*_*_*_*_*_*" -type d))
+#SIMULATION_FOLDERS=($(find . -mindepth 1 -maxdepth 1 -name "${SIM_HEADER}*" -type d ))
+column_values=
+#column_values=(0 15 30)
 
 PARTICLE_TYPE="A2-ion"
 #PARTICLE_TYPE="Electron"
 X_INTERPOLATION=512
 Y_INTERPOLATION=512
 
-#the following is the value used to split the collected files. It's usual to split along the bulk length
-column=4
-# 1:{PREPLASMA_LENGTH} 2:{DENSITY} 3:{RAMP_LENGTH} 4:{BULK_LENGTH} 5:{CONT_LENGTH} 
-# 6:{MAX_ENERGY} 7:{TOT_ENERGY} 8:{TOT_ENERGY_INTEGRATED_SPECTRUM} 9:{FRONT_TOT_ENERGY_INTEGRATED_SPECTRUM}
-#10:{REAR_TOT_ENERGY_INTEGRATED_SPECTRUM} 11:{AVE_ENERGY} 12:{TOT_NUMBER} 13:{FRONT_AVE_ENERGY}
-#14:{FRONT_TOT_NUMBER} 15:{REAR_AVE_ENERGY} 16:{REAR_TOT_NUMBER} 17:{DIAG_MAX_ENERGY} 18:{DIAG_TOT_ENERGY}"
-
 DIAG_STEP_TO_BE_READ=04
 SPEC_TIME_TO_BE_READ=80
 SPEC_VERSION=4
 DIAG_VERSION=4
 OUTPUT_FILE="energy_scan_${SIM_HEADER}${PARTICLE_TYPE}.txt"
-
-
 
 # DESCRIPTION OF DIAG COLUMNS
 #              1:timestep 2:Efields2 
@@ -55,15 +47,15 @@ printf "#PreplasmaLength;Density;RampLength;BulkLength;ContLength;%sMaxEnergy;%s
 
 for sim in "${SIMULATION_FOLDERS[@]}"
 do
- ANGLE=$(echo "$sim" | awk -F'_' '{print $1}')
- PREPLASMA_LENGTH=$(echo "$sim" | awk -F'_' '{print $2}')
- PREPLASMA_DENSITY=$(echo "$sim" | awk -F'_' '{print $3}')
- RAMP_LENGTH=$(echo "$sim" | awk -F'_' '{print $4}')
- BULK_LENGTH=$(echo "$sim" | awk -F'_' '{print $5}')
- DENSITY=$(echo "$sim" | awk -F'_' '{print $6}')
- CONT_LENGTH=$(echo "$sim" | awk -F'_' '{print $7}')
- LASER_A_NOTE=$(echo "$sim" | awk -F'_' '{print $8}')
- LASER_LENGTH=$(echo "$sim" | awk -F'_' '{print $9}')
+ ANGLE=$(basename "$sim" | awk -F'_' '{print $1}')
+ PREPLASMA_LENGTH=$(basename "$sim" | awk -F'_' '{print $2}')
+ PREPLASMA_DENSITY=$(basename "$sim" | awk -F'_' '{print $3}')
+ RAMP_LENGTH=$(basename "$sim" | awk -F'_' '{print $4}')
+ BULK_LENGTH=$(basename "$sim" | awk -F'_' '{print $5}')
+ DENSITY=$(basename "$sim" | awk -F'_' '{print $6}')
+ CONT_LENGTH=$(basename "$sim" | awk -F'_' '{print $7}')
+ LASER_A_NOTE=$(basename "$sim" | awk -F'_' '{print $8}')
+ LASER_LENGTH=$(basename "$sim" | awk -F'_' '{print $9}')
 
  cd "$sim/diagnostics" || exit
  rm -f ./*.txt
@@ -106,22 +98,36 @@ do
  REAR_TOT_ENERGY_INTEGRATED_SPECTRUM=${aveData[9]}
 
  cd ../.. || exit
+ #  1:"${ANGLE}"                                   2:"${PREPLASMA_LENGTH}"                       3:"${PREPLASMA_DENSITY}"
+ #  4:"${RAMP_LENGTH}"                             5:"${BULK_LENGTH}"                            6:"${DENSITY}"
+ #  7:"${CONT_LENGTH}"                             8:"${LASER_A_NOTE}"                           9:"${LASER_LENGTH}"
+ # 10:"${MAX_ENERGY}"                             11:"${TOT_ENERGY}"                            12:"${TOT_ENERGY_INTEGRATED_SPECTRUM}"
+ # 13:"${FRONT_TOT_ENERGY_INTEGRATED_SPECTRUM}"   14:"${REAR_TOT_ENERGY_INTEGRATED_SPECTRUM}"   15:"${AVE_ENERGY}"
+ # 16:"${TOT_NUMBER}"                             17:"${FRONT_AVE_ENERGY}"                      18:"${FRONT_TOT_NUMBER}"
+ # 19:"${REAR_AVE_ENERGY}"                        20:"${REAR_TOT_NUMBER}"                       21:"${DIAG_MAX_ENERGY}"
+ # 22:"${DIAG_TOT_ENERGY}" 
  printf '%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s' "${ANGLE}" "${PREPLASMA_LENGTH}" "${PREPLASMA_DENSITY}" "${RAMP_LENGTH}" "${BULK_LENGTH}" "${DENSITY}" "${CONT_LENGTH}" "${LASER_A_NOTE}" "${LASER_LENGTH}" "${MAX_ENERGY}" "${TOT_ENERGY}" "${TOT_ENERGY_INTEGRATED_SPECTRUM}" "${FRONT_TOT_ENERGY_INTEGRATED_SPECTRUM}" "${REAR_TOT_ENERGY_INTEGRATED_SPECTRUM}" "${AVE_ENERGY}" "${TOT_NUMBER}" "${FRONT_AVE_ENERGY}" "${FRONT_TOT_NUMBER}" "${REAR_AVE_ENERGY}" "${REAR_TOT_NUMBER}" "${DIAG_MAX_ENERGY}" "${DIAG_TOT_ENERGY}" >> "${OUTPUT_FILE}"
  printf '\n'  >> "${OUTPUT_FILE}"
 
 done
 
+#the following is the value used to split the collected files. It's usual to split along the bulk length
+column=5
+
 for value in "${column_values[@]}"
 do
- $SCANNER -in "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}.txt" -out "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -select "${column}" "${value}"
- #${BILINEAR_FILTER} -cx 1 -cy 3 -ce 6 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -gnuplot -title "bulk length ${value} {/Symbol m}m" -xlabel "Preplasma length ({/Symbol m}m)" -ylabel "Ramp length ({/Symbol m}m)" -cblabel "Maximum proton energy (MeV)"
- ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 6 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -gnuplot -title "bulk length ${value} um" -xlabel "Preplasma length (um)" -ylabel "Ramp length (um)" -cblabel "Maximum proton energy (MeV)"
+ $SCANNER -in "${OUTPUT_FILE}" -out "${OUTPUT_FILE}_${value}.txt" -select "${column}" "${value}"
+
+ # x: Preplasma length; y: Ramp length; cb: Maximum proton energy
+ ${BILINEAR_FILTER} -cx 2 -cy 4 -ce 10 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "${OUTPUT_FILE}_${value}.txt" -gnuplot -title "bulk length ${value} um" -xlabel "Preplasma length (um)" -ylabel "Ramp length (um)" -cblabel "Maximum proton energy (MeV)"
  $GNUPLOT plot.plt
- #${BILINEAR_FILTER} -cx 1 -cy 3 -ce 15 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -gnuplot -title "bulk length ${value} {/Symbol m}m" -xlabel "Preplasma length ({/Symbol m}m)" -ylabel "Ramp length ({/Symbol m}m)" -cblabel "Average proton temperature (MeV)"
- ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 15 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -gnuplot -title "bulk length ${value} um" -xlabel "Preplasma length (um)" -ylabel "Ramp length (um)" -cblabel "Average proton temperature (MeV)"
+
+ # x: Preplasma length; y: Ramp length; cb: Average proton energy
+ ${BILINEAR_FILTER} -cx 2 -cy 4 -ce 15 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "${OUTPUT_FILE}_${value}.txt" -gnuplot -title "bulk length ${value} um" -xlabel "Preplasma length (um)" -ylabel "Ramp length (um)" -cblabel "Average proton temperature (MeV)"
  $GNUPLOT plot.plt
- #${BILINEAR_FILTER} -cx 1 -cy 3 -ce 18 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -gnuplot -title "bulk length ${value} {/Symbol m}m" -xlabel "Preplasma length ({/Symbol m}m)" -ylabel "Ramp length ({/Symbol m}m)" -cblabel "Total proton energy ({/Symbol m}J)" -cb_magn 1000000
- ${BILINEAR_FILTER} -cx 1 -cy 3 -ce 18 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "energy_scan_${SIM_HEADER}${PARTICLE_TYPE}_${value}.txt" -gnuplot -title "bulk length ${value} um" -xlabel "Preplasma length (um)" -ylabel "Ramp length (um)" -cblabel "Total proton energy (mJ)" -cb_magn 1000
+
+ # x: Preplasma length; y: Ramp length; cb: Total proton energy
+ ${BILINEAR_FILTER} -cx 2 -cy 4 -ce 22 -nx ${X_INTERPOLATION} -ny ${Y_INTERPOLATION} -file "${OUTPUT_FILE}_${value}.txt" -gnuplot -title "bulk length ${value} um" -xlabel "Preplasma length (um)" -ylabel "Ramp length (um)" -cblabel "Total proton energy (mJ)" -cb_magn 1000
  $GNUPLOT plot.plt
 done
 
