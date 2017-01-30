@@ -22,8 +22,6 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-#define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
 #define MEV_TO_JOULE 1.602176565E-13
 
 

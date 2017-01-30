@@ -1,6 +1,4 @@
 #define LUNGHEZZA_MAX_NOMEFILE 256
-#define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
 #define BUFFER_SIZE 1024
 
 #include <iostream>

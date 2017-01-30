@@ -22,11 +22,6 @@ along with tools-ALaDyn.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
-#define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
-
-
-
 #include <iostream>
 #include <cstdio>
 #include <sstream>

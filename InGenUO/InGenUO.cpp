@@ -10,7 +10,6 @@
 //
 
 
-#define _CRT_SECURE_NO_WARNINGS
 #define MAX_SIZE_OF_PATH 1024
 
 #include <iostream>
@@ -21,11 +20,7 @@
 #include <cstdlib>
 #include <sys/stat.h>
 #include <errno.h>
-#if defined (_MSC_VER)
 #include <boost/filesystem.hpp>
-#else
-#include <unistd.h>
-#endif
 #include "jsoncons/json.hpp"
 
 
@@ -359,23 +354,14 @@ void parse_json_file(ALaDyn_parameters& parameters, const char * filename) {
 std::string cartella(std::string prefisso)
 {
   char* path = (char*)malloc(sizeof(char) * MAX_SIZE_OF_PATH);
-#if defined (_MSC_VER)
   std::string pathstring;
   boost::filesystem::path mydir = boost::filesystem::system_complete(pathstring);
   const char* curr_dir = mydir.string().c_str();
-#else
-  int ris;
-  const char* curr_dir = getcwd(NULL, 0);
-#endif
   strcpy(path, curr_dir);
   strcat(path, prefisso.data());
-#if defined (_MSC_VER)
   if (!boost::filesystem::exists(path)) {
     boost::filesystem::create_directories(path);
   }
-#else
-  ris = mkdir(path, S_IRWXU);
-#endif
   free(path);
   return std::string(path);
 }

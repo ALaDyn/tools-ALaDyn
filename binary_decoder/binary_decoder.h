@@ -5,9 +5,6 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
-#define _SCL_SECURE_NO_WARNINGS
 
 #define MAJOR_RELEASE  7
 #define MINOR_RELEASE  1
