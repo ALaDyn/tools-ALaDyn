@@ -231,6 +231,7 @@ void Parameters::man(const char argv[]) {
   std::cerr << "Example: " << argv[0] << " Edenout01 -densityplot E 0.0 30.0 60 thetaT 0 0.20 20" << std::endl;
   std::cerr << "----------Full argument list------------------- " << std::endl;
   std::cerr << "-swap/-noswap (force endianess swap/noswap) -force_v1 -force_v2 -force_v3 -force_v4 (force specific file format)" << std::endl;
+  std::cerr << "-span #n -subsample #m -ncol3d #N -ncol2d #M -weight #w -charge #c " << std::endl;
   std::cerr << "-dump_ppg -dump_csv -dump_clean -dump_xyzE " << std::endl;
   std::cerr << "-dump_cutx #x -dump_cuty #y -dump_cutz #z  -dump_lineoutx -dump_gnuplot" << std::endl;
   std::cerr << "-dump_vtk -dump_vtk_nostretch (dumps in the vtk just the unstretched part of the grid)" << std::endl;
