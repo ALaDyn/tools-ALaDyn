@@ -18,7 +18,7 @@ X_INTERPOLATION=512
 Y_INTERPOLATION=512
 
 DIAG_STEP_TO_BE_READ=04
-SPEC_TIME_TO_BE_READ=80
+SPEC_TIME_TO_BE_READ=50
 SPEC_VERSION=4
 DIAG_VERSION=4
 OUTPUT_FILE="energy_scan_${SIM_HEADER}${PARTICLE_TYPE}.txt"
@@ -65,9 +65,18 @@ do
  if [ -f "diag${DIAG_STEP_TO_BE_READ}.dat" ];
  then
   ${SPEC_DECODER} diag${DIAG_STEP_TO_BE_READ}.dat v${DIAG_VERSION}
-  DIAG_MAX_ENERGY=$(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt | awk '{print $'${COLUMN_MAX_ENERGY}'}')
-  DIAG_TOT_ENERGY=$(tail -1 diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt | awk '{print $'${COLUMN_TOT_ENERGY}'}')
-  logFitData=($( ${LOG_FIT_SOFTWARE} -x ${COLUMN_TIMESTEP} -y ${COLUMN_MAX_ENERGY} -scan diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt ))
+  while read line 
+   do read -a tokens <<< $line
+   if [[ "${tokens[0]}" == ${SPEC_TIME_TO_BE_READ}* ]] ; then
+    DIAG_MAX_ENERGY=${tokens[${COLUMN_MAX_ENERGY}]}
+    DIAG_TOT_ENERGY=${tokens[${COLUMN_TOT_ENERGY}]}
+   fi
+  done < diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt
+  logFitData=($( ${LOG_FIT_SOFTWARE} -x ${COLUMN_TIMESTEP} -y ${COLUMN_MAX_ENERGY} -min 20 -max 50 -scan diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt ))
+  ${LOG_FIT_SOFTWARE} -x ${COLUMN_TIMESTEP} -y ${COLUMN_MAX_ENERGY} -min 20 -max 50 -gnuplot diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt
+  ${GNUPLOT} plot.plt
+  plot_name=$(basename $sim)
+  mv diag${DIAG_STEP_TO_BE_READ}.dat.particles.txt.png ../../${plot_name}.png
  else
   DIAG_MAX_ENERGY="-1"
   DIAG_TOT_ENERGY="-1"
