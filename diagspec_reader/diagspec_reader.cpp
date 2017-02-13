@@ -10,6 +10,10 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#define MAJOR_VERSION     1
+#define MINOR_VERSION     1
+
+
 class Diag_data
 {
 public:
@@ -1090,10 +1094,18 @@ void Diag_data::decode_spec_v4(std::ifstream &infile) {
   deallocate_arrays();
 }
 
+
+void usage(const char * progname) {
+  std::vector<std::string> tokens;
+  boost::split(tokens, progname, boost::is_any_of("/\\"));
+  std::cout << "Usage: " << tokens.back() << " filename v1/v2/v3/v4 [-tmax tt.ttt] " << std::endl;
+}
+
 int main(int argc, const char* argv[]) {
+  std::cout << "diagspec_reader v" << MAJOR_VERSION << '.' << MINOR_VERSION << std::endl;
   if (argc < 3) {
-    std::cout << "Usage: ./leggi_diag filename v1/v2/v3/v4 [-tmax tt.ttt] " << std::endl;
-    exit(1);
+    usage(argv[0]);
+    exit(-3);
   }
 
   Diag_data oDiag_data;
@@ -1106,7 +1118,9 @@ int main(int argc, const char* argv[]) {
     exit(2);
   }
 
-  oDiag_data.versione = boost::lexical_cast<int32_t>(argv[2][1]);
+  if (argv[2][0] == '-') oDiag_data.versione = boost::lexical_cast<int32_t>(argv[2][2]);
+  else oDiag_data.versione = boost::lexical_cast<int32_t>(argv[2][1]);
+
   if ((argc == 5) && (std::string(argv[3]) == "-tmax")) {
     oDiag_data.btmax = true;
     oDiag_data.tmax = boost::lexical_cast<double>(argv[4]);
@@ -1114,6 +1128,8 @@ int main(int argc, const char* argv[]) {
   oDiag_data.tipofile = argv[1][0];
   oDiag_data.nomefile = argv[1];
   if (oDiag_data.tipofile != 's' && oDiag_data.tipofile != 'd')  std::cout << "File non riconosciuto" << std::endl;
+
+  std::cout << "Working on file " << oDiag_data.nomefile << ", version: " << oDiag_data.versione << ", type: " << oDiag_data.tipofile << std::endl;
 
   oDiag_data.start(infile);
 
