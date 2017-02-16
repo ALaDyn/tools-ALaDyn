@@ -72,7 +72,7 @@ for i in range(frame_begin, frame_end + 1 ):
 		# R_selected = np.full((number_of_particles), True, dtype=bool)
 
 		#--- jump ---#
-		p_selected[0:number_of_particles:jump]=False
+		p_selected[0:jump:number_of_particles]=False
 
 		if(gamma_threshold>-1.):
 			Px = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Px')
@@ -126,7 +126,7 @@ for i in range(frame_begin, frame_end + 1 ):
 		W = W[p_selected]
 
 		#--- *** diagnostics *** ---#
-		Charge  =  read_electrons_ppm( path_read,'Elpout'+s+'.dat ')*np.sum(W)*1.6e-7
+		Charge  =  read_electrons_ppm( path_read,'Elpout'+s+'.dat')*np.sum(W)*1.6e-7
 		sigmax  = np.std(X)
 		sigmay  = np.std(Y)
 		Current = Charge*1e-15*3e8/np.sqrt(2*np.pi)/sigmax/1e-6
@@ -195,16 +195,16 @@ for i in range(frame_begin, frame_end + 1 ):
 		while (last_particle_x>slice_x_max):
 			X_selected = (X>slice_x_min & X<slice_x_max)
 
-			Charge  =  read_electrons_ppm( path_read,'Elpout'+s+'.dat ')*np.sum(W[(X_selected])*1.6e-7
-			sigmax  = np.std(X[(X_selected])
-			sigmay  = np.std(Y[(X_selected])
+			Charge  =  read_electrons_ppm(path_read,'Elpout'+s+'.dat')*np.sum(W[X_selected])*1.6e-7
+			sigmax  = np.std(X[X_selected])
+			sigmay  = np.std(Y[X_selected])
 			Current = Charge*1e-15*3e8/np.sqrt(2*np.pi)/slice_um/1e-6
 			gamma = np.array(np.sqrt(1. + Px**2 + Py**2 + Pz**2))
-			en_spread = round(np.std(gamma[(X_selected]/np.mean(gamma[(X_selected])*100,1)
-			emittance_y = np.sqrt( np.std(Y[(X_selected])**2*np.std(Py[(X_selected])**2-np.cov(Y[(X_selected],Py[(X_selected])[0][1]**2);
-			emittance_z = np.sqrt( np.std(Z[(X_selected])**2*np.std(Pz[(X_selected])**2-np.cov(X[(X_selected],Pz[(X_selected])[0][1]**2);
+			en_spread = round(np.std(gamma[X_selected])/np.mean(gamma[X_selected])*100,1)
+			emittance_y = np.sqrt( np.std(Y[X_selected])**2*np.std(Py[X_selected])**2-np.cov(Y[X_selected],Py[X_selected])[0][1]**2);
+			emittance_z = np.sqrt( np.std(Z[X_selected])**2*np.std(Pz[X_selected])**2-np.cov(X[X_selected],Pz[X_selected])[0][1]**2);
 
-			print slice_counter,Charge,sigmax,sigmay,np.mean(gamma[(X_selected]),en_spread,emittance_y,emittance_z
+			print slice_counter,Charge,sigmax,sigmay,np.mean(gamma[X_selected]),en_spread,emittance_y,emittance_z
 
 			slice_x_min+=slice_um
 			slice_x_max+=slice_um
