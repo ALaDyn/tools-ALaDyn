@@ -10,7 +10,7 @@ all: $(EXES)
 
 
 %.exe: %.cpp
-	$(CXX) $(OPT) -o $@ $<
+	$(CXX) $(OPT) -o $@ $< -lboost_system -lboost_filesystem
 
 
 clean:
