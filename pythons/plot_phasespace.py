@@ -127,23 +127,39 @@ for i in range(frame_begin, frame_end + 1 ):
 
 		#--- *** diagnostics *** ---#
 		Charge  =  read_electrons_ppm( path_read,'Elpout'+s+'.dat')*np.sum(W)*1.6e-7
-		sigmax  = np.std(X)
-		sigmay  = np.std(Y)
-		Current = Charge*1e-15*3e8/np.sqrt(2*np.pi)/sigmax/1e-6
 		gamma = np.array(np.sqrt(1. + Px**2 + Py**2 + Pz**2))
-		en_spread = round(np.std(gamma)/np.mean(gamma)*100,1)
-		emittance_y = np.sqrt( np.std(Y)**2*np.std(Py)**2-np.cov(Y,Py)[0][1]**2);
-		emittance_z = np.sqrt( np.std(Z)**2*np.std(Pz)**2-np.cov(X,Pz)[0][1]**2);
+		mu_x=np.average(X,weights=W)
+		mu_y=np.average(Y,weights=W)
+		mu_z=np.average(Z,weights=W)
+		mu_Px=np.average(Px,weights=W)
+		mu_Py=np.average(Py,weights=W)
+		mu_Pz=np.average(Pz,weights=W)
+		mu_gamma=np.average(gamma,weights=W)
+		sigma_x=np.sqrt( np.average((X-mu_x)**2, weights=W) )
+		sigma_y=np.sqrt( np.average((Y-mu_y)**2, weights=W) )
+		sigma_z=np.sqrt( np.average((Z-mu_z)**2, weights=W) )
+		sigma_Px=np.sqrt( np.average((X-mu_Px)**2, weights=W) )
+		sigma_Py=np.sqrt( np.average((Y-mu_Py)**2, weights=W) )
+		sigma_Pz=np.sqrt( np.average((Z-mu_Pz)**2, weights=W) )
+		sigma_gamma=np.sqrt( np.average((gamma-mu_gamma)**2, weights=W) )
+		cov_y_Py=np.average((Y-mu_y)*(Py-mu_Py), weights=W)
+		cov_z_Pz=np.average((Z-mu_z)*(Pz-mu_Pz), weights=W)
+
+		en_spread = sigma_gamma/mu_gamma*100.
+		emittance_y = np.sqrt( sigma_y**2*sigma_Py**2-cov_y_Py**2);
+		emittance_z = np.sqrt( sigma_z**2*sigma_Pz**2-cov_z_Pz**2);
+		Current = Charge*1e-15*3e8/np.sqrt(2*np.pi)/sigma_x/1e-6
+		#--- *** ---#
 
 		print 'Diagnostic for the whole bunch'
 		print 'Energy spread: ', ('%3.2e' % en_spread) ,'%'
 		print 'Normalized Emittance Y: ', (round(emittance_y,2)), 'mm-mrad'
 		print 'Normalized Emittance Z: ', (round(emittance_z,2)), 'mm-mrad'
-		print 'Mean Energy: ', round(np.mean(gamma)*0.51,1), 'MeV'
+		print 'Mean Energy: ',  ('%3.2e' % mu_gamma), 'MeV'
 		print 'Charge:',('%3.2e' % Charge), 'pC'
 		print 'Peak Current:',('%3.2e' % Current), 'kA'
-		print 'Sigmax:',('%3.2e' % sigmax),'mum'
-		print 'Sigmay:',('%3.2e' % sigmay),'mum'
+		print 'Sigmax:',('%3.2e' % sigma_x),'mum'
+		print 'Sigmay:',('%3.2e' % sigma_y),'mum'
 		plt.figure(figsize=(20,10))
 		#fig=plt.figure()
 		#ax=fig.add_subplot(111,projection='3d')
