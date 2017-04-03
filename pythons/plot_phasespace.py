@@ -154,7 +154,7 @@ for i in range(frame_begin, frame_end + 1 ):
 		print 'Energy spread: ', ('%3.2e' % en_spread) ,'%'
 		print 'Normalized Emittance Y: ', (round(emittance_y,2)), 'mm-mrad'
 		print 'Normalized Emittance Z: ', (round(emittance_z,2)), 'mm-mrad'
-		print 'Mean Energy: ',  ('%3.2e' % mu_gamma*0.511), 'MeV'
+		print 'Mean Energy: ',  ('%3.2e' % (mu_gamma*0.511)), 'MeV'
 		print 'Charge:',('%3.2e' % Charge), 'pC'
 		print 'Peak Current:',('%3.2e' % Current), 'kA'
 		print 'Sigmax:',('%3.2e' % sigma_x),'mum'
