@@ -150,12 +150,11 @@ for i in range(frame_begin, frame_end + 1 ):
 		emittance_z = np.sqrt( sigma_z**2*sigma_Pz**2-cov_z_Pz**2);
 		Current = Charge*1e-15*3e8/np.sqrt(2*np.pi)/sigma_x/1e-6
 		#--- *** ---#
-
 		print 'Diagnostic for the whole bunch'
 		print 'Energy spread: ', ('%3.2e' % en_spread) ,'%'
 		print 'Normalized Emittance Y: ', (round(emittance_y,2)), 'mm-mrad'
 		print 'Normalized Emittance Z: ', (round(emittance_z,2)), 'mm-mrad'
-		print 'Mean Energy: ',  ('%3.2e' % mu_gamma), 'MeV'
+		print 'Mean Energy: ',  ('%3.2e' % mu_gamma*0.511), 'MeV'
 		print 'Charge:',('%3.2e' % Charge), 'pC'
 		print 'Peak Current:',('%3.2e' % Current), 'kA'
 		print 'Sigmax:',('%3.2e' % sigma_x),'mum'
@@ -186,7 +185,7 @@ for i in range(frame_begin, frame_end + 1 ):
 		#plt.scatter(Pz,Py,s=.1,edgecolors='None')
 		#plt.xlabel('Pz/mc');plt.ylabel('Py/mc')
 		#plt.subplot(313)
-		plt.hist(gamma*0.511,300)
+		plt.hist(gamma*0.511,300,weights=W)
 		#       plt.hist(gamma[gamma_selected],50)
 		plt.xlabel('$Energy (MeV)$',fontsize=24,fontweight='bold');plt.ylabel('$dN/dE$',fontsize=24,fontweight='bold');
 		#       plt.axis('tight')
