@@ -23,12 +23,13 @@ from utilities_1 import *
 
 # --- # --- # --- #
 ### --- ### shell inputs
-if(len(sys.argv)<9):
+if(len(sys.argv)<10):
 	print 'Usage :: python ~/Codes/tools-ALaDyn/ALaDyn_Pythons/plot_phasespace.py 0 9 -1 -1 0 1000 10 1 5'
 	print 'Not enough arguments >>>'
 	print ''
 	print 'frame begin'
 	print 'frame end'
+	print 'selection via Weights: all particles with weight greater then INput :: -1 for all particles'
 	print 'selection via Weights: all particles with weight less then INput :: -1 for all particles'
 	print 'gamma cut: only particle with gamma greater then INput :: -1 for all particles'
 	print 'longitudinal min cut: remove particle with X less than INput :: -1 for no cut'
@@ -41,13 +42,14 @@ if(len(sys.argv)<9):
 #---
 frame_begin = int(sys.argv[1])
 frame_end   = int(sys.argv[2])
-W_threshold = float(sys.argv[3])
-gamma_threshold   = float(sys.argv[4])
-Xmin_threshold = float(sys.argv[5])
-Xmax_threshold = float(sys.argv[6])
-transverse_threshold = float(sys.argv[7])
-jump = int(sys.argv[8])
-slice_um  = float(sys.argv[9])
+Wmax_threshold = float(sys.argv[3])
+Wmin_threshold = float(sys.argv[4])
+gamma_threshold   = float(sys.argv[5])
+Xmin_threshold = float(sys.argv[6])
+Xmax_threshold = float(sys.argv[7])
+transverse_threshold = float(sys.argv[8])
+jump = int(sys.argv[9])
+slice_um  = float(sys.argv[10])
 
 #-path
 path = os.getcwd()
@@ -88,9 +90,13 @@ for i in range(frame_begin, frame_end + 1 ):
 			p_selected = (gamma>gamma_threshold)
 			del gamma
 
-		if(W_threshold>-1.):
+		if(Wmin_threshold>-1.):
 			W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
-			p_selected = (p_selected & (W<=W_threshold) )
+			p_selected = (p_selected & (W<=Wmin_threshold) )
+
+		if(Wmax_threshold>-1.):
+			W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
+			p_selected = (p_selected & (W>=Wmax_threshold) )
 
 		if(Xmin_threshold> -1):
 			X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
