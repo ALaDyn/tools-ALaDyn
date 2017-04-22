@@ -26,9 +26,9 @@ CBMIN_FLD=-5
 CBMAX_FLD=5
  
 
-for folder in $(seq ${FIRST_SIM} ${LAST_SIM}) ; do
+for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
 
- cd "$folder" || return
+ cd "$folder" || exit
  num=${folder:2:3}
 
  #for file in $(find . -name "E?fout${num}.bin" -o -name "B?fout${num}.bin" -o -name "?denout${num}.bin" -o -name "H?dnout${num}.bin") ; do
@@ -172,7 +172,7 @@ for folder in $(seq ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outBz}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
 
- cd .. || return
+ cd .. || exit
 
 done
 
