@@ -258,11 +258,12 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  	if [ ${ENABLE_CNAF_JOB_SUBMISSION} ] ; then 
  		rm -f "${JOB_GNUPLOT}" ; touch "${JOB_GNUPLOT}" ; chmod 775 "${JOB_GNUPLOT}"
 		{
-			printf "\#BSUB -o %%J.out\n"
-			printf "\#BSUB -e %%J.err\n"
-			printf "\#BSUB -q hpc_short\n"
-			printf "\#BSUB -n 16\n"
-			printf "\#BSUB -R \"span[ptile=16]\"\n"
+			printf "#BSUB -J impi${num}"
+			printf "#BSUB -o %%J.out\n"
+			printf "#BSUB -e %%J.err\n"
+			printf "#BSUB -q hpc_short\n"
+			printf "#BSUB -n 16\n"
+			printf "#BSUB -R \"span[ptile=16]\"\n"
 			printf "module load compilers/gcc-4.9.0\n"
 			printf "module load boost_1_56_0_gcc4_9_0\n"
 			printf "cd \"$folder\"\n"
