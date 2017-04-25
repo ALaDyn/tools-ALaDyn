@@ -6,6 +6,7 @@
 # find . -type f -name '*.png' | cpio -p -d -v ../target_folder
 #####
 
+ENABLE_CNAF_JOB_SUBMISSION=true
 BINARY_READER=$HOME/bin/leggi_bin
 FIRST_SIM=0
 LAST_SIM=99
@@ -46,6 +47,14 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  file_Ex=Exfout${num}.txt
  file_Ey=Eyfout${num}.txt
  file_Bz=Bzfout${num}.txt
+ gnuplot_file_E=Edenout${num}.plt
+ gnuplot_file_P=Pdenout${num}.plt
+ gnuplot_file_H=H1dnout${num}.plt
+ gnuplot_file_Ex=Exfout${num}.plt
+ gnuplot_file_Ey=Eyfout${num}.plt
+ gnuplot_file_Bz=Bzfout${num}.plt
+ gnuplot_file_ExfEden=Bzfout${num}.plt
+ JOB_GNUPLOT=plt${num}.cmd
  file_outE=Edenout${num}.${IMAGE_TYPE}
  file_outP=Pdenout${num}.${IMAGE_TYPE}
  file_outH=H1denout${num}.${IMAGE_TYPE}
@@ -53,8 +62,8 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  file_outEy=Eyfout${num}.${IMAGE_TYPE}
  file_outBz=Bzfout${num}.${IMAGE_TYPE}
  file_outExfEden=ExfEden${num}.${IMAGE_TYPE}
- GNUPLOT_FILE='grid.plt'
 
+ GNUPLOT_FILE=${gnuplot_file_E}
  echo 'sto plottando la griglia densita` elettroni #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -75,6 +84,7 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outE}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
   
+ GNUPLOT_FILE=${gnuplot_file_P}
  echo 'sto plottando la griglia densita` protoni #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -96,6 +106,7 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outP}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
   
+ GNUPLOT_FILE=${gnuplot_file_H}
  echo 'sto plottando la griglia densita` ioni #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -116,6 +127,7 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outH}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
 
+ GNUPLOT_FILE=${gnuplot_file_Ex}
  echo 'sto plottando la griglia Ex #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -135,6 +147,7 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outEx}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
 
+ GNUPLOT_FILE=${gnuplot_file_Ey}
  echo 'sto plottando la griglia Ey #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -154,6 +167,7 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outEy}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
 
+ GNUPLOT_FILE=${gnuplot_file_Bz}
  echo 'sto plottando la griglia Bz #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -173,6 +187,7 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
  } >> "${GNUPLOT_FILE}"
  #if [ ! -s "${file_outBz}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
 
+ GNUPLOT_FILE=${gnuplot_file_ExfEden}
  echo 'sto plottando la composizione Ex-Eden #'"$num"
  rm -f "${GNUPLOT_FILE}" ; touch "${GNUPLOT_FILE}" ; chmod 775 "${GNUPLOT_FILE}"
  {
@@ -183,10 +198,10 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
    printf "set terminal %scairo size %s,%s font ',%s'\n" "${IMAGE_TYPE}" "${SIZEX_COMPOSITION}" "${SIZEY_COMPOSITION}" "${FONTSIZE}"
    printf "set output FILE_OUT\n"
    printf "set multiplot layout 1, 2 title 'Laser-plasma interaction'\n"
-   printf "set title 'E_x fields'\n"
+   printf "set title 'E_x field'\n"
    printf "set ylabel 'x ({/Symbol.ttf m}m)'\n"
    printf "set xlabel 'y ({/Symbol.ttf m}m)'\n"
-   printf "set cblabel 'Ex (TV/m)'\n"
+   printf "set cblabel 'E_x (TV/m)'\n"
    printf "set cbrange[%s:%s]\n" "${CBMIN_FLD}" "${CBMAX_FLD}"
    printf "set xrange[%s:%s]\n" "${YMIN}" "${YMAX}"
    printf "set yrange[%s:%s]\n" "${XMIN}" "${XMAX}"
@@ -239,9 +254,27 @@ for folder in $(seq -f "%04g" ${FIRST_SIM} ${LAST_SIM}) ; do
    printf "plot FILE_IN_EDEN u 2:1:(\$3*nc) w image notitle\n"
    printf "unset multiplot\n"
  } >> "${GNUPLOT_FILE}"
- if [ ! -s "${file_outExfEden}" ] ; then $GNUPLOT "${GNUPLOT_FILE}" ; fi
+ if [ ! -s "${file_outExfEden}" ] ; then 
+ 	if [ ${ENABLE_CNAF_JOB_SUBMISSION} ] ; then 
+ 		rm -f "${JOB_GNUPLOT}" ; touch "${JOB_GNUPLOT}" ; chmod 775 "${JOB_GNUPLOT}"
+		{
+			printf "#BSUB -o %J.out\n"
+			printf "#BSUB -e %J.err\n"
+			printf "#BSUB -q hpc_short\n"
+			printf "#BSUB -n 16\n"
+			printf "#BSUB -R \"span[ptile=16]\"\n"
+			printf "module load compilers/gcc-4.9.0\n"
+			printf "module load boost_1_56_0_gcc4_9_0\n"
+			printf "cd \"$folder\"\n"
+			printf "${GNUPLOT} ${GNUPLOT_FILE}\n"
+		} >> "${JOB_GNUPLOT}"
+ 		bsub < "${JOB_GNUPLOT}"
+ 	else
+ 		$GNUPLOT "${GNUPLOT_FILE}"
+ 	fi
+ fi
 
- cp ./*.png ../images/
+ #cp ./*.png ../images/
 
  cd .. || exit
 
