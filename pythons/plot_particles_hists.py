@@ -18,7 +18,8 @@ import matplotlib.pyplot as plt
 sys.path.append(os.path.join(os.path.expanduser('~'),'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ###>>>
 ### --- ###
-from Particle_reader_utilities import *
+from read_particle_phasespace import *
+from utilities_1 import *
 ### --- ###
 
 
@@ -38,7 +39,7 @@ if __name__ == '__main__':
 	#-path
 	path = os.getcwd()
 	#-folder output structure
-	generate_folder_phasespace(path)
+	#generate_folder_phasespace(path)
 	#-hunting and printing
 	for root_dir, sub_dirs, files in os.walk(path):
 		prune_dirs(sub_dirs)

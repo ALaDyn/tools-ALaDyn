@@ -15,6 +15,14 @@ import numpy as np
 ### --- ###
 
 
+#--- *** ---# prune not necessary sub dirs
+def prune_dirs(dirs):
+	if 'out' in dirs:
+		dirs.remove('out')
+	if 'dump' in dirs:
+		dirs.remove('dump')
+
+
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = colors.LinearSegmentedColormap.from_list(
         'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
