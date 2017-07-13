@@ -30,7 +30,7 @@ def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 	#- vector length -#
 	struct.unpack('i', f.read(4))
 	N_param = struct.unpack('i', f.read(4))[0]
-	print N_param
+	print(N_param)
 	struct.unpack('i', f.read(4))
 
 
@@ -53,9 +53,9 @@ def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 
 	#---***---#
 	r = np.zeros((nx,ny,nz))
-	print 'total grid size: n=(',nx,ny,nz,')'
+	print('total grid size: n=(',nx,ny,nz,')')
 	rr=[]
-	print 'number of Np processors: Np_y=',nproc_y,'Np_z=', nproc_z
+	print('number of Np processors: Np_y=',nproc_y,'Np_z=', nproc_z)
 
 	offsetz = 0
 	for counter_z in range(0,nproc_z):
@@ -121,7 +121,7 @@ def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_
 	#- vector length -#
 	struct.unpack('i', f.read(4))
 	N_param = struct.unpack('i', f.read(4))[0]
-	print N_param
+	print(N_param)
 	struct.unpack('i', f.read(4))
 
 
