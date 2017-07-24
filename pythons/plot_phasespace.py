@@ -158,13 +158,16 @@ for i in range(frame_begin, frame_end + 1 ):
 		#--- *** ---#
 		print 'Diagnostic for the whole bunch'
 		print 'Energy spread: ', ('%3.2e' % en_spread) ,'%'
+		print 'mean energy :',mu_gamma
+		print 'sigma_energy:',sigma_gamma
 		print 'Normalized Emittance Y: ', (round(emittance_y,2)), 'mm-mrad'
 		print 'Normalized Emittance Z: ', (round(emittance_z,2)), 'mm-mrad'
 		print 'Mean Energy: ',  ('%3.2e' % (mu_gamma*0.511)), 'MeV'
 		print 'Charge:',('%3.2e' % Charge), 'pC'
 		print 'Peak Current:',('%3.2e' % Current), 'kA'
-		print 'Sigmax:',('%3.2e' % sigma_x),'mum'
-		print 'Sigmay:',('%3.2e' % sigma_y),'mum'
+		print 'longitudinal - Sigmax:',('%3.2e' % sigma_x),'mum'
+		print 'transverse   - Sigmay:',('%3.2e' % sigma_y),'mum'
+
 		plt.figure(figsize=(20,10))
 		#fig=plt.figure()
 		#ax=fig.add_subplot(111,projection='3d')
