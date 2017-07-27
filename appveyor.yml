@@ -1,0 +1,43 @@
+image: Visual Studio 2017
+clone_folder: c:\projects\tools-ALaDyn
+configuration: Release
+
+environment:
+    matrix:
+    - platform: cygwin64
+      COMPILER: cygwin
+      CYGWIN_NOWINPATH: yes
+    - platform: Win32
+      COMPILER: vs
+
+install:
+  - if [%COMPILER%]==[vs] cinst cmake
+  - if [%COMPILER%]==[vs] SET "PATH=C:\Program Files\CMake\bin;%PATH%"
+  - if [%COMPILER%]==[vs] call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" x86
+  - if [%COMPILER%]==[cygwin] SET "PATH=C:\cygwin64\bin;C:\cygwin64\usr\bin;%PATH%"
+  - if [%COMPILER%]==[cygwin] SET PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+  - git submodule -q update --init --recursive
+  - cd ..
+  - mkdir C:\projects\deps
+  - cd C:\projects\deps
+  - ps: if($env:COMPILER -eq "vs") { Invoke-WebRequest https://download.microsoft.com/download/B/2/E/B2EB83FE-98C2-4156-834A-E1711E6884FB/MSMpiSetup.exe -OutFile C:\projects\deps\msmpi.exe }
+  - if [%COMPILER%]==[vs] C:\projects\deps\msmpi.exe -unattend
+  - mkdir cygwin-downloads
+  - ps: if($env:COMPILER -eq "cygwin") { Invoke-WebRequest https://cygwin.com/setup-x86_64.exe -OutFile C:\projects\deps\cygwin-setup.exe }
+  - if [%COMPILER%]==[cygwin] C:\projects\deps\cygwin-setup.exe --quiet-mode --no-shortcuts --no-startmenu --no-desktop --upgrade-also --root C:\cygwin64 --local-package-dir C:\projects\deps\cygwin-downloads --packages gcc-g++,cmake
+  - cd ..
+  - git clone https://github.com/Microsoft/vcpkg
+  - cd vcpkg
+  - if [%COMPILER%]==[vs] powershell -exec bypass scripts\bootstrap.ps1
+  - if [%COMPILER%]==[vs] vcpkg integrate install
+  - if [%COMPILER%]==[vs] vcpkg install boost
+  - cd ..
+  - cd C:\projects\tools-ALaDyn
+
+build_script:
+  - mkdir build
+  - cd build
+  - if [%COMPILER%]==[cygwin] cmake .. -G "Unix Makefiles"
+  - if [%COMPILER%]==[cygwin] cmake --build . --target install
+  - if [%COMPILER%]==[vs]     cmake .. -G "Visual Studio 15 2017" "-DCMAKE_TOOLCHAIN_FILE=C:\projects\vcpkg\scripts\buildsystems\vcpkg.cmake"
+  - if [%COMPILER%]==[vs]     cmake --build . --target install --config Release

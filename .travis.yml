@@ -1,16 +1,28 @@
+language: cpp
+
+os:
+  - linux
+  - osx
+
+dist: trusty
 sudo: false
-language: c++
+
+compiler: 
+  - gcc
+  - clang
+
+matrix:
+    exclude:
+    - os: osx
+      compiler: gcc
+    - os: linux
+      compiler: clang
+
 addons:
   apt:
-    sources:
-    - ubuntu-toolchain-r-test
     packages:
-    - gcc-5
-    - g++-5
     - libboost-all-dev
-install:
-    - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
-compiler:
-  - gcc
+
 script:
-  - make
+  - mkdir build && cd build && cmake .. && cmake --build . --target install
+
