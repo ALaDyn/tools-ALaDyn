@@ -22,6 +22,11 @@ addons:
   apt:
     packages:
     - libboost-all-dev
+    - gcc-5
+    - g++-5
+
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5" ;fi                             ;fi
 
 script:
   - mkdir build && cd build && cmake .. && cmake --build . --target install

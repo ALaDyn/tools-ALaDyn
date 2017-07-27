@@ -18,7 +18,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 set(JSONCONS_INCLUDE_PATH ${CMAKE_SOURCE_DIR}/ext/jsoncons/src)
 
-include_directories(${JSONCONS_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/src/)
+include_directories(${JSONCONS_INCLUDE_PATH} ${Boost_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/src/)
 
 add_executable(binary_analyzer                ${CMAKE_SOURCE_DIR}/binary_analyzer/binary_analyzer.cpp)
 add_executable(diagspec_reader                ${CMAKE_SOURCE_DIR}/diagspec_reader/diagspec_reader.cpp)
