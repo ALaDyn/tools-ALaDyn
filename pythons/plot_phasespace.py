@@ -57,8 +57,12 @@ path = os.getcwd()
 generate_folder_phasespace(path)
 
 #--- ***  mining and printing ***---#
-for i in range(frame_begin, frame_end + 1 ):
+#--- if frm_begin == frm_end : run and plot ---#
+if( frame_begin == frame_end ):
+# for i in range(frame_begin, frame_end + 1 ):
 	print '-------------------'
+	print 'frame_begin == frame_end  :: analysis and plot'
+	i=frame_begin
 	s='%2.2i'%i
 	path_read  = os.path.join(path,'%4.4i'%i)
 	path_write = path
@@ -236,3 +240,126 @@ for i in range(frame_begin, frame_end + 1 ):
 
 	else:
 		print '--- --- ---'
+
+#--- full analysis :: loop from frm_begin to frm_end ---#
+if(frame_end > frame_begin):
+	print '-------------------'
+	print 'full analysis :: loop from frame_begin to frame_end'
+
+	for i in range(frame_begin, frame_end + 1 ):
+		s='%2.2i'%i
+		path_read  = os.path.join(path,'%4.4i'%i)
+		path_write = path
+		if output_exists(path_read,'phasespace',i) == True:
+			print 'Analysing Phase Space --- frame >>> ',i
+			X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
+			number_of_particles_before_selection = len(X); del X
+			p_selected = np.full((number_of_particles_before_selection), True, dtype=bool)
+
+			#--- jump ---#
+			if(number_of_particles_before_selection>1):
+				p_selected[0:jump:number_of_particles_before_selection]=False
+
+				if(gamma_threshold>-1.):
+					Px = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Px')
+					gamma = 1.+Px**2
+					del Px
+					Py = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Py')
+					gamma = gamma+Py**2
+					del Py
+					Pz = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Pz')
+					gamma = gamma+Pz**2
+					del Pz
+					gamma=np.array(np.sqrt(gamma))
+					p_selected = (gamma>gamma_threshold)
+					del gamma
+
+				if(Wmin_threshold>-1.):
+					W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
+					p_selected = (p_selected & (W<=Wmin_threshold) )
+
+				if(Wmax_threshold>-1.):
+					W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
+					p_selected = (p_selected & (W>=Wmax_threshold) )
+
+				if(Xmin_threshold> -1):
+					X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
+					p_selected = (p_selected & (X>=Xmin_threshold) )
+					del X
+				if(Xmax_threshold> -1):
+					X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
+					p_selected = (p_selected & (X<=Xmax_threshold) )
+					del X
+
+				if(transverse_threshold > -1):
+					Y = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Y')
+					p_selected = (p_selected & (abs(Y)<=transverse_threshold) )
+					del Y
+					Z = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Z')
+					p_selected = (p_selected & (abs(Z)<=transverse_threshold) )
+					del Z
+
+				# --- *** --- #
+				Px = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Px')
+				Px = Px[p_selected]
+				Py = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Py')
+				Py = Py[p_selected]
+				Pz = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Pz')
+				Pz = Pz[p_selected]
+				X = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','X')
+				X = X[p_selected]
+				Y = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Y')
+				Y = Y[p_selected]
+				Z = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','Z')
+				Z = Z[p_selected]
+				W = read_particle_phasespace_bycomponent( path_read,'Elpout'+s+'.bin','W')
+				W = W[p_selected]
+
+				#--- *** diagnostics *** ---#
+				number_of_particles_after_selection = len(W)
+				if( number_of_particles_after_selection > 1 ):
+					Charge  =  read_electrons_ppm( path_read,'Elpout'+s+'.dat')*np.sum(W)*1.6e-7
+					gamma = np.array(np.sqrt(1. + Px**2 + Py**2 + Pz**2))
+					mu_x=np.average(X,weights=W)
+					mu_y=np.average(Y,weights=W)
+					mu_z=np.average(Z,weights=W)
+					mu_Px=np.average(Px,weights=W)
+					mu_Py=np.average(Py,weights=W)
+					mu_Pz=np.average(Pz,weights=W)
+					mu_gamma=np.average(gamma,weights=W)
+					sigma_x=np.sqrt( np.average((X-mu_x)**2, weights=W) )
+					sigma_y=np.sqrt( np.average((Y-mu_y)**2, weights=W) )
+					sigma_z=np.sqrt( np.average((Z-mu_z)**2, weights=W) )
+					sigma_Px=np.sqrt( np.average((X-mu_Px)**2, weights=W) )
+					sigma_Py=np.sqrt( np.average((Y-mu_Py)**2, weights=W) )
+					sigma_Pz=np.sqrt( np.average((Z-mu_Pz)**2, weights=W) )
+					sigma_gamma=np.sqrt( np.average((gamma-mu_gamma)**2, weights=W) )
+					cov_y_Py=np.average((Y-mu_y)*(Py-mu_Py), weights=W)
+					cov_z_Pz=np.average((Z-mu_z)*(Pz-mu_Pz), weights=W)
+
+					en_spread = sigma_gamma/mu_gamma*100.
+					emittance_y = np.sqrt( sigma_y**2*sigma_Py**2-cov_y_Py**2);
+					emittance_z = np.sqrt( sigma_z**2*sigma_Pz**2-cov_z_Pz**2);
+					Current = Charge*1e-15*3e8/np.sqrt(2*np.pi)/sigma_x/1e-6
+
+			if(number_of_particles_before_selection <= 1 or number_of_particles_after_selection <= 1):
+				Charge  = 0.0; gamma   = 0.0
+				mu_x    = 0.0; mu_y    = 0.0; mu_z    = 0.0
+				mu_Px   = 0.0; mu_Py   = 0.0; mu_Pz   = 0.0
+				mu_gamma= 0.0; sigma_x = 0.0; sigma_y = 0.0; sigma_z = 0.0
+				sigma_Px= 0.0; sigma_Py= 0.0; sigma_Pz= 0.0; sigma_gamma= 0.0
+				cov_y_Py = 0.0;	cov_z_Pz = 0.0; en_spread = 0.0
+				emittance_y = 0.0; emittance_z = 0.0; Current = 0.0
+
+			#--- *** ---#
+			run_distance = read_run_distance( path_read,'Elpout'+s+'.dat')
+			f = open('PS_diagnostic.dat','a')
+			f.write( '%3i \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e\n' % (i,run_distance,sigma_x,sigma_y,sigma_z,emittance_y,emittance_z,mu_gamma*0.511,en_spread,Charge) )
+			f.close()
+			# 1 :: frame
+			# 2 :: run_distance
+			# 3,4,5 :: sigma_x,sigma_y,sigma_z
+			# 6,7 :: emittance_y,emittance_z
+			# 8 :: energy in MeV, mu_gamma*0.511
+			# 9 :: en_spread
+			# 10 :: Charge in pC

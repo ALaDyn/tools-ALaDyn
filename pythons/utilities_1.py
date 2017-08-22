@@ -55,7 +55,7 @@ def	generate_folder_output_structure(path,savedata):
 	if not os.path.exists( directory_rho ):
 		os.makedirs(directory_rho)
 	if not os.path.exists( directory_jx ):
-		os.makedirs(directory_jx)		
+		os.makedirs(directory_jx)
 	if not os.path.exists( directory_E ):
 		os.makedirs(directory_E)
 	if not os.path.exists( directory_B ):
@@ -204,3 +204,12 @@ def	generate_folder_vts(path):
 	directory = os.path.join(path,'VTS_files')
 	if not os.path.exists( directory ):
 		os.makedirs(directory)
+
+
+def read_electrons_ppm(dir_path,file_name):
+	filename = open(os.path.join(dir_path,file_name), 'r')
+	return float(filename.readlines()[10].split()[2])
+
+def read_run_distance(dir_path,file_name):
+	filename = open(os.path.join(dir_path,file_name), 'r')
+	return float(filename.readlines()[7].split()[0])

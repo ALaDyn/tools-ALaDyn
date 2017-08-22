@@ -49,11 +49,6 @@ def read_particle_phasespace_bycomponent(dir_path,file_name,component):
 	return np.array(cmp)
 
 
-def read_electrons_ppm(dir_path,file_name):
-	filename = open(os.path.join(dir_path,file_name), 'r')
-	return float(filename.readlines()[10].split()[2])
-
-
 #- folder structure for outputs -#
 def	generate_folder_phasespace(path):
 	directory = os.path.join(path,'plots','phasespace')
