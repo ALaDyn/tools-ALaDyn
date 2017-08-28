@@ -219,7 +219,7 @@ if( frame_begin == frame_end ):
 		plt.ylabel(r'$Y (\mu m) Transvere$',fontsize=8)
 
 		plt.subplot(212)
-        plt.scatter(Y,Z,s=.1,edgecolors='None')
+        	plt.scatter(Y,Z,s=.1,edgecolors='None')
 		plt.xlabel(r'$Y (\mu m) Transvere$',fontsize=8)
 		plt.ylabel(r'$Z (\mu m) Transvere$',fontsize=8)
 		plt.show()
