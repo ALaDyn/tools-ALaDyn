@@ -172,7 +172,7 @@ if( frame_begin == frame_end ):
 		print 'longitudinal - Sigmax:',('%3.2e' % sigma_x),'mum'
 		print 'transverse   - Sigmay:',('%3.2e' % sigma_y),'mum'
 
-		plt.figure(figsize=(20,10))
+		plt.figure(figsize=(10,5))
 		#fig=plt.figure()
 		#ax=fig.add_subplot(111,projection='3d')
 		#ax.scatter(X,Y,Z,s=.05,edgecolors='None')
@@ -209,6 +209,19 @@ if( frame_begin == frame_end ):
 		#name_output =  '3Dplot' + '_' +('%2.2i'%i)+ '.png'
 		plt.savefig( os.path.join(path_write,'data','phasespace',name_output) )
 		#plt.close()
+		plt.show()
+
+		# --- Second Plot :: PS scatter plot---#
+		plt.figure(figsize=(10,5))
+		plt.subplot(211)
+		plt.scatter(X,Y,s=.1,edgecolors='None')
+		plt.xlabel(r'$X (\mu m) Longitudinal$',fontsize=8)
+		plt.ylabel(r'$Y (\mu m) Transvere$',fontsize=8)
+
+		plt.subplot(212)
+        plt.scatter(Y,Z,s=.1,edgecolors='None')
+		plt.xlabel(r'$Y (\mu m) Transvere$',fontsize=8)
+		plt.ylabel(r'$Z (\mu m) Transvere$',fontsize=8)
 		plt.show()
 
 
