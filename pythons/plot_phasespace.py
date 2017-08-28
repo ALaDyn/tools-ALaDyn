@@ -216,12 +216,12 @@ if( frame_begin == frame_end ):
 		plt.subplot(211)
 		plt.scatter(X,Y,s=.1,edgecolors='None')
 		plt.xlabel(r'$X (\mu m) Longitudinal$',fontsize=8)
-		plt.ylabel(r'$Y (\mu m) Transvere$',fontsize=8)
+		plt.ylabel(r'$Y (\mu m) Transverse$',fontsize=8)
 
 		plt.subplot(212)
         	plt.scatter(Y,Z,s=.1,edgecolors='None')
-		plt.xlabel(r'$Y (\mu m) Transvere$',fontsize=8)
-		plt.ylabel(r'$Z (\mu m) Transvere$',fontsize=8)
+		plt.xlabel(r'$Y (\mu m) Transverse$',fontsize=8)
+		plt.ylabel(r'$Z (\mu m) Transverse$',fontsize=8)
 		plt.show()
 
 
