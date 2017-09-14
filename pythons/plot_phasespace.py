@@ -343,9 +343,9 @@ if(frame_end > frame_begin):
 					sigma_x=np.sqrt( np.average((X-mu_x)**2, weights=W) )
 					sigma_y=np.sqrt( np.average((Y-mu_y)**2, weights=W) )
 					sigma_z=np.sqrt( np.average((Z-mu_z)**2, weights=W) )
-					sigma_Px=np.sqrt( np.average((X-mu_Px)**2, weights=W) )
-					sigma_Py=np.sqrt( np.average((Y-mu_Py)**2, weights=W) )
-					sigma_Pz=np.sqrt( np.average((Z-mu_Pz)**2, weights=W) )
+					sigma_Px=np.sqrt( np.average((Px-mu_Px)**2, weights=W) )
+					sigma_Py=np.sqrt( np.average((Py-mu_Py)**2, weights=W) )
+					sigma_Pz=np.sqrt( np.average((Pz-mu_Pz)**2, weights=W) )
 					sigma_gamma=np.sqrt( np.average((gamma-mu_gamma)**2, weights=W) )
 					cov_y_Py=np.average((Y-mu_y)*(Py-mu_Py), weights=W)
 					cov_z_Pz=np.average((Z-mu_z)*(Pz-mu_Pz), weights=W)
@@ -367,7 +367,7 @@ if(frame_end > frame_begin):
 			#--- *** ---#
 			run_distance = read_run_distance( path_read,'Elpout'+s+'.dat')
 			f = open('PS_diagnostic.dat','a')
-			f.write( '%3i \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e\n' % (i,run_distance,sigma_x,sigma_y,sigma_z,emittance_y,emittance_z,mu_gamma*0.511,en_spread,Charge) )
+			f.write( '%3i \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e \t %5.4e\n' % (i,run_distance,sigma_x,sigma_y,sigma_z,emittance_y,emittance_z,mu_gamma*0.511,en_spread,Charge,sigma_Py,cov_y_Py) )
 			f.close()
 			# 1 :: frame
 			# 2 :: run_distance
