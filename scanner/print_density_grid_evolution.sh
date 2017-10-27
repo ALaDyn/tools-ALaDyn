@@ -1,9 +1,14 @@
 #! /bin/bash
 
+#####
 # per estrarre tutti i png generati nelle varie cartelle, e raccoglierli in un albero identico
 # ma privo dei files .txt, .bin, .dat inutili, questo comando e' utilissimo:
 #####
-# find . -type f -name '*.png' | cpio -p -d -v ../target_folder
+# find . -type f -name '*.png' | cpio -p -d -v path_to/target_folder
+#####
+# per estrarre tutti i png ed archiviarli tutti in una unica cartella invece usare
+#####
+# find . -type f -name '*.png' -exec cp {} path_to/target_folder \;
 #####
 
 ENABLE_CNAF_JOB_SUBMISSION=true
