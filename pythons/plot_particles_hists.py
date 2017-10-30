@@ -48,7 +48,12 @@ if __name__ == '__main__':
 				#-operate here!
 				#PSBunch2_21.bin
 				print file
-				X, Y, Z, Px, Py, Pz, W = read_particle_phasespace( os.path.join(root_dir,file) )
+				X = read_particle_phasespace_bycomponent(root_dir,file,1)
+				Y = read_particle_phasespace_bycomponent(root_dir,file,2)
+				Z = read_particle_phasespace_bycomponent(root_dir,file,3)
+				Px= read_particle_phasespace_bycomponent(root_dir,file,4)
+				Py= read_particle_phasespace_bycomponent(root_dir,file,5)
+				Pz= read_particle_phasespace_bycomponent(root_dir,file,6)
 				X=np.array(X);    Y=np.array(Y);   Z=np.array(Z)
 				Px=np.array(Px); Py=np.array(Py); Pz=np.array(Pz)
 

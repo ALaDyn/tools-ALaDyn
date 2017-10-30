@@ -9,19 +9,21 @@
 
 ### loading shell commands
 import os, os.path, glob, sys, shutil
+import pyximport; pyximport.install()
 ###>>>
 home_path = os.path.expanduser('~')
 sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
 ###>>>
 ### --- ###
-from read_ALaDyn_bin import *
+# from read_ALaDyn_bin import *
+from read_ALaDyn_bin_pyx import *
 from utilities_1 import *
-from utility_density import *
-from utility_Efield import *
-from utility_Bfield import *
-from utility_ionization import *
-from utility_energy_density import *
-from utility_axes import *
+#from utility_density import *
+#from utility_Efield import *
+#from utility_Bfield import *
+#from utility_ionization import *
+#from utility_energy_density import *
+#from utility_axes import *
 
 
 ### --- ###
@@ -87,8 +89,8 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path_write,'data','jx',('jx_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose(),fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','jx',('jx_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),K.transpose(),fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','jx',('jx_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose()+K.transpose(),fmt='%15.14e')
-			
-			
+
+
 		if output_exists(path_read,'ionization',i) == True:
 			print 'ionization rate --- frame >>> ',i
 			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
@@ -152,4 +154,4 @@ if __name__ == '__main__':
 
 			#np.savetxt( os.path.join(path_write,'data','axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 			#np.savetxt( os.path.join(path_write,'data','axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
-			#np.savetxt( os.path.join(path_write,'data','axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
+			#np.savetxt( os.path.join(path_write,'data','axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.
