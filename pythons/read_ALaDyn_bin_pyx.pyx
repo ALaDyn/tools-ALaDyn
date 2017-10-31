@@ -127,6 +127,21 @@ def read_ALaDyn_bin(dir_path,file_name,grid_no_grid):
 # --- --- --- --- --- --- --- --- --- --- --- #
 def read_ALaDyn_bin_section(dir_path,file_name,grid_no_grid,axis_to_cut,cell_to_cut):
 
+	cdef int counter_z = 0
+	cdef int counter_y = 0
+	cdef int k = 0
+	cdef int j = 0
+	cdef int i = 0
+	cdef int nx= 0
+	cdef int ny= 0
+	cdef int nz= 0
+	cdef int nproc_y=0
+	cdef int nproc_z=0
+	cdef int npx =0
+	cdef int npy =0
+	cdef int npz =0
+	cdef float temp = 0.
+
 	# - #
 	path     = os.path.join(os.path.join(dir_path,file_name))
 	f        = open(path,'rb')
