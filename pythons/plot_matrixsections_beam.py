@@ -9,21 +9,20 @@
 
 ### loading shell commands
 import os, os.path, glob, sys, shutil
-import pyximport; pyximport.install()
 ###>>>
 home_path = os.path.expanduser('~')
 sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
+sys.path.append(os.path.join(os.getcwd()))
 ###>>>
 ### --- ###
-# from read_ALaDyn_bin import *
-from read_ALaDyn_bin_pyx import *
+from read_ALaDyn_bin import *
 from utilities_1 import *
-#from utility_density import *
-#from utility_Efield import *
-#from utility_Bfield import *
-#from utility_ionization import *
-#from utility_energy_density import *
-#from utility_axes import *
+from utility_density import *
+from utility_Efield import *
+from utility_Bfield import *
+from utility_ionization import *
+from utility_energy_density import *
+from utility_axes import *
 
 
 ### --- ###
@@ -32,10 +31,10 @@ from utilities_1 import *
 
 ### --- ### shell inputs
 if(len(sys.argv)<2):
-	print 'Input  [1]: frame_begin'
-	print 'Input  [2]: frame_end'
-	print 'Input  [3]: axis to cut'
-	print 'Input  [4]: slice position (cell number)'
+	print('Input  [1]: frame_begin')
+	print('Input  [2]: frame_end')
+	print('Input  [3]: axis to cut')
+	print('Input  [4]: slice position (cell number)')
 
 	exit(0)
 
@@ -64,13 +63,13 @@ if __name__ == '__main__':
 
 
 	for i in range(frame_begin, min(frame_end,last_output(os.getcwd())) + 1 ):
-		print '-------------------'
+		print('-------------------')
 		s='%2.2i'%i
 		path_read  = os.path.join(path,'%4.4i'%i)
 		path_write = path
 
 		if output_exists(path_read,'rho',i) == True:
-			print 'rho --- frame >>> ',i
+			print('rho --- frame >>> ',i)
 			M,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Bdenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Edenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
@@ -82,27 +81,27 @@ if __name__ == '__main__':
 			np.savetxt( os.path.join(path_write,'data','axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')
 
 		if output_exists(path_read,'jx',i) == True:
-			print 'jx --- frame >>> ',i
+			print('jx --- frame >>> ',i)
 			M,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Jxbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			K,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Jxfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
 			np.savetxt( os.path.join(path_write,'data','jx',('jx_bunch_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose(),fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','jx',('jx_bck_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),K.transpose(),fmt='%15.14e')
 			np.savetxt( os.path.join(path_write,'data','jx',('jx_tot_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),M.transpose()+K.transpose(),fmt='%15.14e')
-
-
+			
+			
 		if output_exists(path_read,'ionization',i) == True:
-			print 'ionization rate --- frame >>> ',i
+			print('ionization rate --- frame >>> ',i)
 			I,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'H1dnout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			np.savetxt( os.path.join(path_write,'data','ionization',('ionization_'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),I.transpose(),fmt='%15.14e')
 
 		if output_exists(path_read,'Energy_density',i) == True:
-            		print 'energy density --- frame >>> ',i
+            		print('energy density --- frame >>> ',i)
             		ED,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Elenout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
             		np.savetxt( os.path.join(path_write,'data','Energy_density',('Energy_Density'+axis_to_cut+'_'+('%2.2i'%i)+'.txt')),ED.transpose(),fmt='%15.14e')
 
 		if output_exists(path_read,'E',i) == True:
-			print 'E --- frame >>> ',i
+			print('E --- frame >>> ',i)
 			Exb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path_read,'Exbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Exf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Exfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
@@ -130,7 +129,7 @@ if __name__ == '__main__':
 
 
 		if output_exists(path_read,'B',i) == True:
-			print 'B --- frame >>> ',i
+			print('B --- frame >>> ',i)
 			#Bxb,ax1,ax2,ax3 = read_ALaDyn_bin_section(path,'Bxbout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 			Bxf,ax4,ax5,ax6 = read_ALaDyn_bin_section(path_read,'Bxfout'+s+'.bin','grid',axis_to_cut,cell_to_cut)
 
@@ -154,4 +153,4 @@ if __name__ == '__main__':
 
 			#np.savetxt( os.path.join(path_write,'data','axes',('x_'+('%2.2i'%i)+'.txt')),ax1,fmt='%15.14e')
 			#np.savetxt( os.path.join(path_write,'data','axes',('y_'+('%2.2i'%i)+'.txt')),ax2,fmt='%15.14e')
-			#np.savetxt( os.path.join(path_write,'data','axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.
+			#np.savetxt( os.path.join(path_write,'data','axes',('z_'+('%2.2i'%i)+'.txt')),ax3,fmt='%15.14e')

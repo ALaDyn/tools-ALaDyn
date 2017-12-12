@@ -8,10 +8,8 @@
 #####################################################################
 
 ### loading shell commands
-import os, os.path, glob, sys, shutil, time, datetime
+import os, os.path
 import numpy as np
-from pylab import *
-from matplotlib import colors, ticker, cm
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
@@ -47,8 +45,8 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
 	#- cut & sign
 	matrix = np.abs( matrix )
 	matrix2 = np.abs( matrix2 )
-	print 'rho-max >>', np.max([np.max(matrix),np.max(matrix2)])
-	print 'rho-min >>', np.min([np.min(matrix),np.min(matrix2)])
+	print('rho-max >>', np.max([np.max(matrix),np.max(matrix2)]))
+	print('rho-min >>', np.min([np.min(matrix),np.min(matrix2)]))
 # 	matrix[ (matrix<rho_min) ] = rho_min
 # 	matrix[ (matrix>rho_max) ] = rho_max
 # 	matrix2[ (matrix2<rho_min) ] = rho_min
@@ -240,7 +238,7 @@ def plot_density_sections(path,frame,rho_min,rho_max,isolines,celltocut,slicepos
     #----- Save density sections data -----#
 	if (savedata == 'True'):
 
-		print 'saving rho data'
+		print('saving rho data')
 
 		rho_b = matrix
 		rho_w = matrix2

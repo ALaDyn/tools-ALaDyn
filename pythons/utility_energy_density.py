@@ -8,10 +8,8 @@
 #####################################################################
 
 ### loading shell commands
-import os, os.path, glob, sys, shutil, time, datetime
+import os, os.path
 import numpy as np
-from pylab import *
-from matplotlib import colors, ticker, cm
 ###>>>
 # home_path = os.path.expanduser('~')
 # sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/ALaDyn_Pythons'))
@@ -45,8 +43,8 @@ def plot_energy_density_sections(path,frame,Energy_density_min,Energy_density_ma
 
 	#- cut & sign
 	matrix3 = np.abs( matrix3 )
-	print 'Energy_density_max >>', np.max([np.max(matrix3)])
-	print 'Energy_density_min  >>', np.min([np.min(matrix3)])
+	print('Energy_density_max >>', np.max([np.max(matrix3)]))
+	print('Energy_density_min  >>', np.min([np.min(matrix3)]))
 
 
 
@@ -123,7 +121,7 @@ def plot_energy_density_sections(path,frame,Energy_density_min,Energy_density_ma
     #----- Save density sections data -----#
 	if (savedata == 'True'):
 
-		print 'saving Energy_density data'
+		print('saving Energy_density data')
 
 		Energy_density = matrix3
 

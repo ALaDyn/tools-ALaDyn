@@ -1,4 +1,7 @@
 
+*/__pycache__/
+*.pyc
+
 #VS Code
 .vs/
 .vscode/
@@ -66,3 +69,5 @@ x64/
 bld/
 [Bb]in/
 [Oo]bj/
+
+

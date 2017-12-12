@@ -9,8 +9,7 @@
 
 ### ---------------------------------------------------- ###
 ### loading shell commands
-import os, os.path, glob, sys, shutil
-from matplotlib import colors, ticker, cm
+import os, os.path, sys
 ###>>>
 home_path = os.path.expanduser('~')
 sys.path.append(os.path.join(home_path,'Codes/ALaDyn_Code/tools-ALaDyn/pythons'))
@@ -33,7 +32,7 @@ def save_moving_window_coordinates(path,frame):
 	#--- axis coordinates of the moving window ---#
 
 
-	print 'saving moving window axes'
+	print('saving moving window axes')
 
 
 	np.savetxt( os.path.join(path,'data','axes',('x_'+('%2.2i'%frame)+'.dat')) ,x,fmt='%15.14e')
