@@ -1,6 +1,7 @@
-
+# Python package
 */__pycache__/
 *.pyc
+*.egg-info/
 
 #VS Code
 .vs/
