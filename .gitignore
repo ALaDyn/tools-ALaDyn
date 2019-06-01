@@ -2,6 +2,8 @@
 */__pycache__/
 *.pyc
 *.egg-info/
+read_field.c
+read_phase_space.c
 
 #VS Code
 .vs/

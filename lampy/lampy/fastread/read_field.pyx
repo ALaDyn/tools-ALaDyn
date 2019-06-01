@@ -1,7 +1,7 @@
 #!python
 #cython: language_level=3
 
-import os, sys
+import os
 import struct
 import numpy as np
 from cpython cimport array

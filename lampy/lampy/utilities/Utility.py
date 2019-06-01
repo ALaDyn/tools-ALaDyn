@@ -3,7 +3,7 @@ import sys
 from scipy.constants import pi
 from numpy import sqrt
 
-lampy_version = '0.1.dev0'
+lampy_version = '0.1.dev1'
 module_path = os.path.dirname(sys.modules[__name__].__file__)
 module_path = os.path.join(module_path, os.pardir)
 
@@ -142,19 +142,15 @@ def _translate_filename(fname):
     return(_translated_filenames[fname])
 
 
-def _grid_convert(timestep_dic, timestep, Directories, path, params, **kwargs):
-    from ..datas.Field import _Electromagnetic_fields
-    from ..fastread.parameter_read import _read_box_limits
-
+def _translate_timestep(timestep, timestep_dic):
     for key, value in timestep_dic.items():
         if timestep == value:
             folder = key
-    for elem in Directories._filelist([folder]):
-        for em_field in _Electromagnetic_fields:
-            if em_field in elem:
-                file_path = os.path.join(path, folder, elem)
-                break
-    box_limits = _read_box_limits(file_path)
+    return folder
+
+
+def _grid_convert(box_limits, params, **kwargs):
+
     grid_point = list()
     if 'x' in kwargs:
         x = kwargs['x']
