@@ -1,5 +1,6 @@
 from .fastread.parameter_read import _output_directories
 from .datas.Field import Field
+from .datas.Parts import Particles
 import matplotlib.pylab as plt
 import os
 
@@ -74,6 +75,8 @@ class Simulation(object):
         self._timesteps = self._collect_timesteps()
         self.outputs = self._collect_outputs()
         self.Field = Field(self)
+        self.Particles = Particles(self)
+        self._box_limits = self.Field._read_all_box_limits()
 
     def _open_folder(self, path):
 

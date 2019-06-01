@@ -12,10 +12,10 @@ extensions = [Extension(
 
 setup(
     name='lampy',
-    version='0.1.dev0',
+    version='0.1.dev1',
     description="Python suite to access, manipulate and plot ALaDyn's datas",
     packages=find_packages('.'),
-    author='Davide Terzani',
+    author='ALaDyn Collaboration',
     maintainer='Davide Terzani',
     maintainer_email='davide.terzani@ino.it',
     license='GNU GPLv3',
