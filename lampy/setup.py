@@ -10,6 +10,7 @@ extensions = [Extension(
           sources=["lampy/fastread/read_phase_space.pyx","lampy/fastread/clibs/lib_read_phase_space.c"])
 ]
 
+requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(
     name='lampy',
     version='0.1.dev1',
@@ -30,5 +31,6 @@ setup(
         'Intended Audience :: Science/Research',
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering :: Physics',
-        'Programming Language :: Python :: 3.7']
+        'Programming Language :: Python :: 3.7'],
+    install_requires=[requirements]
 )
