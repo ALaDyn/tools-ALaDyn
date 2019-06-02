@@ -78,6 +78,54 @@ class Simulation(object):
         self.Particles = Particles(self)
         self._box_limits = self.Field._read_all_box_limits()
 
+    def _collect_outputs(self, *args):
+
+        from .utilities.Utility import _translated_filenames
+
+        if len(args) > 0:
+            directory = args[0]
+        else:
+            directory = self.directories[-1]
+
+        output_list = list()
+
+        for elem in self._Directories._filelist([directory]):
+            for key, value in _translated_filenames.items():
+                if value in elem:
+                    output_list += [key]
+                    break
+
+        return output_list
+
+    def _collect_timesteps(self):
+
+        from .utilities.Utility import _total_filenamelist
+        from .fastread.parameter_read import _read_file_timestep
+
+        _timesteps = dict()
+        for directory in self.directories:
+            for filename in _total_filenamelist:
+                for elem in self._Directories._filelist([directory]):
+                    if filename in elem:
+                        break
+                file_timestep_path = os.path.join(self.path, directory, elem)
+                _timesteps[directory] = _read_file_timestep(file_timestep_path)
+                break
+        return _timesteps
+
+    def _derive_file_path(self, field_name, timestep):
+
+        from .utilities.Utility import _translate_filename
+
+        filename = _translate_filename(field_name)
+        for key, value in self._timesteps.items():
+            if timestep == value:
+                folder = key
+        filename = filename+folder[-2:]
+        file_path = os.path.join(self.path, folder, filename)
+
+        return file_path
+
     def _open_folder(self, path):
 
         from .utilities.Utility import _read_simulation,\
@@ -118,41 +166,6 @@ class Simulation(object):
             print(files)
             print('')
 
-    def _collect_timesteps(self):
-
-        from .utilities.Utility import _total_filenamelist
-        from .fastread.parameter_read import _read_file_timestep
-
-        _timesteps = dict()
-        for directory in self.directories:
-            for filename in _total_filenamelist:
-                for elem in self._Directories._filelist([directory]):
-                    if filename in elem:
-                        break
-                file_timestep_path = os.path.join(self.path, directory, elem)
-                _timesteps[directory] = _read_file_timestep(file_timestep_path)
-                break
-        return _timesteps
-
-    def _collect_outputs(self, *args):
-
-        from .utilities.Utility import _translated_filenames
-
-        if len(args) > 0:
-            directory = args[0]
-        else:
-            directory = self.directories[-1]
-
-        output_list = list()
-
-        for elem in self._Directories._filelist([directory]):
-            for key, value in _translated_filenames.items():
-                if value in elem:
-                    output_list += [key]
-                    break
-
-        return output_list
-
     def show_times(self):
         """
         Method to show the output times (in microns)
@@ -161,19 +174,6 @@ class Simulation(object):
         for key, value in self._timesteps.items():
             print('Directory '+str(key)+' contains output at time '+str(value))
 
-    def _derive_file_path(self, field_name, timestep):
-
-        from .utilities.Utility import _translate_filename
-
-        filename = _translate_filename(field_name)
-        for key, value in self._timesteps.items():
-            if timestep == value:
-                folder = key
-        filename = filename+folder[-2:]
-        file_path = os.path.join(self.path, folder, filename)
-
-        return file_path
-
 
 class Directories(object):
 
@@ -181,9 +181,6 @@ class Directories(object):
 
         self._path = Simulation.path
         self._listdir = _output_directories(self._path)
-
-    def _show(self):
-        return self._listdir
 
     def _filelist(self, *args):
         if len(args) > 0:
@@ -199,3 +196,6 @@ class Directories(object):
             self._listfile += templist
 
         return self._listfile
+
+    def _show(self):
+        return self._listdir

@@ -51,24 +51,6 @@ class Field(object):
             self._stored_fields[(field_name, timestep)] =\
                 self._stored_fields[(field_name, timestep)][:, :, 0]
 
-    def _search_field_by_timestep(self, timestep):
-
-        field_list = list()
-        for key in self._stored_fields.keys():
-            if timestep in key and key[0] not in field_list:
-                field_list += [key[0]]
-
-        return field_list
-
-    def _search_field_by_field(self, field_name):
-
-        time_list = list()
-        for key in self._stored_fields.keys():
-            if field_name in key and key[1] not in time_list:
-                time_list += [key[1]]
-
-        return time_list
-
     def _read_all_box_limits(self):
 
         box_limits = dict()
@@ -99,6 +81,24 @@ class Field(object):
 
         else:
             self._field_read(field_name, timestep)
+
+    def _search_field_by_field(self, field_name):
+
+        time_list = list()
+        for key in self._stored_fields.keys():
+            if field_name in key and key[1] not in time_list:
+                time_list += [key[1]]
+
+        return time_list
+
+    def _search_field_by_timestep(self, timestep):
+
+        field_list = list()
+        for key in self._stored_fields.keys():
+            if timestep in key and key[0] not in field_list:
+                field_list += [key[0]]
+
+        return field_list
 
     def map_2d(self, field, timestep,
                plane='xy', normalized=False, comoving=False, **kwargs):

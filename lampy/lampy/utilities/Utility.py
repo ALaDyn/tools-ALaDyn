@@ -54,6 +54,75 @@ _total_filenamelist += ['H'+str(n)+'dnout' for n in range(1, 6)]
 _total_filenamelist += ['H'+str(n)+'enout' for n in range(1, 6)]
 
 
+def _compute_physical_parameters(dictionary):
+    """
+    Utility that computes the relevant physical parameters
+    starting from the input file.
+    """
+    speed_of_light = 0.3
+    r_e = 2.81794033
+
+    if dictionary['ny'] < 2 and dictionary['nz'] < 2:
+        dictionary['n_dimensions'] = 1
+    elif dictionary['ny'] > 1 and dictionary['nz'] < 2:
+        dictionary['n_dimensions'] = 2
+    else:
+        dictionary['n_dimensions'] = 3
+
+    if 'lam0' in dictionary.keys():
+        dictionary['omega_0'] = 2*pi/dictionary['lam0']
+    if 'lam1' in dictionary.keys():
+        dictionary['omega_1'] = 2*pi/dictionary['lam1']
+    if 'n_over_nc' in dictionary.keys():
+        dictionary['omega_p'] =\
+            dictionary['omega_0']*sqrt(dictionary['n_over_nc'])
+        if 'lam0' in dictionary.keys():
+            dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
+            dictionary['n0'] = dictionary['n_crit']*dictionary['n_over_nc']
+            dictionary['n0'] = dictionary['n0']*1.E3*1.E18
+            dictionary['n_crit'] = dictionary['n_crit']*1.E21
+
+
+def _compute_simulation_parameters(dictionary):
+    """
+    Utility that computes the relevant physical parameters
+    starting from the input file.
+    """
+    dictionary['dx'] = 1./dictionary['k0']
+    if dictionary['n_dimensions'] == 1:
+        return
+    if 'yx_rat' in dictionary.keys():
+        dictionary['dy'] = dictionary['yx_rat']*dictionary['dx']
+    else:
+        dictionary['dy'] = dictionary['dx']
+
+    if dictionary['n_dimensions'] == 2:
+        return
+    if 'zx_rat' in dictionary.keys():
+        dictionary['dz'] = dictionary['zx_rat']*dictionary['dx']
+    else:
+        dictionary['dz'] = dictionary['dy']
+
+
+def _grid_convert(box_limits, params, **kwargs):
+
+    grid_point = list()
+    if 'x' in kwargs:
+        x = kwargs['x']
+        dx = params['dx']
+        grid_point += [int((x-box_limits['x_min'])/(dx*params['jump']))]
+    if 'y' in kwargs:
+        y = kwargs['y']
+        dy = params['dy']
+        grid_point += [int((y-box_limits['y_min'])/(dy*params['jump']))]
+    if params['n_dimensions'] == 3:
+        if 'z' in kwargs:
+            z = kwargs['z']
+            dz = params['dz']
+            grid_point += [int((z-box_limits['z_min'])/(dz*params['jump']))]
+    return grid_point
+
+
 def _read_simulation(path):
     """
     Utility that reads the 'input.nml' file
@@ -89,50 +158,6 @@ def _read_simulation(path):
     return param_dic
 
 
-def _compute_physical_parameters(dictionary):
-    """
-    Utility that computes the relevant physical parameters
-    starting from the input file.
-    """
-    speed_of_light = 0.3
-
-    if dictionary['ny'] < 2 and dictionary['nz'] < 2:
-        dictionary['n_dimensions'] = 1
-    elif dictionary['ny'] > 1 and dictionary['nz'] < 2:
-        dictionary['n_dimensions'] = 2
-    else:
-        dictionary['n_dimensions'] = 3
-
-    if 'lam0' in dictionary.keys():
-        dictionary['omega_0'] = 2*pi/dictionary['lam0']
-    if 'lam1' in dictionary.keys():
-        dictionary['omega_1'] = 2*pi/dictionary['lam1']
-    if 'n_over_nc' in dictionary.keys():
-        dictionary['omega_p'] =\
-            dictionary['omega_0']*sqrt(dictionary['n_over_nc'])
-
-
-def _compute_simulation_parameters(dictionary):
-    """
-    Utility that computes the relevant physical parameters
-    starting from the input file.
-    """
-    dictionary['dx'] = 1./dictionary['k0']
-    if dictionary['n_dimensions'] == 1:
-        return
-    if 'yx_rat' in dictionary.keys():
-        dictionary['dy'] = dictionary['yx_rat']*dictionary['dx']
-    else:
-        dictionary['dy'] = dictionary['dx']
-
-    if dictionary['n_dimensions'] == 2:
-        return
-    if 'zx_rat' in dictionary.keys():
-        dictionary['dz'] = dictionary['zx_rat']*dictionary['dx']
-    else:
-        dictionary['dz'] = dictionary['dy']
-
-
 def _translate_filename(fname):
     """
     Utility that connects the fields and particles informations with the
@@ -147,22 +172,3 @@ def _translate_timestep(timestep, timestep_dic):
         if timestep == value:
             folder = key
     return folder
-
-
-def _grid_convert(box_limits, params, **kwargs):
-
-    grid_point = list()
-    if 'x' in kwargs:
-        x = kwargs['x']
-        dx = params['dx']
-        grid_point += [int((x-box_limits['x_min'])/(dx*params['jump']))]
-    if 'y' in kwargs:
-        y = kwargs['y']
-        dy = params['dy']
-        grid_point += [int((y-box_limits['y_min'])/(dy*params['jump']))]
-    if params['n_dimensions'] == 3:
-        if 'z' in kwargs:
-            z = kwargs['z']
-            dz = params['dz']
-            grid_point += [int((z-box_limits['z_min'])/(dz*params['jump']))]
-    return grid_point
