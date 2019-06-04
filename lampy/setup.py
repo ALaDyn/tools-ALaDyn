@@ -13,7 +13,7 @@ extensions = [Extension(
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(
     name='lampy',
-    version='0.1.dev1',
+    version='0.1.dev2',
     description="Python suite to access, manipulate and plot ALaDyn's datas",
     packages=find_packages('.'),
     author='ALaDyn Collaboration',
