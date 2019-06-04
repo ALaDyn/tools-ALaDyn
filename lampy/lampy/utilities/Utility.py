@@ -2,6 +2,7 @@ import os
 import sys
 from scipy.constants import pi
 from numpy import sqrt
+import numpy as np
 
 lampy_version = '0.1.dev1'
 module_path = os.path.dirname(sys.modules[__name__].__file__)
@@ -107,19 +108,33 @@ def _compute_simulation_parameters(dictionary):
 def _grid_convert(box_limits, params, **kwargs):
 
     grid_point = list()
+    if params['str_flag'] == 0:
+        stretched = False
+    elif (params['str_flag'] == 1) or (params['str_flag'] == 2):
+        stretched = True
     if 'x' in kwargs:
         x = kwargs['x']
         dx = params['dx']
+        comp = 'x'
         grid_point += [int((x-box_limits['x_min'])/(dx*params['jump']))]
     if 'y' in kwargs:
         y = kwargs['y']
-        dy = params['dy']
-        grid_point += [int((y-box_limits['y_min'])/(dy*params['jump']))]
+        if not stretched:
+            dy = params['dy']
+            grid_point += [int((y-box_limits['y_min'])/(dy*params['jump']))]
+        else:
+            comp = 'y'
+            grid_point += [int(_transverse_stretch(y, params, comp))]
     if params['n_dimensions'] == 3:
         if 'z' in kwargs:
             z = kwargs['z']
-            dz = params['dz']
-            grid_point += [int((z-box_limits['z_min'])/(dz*params['jump']))]
+            if not stretched:
+                dz = params['dz']
+                grid_point += [int((z-box_limits['z_min']) /
+                               (dz*params['jump']))]
+            else:
+                comp = 'z'
+                grid_point += [int(_transverse_stretch(z, params, comp))]
     return grid_point
 
 
@@ -172,3 +187,78 @@ def _translate_timestep(timestep, timestep_dic):
         if timestep == value:
             folder = key
     return folder
+
+
+def _transverse_stretch(x, params, comp):
+
+    nl = params['n'+comp]
+    dl = params['d'+comp]
+
+    if params['str_flag'] == 1:
+        ns = nl/6
+    elif params['str_flag'] == 2:
+        ns = nl/4
+
+    return _inverse_stretch_function(x, nl, ns, dl)
+
+
+def _stretch_function(x, nx, ns, dx):
+
+    max_angle = 2*pi/5  # Arbitrary choice, can be changed
+    const = -nx*dx/2    # Assumes that grid is centered around zero
+    if type(x) is np.ndarray:
+        x = x.astype(float)
+    elif type(x) is int:
+        x = float(x)
+
+    def f(x):
+
+        stretch = -dx*ns/max_angle*np.tan(-max_angle*(x-ns)/ns)+ns*dx+const
+        return stretch
+
+    def g(x):
+
+        stretch = dx*x+const
+        return stretch
+
+    symm_center = g(nx/2)
+    str_func =\
+        np.piecewise(x, [x < ns, (x >= ns) & (x <= nx-ns)],
+                     [lambda x: f(x), lambda x: g(x),
+                      lambda x: 2*symm_center-f(nx-x)])
+
+    return str_func
+
+
+def _inverse_stretch_function(x, nx, ns, dx):
+
+    max_angle = 2*pi/5  # Arbitrary choice, can be changed
+    const = -nx*dx/2    # Assumes that grid is centered around zero
+    xs = ns*dx
+    xM = nx*dx
+
+    def f(x):
+
+        stretch = ns/max_angle*np.arctan(max_angle*((x-const-xs)/xs))+ns
+        if type(stretch) is np.ndarray:
+            stretch.astype(int)
+        elif type(stretch) is float:
+            stretch = int(stretch)
+        return stretch
+
+    def g(x):
+
+        stretch = (x-const)/dx
+        if type(stretch) is np.ndarray:
+            stretch.astype(int)
+        elif type(stretch) is float:
+            stretch = int(stretch)
+        return stretch
+
+    symm_center = g(nx/2)
+    inv_str_func =\
+        np.piecewise(x, [x < xs, (x >= xs) & (x <= xM-xs)],
+                     [lambda x: f(x), lambda x: g(x),
+                      lambda x: nx-f(2*symm_center-x)])
+
+    return inv_str_func

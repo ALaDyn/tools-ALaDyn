@@ -252,13 +252,6 @@ class Particles(object):
                   """.format(x_ave, y_ave, sigma_x, sigma_y, px_ave, py_ave,
                              sigma_px, sigma_py))
 
-    def get_data(self, phase_space_name, timestep):
-
-        ps = dict()
-        temp = self._return_phase_space(phase_space_name, timestep)
-        ps['data'] = temp
-        ps['time'] = timestep
-
 
 def _select_particles(ps, params, **kwargs):
 
