@@ -114,7 +114,7 @@ class Field(object):
         field : str or numpy array type
             If a string is given, it is the name of the plotted field.
             To know the available field in the simulation,
-            check the s.outputs variable.
+            check the s.show_outputs() variable.
         timestep : float
             Variable that defines the instant at which
             the field should be plotted.
@@ -272,7 +272,7 @@ class Field(object):
         field : str or numpy array type
             If a string is given, it is the name of the plotted field.
             To know the available field in the simulation,
-            check the s.outputs variable.
+            check the s.show_outputs() variable.
         timestep : float
             Variable that defines the instant at which
             the field should be plotted.
@@ -451,26 +451,58 @@ class Field(object):
         """
         self.comoving = False
 
-    def get_data(self, field_name, timestep):
+    def get_data(self, field_name, time):
+        """
+        Method that retrieves any field data and returns the 2D or 3D array.
 
+        Parameters
+        --------
+        field_name : str
+            Name of the array that is to be collected
+        time : float
+            Instant at which array is retrieved
+
+        Results
+        --------
+        field : dict
+            Data are returned as a dictionary.
+            field['data'] is the array containing the data
+            field['time'] is the corresponding time 
+        """
         f = dict()
-        self._return_field(field_name, timestep)
-        f['data'] = self._stored_fields[(field_name, timestep)]
-        f['time'] = timestep
+        self._return_field(field_name, time)
+        f['data'] = self._stored_fields[(field_name, time)]
+        f['time'] = time
 
         return f
 
-    def get_axis(self, axis, timestep):
+    def get_axis(self, axis, time):
+        """
+        Method that retrieves any axis data and returns it as a 1D array.
 
-        field_list = self._search_field_by_timestep(timestep)
+        Parameters
+        --------
+        axis : str
+            Name of the axis that is to be collected
+        time : float
+            Instant at which array is retrieved
+
+        Results
+        --------
+        axis : dict
+            Data are returned as a dictionary.
+            axis['data'] is the array containing the data
+            axis['time'] is the corresponding time 
+        """
+        field_list = self._search_field_by_timestep(time)
         ax = dict()
         if not field_list:
             print("""No axis have been read yet at timestep {}.
             Call first
             >>> f = s.Field.get_data(any_available_field_name,{})
-            to load the axis data""".format(timestep, timestep))
+            to load the axis data""".format(time, time))
             return
-        ax['data'] = self._stored_axis[(axis, timestep)]
-        ax['time'] = timestep
+        ax['data'] = self._stored_axis[(axis, time)]
+        ax['time'] = time
 
         return ax

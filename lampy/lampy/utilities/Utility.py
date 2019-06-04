@@ -190,7 +190,10 @@ def _translate_timestep(timestep, timestep_dic):
 
 
 def _transverse_stretch(x, params, comp):
-
+    """
+    Function that wraps the inverse stretch functions.
+    It takes as argument a coordinate and computes the grid index.
+    """
     nl = params['n'+comp]
     dl = params['d'+comp]
 
@@ -203,7 +206,12 @@ def _transverse_stretch(x, params, comp):
 
 
 def _stretch_function(x, nx, ns, dx):
-
+    """
+    Stretch function.
+            / 5 dx ns/2 pi tan(2 pi/5 (n-ns)/ns)+ ns dx + C
+    f(x)=  <  dx n +C
+            \ 
+    """
     max_angle = 2*pi/5  # Arbitrary choice, can be changed
     const = -nx*dx/2    # Assumes that grid is centered around zero
     if type(x) is np.ndarray:
@@ -213,7 +221,7 @@ def _stretch_function(x, nx, ns, dx):
 
     def f(x):
 
-        stretch = -dx*ns/max_angle*np.tan(-max_angle*(x-ns)/ns)+ns*dx+const
+        stretch = dx*ns/max_angle*np.tan(max_angle*(x-ns)/ns)+ns*dx+const
         return stretch
 
     def g(x):
@@ -231,7 +239,9 @@ def _stretch_function(x, nx, ns, dx):
 
 
 def _inverse_stretch_function(x, nx, ns, dx):
-
+    """
+    Inverse of the stretch function.
+    """
     max_angle = 2*pi/5  # Arbitrary choice, can be changed
     const = -nx*dx/2    # Assumes that grid is centered around zero
     xs = ns*dx

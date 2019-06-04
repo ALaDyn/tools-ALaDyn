@@ -11,7 +11,30 @@ e = 1.6E-7
 class Particles(object):
 
     def __init__(self, Simulation):
+        """
+        Class that contains all the methods and datas related to the
+        particles phase space.
 
+        With the available methods it is possible to access, manipulate and
+        plot all the produced phase spaces.
+
+        Any phase space ps is a dictionary of 8 (3D) or 6 (2D) components.
+        ps['x'] particles coordinates on the x axis
+        ps['y'] particles coordinates on the y axis
+        ps['z'] particles coordinates on the z axis (only if 3D simulation)
+        ps['px'] particles momenta along the x direction
+        ps['py'] particles momenta along the y direction
+        ps['pz'] particles momenta along the z direction (only in 3D)
+        ps['weight'] particles computational weights
+        ps['gamma'] particles Lorentz factor.
+
+        Possible phase spaces are, if outputted:
+        - phase_space: phase space of all the electrons
+        - phase_space_ionization: phase space of all the particles produced
+          via the ionization process
+        - phase_space_high_energy: phase space of all the particles with
+          gamma > gamma_min.
+        """
         self._Simulation = Simulation
         self._params = Simulation.params
         self._directories = Simulation.directories
@@ -78,9 +101,40 @@ class Particles(object):
 
         self._stored_phase_space[(phase_space_name, timestep)] = phase_space
 
-    def scatter(self, phase_space, timestep=None, component1='x',
+    def scatter(self, phase_space, time=None, component1='x',
                 component2='y', comoving=False, **kwargs):
+        """
+        Method that produces a scatter plot of the given phase space.
 
+        It takes as input the phase space type (e.g. all electrons, energetic
+        electrons, etc.) and the time of interest.
+
+        Parameters
+        --------
+        phase_space : str or dict
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float, optional (default None)
+            Time at the phase space is plotted. It is necessary if the phase
+            space name is passed, it is optional if the phase space dictionary
+            is passed. However, it may be necessary if the longitudinal 
+            axis is set on 'comoving'.
+        component1 : str
+             First component of the scatter plot. Default is taken as 'x'.
+        component2 : str
+             Second component of the scatter plot. Default is taken as 'y'
+        comoving : bool
+            If True, the longitudinal axis is transformed as xi=x-v_w t.
+            Remember that, to obtain the comoving axis, the time is needed
+            even when the phase space dictionary is passed.
+
+        Kwargs
+        --------
+        All the kwargs for the pyplot.scatter function.
+        """
         accepted_types = [str, dict]
 
         if type(phase_space) not in accepted_types:
@@ -91,33 +145,53 @@ class Particles(object):
             return
 
         if type(phase_space) is str:
-            if timestep is None:
+            if time is None:
                 print("""
         Time not known, impossible to plot datas.
         Please specify a time variable.
                       """)
                 return
             file_path = self._Simulation._derive_file_path(phase_space,
-                                                           timestep)
+                                                           time)
             file_path = file_path+'.bin'
 
         if type(phase_space) is str:
-            self._return_phase_space(phase_space, timestep)
-            ps = self._stored_phase_space[(phase_space, timestep)]
+            self._return_phase_space(phase_space, time)
+            ps = self._stored_phase_space[(phase_space, time)]
         elif type(phase_space) is dict:
             ps = phase_space
 
         if comoving:
-            if timestep is None:
+            if time is None:
                 print("Time not known, impossible to shift datas.")
             else:
                 v = self._params['w_speed']
-                ps['x'] = ps['x']-v*timestep
+                ps['x'] = ps['x']-v*time
 
         plt.scatter(ps[component1], ps[component2], s=1, **kwargs)
 
     def get_data(self, phase_space_name, timestep):
+        """
+        Method that retrieves any phase space data
+        and returns it as a dictionary.
 
+        Parameters
+        --------
+        phase_space_name : str
+            Name of the phase space that is to be collected
+        time : float
+            Instant at which dictionary is retrieved
+
+        Results
+        --------
+        phase space : dict
+            Data are returned as a dictionary.
+            phase space ['data'] is the dictionary containing the data
+            phase space['time'] is the corresponding time .
+
+            phase space ['data'] is again a dictionary, with possible keys:
+            'x', 'y', 'z', 'px', 'py', 'pz', 'weight', 'gamma'
+        """
         ps = dict()
         self._return_phase_space(phase_space_name, timestep)
         ps['data'] = self._stored_fields[(phase_space_name, timestep)]
@@ -125,8 +199,32 @@ class Particles(object):
 
         return ps
 
-    def bunch_analysis(self, phase_space, timestep, **kwargs):
+    def bunch_analysis(self, phase_space, time, **kwargs):
+        """
+        Method that analyzed the given phase space, computing all it's
+        statistical properties.
 
+        Parameters
+        --------
+        phase_space : str or dict
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float
+            Time at which the phase space is analyzed.
+        
+        Kwargs
+        --------
+        List of possible kwargs:
+            
+            'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
+            'z_min', 'z_max', 'weight_min', 'weight_max'
+
+            It is possible to select parts of phase space to analyze via
+            the input kwargs.   
+        """
         n_dimensions = self._params['n_dimensions']
         dx = self._params['dx']
         dy = self._params['dy']
@@ -151,12 +249,12 @@ class Particles(object):
 
         if type(phase_space) is str:
             file_path = self._Simulation._derive_file_path(phase_space,
-                                                           timestep)
+                                                           time)
             file_path = file_path+'.bin'
 
         if type(phase_space) is str:
-            self._return_phase_space(phase_space, timestep)
-            ps = self._stored_phase_space[(phase_space, timestep)]
+            self._return_phase_space(phase_space, time)
+            ps = self._stored_phase_space[(phase_space, time)]
         elif type(phase_space) is dict:
             ps = phase_space
 
@@ -170,7 +268,7 @@ class Particles(object):
                 break
 
         if(not all_particles):
-            ps = _select_particles(ps, self._params, **kwargs)
+            ps = select_particles(ps, self._params, **kwargs)
 
         n_parts = len(ps['x'])
 
@@ -253,8 +351,28 @@ class Particles(object):
                              sigma_px, sigma_py))
 
 
-def _select_particles(ps, params, **kwargs):
+def select_particles(ps, params, **kwargs):
+    """
+    Function that takes in input a phase space dictionary, and the array of
+    parameters and selects particles according to the given conditions.
 
+    Parameters
+    --------
+    ps : dictionary
+        Phase space dictionary with the particles that have to be selected.
+    params : dictionary
+        Dictionary with all the simulation parameters.
+    
+    Kwargs
+    --------
+    List of possible kwargs:
+            
+            'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
+            'z_min', 'z_max', 'weight_min', 'weight_max'
+
+            It is possible to select parts of phase space to analyze via
+            the input kwargs.
+    """
     n_dimensions = params['n_dimensions']
 
     possible_kwargs = ['gamma_min', 'gamma_max', 'x_min', 'x_max',
