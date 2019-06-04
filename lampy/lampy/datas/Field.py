@@ -1,7 +1,7 @@
 from ..compiled_cython.read_field import read_ALaDyn_bin
 from ..utilities.Utility import _grid_convert, _translate_timestep
 from ..fastread.parameter_read import _read_box_limits
-import matplotlib.pylab as plt
+import matplotlib.pyplot as plt
 import os
 import numpy as np
 
@@ -203,8 +203,8 @@ class Field(object):
             print(error)
 
         if self._params['n_dimensions'] == 3:
-            plane = _grid_convert(box_limits, self._params, x=x_plane,
-                                  y=y_plane, z=z_plane)
+            map_plane = _grid_convert(box_limits, self._params, x=x_plane,
+                                      y=y_plane, z=z_plane)
 
         if type(field) is str:
             self._return_field(field, timestep)
@@ -238,7 +238,7 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
-                nz_map = plane[2]
+                nz_map = map_plane[2]
                 plt.imshow(f[..., nz_map].transpose(), origin='low',
                            extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
 
@@ -247,14 +247,14 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
-                ny_map = plane[1]
+                ny_map = map_plane[1]
                 plt.imshow(f[:, ny_map, :].transpose(), origin='low',
                            extent=(x[0], x[-1], z[0], z[-1]), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
-                nx_map = plane[0]
+                nx_map = map_plane[0]
                 plt.imshow(f[nx_map, ...].transpose(), origin='low',
                            extent=(y[0], y[-1], z[0], z[-1]), **kwargs)
 
@@ -373,7 +373,8 @@ class Field(object):
                     E0 = norm
                 f = f/E0
 
-        line = _grid_convert(box_limits, self._params, x=x_line, y=y_line)
+        line = _grid_convert(box_limits, self._params, x=x_line, y=y_line,
+                             z=z_line)
         if axis == 'z' and self._params['n_dimensions'] == 2:
             print("""WARNING: No lineout along the z axis is possible
                      in 2 dimensions.
@@ -402,8 +403,8 @@ class Field(object):
                 plt.plot(y, f[nx_lineout, :, nz_lineout], **kwargs)
         elif axis == 'z':
             z = self._stored_axis[('z', timestep)]
+            nx_lineout = line[0]
             ny_lineout = line[1]
-            nz_lineout = line[2]
             plt.plot(z, f[nx_lineout, ny_lineout, :], **kwargs)
 
     def normalize(self, **kwargs):
