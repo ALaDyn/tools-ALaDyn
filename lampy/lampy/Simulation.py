@@ -1,7 +1,7 @@
 from .fastread.parameter_read import _output_directories
 from .datas.Field import Field
 from .datas.Parts import Particles
-import matplotlib.pylab as plt
+import matplotlib.pyplot as plt
 import os
 
 
@@ -110,6 +110,7 @@ class Simulation(object):
                         break
                 file_timestep_path = os.path.join(self.path, directory, elem)
                 _timesteps[directory] = _read_file_timestep(file_timestep_path)
+                _timesteps[directory] = round(_timesteps[directory], 2)
                 break
         return _timesteps
 
@@ -173,6 +174,13 @@ class Simulation(object):
         """
         for key, value in self._timesteps.items():
             print('Directory '+str(key)+' contains output at time '+str(value))
+
+    def show_outputs(self):
+        """
+        Method that returns a list of the available
+        outputs.
+        """
+        print(self.outputs)
 
 
 class Directories(object):
