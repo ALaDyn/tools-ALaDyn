@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+#include "lib_read_binary.h"
 
 
 void read_binary(float *field, float *x, float*y, float *z, char *file_pointer){ 

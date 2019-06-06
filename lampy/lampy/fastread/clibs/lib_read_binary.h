@@ -1,0 +1,1 @@
+void read_binary(float *, float *, float *, float *, char *);

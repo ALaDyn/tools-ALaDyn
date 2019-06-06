@@ -1,24 +1,30 @@
 #!python
 #cython: language_level=3
+#setuptools: sources = clibs/lib_read_binary.c
 
-import os
+cdef extern from "clibs/lib_read_binary.c":
+    pass
+cdef extern from 'clibs/lib_read_binary.h':
+    void read_binary(float* field, float* x, float* y, float* z, char* file_name)
+
+from cython.view cimport array as cvarray
 import struct
 import numpy as np
-from cpython cimport array
-from ctypes import *
-from ..utilities.Utility import module_path
+cimport numpy as np
 
 def read_ALaDyn_bin(file_path,params):
     
     # - #
+    cdef int nx
+    cdef int ny
+    cdef int nz
     
-    path     = file_path+'.bin'
-    f        = open(str(path), 'rb')
-    path     = c_char_p(path.encode('utf-8'))
-    cpath = module_path
-    cpath = os.path.join(cpath, 'fastread', 'clibs')
-    read_bin = CDLL(os.path.join(cpath, 'lib_read_binary.so'))
+    path = file_path+'.bin'
+    f = open(path, 'rb')
+    uni_path = path.encode('UTF-8')
+    cdef char* c_path = uni_path
 
+    # Here it reads the header via a standard struct unpack procedure
     struct.unpack('i', f.read(4))
     N_param = struct.unpack('i', f.read(4))[0]
 
@@ -38,21 +44,26 @@ def read_ALaDyn_bin(file_path,params):
     nx = params['nx']
     ny = params['ny']
     nz = params['nz']
-    #---***---#
+    # End of the header read
+
     totlen = nx*ny*nz
-    fieldarr = (c_float*totlen)    
-    gridx = (c_float*nx)
-    gridy = (c_float*ny)
-    gridz = (c_float*nz)
-    r = fieldarr()    
-    x = gridx()
-    y = gridy()
-    z = gridz()
+    f = cvarray(shape=(totlen,), itemsize=sizeof(float), format="f")  
+    x = cvarray(shape=(nx,), itemsize=sizeof(float), format="f")    
+    y = cvarray(shape=(ny,), itemsize=sizeof(float), format="f")   
+    z = cvarray(shape=(nz,), itemsize=sizeof(float), format="f") 
 
-    read_bin.read_binary(byref(r), byref(x), byref(y), byref(z), path)
-    r = np.ndarray(buffer=r, dtype=np.float32, shape=(nx,ny,nz), order='F')
-    x = np.ndarray(buffer=x, dtype=np.float32, shape=(nx))
-    y = np.ndarray(buffer=y, dtype=np.float32, shape=(ny))
-    z = np.ndarray(buffer=z, dtype=np.float32, shape=(nz))
+    read_file(f, x, y, z, c_path)
 
-    return (r, x, y, z)
+    f=np.reshape(f ,(nx,ny,nz), order='F')    
+    return (f, x, y, z)
+
+def read_file(f, x, y, z, f_path):
+
+    cdef float [::1] f_view = f
+    cdef float [::1] x_view = x
+    cdef float [::1] y_view = y
+    cdef float [::1] z_view = z
+
+    read_binary(&f_view[0], &x_view[0], &y_view[0], &z_view[0], f_path)
+
+    return (f, x, y, z)
