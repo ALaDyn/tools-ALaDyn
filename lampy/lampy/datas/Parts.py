@@ -120,7 +120,7 @@ class Particles(object):
         time : float, optional (default None)
             Time at the phase space is plotted. It is necessary if the phase
             space name is passed, it is optional if the phase space dictionary
-            is passed. However, it may be necessary if the longitudinal 
+            is passed. However, it may be necessary if the longitudinal
             axis is set on 'comoving'.
         component1 : str
              First component of the scatter plot. Default is taken as 'x'.
@@ -214,16 +214,16 @@ class Particles(object):
             check the s.show_outputs() variable.
         time : float
             Time at which the phase space is analyzed.
-        
+
         Kwargs
         --------
         List of possible kwargs:
-            
+
             'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
             'z_min', 'z_max', 'weight_min', 'weight_max'
 
             It is possible to select parts of phase space to analyze via
-            the input kwargs.   
+            the input kwargs.
         """
         n_dimensions = self._params['n_dimensions']
         dx = self._params['dx']
@@ -362,11 +362,11 @@ def select_particles(ps, params, **kwargs):
         Phase space dictionary with the particles that have to be selected.
     params : dictionary
         Dictionary with all the simulation parameters.
-    
+
     Kwargs
     --------
     List of possible kwargs:
-            
+
             'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
             'z_min', 'z_max', 'weight_min', 'weight_max'
 

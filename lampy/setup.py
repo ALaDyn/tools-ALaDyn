@@ -3,6 +3,9 @@ from setuptools.extension import Extension
 from Cython.Build import cythonize
 import numpy
 
+with open('./README.md') as f:
+    long_description = f.read()
+
 extensions = [Extension(
           name="read_field",
           sources=["lampy/fastread/read_field.pyx"]),
@@ -21,6 +24,8 @@ setup(
     name='lampy',
     version='0.1.dev2',
     description="Python suite to access, manipulate and plot ALaDyn's datas",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages('.'),
     author='ALaDyn Collaboration',
     maintainer='Davide Terzani',

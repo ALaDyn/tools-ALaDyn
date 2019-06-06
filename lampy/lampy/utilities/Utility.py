@@ -208,9 +208,17 @@ def _transverse_stretch(x, params, comp):
 def _stretch_function(x, nx, ns, dx):
     """
     Stretch function.
-            / 5 dx ns/2 pi tan(2 pi/5 (n-ns)/ns)+ ns dx + C
-    f(x)=  <  dx n +C
-            \ 
+
+        / (5 dx ns)/(2 pi) tan(2 pi/5 (n-ns)/ns) + ns dx + C,   if 0 < n < ns
+
+f(x)= <  dx n + C,  if ns < n < nt-ns
+
+        \ dx (nt-ns) + (5 dx ns)/(2 pi) tan(2 pi/5 (n-(nt-ns))/ns) + C , else
+
+    nt : total number of cells in the transverse direction.
+    ns : total number of stretched cells
+        ns = nt/6 if str_flag = 1
+        ns = nt/4 if str_flag = 2
     """
     max_angle = 2*pi/5  # Arbitrary choice, can be changed
     const = -nx*dx/2    # Assumes that grid is centered around zero

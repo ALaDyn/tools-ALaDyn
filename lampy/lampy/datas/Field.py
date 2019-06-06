@@ -467,7 +467,7 @@ class Field(object):
         field : dict
             Data are returned as a dictionary.
             field['data'] is the array containing the data
-            field['time'] is the corresponding time 
+            field['time'] is the corresponding time
         """
         f = dict()
         self._return_field(field_name, time)
@@ -492,7 +492,7 @@ class Field(object):
         axis : dict
             Data are returned as a dictionary.
             axis['data'] is the array containing the data
-            axis['time'] is the corresponding time 
+            axis['time'] is the corresponding time
         """
         field_list = self._search_field_by_timestep(time)
         ax = dict()
