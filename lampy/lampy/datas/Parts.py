@@ -229,7 +229,7 @@ class Particles(object):
         dx = self._params['dx']
         dy = self._params['dy']
         w0 = self._params['w0_y']
-        n0 = self._params['n0']*1.E-6
+        n0 = self._params['n0']*1.E-12
 
         pi = np.pi
 
