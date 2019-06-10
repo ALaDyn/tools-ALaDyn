@@ -25,22 +25,16 @@ def read_ALaDyn_bin(file_path,params):
     cdef char* c_path = uni_path
 
     # Here it reads the header via a standard struct unpack procedure
-    struct.unpack('i', f.read(4))
-    N_param = struct.unpack('i', f.read(4))[0]
-
-    struct.unpack('i', f.read(4))
-    struct.unpack('i', f.read(4))
-    int_param = list()
-    for i in range(0, N_param):
-        int_param.append(struct.unpack('i', f.read(4)))
-    struct.unpack('i', f.read(4))
-    nproc_y = int(int_param[0][0])
-    nproc_z = int(int_param[1][0])
-    ndimension = int(int_param[14][0])
-    struct.unpack('i', f.read(4))
-    for i in range(0, N_param):
-        struct.unpack('f', f.read(4))
-    struct.unpack('i', f.read(4))
+    f.seek(4)
+    Nparam = struct.unpack('=i', f.read(4))[0]
+    f.seek(16)
+    integerdata_temp = struct.unpack('='+Nparam*'i', f.read(Nparam*4))
+    f.seek(104)
+    realdata_temp = struct.unpack('='+Nparam*'f', f.read(Nparam*4))
+    f.seek(4)
+    nproc_y = integerdata_temp[0]
+    nproc_z = integerdata_temp[1]
+    ndimension = integerdata_temp[14]
     nx = params['nx']
     ny = params['ny']
     nz = params['nz']

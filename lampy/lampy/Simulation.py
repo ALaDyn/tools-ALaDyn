@@ -76,7 +76,7 @@ class Simulation(object):
         self.outputs = self._collect_outputs()
         self.Field = Field(self)
         self.Particles = Particles(self)
-        self._box_limits = self.Field._read_all_box_limits()
+        self._box_limits = self.Field._box_limits()
 
     def _collect_outputs(self, *args):
 

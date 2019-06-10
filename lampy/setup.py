@@ -3,7 +3,7 @@ from setuptools.extension import Extension
 from Cython.Build import cythonize
 import numpy
 
-with open('./README.md') as f:
+with open('README.md') as f:
     long_description = f.read()
 
 extensions = [Extension(
@@ -22,12 +22,13 @@ lib_read_phase_space = ('lib_read_phase_space',
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(
     name='lampy',
-    version='0.1.dev2',
+    version='0.1.dev7',
     description="Python suite to access, manipulate and plot ALaDyn's datas",
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages('.'),
     author='ALaDyn Collaboration',
+    author_email='davide.terzani@ino.it',
     maintainer='Davide Terzani',
     maintainer_email='davide.terzani@ino.it',
     license='GNU GPLv3',

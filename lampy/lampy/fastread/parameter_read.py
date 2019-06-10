@@ -7,11 +7,11 @@ def export_parameters(dir_path, file_name):
     file_read = open(path+'.bin', 'rb')
 
     file_read.seek(4)
-    Nparam = struct.unpack('i', file_read.read(4))[0]
+    Nparam = struct.unpack('=i', file_read.read(4))[0]
     file_read.seek(16)
-    integerdata_temp = struct.unpack(Nparam*'i', file_read.read(Nparam*4))
+    integerdata_temp = struct.unpack('='+Nparam*'i', file_read.read(Nparam*4))
     file_read.seek(104)
-    realdata_temp = struct.unpack(Nparam*'f', file_read.read(Nparam*4))
+    realdata_temp = struct.unpack('='+Nparam*'f', file_read.read(Nparam*4))
 
     file_read.close()
     integerdata = dict()
@@ -91,11 +91,11 @@ def _read_box_limits(file_path):
     file_read = open(file_path, 'rb')
 
     file_read.seek(4)
-    Nparam = struct.unpack('i', file_read.read(4))[0]
+    Nparam = struct.unpack('=i', file_read.read(4))[0]
     file_read.seek(16)
-    _ = struct.unpack(Nparam*'i', file_read.read(Nparam*4))
+    _ = struct.unpack('='+Nparam*'i', file_read.read(Nparam*4))
     file_read.seek(104)
-    realdata_temp = struct.unpack(Nparam*'f', file_read.read(Nparam*4))
+    realdata_temp = struct.unpack('='+Nparam*'f', file_read.read(Nparam*4))
     file_read.close()
     realdata = dict()
     realdata['x_min'] = realdata_temp[1]
