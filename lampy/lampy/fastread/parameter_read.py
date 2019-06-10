@@ -66,11 +66,11 @@ def _read_file_timestep(file_path):
     file_read = open(file_path, 'rb')
 
     file_read.seek(4)
-    Nparam = struct.unpack('i', file_read.read(4))[0]
+    Nparam = struct.unpack('=i', file_read.read(4))[0]
     file_read.seek(16)
-    _ = struct.unpack(Nparam*'i', file_read.read(Nparam*4))
+    _ = struct.unpack('='+Nparam*'i', file_read.read(Nparam*4))
     file_read.seek(104)
-    realdata_temp = struct.unpack(Nparam*'f', file_read.read(Nparam*4))
+    realdata_temp = struct.unpack('='+Nparam*'f', file_read.read(Nparam*4))
     file_read.close()
     realdata = dict()
     realdata['time'] = realdata_temp[0]

@@ -76,7 +76,7 @@ class Simulation(object):
         self.outputs = self._collect_outputs()
         self.Field = Field(self)
         self.Particles = Particles(self)
-        self._box_limits = self.Field._box_limits()
+        self._box_limits = self.Field._box_limits
 
     def _collect_outputs(self, *args):
 
@@ -198,7 +198,7 @@ class Directories(object):
         self._listfile = list()
         for directory in listdir:
             templist = os.listdir(os.path.join(self._path, directory))
-            for elem in templist:
+            for elem in templist[:]:
                 if '.dat' in elem:
                     templist.remove(elem)
             self._listfile += templist
