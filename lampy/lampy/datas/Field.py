@@ -1,6 +1,9 @@
 from ..compiled_cython.read_field import read_ALaDyn_bin
-from ..utilities.Utility import _grid_convert
-import matplotlib.pylab as plt
+from ..utilities.Utility import _grid_convert, _translate_timestep
+from ..fastread.parameter_read import _read_box_limits
+import matplotlib.pyplot as plt
+import os
+import numpy as np
 
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
@@ -31,6 +34,7 @@ class Field(object):
         self._E0 = 1
         self._omegap = self._params['omega_p']
         self._Directories = Simulation._Directories
+        self._box_limits = self._read_all_box_limits()
 
     def _field_read(self, field_name, timestep):
 
@@ -47,23 +51,27 @@ class Field(object):
             self._stored_fields[(field_name, timestep)] =\
                 self._stored_fields[(field_name, timestep)][:, :, 0]
 
-    def _search_field_by_timestep(self, timestep):
+    def _read_all_box_limits(self):
 
-        field_list = list()
-        for key in self._stored_fields.keys():
-            if timestep in key and key[0] not in field_list:
-                field_list += [key[0]]
+        box_limits = dict()
+        file_path = None
+        for key in self._timesteps.keys():
+            folder = key
+            for elem in self._Directories._filelist([folder]):
+                for em_field in _Electromagnetic_fields:
+                    if em_field in elem:
+                        file_path = os.path.join(self._path, folder, elem)
+                        break
+                if file_path is not None:
+                    break
+            box_limits[folder] = _read_box_limits(file_path)
+            file_path = None
+        if not box_limits:
+            print(""" No EM field output have been found in this
+                  folder""")
+            return
 
-        return field_list
-
-    def _search_field_by_field(self, field_name):
-
-        time_list = list()
-        for key in self._stored_fields.keys():
-            if field_name in key and key[1] not in time_list:
-                time_list += [key[1]]
-
-        return time_list
+        return box_limits
 
     def _return_field(self, field_name, timestep):
 
@@ -74,7 +82,25 @@ class Field(object):
         else:
             self._field_read(field_name, timestep)
 
-    def map_2d(self, field_name, timestep,
+    def _search_field_by_field(self, field_name):
+
+        time_list = list()
+        for key in self._stored_fields.keys():
+            if field_name in key and key[1] not in time_list:
+                time_list += [key[1]]
+
+        return time_list
+
+    def _search_field_by_timestep(self, timestep):
+
+        field_list = list()
+        for key in self._stored_fields.keys():
+            if timestep in key and key[0] not in field_list:
+                field_list += [key[0]]
+
+        return field_list
+
+    def map_2d(self, field, timestep,
                plane='xy', normalized=False, comoving=False, **kwargs):
         """
         Method that generates a 2D map.
@@ -85,10 +111,10 @@ class Field(object):
 
         Parameters
         --------
-        field_name : str
-            Name of the plotted field.
+        field : str or numpy array type
+            If a string is given, it is the name of the plotted field.
             To know the available field in the simulation,
-            check the s.outputs variable.
+            check the s.show_outputs() variable.
         timestep : float
             Variable that defines the instant at which
             the field should be plotted.
@@ -117,7 +143,12 @@ class Field(object):
         z : float
             Moves the cutting plane along the z axis to a given z value
         """
-        from ..fastread.parameter_read import _read_box_limits
+
+        accepted_types = [str, np.ndarray]
+        if type(field) not in accepted_types:
+            print("""Input field must be either a string with the field name
+            or a numpy array """)
+            return
 
         if 'norm' in kwargs:
             norm = kwargs['norm']
@@ -125,9 +156,12 @@ class Field(object):
         else:
             norm = None
 
-        file_path = self._Simulation._derive_file_path(field_name, timestep)
-        file_path = file_path+'.bin'
-        box_limits = _read_box_limits(file_path)
+        if type(field) is str:
+            file_path = self._Simulation._derive_file_path(field, timestep)
+            file_path = file_path+'.bin'
+
+        folder = _translate_timestep(timestep, self._timesteps)
+        box_limits = self._box_limits[folder]
 
         if 'x' in kwargs:
             x_plane = kwargs['x']
@@ -169,19 +203,22 @@ class Field(object):
             print(error)
 
         if self._params['n_dimensions'] == 3:
-            plane = _grid_convert(self._timesteps, timestep, self._Directories,
-                                  self._path, self._params, x=x_plane,
-                                  y=y_plane, z=z_plane)
-        self._return_field(field_name, timestep)
-        f = self._stored_fields[(field_name, timestep)]
+            map_plane = _grid_convert(box_limits, self._params, x=x_plane,
+                                      y=y_plane, z=z_plane)
 
-        if (self.normalized or normalized) and\
-           field_name in _Electromagnetic_fields:
-            if norm is None:
-                E0 = self._E0
-            else:
-                E0 = norm
-            f = f/E0
+        if type(field) is str:
+            self._return_field(field, timestep)
+            f = self._stored_fields[(field, timestep)]
+        elif type(field) is np.ndarray:
+            f = field
+
+        if self.normalized or normalized:
+            if field in _Electromagnetic_fields:
+                if norm is None:
+                    E0 = self._E0
+                else:
+                    E0 = norm
+                f = f/E0
 
         if self._params['n_dimensions'] == 2:
             if plane != 'xy':
@@ -201,7 +238,7 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
-                nz_map = plane[2]
+                nz_map = map_plane[2]
                 plt.imshow(f[..., nz_map].transpose(), origin='low',
                            extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
 
@@ -210,18 +247,18 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
-                ny_map = plane[1]
+                ny_map = map_plane[1]
                 plt.imshow(f[:, ny_map, :].transpose(), origin='low',
                            extent=(x[0], x[-1], z[0], z[-1]), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
-                nx_map = plane[0]
+                nx_map = map_plane[0]
                 plt.imshow(f[nx_map, ...].transpose(), origin='low',
                            extent=(y[0], y[-1], z[0], z[-1]), **kwargs)
 
-    def lineout(self, field_name, timestep, axis='x',
+    def lineout(self, field, timestep, axis='x',
                 normalized=False, comoving=False, **kwargs):
         """
         Method that generates a lineout (plot along a single axis).
@@ -232,10 +269,10 @@ class Field(object):
 
         Parameters
         --------
-        field_name : str
-            Name of the plotted field.
+        field : str or numpy array type
+            If a string is given, it is the name of the plotted field.
             To know the available field in the simulation,
-            check the s.outputs variable.
+            check the s.show_outputs() variable.
         timestep : float
             Variable that defines the instant at which
             the field should be plotted.
@@ -265,7 +302,11 @@ class Field(object):
             Moves the lineout axis along the z axis to a given z value
         """
 
-        from ..fastread.parameter_read import _read_box_limits
+        accepted_types = [str, np.ndarray]
+        if type(field) not in accepted_types:
+            print("""Input field must be either a string with the field name
+            or a numpy array """)
+            return
 
         if 'norm' in kwargs:
             norm = kwargs['norm']
@@ -273,9 +314,12 @@ class Field(object):
         else:
             norm = None
 
-        file_path = self._Simulation._derive_file_path(field_name, timestep)
-        file_path = file_path+'.bin'
-        box_limits = _read_box_limits(file_path)
+        if type(field) is str:
+            file_path = self._Simulation._derive_file_path(field, timestep)
+            file_path = file_path+'.bin'
+
+        folder = _translate_timestep(timestep, self._timesteps)
+        box_limits = self._box_limits[folder]
 
         if 'x' in kwargs:
             x_line = kwargs['x']
@@ -315,18 +359,22 @@ class Field(object):
         if error != '':
             print(error)
 
-        self._return_field(field_name, timestep)
-        f = self._stored_fields[(field_name, timestep)]
+        if type(field) is str:
+            self._return_field(field, timestep)
+            f = self._stored_fields[(field, timestep)]
+        elif type(field) is np.ndarray:
+            f = field
 
-        if (self.normalized or normalized)\
-           and field_name in _Electromagnetic_fields:
-            if norm is None:
-                E0 = self._E0
-            else:
-                E0 = norm
-            f = f/E0
-        line = _grid_convert(self._timesteps, timestep, self._Directories,
-                             self._path, self._params, x=x_line, y=y_line)
+        if self.normalized or normalized:
+            if field in _Electromagnetic_fields:
+                if norm is None:
+                    E0 = self._E0
+                else:
+                    E0 = norm
+                f = f/E0
+
+        line = _grid_convert(box_limits, self._params, x=x_line, y=y_line,
+                             z=z_line)
         if axis == 'z' and self._params['n_dimensions'] == 2:
             print("""WARNING: No lineout along the z axis is possible
                      in 2 dimensions.
@@ -355,8 +403,8 @@ class Field(object):
                 plt.plot(y, f[nx_lineout, :, nz_lineout], **kwargs)
         elif axis == 'z':
             z = self._stored_axis[('z', timestep)]
+            nx_lineout = line[0]
             ny_lineout = line[1]
-            nz_lineout = line[2]
             plt.plot(z, f[nx_lineout, ny_lineout, :], **kwargs)
 
     def normalize(self, **kwargs):
@@ -402,3 +450,59 @@ class Field(object):
         v_w is the moving window velocity.
         """
         self.comoving = False
+
+    def get_data(self, field_name, time):
+        """
+        Method that retrieves any field data and returns the 2D or 3D array.
+
+        Parameters
+        --------
+        field_name : str
+            Name of the array that is to be collected
+        time : float
+            Instant at which array is retrieved
+
+        Results
+        --------
+        field : dict
+            Data are returned as a dictionary.
+            field['data'] is the array containing the data
+            field['time'] is the corresponding time
+        """
+        f = dict()
+        self._return_field(field_name, time)
+        f['data'] = self._stored_fields[(field_name, time)]
+        f['time'] = time
+
+        return f
+
+    def get_axis(self, axis, time):
+        """
+        Method that retrieves any axis data and returns it as a 1D array.
+
+        Parameters
+        --------
+        axis : str
+            Name of the axis that is to be collected
+        time : float
+            Instant at which array is retrieved
+
+        Results
+        --------
+        axis : dict
+            Data are returned as a dictionary.
+            axis['data'] is the array containing the data
+            axis['time'] is the corresponding time
+        """
+        field_list = self._search_field_by_timestep(time)
+        ax = dict()
+        if not field_list:
+            print("""No axis have been read yet at timestep {}.
+            Call first
+            >>> f = s.Field.get_data(any_available_field_name,{})
+            to load the axis data""".format(time, time))
+            return
+        ax['data'] = self._stored_axis[(axis, time)]
+        ax['time'] = time
+
+        return ax

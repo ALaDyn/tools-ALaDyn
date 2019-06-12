@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-
+#include "lib_read_phase_space.h"
 
 
 void read_phasespace(float *ps_component, int dimensionality, char *file_pointer){ 

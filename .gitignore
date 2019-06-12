@@ -1,7 +1,11 @@
 # Python package
 */__pycache__/
 *.pyc
+*.pyd
+dist/
 *.egg-info/
+read_field.c
+read_phase_space.c
 
 #VS Code
 .vs/
