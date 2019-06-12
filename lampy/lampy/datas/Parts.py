@@ -1,6 +1,8 @@
 from ..compiled_cython.read_phase_space import total_phase_space_read
 import matplotlib.pylab as plt
 import numpy as np
+from ..utilities.Utility import speed_of_light
+import os
 
 _phase_spaces = ['phase_space', 'phase_space_ionization',
                  'phase_space_high_energy']
@@ -45,6 +47,7 @@ class Particles(object):
         self.comoving = False
         self._Directories = Simulation._Directories
         self._stored_phase_space = dict()
+        self._dx = self._params['dx']
 
     def _search_ps_by_timestep(self, timestep):
 
@@ -58,7 +61,7 @@ class Particles(object):
     def _search_ps_by_ps_name(self, phase_space_name):
 
         phase_space_list = list()
-        for key in self._stored_fields.keys():
+        for key in self._stored_phase_space.keys():
             if phase_space_name in key and key[1] not in phase_space_list:
                 phase_space_list += [key[1]]
 
@@ -194,7 +197,7 @@ class Particles(object):
         """
         ps = dict()
         self._return_phase_space(phase_space_name, timestep)
-        ps['data'] = self._stored_fields[(phase_space_name, timestep)]
+        ps['data'] = self._stored_phase_space[(phase_space_name, timestep)]
         ps['time'] = timestep
 
         return ps
@@ -267,7 +270,7 @@ class Particles(object):
                 all_particles = False
                 break
 
-        if(not all_particles):
+        if not all_particles:
             ps = select_particles(ps, self._params, **kwargs)
 
         n_parts = len(ps['x'])
@@ -318,7 +321,7 @@ class Particles(object):
         print("""
         The total number of particles is {}.
         The sum on the weights of all the selected particles is {}.
-        The total charge measured is Q={:4.1e}pC.
+        The total charge measured is Q={:4.2e}pC.
         The normalized emittance along the first perpendicular axis
         is eps={} mm mrad
               """.format(n_parts, weight_sum, charge, emittance_y))
@@ -349,6 +352,193 @@ class Particles(object):
         <(px-<px>)^2>={}, <(py-<py>)^2>={},
                   """.format(x_ave, y_ave, sigma_x, sigma_y, px_ave, py_ave,
                              sigma_px, sigma_py))
+
+    def slice_analysis(self, phase_space, time, number_of_iterations=100,
+                       filename='slice_analysis.dat', **kwargs):
+
+        n_dimensions = self._params['n_dimensions']
+        dx = self._params['dx']
+        dy = self._params['dy']
+        w0 = self._params['w0_y']
+        n0 = self._params['n0']*1.E-12
+        if n_dimensions == 3:
+            dz = self._params['dz']
+        accepted_types = [str, dict]
+
+        path = os.path.join(self._path, filename)
+        f = open(path, 'w')
+
+        if type(phase_space) not in accepted_types:
+            print("""
+        Input phase_space must be either a string with the phase_space name
+        or a dictionary
+                  """)
+            return
+
+        if type(phase_space) is str:
+            if time is None:
+                print("""
+        Time not known, impossible to plot datas.
+        Please specify a time variable.
+                      """)
+                return
+            file_path = self._Simulation._derive_file_path(phase_space,
+                                                           time)
+            file_path = file_path+'.bin'
+
+        if type(phase_space) is str:
+            self._return_phase_space(phase_space, time)
+            ps = self._stored_phase_space[(phase_space, time)]
+        elif type(phase_space) is dict:
+            ps = phase_space
+
+        if 'x_min' in kwargs:
+            x_min = kwargs['x_min']
+        else:
+            x_min = np.amin(ps['x'])
+        if 'x_max' in kwargs:
+            x_max = kwargs['x_max']
+        else:
+            x_max = np.amax(ps['x'])
+        if 'slice_length' in kwargs:
+            slice_length = kwargs['slice_length']
+        else:
+            slice_length = 4*self._params['dx']
+
+        delta = float(x_max-x_min)/number_of_iterations
+        slice_length_fs = slice_length/speed_of_light
+
+        sorted_index = np.argsort(ps['x'])
+        ps_sorted = dict()
+        for key in ps.keys():
+            ps_sorted[key] = ps[key][sorted_index]
+
+        for i in range(number_of_iterations):
+
+            x_center = x_min+delta*i
+            x0 = x_center-slice_length/2.
+            x1 = x_center+slice_length/2.
+            min_index = np.where(ps_sorted['x'] >= x0)[0]
+            max_index = np.where(ps_sorted['x'] <= x1)[0]
+
+            if len(min_index) > 0 and len(max_index) > 0:
+                min_index = min_index[0]
+                max_index = max_index[-1]
+
+                yp = ps_sorted['y'][min_index:max_index]
+                pyp = ps_sorted['py'][min_index:max_index]
+                wgh = ps_sorted['weight'][min_index:max_index]
+                gamma_single_particle = ps_sorted['gamma'][min_index:max_index]
+
+                if n_dimensions == 3:
+
+                    zp = ps_sorted['z'][min_index:max_index]
+                    pzp = ps_sorted['pz'][min_index:max_index]
+
+                weight_sum = np.sum(wgh)
+                y_ave = np.sum(wgh*yp)/weight_sum
+                py_ave = np.sum(wgh*pyp)/weight_sum
+                y_diff = yp-y_ave
+                py_diff = pyp-py_ave
+                y_square = np.sum(wgh*yp**2)/weight_sum
+                py_square = np.sum(wgh*pyp**2)/weight_sum
+
+                gamma_ave = np.sum(wgh*gamma_single_particle)/weight_sum
+                gamma_square = np.sum(wgh*gamma_single_particle**2)/weight_sum
+                if n_dimensions == 3:
+
+                    z_ave = np.sum(wgh*zp)/weight_sum
+                    z_square = np.sum(wgh*zp**2)/weight_sum
+                    z_diff = zp-z_ave
+                    pz_ave = np.sum(wgh*pzp)/weight_sum
+                    pz_diff = pzp-pz_ave
+                    pz_square = np.sum(wgh*pzp**2)/weight_sum
+
+                sigma_y = y_square-y_ave**2
+                sigma_py = py_square-py_ave**2
+                sigma_gamma = gamma_square-gamma_ave**2
+                if n_dimensions == 3:
+                    sigma_z = z_square-z_ave**2
+                    sigma_pz = pz_square-pz_ave**2
+                y_py_corr = np.sum(wgh*y_diff*py_diff)/weight_sum
+                if n_dimensions == 3:
+                    z_pz_corr = np.sum(wgh*z_diff*pz_diff)/weight_sum
+
+                emittance_y = np.sqrt(sigma_y*sigma_py-y_py_corr**2)
+
+                energy_spread = np.sqrt(sigma_gamma)/gamma_ave
+                if n_dimensions == 2:
+                    charge = e*n0*dx*dy*w0*weight_sum*np.pi/2.
+                if n_dimensions == 3:
+                    emittance_z = np.sqrt(sigma_z*sigma_pz-z_pz_corr**2)
+                    charge = e*n0*dx*dy*dz*weight_sum
+
+                current = charge/slice_length_fs
+
+                if n_dimensions == 3:
+                    f.writelines('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\
+                                 \n'.format(x_center, emittance_y, emittance_z,
+                                            sigma_y, sigma_z, current,
+                                            gamma_ave, energy_spread))
+                if n_dimensions == 2:
+                    f.writelines('{}\t{}\t{}\t{}\t{}\t{}\
+                                 \n'.format(x_center, emittance_y, sigma_y,
+                                            current, gamma_ave, energy_spread))
+
+        f.close()
+        slice_analysis = self.read_slice_analysis(path)
+
+        return slice_analysis
+
+    def read_slice_analysis(self, file_name):
+
+        f = open(file_name, 'r')
+        lines = f.readlines()
+
+        n_dimensions = self._params['n_dimensions']
+
+        slice_analysis = dict()
+        x_center = list()
+        emittance_y = list()
+        sigma_y = list()
+        current = list()
+        gamma_ave = list()
+        energy_spread = list()
+        emittance_z = list()
+        sigma_z = list()
+
+        if n_dimensions == 3:
+            for line in lines:
+                x_center.append(float(line.split()[0]))
+                emittance_y.append(float(line.split()[1]))
+                emittance_z.append(float(line.split()[2]))
+                sigma_y.append(float(line.split()[3]))
+                sigma_z.append(float(line.split()[4]))
+                current.append(float(line.split()[5]))
+                gamma_ave.append(float(line.split()[6]))
+                energy_spread.append(float(line.split()[7]))
+
+        elif n_dimensions == 2:
+            for line in lines:
+                x_center.append(float(line.split()[0]))
+                emittance_y.append(float(line.split()[1]))
+                sigma_y.append(float(line.split()[2]))
+                current.append(float(line.split()[3]))
+                gamma_ave.append(float(line.split()[4]))
+                energy_spread.append(float(line.split()[5]))
+
+        slice_analysis['x_center'] = x_center
+        slice_analysis['emittance_y'] = emittance_y
+        slice_analysis['sigma_y'] = sigma_y
+        slice_analysis['J'] = current
+        slice_analysis['gamma'] = gamma_ave
+        slice_analysis['e_spread'] = energy_spread
+
+        if n_dimensions == 3:
+            slice_analysis['emittance_z'] = emittance_z
+            slice_analysis['sigma_z'] = sigma_z
+
+        return slice_analysis
 
 
 def select_particles(ps, params, **kwargs):
