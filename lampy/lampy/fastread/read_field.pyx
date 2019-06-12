@@ -48,7 +48,11 @@ def read_ALaDyn_bin(file_path,params):
 
     read_file(f, x, y, z, c_path)
 
-    f=np.reshape(f ,(nx,ny,nz), order='F')    
+    f = np.reshape(f, (nx,ny,nz), order='F')
+    x = np.asarray(x)
+    y = np.asarray(y)
+    z = np.asarray(z)
+
     return (f, x, y, z)
 
 def read_file(f, x, y, z, f_path):
