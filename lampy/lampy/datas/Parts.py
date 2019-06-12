@@ -353,9 +353,44 @@ class Particles(object):
                   """.format(x_ave, y_ave, sigma_x, sigma_y, px_ave, py_ave,
                              sigma_px, sigma_py))
 
-    def slice_analysis(self, phase_space, time, number_of_iterations=100,
+    def slice_analysis(self, phase_space, time, number_of_slices=100,
                        filename='slice_analysis.dat', **kwargs):
+        """
+        Method that computes the slice analysis of a given particle bunch.
 
+        Parameters
+        --------
+        phase_space : str or dict
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float
+            Time at which the slice analysis is performed.
+        number_of_slices : int, optional
+            Number of slices in which the bunch is divided.
+            Defatul value is 100.
+        filename : str, optional
+            Name of the file on which results are written.
+            Default is 'slice_analysis.dat'.
+
+        Kwargs
+        --------
+        List of possible kwargs:
+
+            'x_min', 'x_max', 'slice_length'
+
+        x_min : float
+            x value from which the analysis starts.
+        x_max : float
+            x value in which the analysis ends.
+        If neither x_min nor x_max are specified, the analysis is performed on
+        the whole bunch.
+
+        slice_length : float
+            lenght of every slice 
+        """
         n_dimensions = self._params['n_dimensions']
         dx = self._params['dx']
         dy = self._params['dy']
@@ -405,7 +440,7 @@ class Particles(object):
         else:
             slice_length = 4*self._params['dx']
 
-        delta = float(x_max-x_min)/number_of_iterations
+        delta = float(x_max-x_min)/number_of_slices
         slice_length_fs = slice_length/speed_of_light
 
         sorted_index = np.argsort(ps['x'])
@@ -413,7 +448,7 @@ class Particles(object):
         for key in ps.keys():
             ps_sorted[key] = ps[key][sorted_index]
 
-        for i in range(number_of_iterations):
+        for i in range(number_of_slices):
 
             x_center = x_min+delta*i
             x0 = x_center-slice_length/2.
@@ -491,7 +526,14 @@ class Particles(object):
         return slice_analysis
 
     def read_slice_analysis(self, file_name):
+        """
+        Method that reads the file containing a slice analysis.
 
+        Parameters
+        --------
+        file_name : str
+            Name of the file
+        """
         f = open(file_name, 'r')
         lines = f.readlines()
 
