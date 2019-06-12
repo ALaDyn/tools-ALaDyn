@@ -4,7 +4,7 @@ from scipy.constants import pi
 from numpy import sqrt
 import numpy as np
 
-lampy_version = '0.1.dev7'
+lampy_version = '0.1.dev8'
 module_path = os.path.dirname(sys.modules[__name__].__file__)
 module_path = os.path.join(module_path, os.pardir)
 
