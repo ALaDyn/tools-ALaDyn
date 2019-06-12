@@ -69,7 +69,7 @@ class Simulation(object):
         if 'dy' in self.params.keys():
             self._dy = self.params['dy']
         self._dimensions = self.params['n_dimensions']
-        self.path = path
+        self.path = os.path.abspath(path)
         self._Directories = Directories(self)
         self.directories = self._Directories._show()
         self._timesteps = self._collect_timesteps()
