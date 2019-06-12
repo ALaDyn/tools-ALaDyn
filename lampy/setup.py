@@ -15,9 +15,10 @@ extensions = [Extension(
 ]
 
 lib_read_binary = ('lib_read_binary',
-                 {'sources': ['lampy/fastread/clibs/lib_read_binary.c']})
+                   {'sources': ['lampy/fastread/clibs/lib_read_binary.c']})
 lib_read_phase_space = ('lib_read_phase_space',
-                 {'sources': ["lampy/fastread/clibs/lib_read_phase_space.c"]})
+                        {'sources':
+                         ["lampy/fastread/clibs/lib_read_phase_space.c"]})
 
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(

@@ -8,6 +8,9 @@ lampy_version = '0.1.dev7'
 module_path = os.path.dirname(sys.modules[__name__].__file__)
 module_path = os.path.join(module_path, os.pardir)
 
+speed_of_light = 0.3
+r_e = 2.81794033
+
 _translated_filenames = dict()
 _total_filenamelist = list()
 _translated_filenames['Ex'] = 'Exfout'
@@ -60,9 +63,6 @@ def _compute_physical_parameters(dictionary):
     Utility that computes the relevant physical parameters
     starting from the input file.
     """
-    speed_of_light = 0.3
-    r_e = 2.81794033
-
     if dictionary['ny'] < 2 and dictionary['nz'] < 2:
         dictionary['n_dimensions'] = 1
     elif dictionary['ny'] > 1 and dictionary['nz'] < 2:
