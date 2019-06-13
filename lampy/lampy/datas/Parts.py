@@ -389,7 +389,7 @@ class Particles(object):
         the whole bunch.
 
         slice_length : float
-            lenght of every slice 
+            lenght of every slice
         """
         n_dimensions = self._params['n_dimensions']
         dx = self._params['dx']
