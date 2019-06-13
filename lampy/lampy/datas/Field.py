@@ -251,7 +251,7 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
-                nz_map = map_plane[2]
+                nz_map = map_plane['z']
                 plt.imshow(f[..., nz_map].transpose(), origin='low',
                            extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
 
@@ -260,14 +260,14 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
-                ny_map = map_plane[1]
+                ny_map = map_plane['y']
                 plt.imshow(f[:, ny_map, :].transpose(), origin='low',
                            extent=(x[0], x[-1], z[0], z[-1]), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
-                nx_map = map_plane[0]
+                nx_map = map_plane['x']
                 plt.imshow(f[nx_map, ...].transpose(), origin='low',
                            extent=(y[0], y[-1], z[0], z[-1]), **kwargs)
 
