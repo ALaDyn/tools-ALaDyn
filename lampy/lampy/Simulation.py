@@ -1,6 +1,7 @@
 from .fastread.parameter_read import _output_directories
 from .datas.Field import Field
 from .datas.Parts import Particles
+from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
 import os
 
@@ -77,6 +78,7 @@ class Simulation(object):
         self.Field = Field(self)
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
+        self.Diagnostics = Diagnostics(self)
 
     def _collect_outputs(self, *args):
 
