@@ -63,11 +63,11 @@ class Simulation(object):
         """
         plt.ion()
         self.params = self._open_folder(path)
-        self._dx = self.params['dx']
+        self.dx = self.params['dx']
         if 'dz' in self.params.keys():
-            self._dz = self.params['dz']
+            self.dz = self.params['dz']
         if 'dy' in self.params.keys():
-            self._dy = self.params['dy']
+            self.dy = self.params['dy']
         self._dimensions = self.params['n_dimensions']
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
