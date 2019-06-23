@@ -154,6 +154,7 @@ class Particles(object):
         Please specify a time variable.
                       """)
                 return
+            time = self._Simulation._nearest_time(time)
             file_path = self._Simulation._derive_file_path(phase_space,
                                                            time)
             file_path = file_path+'.bin'
@@ -196,6 +197,7 @@ class Particles(object):
             'x', 'y', 'z', 'px', 'py', 'pz', 'weight', 'gamma'
         """
         ps = dict()
+        timestep = self._Simulation._nearest_time(timestep)
         self._return_phase_space(phase_space_name, timestep)
         ps['data'] = self._stored_phase_space[(phase_space_name, timestep)]
         ps['time'] = timestep

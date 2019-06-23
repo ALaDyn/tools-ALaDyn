@@ -162,6 +162,8 @@ class Field(object):
         else:
             norm = None
 
+        timestep = self._Simulation._nearest_time(timestep)
+
         if type(field) is str:
             file_path = self._Simulation._derive_file_path(field, timestep)
             file_path = file_path+'.bin'
@@ -326,6 +328,8 @@ class Field(object):
             del kwargs['norm']
         else:
             norm = None
+
+        timestep = self._Simulation._nearest_time(timestep)
 
         if type(field) is str:
             file_path = self._Simulation._derive_file_path(field, timestep)
@@ -514,6 +518,7 @@ class Field(object):
             field['time'] is the corresponding time
         """
         f = dict()
+        time = self._Simulation._nearest_time(time)
         self._return_field(field_name, time)
         f['data'] = self._stored_fields[(field_name, time)]
         f['time'] = time
@@ -538,6 +543,7 @@ class Field(object):
             axis['data'] is the array containing the data
             axis['time'] is the corresponding time
         """
+        time = self._Simulation._nearest_time(time)
         field_list = self._search_field_by_timestep(time)
         ax = dict()
         if not field_list:

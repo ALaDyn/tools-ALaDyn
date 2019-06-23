@@ -127,6 +127,20 @@ class Simulation(object):
 
         return file_path
 
+    def _nearest_time(self, timestep):
+
+        times = list()
+        times += [time for time in self._timesteps.values()]
+
+        if timestep in times:
+            return timestep
+        else:
+            mintime = min(times, key=lambda x: abs(x-timestep))
+            print("""WARNING: Requested time {} is not available.
+                     Output is retrieved at time {}""".format(timestep,
+                                                              mintime))
+            return mintime
+
     def _open_folder(self, path):
 
         from .utilities.Utility import _read_simulation,\
