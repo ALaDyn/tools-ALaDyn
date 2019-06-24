@@ -23,7 +23,7 @@ lib_read_phase_space = ('lib_read_phase_space',
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(
     name='lampy',
-    version='0.1.3',
+    version='0.1.4',
     description="Python suite to access, manipulate and plot ALaDyn's datas",
     long_description=long_description,
     long_description_content_type='text/markdown',
