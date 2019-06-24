@@ -155,19 +155,17 @@ class Particles(object):
                       """)
                 return
             time = self._Simulation._nearest_time(time)
-            file_path = self._Simulation._derive_file_path(phase_space,
-                                                           time)
-            file_path = file_path+'.bin'
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._stored_phase_space[(phase_space, time)]
+            ps = self._stored_phase_space[(phase_space, time)].copy()
         elif type(phase_space) is dict:
-            ps = phase_space
+            ps = phase_space.copy()
 
         if comoving:
             if time is None:
                 print("Time not known, impossible to shift datas.")
+                return
             else:
                 v = self._params['w_speed']
                 ps['x'] = ps['x']-v*time
@@ -273,7 +271,7 @@ class Particles(object):
                 break
 
         if not all_particles:
-            ps = select_particles(ps, self._params, **kwargs)
+            ps = self.select_particles(ps, **kwargs)
 
         n_parts = len(ps['x'])
 
@@ -585,69 +583,93 @@ class Particles(object):
         return slice_analysis
 
 
-def select_particles(ps, params, **kwargs):
-    """
-    Function that takes in input a phase space dictionary, and the array of
-    parameters and selects particles according to the given conditions.
+    def select_particles(self, phase_space, time=None, **kwargs):
+        """
+        Function that takes in input a phase space dictionary, and the array of
+        parameters and selects particles according to the given conditions.
 
-    Parameters
-    --------
-    ps : dictionary
-        Phase space dictionary with the particles that have to be selected.
-    params : dictionary
-        Dictionary with all the simulation parameters.
+        Parameters
+        --------
+        phase_space : dictionary
+            Phase space dictionary with the particles that have to be selected.
+        params : dictionary
+            Dictionary with all the simulation parameters.
 
-    Kwargs
-    --------
-    List of possible kwargs:
+        Kwargs
+        --------
+        List of possible kwargs:
 
-            'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
-            'z_min', 'z_max', 'weight_min', 'weight_max'
+                'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
+                'z_min', 'z_max', 'weight_min', 'weight_max'
 
-            It is possible to select parts of phase space to analyze via
-            the input kwargs.
-    """
-    n_dimensions = params['n_dimensions']
+                It is possible to select parts of phase space to analyze via
+                the input kwargs.
+        """
+        n_dimensions = self._params['n_dimensions']
 
-    possible_kwargs = ['gamma_min', 'gamma_max', 'x_min', 'x_max',
-                       'y_min', 'y_max', 'z_min', 'z_max',
-                       'weight_min', 'weight_max']
+        possible_kwargs = ['gamma_min', 'gamma_max', 'x_min', 'x_max',
+                           'y_min', 'y_max', 'z_min', 'z_max',
+                           'weight_min', 'weight_max']
 
-    var_dic_min = dict()
-    var_dic_max = dict()
-    var_dic_min['gamma_min'] = 'gamma'
-    var_dic_max['gamma_max'] = 'gamma'
-    var_dic_min['x_min'] = 'x'
-    var_dic_min['y_min'] = 'y'
-    var_dic_min['z_min'] = 'z'
-    var_dic_max['x_max'] = 'x'
-    var_dic_max['y_max'] = 'y'
-    var_dic_max['z_max'] = 'z'
-    var_dic_min['weight_min'] = 'weight'
-    var_dic_max['weight_max'] = 'weight'
+        var_dic_min = dict()
+        var_dic_max = dict()
+        var_dic_min['gamma_min'] = 'gamma'
+        var_dic_max['gamma_max'] = 'gamma'
+        var_dic_min['x_min'] = 'x'
+        var_dic_min['y_min'] = 'y'
+        var_dic_min['z_min'] = 'z'
+        var_dic_max['x_max'] = 'x'
+        var_dic_max['y_max'] = 'y'
+        var_dic_max['z_max'] = 'z'
+        var_dic_min['weight_min'] = 'weight'
+        var_dic_max['weight_max'] = 'weight'
 
-    if 'z_min' in kwargs and n_dimensions == 2:
-        del kwargs['z_min']
-    if 'z_max' in kwargs and n_dimensions == 2:
-        del kwargs['z_max']
+        if 'z_min' in kwargs and n_dimensions == 2:
+            del kwargs['z_min']
+        if 'z_max' in kwargs and n_dimensions == 2:
+            del kwargs['z_max']
 
-    index = list()
-    kw_list = list(set(possible_kwargs).intersection(kwargs.keys()))
+        index = list()
+        kw_list = list(set(possible_kwargs).intersection(kwargs.keys()))
 
-    if not kw_list:
-        return ps
+        accepted_types = [str, dict]
 
-    for kw in kw_list:
-        if kw in var_dic_min.keys():
-            index.append(np.where(ps[var_dic_min[kw]] > kwargs[kw])[0])
-        elif kw in var_dic_max.keys():
-            index.append(np.where(ps[var_dic_max[kw]] < kwargs[kw])[0])
+        if type(phase_space) not in accepted_types:
+            print("""
+        Input phase_space must be either a string with the phase_space name
+        or a dictionary
+                  """)
+            return
 
-    tot_index = index[0]
-    for i in range(len(index)):
-        tot_index = set(tot_index).intersection(index[i])
-    ps_selected = dict()
-    tot_index = list(tot_index)
-    for key in ps.keys():
-        ps_selected[key] = ps[key][tot_index]
-    return ps_selected
+        if type(phase_space) is str:
+            if time is None:
+                print("""
+        Time not known, impossible to plot datas.
+        Please specify a time variable.
+                      """)
+                return
+            time = self._Simulation._nearest_time(time)
+
+        if type(phase_space) is str:
+            self._return_phase_space(phase_space, time)
+            ps = self._stored_phase_space[(phase_space, time)].copy()
+        elif type(phase_space) is dict:
+            ps = phase_space.copy()
+
+        if not kw_list:
+            return ps
+
+        for kw in kw_list:
+            if kw in var_dic_min.keys():
+                index.append(np.where(ps[var_dic_min[kw]] > kwargs[kw])[0])
+            elif kw in var_dic_max.keys():
+                index.append(np.where(ps[var_dic_max[kw]] < kwargs[kw])[0])
+
+        tot_index = index[0]
+        for i in range(len(index)):
+            tot_index = set(tot_index).intersection(index[i])
+        ps_selected = dict()
+        tot_index = list(tot_index)
+        for key in ps.keys():
+            ps_selected[key] = ps[key][tot_index]
+        return ps_selected
