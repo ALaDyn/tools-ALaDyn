@@ -132,7 +132,7 @@ def _grid_convert(box_limits, params, **kwargs):
             if not stretched:
                 dz = params['dz']
                 grid_point['z'] = int((z-box_limits['z_min']) /
-                               (dz*params['jump']))
+                                      (dz*params['jump']))
             else:
                 comp = 'z'
                 grid_point['z'] = int(_transverse_stretch(z, params, comp))

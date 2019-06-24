@@ -582,7 +582,6 @@ class Particles(object):
 
         return slice_analysis
 
-
     def select_particles(self, phase_space, time=None, **kwargs):
         """
         Function that takes in input a phase space dictionary, and the array of

@@ -26,42 +26,45 @@ class Diagnostics(object):
         file_path = path+'.dat'
         return file_path
 
-    def read_ionz_diagnostic(self, time):
+    def read_ionz_diagnostic(self, timestep):
 
-        path = self._derive_diag_path('ionz_emitt', time)
+        path = self._derive_diag_path('ionz_emitt', timestep)
 
-        file_read = open(path, 'r')
-
-        lines = file_read.readlines()
+        lines = [line.rstrip('\n') for line in open(path, 'r')]
 
         number_of_outputs = int(lines[17].split()[1])
         sample = np.zeros(number_of_outputs)
-        time = sample
-        charge = sample
-        xmean = sample
-        ymean = sample
-        zmean = sample
-        pxmean = sample
-        pymean = sample
-        pzmean = sample
-        xrms = sample
-        yrms = sample
-        zrms = sample
-        pxrms = sample
-        pyrms = sample
-        pzrms = sample
-        emitx = sample
-        emity = sample
-        dgamma = sample
-        gamma = sample
-        offset = lines.index('time')+1
-        offset += (number_of_outputs-1)/5+1+1+2*((number_of_outputs-1)/6+1)+1+1
+        time = sample.copy()
+        charge = sample.copy()
+        xmean = sample.copy()
+        ymean = sample.copy()
+        zmean = sample.copy()
+        pxmean = sample.copy()
+        pymean = sample.copy()
+        pzmean = sample.copy()
+        xrms = sample.copy()
+        yrms = sample.copy()
+        zrms = sample.copy()
+        pxrms = sample.copy()
+        pyrms = sample.copy()
+        pzrms = sample.copy()
+        emitx = sample.copy()
+        emity = sample.copy()
+        dgamma = sample.copy()
+        gamma = sample.copy()
+        offset = lines.index(' time')+1
+        offset += int((number_of_outputs-1)/5)+1+1 +\
+            2*(int((number_of_outputs-1)/6)+1)+1+1
         for i in range(number_of_outputs):
-            time[i] = float(lines[20+i/5].split()[i % 5])
-            charge[i] = float(lines[20+(number_of_outputs-1)/5+1+1 +
-                              (number_of_outputs-1)/6+1+1+i/6].split()[i % 6])
+            time[i] = float(lines[20+int(i/5)].split()[i % 5])
+            charge[i] =\
+                float(lines[20+int((number_of_outputs-1)/5)+1+1 +
+                      int((number_of_outputs-1)/6)+1+1+int(i/6)].split()
+                      [int(i % 6)])
 
         ind = 0
+        number_of_outputs = int(number_of_outputs)
+
         for line in lines[offset:offset+number_of_outputs]:
             xmean[ind] = float(line.split()[0])
             ymean[ind] = float(line.split()[1])
