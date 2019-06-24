@@ -69,6 +69,9 @@ class Simulation(object):
             self.dz = self.params['dz']
         if 'dy' in self.params.keys():
             self.dy = self.params['dy']
+        self.nx=self.params['nx']
+        self.ny=self.params['ny']
+        self.nz=self.params['nz']
         self._dimensions = self.params['n_dimensions']
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
@@ -138,9 +141,10 @@ class Simulation(object):
             return timestep
         else:
             mintime = min(times, key=lambda x: abs(x-timestep))
-            print("""WARNING: Requested time {} is not available.
-                     Output is retrieved at time {}""".format(timestep,
-                                                              mintime))
+            print("""
+    WARNING: Requested time {} is not available.
+    Output is retrieved at time {}""".format(timestep,
+                                             mintime))
             return mintime
 
     def _open_folder(self, path):
