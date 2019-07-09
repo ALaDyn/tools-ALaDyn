@@ -1,7 +1,6 @@
 from .Simulation import Simulation
-from .utilities.Utility import lampy_version
+from .__version__ import __version__
 
-__version__ = lampy_version
 __doc__ = """
 Light and fast Aladyn's data Manipulation in PYton (LAMPY)
 
