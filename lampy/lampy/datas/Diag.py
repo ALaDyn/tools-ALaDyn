@@ -5,7 +5,9 @@ import numpy as np
 class Diagnostics(object):
 
     def __init__(self, Simulation):
-
+        """
+        Class that contains methods to read the simulation diagnostics.
+        """
         self._Simulation = Simulation
         self._params = Simulation.params
         self._directories = Simulation.directories
@@ -27,7 +29,22 @@ class Diagnostics(object):
         return file_path
 
     def read_ionz_diagnostic(self, timestep):
+        """
+        Function that reads the ionized particles diagnostics.
 
+        Parameters
+        --------
+        timestep : float
+            Time at which the diagnostic is read.
+        
+        Results
+        --------
+        totdata : dict
+            Function 'read_ionz_diagnostic' returns a dictionary with
+            the diagnostics. Every dictionary item is a numpy array.
+            To know the dictionary keys, type
+            'totdata.keys()'
+        """
         path = self._derive_diag_path('ionz_emitt', timestep)
 
         lines = [line.rstrip('\n') for line in open(path, 'r')]
