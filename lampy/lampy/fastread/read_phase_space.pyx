@@ -32,6 +32,7 @@ def total_phase_space_read(file_path, params):
     read_phase_space(ps, n_dimensions, c_path)
 
     ps = np.reshape(ps, (jump, part_number), order='F')
+    ps = np.asarray(ps)
 
     return ps
 
