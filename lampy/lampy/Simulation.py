@@ -1,6 +1,7 @@
 from .fastread.parameter_read import _output_directories
 from .datas.Field import Field
 from .datas.Parts import Particles
+from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
 import os
 
@@ -63,11 +64,14 @@ class Simulation(object):
         """
         plt.ion()
         self.params = self._open_folder(path)
-        self._dx = self.params['dx']
+        self.dx = self.params['dx']
         if 'dz' in self.params.keys():
-            self._dz = self.params['dz']
+            self.dz = self.params['dz']
         if 'dy' in self.params.keys():
-            self._dy = self.params['dy']
+            self.dy = self.params['dy']
+        self.nx = self.params['nx']
+        self.ny = self.params['ny']
+        self.nz = self.params['nz']
         self._dimensions = self.params['n_dimensions']
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
@@ -77,6 +81,7 @@ class Simulation(object):
         self.Field = Field(self)
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
+        self.Diagnostics = Diagnostics(self)
 
     def _collect_outputs(self, *args):
 
@@ -126,6 +131,21 @@ class Simulation(object):
         file_path = os.path.join(self.path, folder, filename)
 
         return file_path
+
+    def _nearest_time(self, timestep):
+
+        times = list()
+        times += [time for time in self._timesteps.values()]
+
+        if timestep in times:
+            return timestep
+        else:
+            mintime = min(times, key=lambda x: abs(x-timestep))
+            print("""
+    WARNING: Requested time {} is not available.
+    Output is retrieved at time {}""".format(timestep,
+                                             mintime))
+            return mintime
 
     def _open_folder(self, path):
 

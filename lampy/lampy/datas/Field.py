@@ -7,6 +7,10 @@ import numpy as np
 
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
+_Envelope = ['A', 'a']
+_Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
+for i in range(6):
+    _Densities += ['rho_ion'+str(i)]
 
 
 class Field(object):
@@ -32,6 +36,8 @@ class Field(object):
         self.normalized = False
         self.comoving = False
         self._E0 = 1
+        self._A = 1
+        self._n0 = 1
         self._omegap = self._params['omega_p']
         self._Directories = Simulation._Directories
         self._box_limits = self._read_all_box_limits()
@@ -156,6 +162,8 @@ class Field(object):
         else:
             norm = None
 
+        timestep = self._Simulation._nearest_time(timestep)
+
         if type(field) is str:
             file_path = self._Simulation._derive_file_path(field, timestep)
             file_path = file_path+'.bin'
@@ -215,10 +223,17 @@ class Field(object):
         if self.normalized or normalized:
             if field in _Electromagnetic_fields:
                 if norm is None:
-                    E0 = self._E0
-                else:
-                    E0 = norm
-                f = f/E0
+                    norm = self._E0
+
+            if field in _Densities:
+                if norm is None:
+                    norm = self._n0
+
+            if field in _Envelope:
+                if norm is None:
+                    norm = self._A
+
+            f = f/norm
 
         if self._params['n_dimensions'] == 2:
             if plane != 'xy':
@@ -238,7 +253,7 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
-                nz_map = map_plane[2]
+                nz_map = map_plane['z']
                 plt.imshow(f[..., nz_map].transpose(), origin='low',
                            extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
 
@@ -247,14 +262,14 @@ class Field(object):
                 if self.comoving or comoving:
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
-                ny_map = map_plane[1]
+                ny_map = map_plane['y']
                 plt.imshow(f[:, ny_map, :].transpose(), origin='low',
                            extent=(x[0], x[-1], z[0], z[-1]), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
-                nx_map = map_plane[0]
+                nx_map = map_plane['x']
                 plt.imshow(f[nx_map, ...].transpose(), origin='low',
                            extent=(y[0], y[-1], z[0], z[-1]), **kwargs)
 
@@ -314,6 +329,8 @@ class Field(object):
         else:
             norm = None
 
+        timestep = self._Simulation._nearest_time(timestep)
+
         if type(field) is str:
             file_path = self._Simulation._derive_file_path(field, timestep)
             file_path = file_path+'.bin'
@@ -368,10 +385,17 @@ class Field(object):
         if self.normalized or normalized:
             if field in _Electromagnetic_fields:
                 if norm is None:
-                    E0 = self._E0
-                else:
-                    E0 = norm
-                f = f/E0
+                    norm = self._E0
+
+            if field in _Densities:
+                if norm is None:
+                    norm = self._n0
+
+            if field in _Envelope:
+                if norm is None:
+                    norm = self._A
+
+            f = f/norm
 
         line = _grid_convert(box_limits, self._params, x=x_line, y=y_line,
                              z=z_line)
@@ -386,28 +410,29 @@ class Field(object):
             if self.comoving or comoving:
                 x = x-x[0]
             if self._params['n_dimensions'] == 2:
-                ny_lineout = line[1]
+                ny_lineout = line['y']
                 plt.plot(x, f[:, ny_lineout], **kwargs)
+
             if self._params['n_dimensions'] == 3:
-                ny_lineout = line[1]
-                nz_lineout = line[2]
+                ny_lineout = line['y']
+                nz_lineout = line['z']
                 plt.plot(x, f[:, ny_lineout, nz_lineout], **kwargs)
         elif axis == 'y':
             y = self._stored_axis[('y', timestep)]
             if self._params['n_dimensions'] == 2:
-                nx_lineout = line[0]
+                nx_lineout = line['x']
                 plt.plot(y, f[nx_lineout, :], **kwargs)
             if self._params['n_dimensions'] == 3:
-                nx_lineout = line[0]
-                nz_lineout = line[2]
+                nx_lineout = line['x']
+                nz_lineout = line['z']
                 plt.plot(y, f[nx_lineout, :, nz_lineout], **kwargs)
         elif axis == 'z':
             z = self._stored_axis[('z', timestep)]
-            nx_lineout = line[0]
-            ny_lineout = line[1]
+            nx_lineout = line['x']
+            ny_lineout = line['y']
             plt.plot(z, f[nx_lineout, ny_lineout, :], **kwargs)
 
-    def normalize(self, **kwargs):
+    def normalize(self, field_type=None, **kwargs):
         """
         Method that normalizes the electromagnetic fields.
 
@@ -415,15 +440,38 @@ class Field(object):
         fields will be normalized to a given norm.
         By defalut, they will be normalized to the cold wavebreaking limit.
 
+        Parameters
+        --------
+        field_type : str, optional
+            Type of field to be normalized. It is needed to know which is
+            the fallback value if nothing is specified. Possibilities are
+            'Electromagnetic', 'Envelope', 'Density', 'All'
         kwargs
         --------
         norm : float
             Defines the normalizing value
         """
-        self._E0 = self._omegap
-        self.normalized = True
+        norm = None
         if 'norm' in kwargs:
-            self._E0 = kwargs['norm']
+            norm = kwargs['norm']
+
+        if field_type == 'Electromagnetic' or field_type == 'All':
+            if norm is not None:
+                self._E0 = norm
+            else:
+                self._E0 = self._omegap
+
+        if field_type == 'Envelope' or field_type == 'All':
+            if norm is not None:
+                self._A = norm
+
+        if field_type == 'Density' or field_type == 'All':
+            if norm is not None:
+                self._n0 = norm
+            else:
+                self._n0 = self._params['n0']
+
+        self.normalized = True
 
     def code_units(self):
         """
@@ -470,6 +518,7 @@ class Field(object):
             field['time'] is the corresponding time
         """
         f = dict()
+        time = self._Simulation._nearest_time(time)
         self._return_field(field_name, time)
         f['data'] = self._stored_fields[(field_name, time)]
         f['time'] = time
@@ -494,6 +543,7 @@ class Field(object):
             axis['data'] is the array containing the data
             axis['time'] is the corresponding time
         """
+        time = self._Simulation._nearest_time(time)
         field_list = self._search_field_by_timestep(time)
         ax = dict()
         if not field_list:

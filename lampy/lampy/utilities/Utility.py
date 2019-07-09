@@ -4,7 +4,6 @@ from scipy.constants import pi
 from numpy import sqrt
 import numpy as np
 
-lampy_version = '0.1.1'
 module_path = os.path.dirname(sys.modules[__name__].__file__)
 module_path = os.path.join(module_path, os.pardir)
 
@@ -25,13 +24,16 @@ _translated_filenames['Jz'] = 'Jzfout'
 _translated_filenames['A'] = 'Aenvout'
 _translated_filenames['a'] = 'aenvout'
 _translated_filenames['rho_fluid'] = 'Fdenout'
-_translated_filenames['rho'] = 'Edenout'
+_translated_filenames['rho_electrons'] = 'Edenout'
+_translated_filenames['rho_protons'] = 'Pdenout'
 for n in range(1, 6):
     _translated_filenames['rho_ion'+str(n)] = 'H'+str(n)+'dnout'
     _translated_filenames['energy_ion'+str(n)] = 'H'+str(n)+'enout'
 
-_translated_filenames['energy'] = 'Elenout'
-_translated_filenames['phase_space'] = 'Elpout'
+_translated_filenames['electron_energy'] = 'Elenout'
+_translated_filenames['proton_energy'] = 'Prenout'
+_translated_filenames['phase_space_electron'] = 'Elpout'
+_translated_filenames['phase_space_proton'] = 'Prpout'
 _translated_filenames['phase_space_ionization'] = 'Eionzout'
 _translated_filenames['phase_space_high_energy'] = 'E_hg_out'
 
@@ -107,7 +109,7 @@ def _compute_simulation_parameters(dictionary):
 
 def _grid_convert(box_limits, params, **kwargs):
 
-    grid_point = list()
+    grid_point = dict()
     if params['str_flag'] == 0:
         stretched = False
     elif (params['str_flag'] == 1) or (params['str_flag'] == 2):
@@ -116,25 +118,26 @@ def _grid_convert(box_limits, params, **kwargs):
         x = kwargs['x']
         dx = params['dx']
         comp = 'x'
-        grid_point += [int((x-box_limits['x_min'])/(dx*params['jump']))]
+        grid_point['x'] = int((x-box_limits['x_min'])/(dx*params['jump']))
     if 'y' in kwargs:
         y = kwargs['y']
         if not stretched:
             dy = params['dy']
-            grid_point += [int((y-box_limits['y_min'])/(dy*params['jump']))]
+            grid_point['y'] = int((y-box_limits['y_min'])/(dy*params['jump']))
         else:
             comp = 'y'
-            grid_point += [int(_transverse_stretch(y, params, comp))]
+            grid_point['y'] = int(_transverse_stretch(y, params, comp))
+
     if params['n_dimensions'] == 3:
         if 'z' in kwargs:
             z = kwargs['z']
             if not stretched:
                 dz = params['dz']
-                grid_point += [int((z-box_limits['z_min']) /
-                               (dz*params['jump']))]
+                grid_point['z'] = int((z-box_limits['z_min']) /
+                                      (dz*params['jump']))
             else:
                 comp = 'z'
-                grid_point += [int(_transverse_stretch(z, params, comp))]
+                grid_point['z'] = int(_transverse_stretch(z, params, comp))
     return grid_point
 
 
@@ -251,13 +254,12 @@ def _inverse_stretch_function(x, nx, ns, dx):
     Inverse of the stretch function.
     """
     max_angle = 2*pi/5  # Arbitrary choice, can be changed
-    const = -nx*dx/2    # Assumes that grid is centered around zero
+    const = nx*dx/2    # Assumes that grid is centered around zero
     xs = ns*dx
-    xM = nx*dx
 
     def f(x):
 
-        stretch = ns/max_angle*np.arctan(max_angle*((x-const-xs)/xs))+ns
+        stretch = ns/max_angle*np.arctan(max_angle*((x+const-xs)/xs))+ns
         if type(stretch) is np.ndarray:
             stretch.astype(int)
         elif type(stretch) is float:
@@ -266,16 +268,18 @@ def _inverse_stretch_function(x, nx, ns, dx):
 
     def g(x):
 
-        stretch = (x-const)/dx
+        stretch = (x+const)/dx
         if type(stretch) is np.ndarray:
             stretch.astype(int)
         elif type(stretch) is float:
             stretch = int(stretch)
         return stretch
 
-    symm_center = g(nx/2)
+    symm_center = nx*dx/2-const
+    alpha = (nx-2*ns)*dx-const/2
+
     inv_str_func =\
-        np.piecewise(x, [x < xs, (x >= xs) & (x <= xM-xs)],
+        np.piecewise(x, [x < -alpha, (x >= -alpha) & (x <= alpha), x > alpha],
                      [lambda x: f(x), lambda x: g(x),
                       lambda x: nx-f(2*symm_center-x)])
 
