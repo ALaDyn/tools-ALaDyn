@@ -36,7 +36,7 @@ class Diagnostics(object):
         --------
         timestep : float
             Time at which the diagnostic is read.
-        
+
         Results
         --------
         totdata : dict
