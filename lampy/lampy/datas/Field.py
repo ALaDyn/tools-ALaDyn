@@ -8,7 +8,7 @@ import numpy as np
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
 _Envelope = ['A', 'a']
-_Densities = ['rho', 'rho_fluid']
+_Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 for i in range(6):
     _Densities += ['rho_ion'+str(i)]
 
