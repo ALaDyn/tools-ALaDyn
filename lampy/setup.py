@@ -2,7 +2,8 @@ from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from Cython.Build import cythonize
 import numpy
-from lampy.__version__ import __version__
+
+__version__ = "0.1.5.post4"
 
 with open('README.md') as f:
     long_description = f.read()
