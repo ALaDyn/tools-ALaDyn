@@ -30,12 +30,13 @@ class Particles(object):
         ps['weight'] particles computational weights
         ps['gamma'] particles Lorentz factor.
 
-        Possible phase spaces are, if outputted:
-        - phase_space: phase space of all the electrons
+        Possible phase spaces are:
+        - phase_space_electrons: phase space of all the electrons
         - phase_space_ionization: phase space of all the particles produced
           via the ionization process
         - phase_space_high_energy: phase space of all the particles with
           gamma > gamma_min.
+        - phase_space_protons: phase space of all the protons
         """
         self._Simulation = Simulation
         self._params = Simulation.params
@@ -48,6 +49,8 @@ class Particles(object):
         self._Directories = Simulation._Directories
         self._stored_phase_space = dict()
         self._dx = self._params['dx']
+        self._selected_index = dict()
+        self._selected_percentage = 1
 
     def _search_ps_by_timestep(self, timestep):
 
@@ -81,7 +84,7 @@ class Particles(object):
         ndim = self._params['n_dimensions']
         file_path = sim._derive_file_path(phase_space_name, timestep)
         phase_space = dict()
-        ps = total_phase_space_read(file_path, self._params)
+        ps, part_number = total_phase_space_read(file_path, self._params)
 
         if ndim == 3:
             phase_space['x'] = ps[0]
@@ -102,10 +105,13 @@ class Particles(object):
             gamma = np.sqrt(1+ps[3]**2+ps[2]**2)
             phase_space['gamma'] = gamma
 
+        self._selected_index[(phase_space_name, timestep)] =\
+            [part_number, np.arange(part_number)]
         self._stored_phase_space[(phase_space_name, timestep)] = phase_space
 
     def scatter(self, phase_space, time=None, component1='x',
-                component2='y', comoving=False, **kwargs):
+                component2='y', comoving=False,
+                selected_percentage=None, **kwargs):
         """
         Method that produces a scatter plot of the given phase space.
 
@@ -170,7 +176,19 @@ class Particles(object):
                 v = self._params['w_speed']
                 ps['x'] = ps['x']-v*time
 
-        plt.scatter(ps[component1], ps[component2], s=1, **kwargs)
+        if (selected_percentage != self._selected_percentage)\
+                and (selected_percentage is not None):
+
+            self._selected_percentage = selected_percentage
+            part_number = self._selected_index[(phase_space, time)][0]
+            sel_part_numb = int(selected_percentage * part_number)
+            sel_index = np.random.choice(np.arange(part_number),
+                size=sel_part_numb, replace=False)
+            sel_index.sort()
+            self._selected_index[(phase_space, time)][1] = sel_index
+
+        inds = self._selected_index[(phase_space, time)][1]
+        plt.scatter(ps[component1][inds], ps[component2][inds], s=1, **kwargs)
 
     def get_data(self, phase_space_name, timestep):
         """
