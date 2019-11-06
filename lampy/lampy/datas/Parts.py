@@ -131,14 +131,21 @@ class Particles(object):
             space name is passed, it is optional if the phase space dictionary
             is passed. However, it may be necessary if the longitudinal
             axis is set on 'comoving'.
-        component1 : str
-             First component of the scatter plot. Default is taken as 'x'.
-        component2 : str
-             Second component of the scatter plot. Default is taken as 'y'
-        comoving : bool
+        component1 : str, optional
+            First component of the scatter plot. Default is taken as 'x'.
+        component2 : str, optional
+            Second component of the scatter plot. Default is taken as 'y'
+        comoving : bool, optional
             If True, the longitudinal axis is transformed as xi=x-v_w t.
             Remember that, to obtain the comoving axis, the time is needed
             even when the phase space dictionary is passed.
+        selected_percentage : float, optional
+            A number between 0 and 1. It determines the percentage of particles
+            that have to be selected from the phase space before to be plotted.
+            It can be important for heavily populated phase spaces, that are
+            difficult to load. Once the particles have been selected, they are
+            always kept between various plots, even if the component is
+            changed until the percentage is changed and a new selection happens
 
         Kwargs
         --------
@@ -182,8 +189,9 @@ class Particles(object):
             self._selected_percentage = selected_percentage
             part_number = self._selected_index[(phase_space, time)][0]
             sel_part_numb = int(selected_percentage * part_number)
-            sel_index = np.random.choice(np.arange(part_number),
-                size=sel_part_numb, replace=False)
+            sel_index =\
+                np.random.choice(np.arange(part_number), size=sel_part_numb,
+                                 replace=False)
             sel_index.sort()
             self._selected_index[(phase_space, time)][1] = sel_index
 

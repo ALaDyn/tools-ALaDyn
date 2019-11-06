@@ -113,7 +113,7 @@ class Field(object):
 
         This method produces a 2D map of the given field
         at the given timestep.
-        It is based on pylab.imshow, so it accepts all its **kwargs.
+        It is based on pyplot.pcolormesh, so it accepts all its **kwargs.
 
         Parameters
         --------
@@ -243,8 +243,7 @@ class Field(object):
             if self.comoving or comoving:
                 x = x-x[0]
             y = self._stored_axis[('y', timestep)]
-            plt.imshow(f.transpose(), origin='low',
-                       extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
+            plt.pcolormesh(x, y, f.transpose(), **kwargs)
 
         elif self._params['n_dimensions'] == 3:
 
@@ -254,8 +253,7 @@ class Field(object):
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
                 nz_map = map_plane['z']
-                plt.imshow(f[..., nz_map].transpose(), origin='low',
-                           extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
+                plt.pcolormesh(x, y, f[..., nz_map].transpose(), **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
                 x = self._stored_axis[('x', timestep)]
@@ -263,15 +261,13 @@ class Field(object):
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
                 ny_map = map_plane['y']
-                plt.imshow(f[:, ny_map, :].transpose(), origin='low',
-                           extent=(x[0], x[-1], z[0], z[-1]), **kwargs)
+                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
                 nx_map = map_plane['x']
-                plt.imshow(f[nx_map, ...].transpose(), origin='low',
-                           extent=(y[0], y[-1], z[0], z[-1]), **kwargs)
+                plt.pcolormesh(y, z, f[nx_map, ...].transpose(), **kwargs)
 
     def lineout(self, field, timestep, axis='x',
                 normalized=False, comoving=False, **kwargs):

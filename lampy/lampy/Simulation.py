@@ -3,6 +3,7 @@ from .datas.Field import Field
 from .datas.Parts import Particles
 from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
+import seaborn as sns
 import os
 
 
@@ -63,6 +64,8 @@ class Simulation(object):
             List of all the available generated outputs
         """
         plt.ion()
+        sns.set()
+        sns.set_style('ticks')
         self.params = self._open_folder(path)
         self.dx = self.params['dx']
         if 'dz' in self.params.keys():
