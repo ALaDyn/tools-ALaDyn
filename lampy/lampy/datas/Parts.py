@@ -4,8 +4,8 @@ import numpy as np
 from ..utilities.Utility import speed_of_light
 import os
 
-_phase_spaces = ['phase_space', 'phase_space_ionization',
-                 'phase_space_high_energy']
+_phase_spaces = ['phase_space_electrons', 'phase_space_ionization',
+                 'phase_space_high_energy', 'phase_space_protons']
 m_e = 0.511
 e = 1.6E-7
 
@@ -210,7 +210,7 @@ class Particles(object):
         time : float
             Instant at which dictionary is retrieved
 
-        Results
+        Returns
         --------
         phase space : dict
             Data are returned as a dictionary.
@@ -615,10 +615,14 @@ class Particles(object):
 
         Parameters
         --------
-        phase_space : dictionary
-            Phase space dictionary with the particles that have to be selected.
-        params : dictionary
-            Dictionary with all the simulation parameters.
+        phase_space : dict or str
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float, optional
+            Time variable is needed when phase_space is a string
 
         Kwargs
         --------
@@ -629,6 +633,12 @@ class Particles(object):
 
                 It is possible to select parts of phase space to analyze via
                 the input kwargs.
+
+        Returns
+        --------
+        ps_selected : dict
+            Phase space dictionary with the selected particles
+
         """
         n_dimensions = self._params['n_dimensions']
 
@@ -698,3 +708,78 @@ class Particles(object):
         for key in ps.keys():
             ps_selected[key] = ps[key][tot_index]
         return ps_selected
+
+    def histogram(self, phase_space, time=None, component1='x',
+                  component2=None, **kwargs):
+        """
+        Method that generates either a 1D or a 2D histogram of a given set and
+        for given components of the phase space.
+        It is based on numpy histogram and, in the 2D case, represents results
+        via a pyplot.pcolormesh plot, masking away all points with a zero
+        contribution to the histogram.
+
+        Parameters
+        --------
+        phase_space : dict or str
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float, optional
+            Time variable is needed when phase_space is a string
+        component1 : str, optional
+            First component of the scatter plot. Default is taken as 'x'.
+        component2 : str, optional
+            Second component of the scatter plot. Default is taken as None
+        
+        Kwargs
+        --------
+        List of possible kwargs:
+
+                'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
+                'z_min', 'z_max', 'weight_min', 'weight_max'
+
+                It is possible to select parts of phase space to analyze via
+                the input kwargs.
+
+        For the histogram and the plot, possible kwargs are:
+
+            alpha, bins, cmap, density
+
+        """
+        cmap = 'Reds'
+        bins = 1000
+        density = True
+        alpha = 1
+
+        if 'cmap' in kwargs:
+            cmap = kwargs['cmap']
+            del kwargs['cmap']
+
+        if 'bins' in kwargs:
+            bins = kwargs['bins']
+            del kwargs['bins']
+
+        if 'density' in kwargs:
+            density = kwargs['density']
+            del kwargs['density']
+
+        if 'alpha' in kwargs:
+            alpha = kwargs['alpha']
+            del kwargs['alpha']
+
+        ps = self.select_particles(phase_space, time=time, **kwargs)
+
+        if component2 is None:
+            _ = plt.hist(ps[component1], weights=ps['weight'],
+                         bins=bins, density=density)
+
+        else:
+            H, xedge, yedge = np.histogram2d(ps[component1], ps[component2],
+                                             bins=bins, weights=ps['weight'],
+                                             density=density)
+            H = H.T
+            X, Y = np.meshgrid(xedge, yedge)
+            H = np.ma.masked_where(H == 0, H)
+            plt.pcolormesh(X, Y, H, cmap=cmap)
