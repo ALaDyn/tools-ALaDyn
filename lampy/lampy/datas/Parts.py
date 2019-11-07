@@ -4,8 +4,8 @@ import numpy as np
 from ..utilities.Utility import speed_of_light
 import os
 
-_phase_spaces = ['phase_space', 'phase_space_ionization',
-                 'phase_space_high_energy']
+_phase_spaces = ['phase_space_electrons', 'phase_space_ionization',
+                 'phase_space_high_energy', 'phase_space_protons']
 m_e = 0.511
 e = 1.6E-7
 
@@ -30,12 +30,13 @@ class Particles(object):
         ps['weight'] particles computational weights
         ps['gamma'] particles Lorentz factor.
 
-        Possible phase spaces are, if outputted:
-        - phase_space: phase space of all the electrons
+        Possible phase spaces are:
+        - phase_space_electrons: phase space of all the electrons
         - phase_space_ionization: phase space of all the particles produced
           via the ionization process
         - phase_space_high_energy: phase space of all the particles with
           gamma > gamma_min.
+        - phase_space_protons: phase space of all the protons
         """
         self._Simulation = Simulation
         self._params = Simulation.params
@@ -48,6 +49,8 @@ class Particles(object):
         self._Directories = Simulation._Directories
         self._stored_phase_space = dict()
         self._dx = self._params['dx']
+        self._selected_index = dict()
+        self._selected_percentage = 1
 
     def _search_ps_by_timestep(self, timestep):
 
@@ -79,9 +82,23 @@ class Particles(object):
 
         sim = self._Simulation
         ndim = self._params['n_dimensions']
+
+        if phase_space_name not in sim.output:
+            print("""
+        {} is not available.
+        Available output are {}.
+        """.format(phase_space_name, sim.output))
+            return
+
         file_path = sim._derive_file_path(phase_space_name, timestep)
-        phase_space = dict()
-        ps = total_phase_space_read(file_path, self._params)
+        try:
+            phase_space = dict()
+            ps, part_number = total_phase_space_read(file_path, self._params)
+        except FileNotFoundError:
+            print("""
+        Phase space {} not available, impossible to read.
+            """.format(phase_space_name))
+            raise
 
         if ndim == 3:
             phase_space['x'] = ps[0]
@@ -102,10 +119,13 @@ class Particles(object):
             gamma = np.sqrt(1+ps[3]**2+ps[2]**2)
             phase_space['gamma'] = gamma
 
+        self._selected_index[(phase_space_name, timestep)] =\
+            [part_number, np.arange(part_number)]
         self._stored_phase_space[(phase_space_name, timestep)] = phase_space
 
     def scatter(self, phase_space, time=None, component1='x',
-                component2='y', comoving=False, **kwargs):
+                component2='y', comoving=False,
+                selected_percentage=None, **kwargs):
         """
         Method that produces a scatter plot of the given phase space.
 
@@ -125,14 +145,21 @@ class Particles(object):
             space name is passed, it is optional if the phase space dictionary
             is passed. However, it may be necessary if the longitudinal
             axis is set on 'comoving'.
-        component1 : str
-             First component of the scatter plot. Default is taken as 'x'.
-        component2 : str
-             Second component of the scatter plot. Default is taken as 'y'
-        comoving : bool
+        component1 : str, optional
+            First component of the scatter plot. Default is taken as 'x'.
+        component2 : str, optional
+            Second component of the scatter plot. Default is taken as 'y'
+        comoving : bool, optional
             If True, the longitudinal axis is transformed as xi=x-v_w t.
             Remember that, to obtain the comoving axis, the time is needed
             even when the phase space dictionary is passed.
+        selected_percentage : float, optional
+            A number between 0 and 1. It determines the percentage of particles
+            that have to be selected from the phase space before to be plotted.
+            It can be important for heavily populated phase spaces, that are
+            difficult to load. Once the particles have been selected, they are
+            always kept between various plots, even if the component is
+            changed until the percentage is changed and a new selection happens
 
         Kwargs
         --------
@@ -170,7 +197,20 @@ class Particles(object):
                 v = self._params['w_speed']
                 ps['x'] = ps['x']-v*time
 
-        plt.scatter(ps[component1], ps[component2], s=1, **kwargs)
+        if (selected_percentage != self._selected_percentage)\
+                and (selected_percentage is not None):
+
+            self._selected_percentage = selected_percentage
+            part_number = self._selected_index[(phase_space, time)][0]
+            sel_part_numb = int(selected_percentage * part_number)
+            sel_index =\
+                np.random.choice(np.arange(part_number), size=sel_part_numb,
+                                 replace=False)
+            sel_index.sort()
+            self._selected_index[(phase_space, time)][1] = sel_index
+
+        inds = self._selected_index[(phase_space, time)][1]
+        plt.scatter(ps[component1][inds], ps[component2][inds], s=1, **kwargs)
 
     def get_data(self, phase_space_name, timestep):
         """
@@ -184,7 +224,7 @@ class Particles(object):
         time : float
             Instant at which dictionary is retrieved
 
-        Results
+        Returns
         --------
         phase space : dict
             Data are returned as a dictionary.
@@ -249,11 +289,6 @@ class Particles(object):
         a string with the phase_space name or a dictionary.
                   """)
             return
-
-        if type(phase_space) is str:
-            file_path = self._Simulation._derive_file_path(phase_space,
-                                                           time)
-            file_path = file_path+'.bin'
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
@@ -417,9 +452,6 @@ class Particles(object):
         Please specify a time variable.
                       """)
                 return
-            file_path = self._Simulation._derive_file_path(phase_space,
-                                                           time)
-            file_path = file_path+'.bin'
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
@@ -589,10 +621,14 @@ class Particles(object):
 
         Parameters
         --------
-        phase_space : dictionary
-            Phase space dictionary with the particles that have to be selected.
-        params : dictionary
-            Dictionary with all the simulation parameters.
+        phase_space : dict or str
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float, optional
+            Time variable is needed when phase_space is a string
 
         Kwargs
         --------
@@ -603,6 +639,12 @@ class Particles(object):
 
                 It is possible to select parts of phase space to analyze via
                 the input kwargs.
+
+        Returns
+        --------
+        ps_selected : dict
+            Phase space dictionary with the selected particles
+
         """
         n_dimensions = self._params['n_dimensions']
 
@@ -672,3 +714,78 @@ class Particles(object):
         for key in ps.keys():
             ps_selected[key] = ps[key][tot_index]
         return ps_selected
+
+    def histogram(self, phase_space, time=None, component1='x',
+                  component2=None, **kwargs):
+        """
+        Method that generates either a 1D or a 2D histogram of a given set and
+        for given components of the phase space.
+        It is based on numpy histogram and, in the 2D case, represents results
+        via a pyplot.pcolormesh plot, masking away all points with a zero
+        contribution to the histogram.
+
+        Parameters
+        --------
+        phase_space : dict or str
+            If it is a string, is the phase space name.
+            Otherwise, a phase space dictionary (i.e. a phase space collected
+            via a get_data()) can be given.
+            To know the available field in the simulation,
+            check the s.show_outputs() variable.
+        time : float, optional
+            Time variable is needed when phase_space is a string
+        component1 : str, optional
+            First component of the scatter plot. Default is taken as 'x'.
+        component2 : str, optional
+            Second component of the scatter plot. Default is taken as None
+
+        Kwargs
+        --------
+        List of possible kwargs:
+
+                'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
+                'z_min', 'z_max', 'weight_min', 'weight_max'
+
+                It is possible to select parts of phase space to analyze via
+                the input kwargs.
+
+        For the histogram and the plot, possible kwargs are:
+
+            alpha, bins, cmap, density
+
+        """
+        cmap = 'Reds'
+        bins = 1000
+        density = True
+        alpha = 1
+
+        if 'cmap' in kwargs:
+            cmap = kwargs['cmap']
+            del kwargs['cmap']
+
+        if 'bins' in kwargs:
+            bins = kwargs['bins']
+            del kwargs['bins']
+
+        if 'density' in kwargs:
+            density = kwargs['density']
+            del kwargs['density']
+
+        if 'alpha' in kwargs:
+            alpha = kwargs['alpha']
+            del kwargs['alpha']
+
+        ps = self.select_particles(phase_space, time=time, **kwargs)
+
+        if component2 is None:
+            _ = plt.hist(ps[component1], weights=ps['weight'],
+                         bins=bins, density=density, alpha=alpha)
+
+        else:
+            H, xedge, yedge = np.histogram2d(ps[component1], ps[component2],
+                                             bins=bins, weights=ps['weight'],
+                                             density=density)
+            H = H.T
+            X, Y = np.meshgrid(xedge, yedge)
+            H = np.ma.masked_where(H == 0, H)
+            plt.pcolormesh(X, Y, H, cmap=cmap, alpha=alpha)

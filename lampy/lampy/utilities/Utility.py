@@ -32,8 +32,8 @@ for n in range(1, 6):
 
 _translated_filenames['electron_energy'] = 'Elenout'
 _translated_filenames['proton_energy'] = 'Prenout'
-_translated_filenames['phase_space_electron'] = 'Elpout'
-_translated_filenames['phase_space_proton'] = 'Prpout'
+_translated_filenames['phase_space_electrons'] = 'Elpout'
+_translated_filenames['phase_space_protons'] = 'Prpout'
 _translated_filenames['phase_space_ionization'] = 'Eionzout'
 _translated_filenames['phase_space_high_energy'] = 'E_hg_out'
 

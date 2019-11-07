@@ -9,6 +9,10 @@ _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
 _Envelope = ['A', 'a']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
+_Lorentz_force = ['Fy', 'Fz']
+# Lorentz force is assumed for a relativistic particle travelling along the x
+# direction
+
 for i in range(6):
     _Densities += ['rho_ion'+str(i)]
 
@@ -45,7 +49,13 @@ class Field(object):
     def _field_read(self, field_name, timestep):
 
         file_path = self._Simulation._derive_file_path(field_name, timestep)
-        f, x, y, z = read_ALaDyn_bin(file_path, self._params)
+        try:
+            f, x, y, z = read_ALaDyn_bin(file_path, self._params)
+        except FileNotFoundError:
+            print("""
+        Field {} not available, impossible to read.
+            """.format(field_name))
+            raise
 
         self._stored_fields[(field_name, timestep)] = f
         self._stored_axis[('x', timestep)] = x
@@ -81,12 +91,35 @@ class Field(object):
 
     def _return_field(self, field_name, timestep):
 
+        Lorentz_force = False
         field_list = self._search_field_by_timestep(timestep)
+
+        if field_name in _Lorentz_force:
+            Lorentz_force = True
+            component = field_name[1]
+            if component == 'y':
+                fields = ['Ey', 'Bz']
+            elif component == 'z':
+                fields = ['Ez', 'By']
+
         if field_name in field_list:
             pass
-
-        else:
+        elif not Lorentz_force:
             self._field_read(field_name, timestep)
+        else:
+            stor_fie = list()
+            for field in fields:
+                if field in field_list:
+                    pass
+                else:
+                    self._field_read(field, timestep)
+                stor_fie += [self._stored_fields[(field, timestep)]]
+            if component == 'y':
+                self._stored_fields[(field_name, timestep)] = \
+                    stor_fie[0] - stor_fie[1]
+            elif component == 'z':
+                self._stored_fields[(field_name, timestep)] = \
+                    stor_fie[0] + stor_fie[1]
 
     def _search_field_by_field(self, field_name):
 
@@ -113,7 +146,7 @@ class Field(object):
 
         This method produces a 2D map of the given field
         at the given timestep.
-        It is based on pylab.imshow, so it accepts all its **kwargs.
+        It is based on pyplot.pcolormesh, so it accepts all its **kwargs.
 
         Parameters
         --------
@@ -152,8 +185,9 @@ class Field(object):
 
         accepted_types = [str, np.ndarray]
         if type(field) not in accepted_types:
-            print("""Input field must be either a string with the field name
-            or a numpy array """)
+            print("""
+        Input field must be either a string with the field name or a numpy
+        array """)
             return
 
         if 'norm' in kwargs:
@@ -162,11 +196,14 @@ class Field(object):
         else:
             norm = None
 
-        timestep = self._Simulation._nearest_time(timestep)
+        if field not in self._Simulation.outputs:
+            print("""
+        {} is not available.
+        Available output are {}.
+        """.format(field, self._Simulation.outputs))
+            return
 
-        if type(field) is str:
-            file_path = self._Simulation._derive_file_path(field, timestep)
-            file_path = file_path+'.bin'
+        timestep = self._Simulation._nearest_time(timestep)
 
         folder = _translate_timestep(timestep, self._timesteps)
         box_limits = self._box_limits[folder]
@@ -221,7 +258,7 @@ class Field(object):
             f = field
 
         if self.normalized or normalized:
-            if field in _Electromagnetic_fields:
+            if field in _Electromagnetic_fields or field in _Lorentz_force:
                 if norm is None:
                     norm = self._E0
 
@@ -243,8 +280,7 @@ class Field(object):
             if self.comoving or comoving:
                 x = x-x[0]
             y = self._stored_axis[('y', timestep)]
-            plt.imshow(f.transpose(), origin='low',
-                       extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
+            plt.pcolormesh(x, y, f.transpose(), **kwargs)
 
         elif self._params['n_dimensions'] == 3:
 
@@ -254,8 +290,7 @@ class Field(object):
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
                 nz_map = map_plane['z']
-                plt.imshow(f[..., nz_map].transpose(), origin='low',
-                           extent=(x[0], x[-1], y[0], y[-1]), **kwargs)
+                plt.pcolormesh(x, y, f[..., nz_map].transpose(), **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
                 x = self._stored_axis[('x', timestep)]
@@ -263,15 +298,13 @@ class Field(object):
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
                 ny_map = map_plane['y']
-                plt.imshow(f[:, ny_map, :].transpose(), origin='low',
-                           extent=(x[0], x[-1], z[0], z[-1]), **kwargs)
+                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
                 nx_map = map_plane['x']
-                plt.imshow(f[nx_map, ...].transpose(), origin='low',
-                           extent=(y[0], y[-1], z[0], z[-1]), **kwargs)
+                plt.pcolormesh(y, z, f[nx_map, ...].transpose(), **kwargs)
 
     def lineout(self, field, timestep, axis='x',
                 normalized=False, comoving=False, **kwargs):
@@ -329,11 +362,14 @@ class Field(object):
         else:
             norm = None
 
-        timestep = self._Simulation._nearest_time(timestep)
+        if field not in self._Simulation.outputs:
+            print("""
+        {} is not available.
+        Available output are {}.
+        """.format(field, self._Simulation.outputs))
+            return
 
-        if type(field) is str:
-            file_path = self._Simulation._derive_file_path(field, timestep)
-            file_path = file_path+'.bin'
+        timestep = self._Simulation._nearest_time(timestep)
 
         folder = _translate_timestep(timestep, self._timesteps)
         box_limits = self._box_limits[folder]
@@ -383,7 +419,7 @@ class Field(object):
             f = field
 
         if self.normalized or normalized:
-            if field in _Electromagnetic_fields:
+            if field in _Electromagnetic_fields or field in _Lorentz_force:
                 if norm is None:
                     norm = self._E0
 
@@ -510,7 +546,7 @@ class Field(object):
         time : float
             Instant at which array is retrieved
 
-        Results
+        Returns
         --------
         field : dict
             Data are returned as a dictionary.
@@ -536,7 +572,7 @@ class Field(object):
         time : float
             Instant at which array is retrieved
 
-        Results
+        Returns
         --------
         axis : dict
             Data are returned as a dictionary.

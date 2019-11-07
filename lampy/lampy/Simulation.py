@@ -5,6 +5,16 @@ from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
 import os
 
+try:
+    import seaborn as sns
+    imported_seaborn = True
+except ImportError:
+    print("Cannot find seaborn module. Plots will be drawn according to the\
+            standard matplotlib style.")
+    imported_seaborn = False
+finally:
+    pass
+
 
 class Simulation(object):
     """
@@ -37,11 +47,19 @@ class Simulation(object):
     s.outputs : list
         List of all the available generated outputs
     s.Field : class
-        Class containing all the method to manipulate fields data.
+        Class containing all the methods to manipulate fields data.
         Check the informations about the Field class
         by typing
 
         >>> help(s.Field)
+
+    s.Particles : class
+        Class containing all the methods to manipulate particle data.
+        Check the informations about the Particles class
+        by typing
+
+        >>> help(s.Particles)
+
     """
 
     def __init__(self, path=os.getcwd()):
@@ -63,6 +81,11 @@ class Simulation(object):
             List of all the available generated outputs
         """
         plt.ion()
+
+        if imported_seaborn:
+            sns.set()
+            sns.set_style('ticks')
+
         self.params = self._open_folder(path)
         self.dx = self.params['dx']
         if 'dz' in self.params.keys():
@@ -99,6 +122,11 @@ class Simulation(object):
                 if value in elem:
                     output_list += [key]
                     break
+
+        if 'Ey' in output_list and 'Bz' in output_list:
+            output_list += ['Fy']
+        if 'Ez' in output_list and 'By' in output_list:
+            output_list += ['Fz']
 
         return output_list
 
