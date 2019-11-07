@@ -258,7 +258,7 @@ class Field(object):
             f = field
 
         if self.normalized or normalized:
-            if field in _Electromagnetic_fields:
+            if field in _Electromagnetic_fields or field in _Lorentz_force:
                 if norm is None:
                     norm = self._E0
 
@@ -419,7 +419,7 @@ class Field(object):
             f = field
 
         if self.normalized or normalized:
-            if field in _Electromagnetic_fields:
+            if field in _Electromagnetic_fields or field in _Lorentz_force:
                 if norm is None:
                     norm = self._E0
 
