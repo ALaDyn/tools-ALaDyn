@@ -82,9 +82,23 @@ class Particles(object):
 
         sim = self._Simulation
         ndim = self._params['n_dimensions']
+
+        if phase_space_name not in sim.output:
+            print("""
+        {} is not available.
+        Available output are {}.
+        """.format(phase_space_name, sim.output))
+            return
+
         file_path = sim._derive_file_path(phase_space_name, timestep)
-        phase_space = dict()
-        ps, part_number = total_phase_space_read(file_path, self._params)
+        try:
+            phase_space = dict()
+            ps, part_number = total_phase_space_read(file_path, self._params)
+        except FileNotFoundError:
+            print("""
+        Phase space {} not available, impossible to read.
+            """.format(phase_space_name))
+            raise
 
         if ndim == 3:
             phase_space['x'] = ps[0]
@@ -277,11 +291,6 @@ class Particles(object):
             return
 
         if type(phase_space) is str:
-            file_path = self._Simulation._derive_file_path(phase_space,
-                                                           time)
-            file_path = file_path+'.bin'
-
-        if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
             ps = self._stored_phase_space[(phase_space, time)]
         elif type(phase_space) is dict:
@@ -443,9 +452,6 @@ class Particles(object):
         Please specify a time variable.
                       """)
                 return
-            file_path = self._Simulation._derive_file_path(phase_space,
-                                                           time)
-            file_path = file_path+'.bin'
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
@@ -732,7 +738,7 @@ class Particles(object):
             First component of the scatter plot. Default is taken as 'x'.
         component2 : str, optional
             Second component of the scatter plot. Default is taken as None
-        
+
         Kwargs
         --------
         List of possible kwargs:
@@ -773,7 +779,7 @@ class Particles(object):
 
         if component2 is None:
             _ = plt.hist(ps[component1], weights=ps['weight'],
-                         bins=bins, density=density)
+                         bins=bins, density=density, alpha=alpha)
 
         else:
             H, xedge, yedge = np.histogram2d(ps[component1], ps[component2],
@@ -782,4 +788,4 @@ class Particles(object):
             H = H.T
             X, Y = np.meshgrid(xedge, yedge)
             H = np.ma.masked_where(H == 0, H)
-            plt.pcolormesh(X, Y, H, cmap=cmap)
+            plt.pcolormesh(X, Y, H, cmap=cmap, alpha=alpha)
