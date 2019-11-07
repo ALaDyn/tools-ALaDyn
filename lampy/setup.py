@@ -3,7 +3,7 @@ from setuptools.extension import Extension
 from Cython.Build import cythonize
 import numpy
 
-__version__ = "0.1.5.post4"
+__version__ = "0.2.0"
 
 with open('README.md') as f:
     long_description = f.read()
