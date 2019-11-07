@@ -37,7 +37,7 @@ class Diagnostics(object):
         timestep : float
             Time at which the diagnostic is read.
 
-        Results
+        Returns
         --------
         totdata : dict
             Function 'read_ionz_diagnostic' returns a dictionary with

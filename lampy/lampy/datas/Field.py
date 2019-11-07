@@ -506,7 +506,7 @@ class Field(object):
         time : float
             Instant at which array is retrieved
 
-        Results
+        Returns
         --------
         field : dict
             Data are returned as a dictionary.
@@ -532,7 +532,7 @@ class Field(object):
         time : float
             Instant at which array is retrieved
 
-        Results
+        Returns
         --------
         axis : dict
             Data are returned as a dictionary.
