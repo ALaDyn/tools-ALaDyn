@@ -8,7 +8,7 @@ import os
 try:
     import seaborn as sns
     imported_seaborn = True
-except:
+except ImportError:
     print("Cannot find seaborn module. Plots will be drawn according to the\
             standard matplotlib style.")
     imported_seaborn = False
@@ -122,6 +122,11 @@ class Simulation(object):
                 if value in elem:
                     output_list += [key]
                     break
+
+        if 'Ey' in output_list and 'Bz' in output_list:
+            output_list += ['Fy']
+        if 'Ez' in output_list and 'By' in output_list:
+            output_list += ['Fz']
 
         return output_list
 
