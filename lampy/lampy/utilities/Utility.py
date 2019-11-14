@@ -84,7 +84,12 @@ def _compute_physical_parameters(dictionary):
             dictionary['n0'] = dictionary['n_crit']*dictionary['n_over_nc']
             dictionary['n0'] = dictionary['n0']*1.E3*1.E18
             dictionary['n_crit'] = dictionary['n_crit']*1.E21
-
+    if 'n0_ref' in dictionary.keys():
+        lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
+        dictionary['omega_p'] = 2*pi/lambda_p
+        if 'lam0' in dictionary.keys():
+            dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
+            dictionary['n0'] = dictionary['n0_ref']*1.e18
 
 def _compute_simulation_parameters(dictionary):
     """
