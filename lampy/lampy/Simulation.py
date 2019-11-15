@@ -9,11 +9,23 @@ try:
     import seaborn as sns
     imported_seaborn = True
 except ImportError:
-    print("Cannot find seaborn module. Plots will be drawn according to the\
-            standard matplotlib style.")
+    print("""
+    Cannot find seaborn module. Plots will be drawn according to the
+    standard matplotlib style.
+        """)
     imported_seaborn = False
 finally:
     pass
+
+try:
+    import f90nml
+    imported_f90nml = True
+except ImportError:
+    print("""
+    Cannot find f90nml module.
+    Namelist will be read via a standard text interpreter.
+        """)
+    imported_f90nml = False
 
 
 class Simulation(object):
@@ -86,6 +98,8 @@ class Simulation(object):
             sns.set()
             sns.set_style('ticks')
 
+        if len(path) == 0:
+            path = os.getcwd()
         self.params = self._open_folder(path)
         self.dx = self.params['dx']
         if 'dz' in self.params.keys():
@@ -177,10 +191,15 @@ class Simulation(object):
 
     def _open_folder(self, path):
 
-        from .utilities.Utility import _read_simulation,\
-            _compute_physical_parameters, _compute_simulation_parameters
+        from .utilities.Utility import _read_simulation_nml,\
+            _compute_physical_parameters, _compute_simulation_parameters,\
+            _read_simulation_without_nml
 
-        params = _read_simulation(path)
+        if imported_f90nml:
+            params = _read_simulation_nml(path)
+        else:
+            params = _read_simulation_without_nml(path)
+
         _compute_physical_parameters(params)
         _compute_simulation_parameters(params)
 

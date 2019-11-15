@@ -91,6 +91,7 @@ def _compute_physical_parameters(dictionary):
             dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
             dictionary['n0'] = dictionary['n0_ref']*1.e18
 
+
 def _compute_simulation_parameters(dictionary):
     """
     Utility that computes the relevant physical parameters
@@ -110,6 +111,24 @@ def _compute_simulation_parameters(dictionary):
         dictionary['dz'] = dictionary['zx_rat']*dictionary['dx']
     else:
         dictionary['dz'] = dictionary['dy']
+
+
+def _find_inputs(path):
+    """
+    Utility that finds and classifies the input files found
+    in the folder.
+    """
+    tot_files = []
+    for dirpath, dirnames, filenames in os.walk(path):
+        tot_files.extend(filenames)
+        break
+
+    inputs = []
+    for f in tot_files:
+        if 'input_' in f and '.nml' in f:
+            inputs.append(f)
+
+    return inputs
 
 
 def _grid_convert(box_limits, params, **kwargs):
@@ -146,7 +165,36 @@ def _grid_convert(box_limits, params, **kwargs):
     return grid_point
 
 
-def _read_simulation(path):
+def _read_simulation_nml(path):
+    """
+    Utility that reads the 'input_??.nml' file
+    in the given folder to assign the simulation
+    parameters.
+    It requires the package f90nml to be installed.
+    """
+    import f90nml
+
+    param_dic = dict()
+    inputs = _find_inputs(path)
+    if len(inputs) > 1:
+        print("LAMPy not yet prepared to read more outputs.")
+        for name in inputs[1:]:
+            inputs.remove(name)
+
+    n = dict()
+    for f in inputs:
+        name = f[-6:-4]
+        n[name] = f90nml.read(f)
+
+    for input_name in n.keys():
+        for namelist_name in n[input_name]:
+            for key, item in n[input_name][namelist_name].items():
+                param_dic[key] = item
+
+    return param_dic
+
+
+def _read_simulation_without_nml(path):
     """
     Utility that reads the 'input.nml' file
     in the given folder to assign the simulation
