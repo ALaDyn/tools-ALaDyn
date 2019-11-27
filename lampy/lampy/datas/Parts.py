@@ -83,11 +83,11 @@ class Particles(object):
         sim = self._Simulation
         ndim = self._params['n_dimensions']
 
-        if phase_space_name not in sim.output:
+        if phase_space_name not in sim.outputs:
             print("""
         {} is not available.
         Available output are {}.
-        """.format(phase_space_name, sim.output))
+        """.format(phase_space_name, sim.outputs))
             return
 
         file_path = sim._derive_file_path(phase_space_name, timestep)

@@ -32,8 +32,7 @@ def read_ALaDyn_bin(file_path,params):
     f.seek(104)
     realdata_temp = struct.unpack('='+Nparam*'f', f.read(Nparam*4))
     f.seek(4)
-    nproc_y = integerdata_temp[0]
-    nproc_z = integerdata_temp[1]
+
     ndimension = integerdata_temp[14]
     nx = params['nx']
     ny = params['ny']
