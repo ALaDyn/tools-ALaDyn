@@ -2,25 +2,28 @@ from setuptools import setup, find_packages
 from setuptools.extension import Extension
 from Cython.Build import cythonize
 import numpy
+import os
 
-__version__ = "0.2.0"
+__version__ = '0.2.0'
 
 with open('README.md') as f:
     long_description = f.read()
 
 extensions = [Extension(
-          name="read_field",
-          sources=["lampy/fastread/read_field.pyx"]),
+          name='read_field',
+          sources=[os.path.join('lampy', 'fastread', 'read_field.pyx')]),
           Extension(
-          name="read_phase_space",
-          sources=["lampy/fastread/read_phase_space.pyx"])
+          name='read_phase_space',
+          sources=[os.path.join('lampy', 'fastread', 'read_phase_space.pyx')])
 ]
 
 lib_read_binary = ('lib_read_binary',
-                   {'sources': ['lampy/fastread/clibs/lib_read_binary.c']})
+                   {'sources': [os.path.join('lampy', 'fastread', 'clibs',
+                                             'lib_read_binary.c')]})
 lib_read_phase_space = ('lib_read_phase_space',
                         {'sources':
-                         ["lampy/fastread/clibs/lib_read_phase_space.c"]})
+                         [os.path.join('lampy', 'fastread', 'clibs',
+                                       'lib_read_phase_space.c')]})
 
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(
@@ -46,7 +49,7 @@ setup(
         'Programming Language :: Python :: 3.7'],
     ext_modules=cythonize(extensions),
     install_requires=[requirements],
-    ext_package='lampy/compiled_cython',
+    ext_package=os.path.join('lampy', 'compiled_cython'),
     libraries=[lib_read_binary, lib_read_phase_space],
     include_dirs=[numpy.get_include()]
 )
