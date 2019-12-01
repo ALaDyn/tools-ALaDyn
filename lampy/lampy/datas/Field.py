@@ -16,6 +16,8 @@ _Lorentz_force = ['Fy', 'Fz']
 for i in range(6):
     _Densities += ['rho_ion'+str(i)]
 
+_Field_list = _Electromagnetic_fields + _Envelope + _Densities
+
 
 class Field(object):
     """
@@ -27,7 +29,7 @@ class Field(object):
     quantity generated.
     """
 
-    def __init__(self, Simulation):
+    def __init__(self, Simulation, field_list):
 
         self._Simulation = Simulation
         self._params = Simulation.params
@@ -35,6 +37,7 @@ class Field(object):
         self._timesteps = Simulation._timesteps
         self._dimensions = Simulation._dimensions
         self._path = Simulation.path
+        self._Field_list = field_list
         self._stored_fields = dict()
         self._stored_axis = dict()
         self.normalized = False
@@ -45,27 +48,48 @@ class Field(object):
         self._omegap = self._params['omega_p']
         self._Directories = Simulation._Directories
         self._box_limits = self._read_all_box_limits()
+        self._field_dictionary = self._initialize_field_dic()
 
-    def _field_read(self, field_name, timestep):
+    def _field_read(self, field, timestep):
 
-        file_path = self._Simulation._derive_file_path(field_name, timestep)
-        try:
-            f, x, y, z = read_ALaDyn_bin(file_path, self._params)
-        except FileNotFoundError:
-            print("""
-        Field {} not available, impossible to read.
-            """.format(field_name))
-            raise
+        f = 0
+        field_list = self._field_dictionary[field]
+        for field_name in field_list:
+            file_path = self._Simulation._derive_file_path(field_name,
+                                                           timestep)
+            try:
+                f_temp, x, y, z = read_ALaDyn_bin(file_path, self._params)
+            except FileNotFoundError:
+                print("""
+            Field {} not available, impossible to read.
+                """.format(field_name))
+                raise
 
-        self._stored_fields[(field_name, timestep)] = f
-        self._stored_axis[('x', timestep)] = x
-        if self._params['n_dimensions'] >= 2:
-            self._stored_axis[('y', timestep)] = y
-        if self._params['n_dimensions'] == 3:
-            self._stored_axis[('z', timestep)] = z
+            self._stored_fields[(field_name, timestep)] = f_temp
+            self._stored_axis[('x', timestep)] = x
+            if self._params['n_dimensions'] >= 2:
+                self._stored_axis[('y', timestep)] = y
+            if self._params['n_dimensions'] == 3:
+                self._stored_axis[('z', timestep)] = z
+            if self._params['n_dimensions'] == 2:
+                self._stored_fields[(field_name, timestep)] =\
+                    self._stored_fields[(field_name, timestep)][:, :, 0]
+
+            if len(field_list) == 1:
+                return
+            f += f_temp
+
+        self._stored_fields[(field, timestep)] = f
         if self._params['n_dimensions'] == 2:
-            self._stored_fields[(field_name, timestep)] =\
-                self._stored_fields[(field_name, timestep)][:, :, 0]
+            self._stored_fields[(field, timestep)] =\
+                self._stored_fields[(field, timestep)][:, :, 0]
+
+    def _initialize_field_dic(self):
+
+        field_dic = dict()
+        for field in self._Field_list:
+            field_dic[field] = [field]
+        return field_dic
 
     def _read_all_box_limits(self):
 
@@ -104,9 +128,9 @@ class Field(object):
 
         if field_name in field_list:
             pass
-        elif not Lorentz_force:
+        elif field_name in self._Field_list:
             self._field_read(field_name, timestep)
-        else:
+        elif Lorentz_force:
             stor_fie = list()
             for field in fields:
                 if field in field_list:
@@ -515,7 +539,7 @@ class Field(object):
         """
         self.normalized = False
 
-    def comoving(self):
+    def set_comoving(self):
         """
         Method used to change the reference frame
         from the lab fixed to the comoving longitudinal axis.
@@ -592,3 +616,22 @@ class Field(object):
         ax['time'] = time
 
         return ax
+
+    def sum(self, field_list, new_name):
+        """
+        Method that defines a new custom field as the sum of
+        other two available fields.
+        WARNING: sum is performed on the available grid, so only fields
+        sharing the same grid should be summed.
+
+        Parameters
+        --------
+        field_list: list
+            List of strings containing the fields that should be summed
+            (e.g. ['rho_electrons', 'rho_fluid'])
+        new_name: str
+            Name of the newly defined field
+        """
+        self._field_dictionary[new_name] = field_list
+        self._Simulation.outputs += [new_name]
+        self._Field_list += [new_name]
