@@ -138,12 +138,17 @@ class Field(object):
                 else:
                     self._field_read(field, timestep)
                 stor_fie += [self._stored_fields[(field, timestep)]]
+            temp = np.zeros_like(stor_fie[0])
             if component == 'y':
+                temp[:-1, ...] = \
+                    0.5*(stor_fie[0][1:, ...] + stor_fie[0][:-1, ...])
                 self._stored_fields[(field_name, timestep)] = \
-                    stor_fie[0] - stor_fie[1]
+                    temp - stor_fie[1]
             elif component == 'z':
+                temp[:, :-1, ...] = \
+                    0.5*(stor_fie[0][:, 1:, ...] + stor_fie[0][:, :-1, ...])
                 self._stored_fields[(field_name, timestep)] = \
-                    stor_fie[0] + stor_fie[1]
+                    temp + stor_fie[1]
 
     def _search_field_by_field(self, field_name):
 
