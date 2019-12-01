@@ -112,6 +112,9 @@ def _compute_simulation_parameters(dictionary):
     else:
         dictionary['dz'] = dictionary['dy']
 
+    if dictionary['str_flag'] > 0:
+        dictionary['stretched'] = True
+
 
 def _find_inputs(path):
     """

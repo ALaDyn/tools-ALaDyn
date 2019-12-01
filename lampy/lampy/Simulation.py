@@ -1,5 +1,5 @@
 from .fastread.parameter_read import _output_directories
-from .datas.Field import Field
+from .datas.Field import Field, _Field_list
 from .datas.Parts import Particles
 from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
@@ -72,6 +72,12 @@ class Simulation(object):
 
         >>> help(s.Particles)
 
+    s.Diagnostic : class
+        Class containing all the methods to manipulate diagnostic files.
+        Check the informations about the Particles class
+        by typing
+
+        >>> help(s.Diagnostics)
     """
 
     def __init__(self, path=os.getcwd()):
@@ -115,7 +121,7 @@ class Simulation(object):
         self.directories = self._Directories._show()
         self._timesteps = self._collect_timesteps()
         self.outputs = self._collect_outputs()
-        self.Field = Field(self)
+        self.Field = Field(self, _Field_list)
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
         self.Diagnostics = Diagnostics(self)
@@ -233,6 +239,39 @@ class Simulation(object):
             print('')
             print(files)
             print('')
+
+    def box(self):
+        """
+        Method that prints the simulation box informations
+        """
+        nx = self.nx
+        ny = self.ny
+        nz = self.nz
+        dx = self.dx
+        if 'dz' in self.params.keys():
+            dz = self.params['dz']
+        if 'dy' in self.params.keys():
+            dy = self.params['dy']
+        nd = self.params['n_dimensions']
+        str_flag = self.params['str_flag']
+        print("""
+        Running the simulation in a {}D box.
+        """.format(nd))
+        print("""
+        Nx = {} <==> dx = {} p.p.m
+        """.format(nx, dx))
+        if nd > 1:
+            print("""
+        Ny = {} <==> dy = {} p.p.m
+        """.format(ny, dy))
+        if nd > 2:
+            print("""
+        Nz = {} <==> dz = {} p.p.m
+        """.format(nz, dz))
+        if str_flag > 0:
+            print("""
+        The grid is transversally stretched with a stretching flag {}
+        """.format(str_flag))
 
     def show_times(self):
         """
