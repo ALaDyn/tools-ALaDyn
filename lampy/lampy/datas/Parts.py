@@ -290,6 +290,8 @@ class Particles(object):
                   """)
             return
 
+        time = self._Simulation._nearest_time(time)
+
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
             ps = self._stored_phase_space[(phase_space, time)]
