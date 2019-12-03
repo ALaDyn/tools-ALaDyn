@@ -10,13 +10,14 @@ _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
 _Envelope = ['A', 'a']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 _Lorentz_force = ['Fy', 'Fz']
+_Energies = ['electrons_energy', 'protons_energy']
 # Lorentz force is assumed for a relativistic particle travelling along the x
 # direction
 
 for i in range(6):
     _Densities += ['rho_ion'+str(i)]
 
-_Field_list = _Electromagnetic_fields + _Envelope + _Densities
+_Field_list = _Electromagnetic_fields + _Envelope + _Densities + _Energies
 
 
 class Field(object):

@@ -30,8 +30,8 @@ for n in range(1, 6):
     _translated_filenames['rho_ion'+str(n)] = 'H'+str(n)+'dnout'
     _translated_filenames['energy_ion'+str(n)] = 'H'+str(n)+'enout'
 
-_translated_filenames['electron_energy'] = 'Elenout'
-_translated_filenames['proton_energy'] = 'Prenout'
+_translated_filenames['electrons_energy'] = 'Elenout'
+_translated_filenames['protons_energy'] = 'Prenout'
 _translated_filenames['phase_space_electrons'] = 'Elpout'
 _translated_filenames['phase_space_protons'] = 'Prpout'
 _translated_filenames['phase_space_ionization'] = 'Eionzout'
