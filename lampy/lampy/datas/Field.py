@@ -169,7 +169,8 @@ class Field(object):
         return field_list
 
     def map_2d(self, field, timestep,
-               plane='xy', normalized=False, comoving=False, **kwargs):
+               plane='xy', normalized=False, comoving=False,
+               mask=None, mask_argument=None, **kwargs):
         """
         Method that generates a 2D map.
 
@@ -197,6 +198,24 @@ class Field(object):
         comoving : bool, optional
             Set comoving = True to plot the fields respect to the longitudinal
             variable xi=x-v_w t, where v_w is the moving window velocity.
+        mask : function, optional
+            If a mask function is given, only the non-masked values of the
+            output field will be plotted. Tipically, a mask function can be
+            passed as an anonymus lambda function, e.g.
+
+                mask = lambda x, y: (x-130)**2 + y**2 <= 200
+
+            that will be interpreted using the numpy method
+            numpy.ma.masked_where.
+        mask_argument : str, optional
+            Possible values are None (default), 'field' or 'axes'.
+            If None, an explicit mask is used for the field array via
+
+                f = mask.
+
+            If 'field' or 'axes', the variables of the anonymus function will
+            be interpreted as the plotted field itself or the axes
+            respectively.
 
         kwargs
         --------
@@ -301,6 +320,11 @@ class Field(object):
 
             f = f/norm
 
+        if mask is not None and mask_argument == 'field':
+            f = np.ma.masked_where(mask(f), f)
+        elif mask is not None and mask_argument is None:
+            f = mask
+
         if self._params['n_dimensions'] == 2:
             if plane != 'xy':
                 print("""WARNING: output data is in two dimensions:
@@ -309,6 +333,9 @@ class Field(object):
             if self.comoving or comoving:
                 x = x-x[0]
             y = self._stored_axis[('y', timestep)]
+            if mask is not None and mask_argument == 'axes':
+                X, Y = np.meshgrid(x, y)
+                f = np.ma.masked_where(mask(X.transpose(), Y.transpose()), f)
             plt.pcolormesh(x, y, f.transpose(), **kwargs)
 
         elif self._params['n_dimensions'] == 3:
@@ -319,6 +346,10 @@ class Field(object):
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
                 nz_map = map_plane['z']
+                if mask is not None and mask_argument == 'axes':
+                    X, Y = np.meshgrid(x, y)
+                    f = np.ma.masked_where(mask(X.transpose(),
+                                           Y.transpose()), f)
                 plt.pcolormesh(x, y, f[..., nz_map].transpose(), **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
@@ -327,12 +358,20 @@ class Field(object):
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
                 ny_map = map_plane['y']
+                if mask is not None and mask_argument == 'axes':
+                    X, Z = np.meshgrid(x, z)
+                    f = np.ma.masked_where(mask(X.transpose(),
+                                           Z.transpose()), f)
                 plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
                 nx_map = map_plane['x']
+                if mask is not None and mask_argument == 'axes':
+                    Y, Z = np.meshgrid(y, z)
+                    f = np.ma.masked_where(mask(Y.transpose(),
+                                           Z.transpose()), f)
                 plt.pcolormesh(y, z, f[nx_map, ...].transpose(), **kwargs)
 
     def lineout(self, field, timestep, axis='x',
