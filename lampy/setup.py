@@ -4,7 +4,11 @@ from Cython.Build import cythonize
 import numpy
 import os
 
-__version__ = '0.2.0'
+about = dict()
+with open("lampy/__about__.py") as fp:
+    exec(fp.read(), about)
+
+__version__ = about['__version__']
 
 with open('README.md') as f:
     long_description = f.read()

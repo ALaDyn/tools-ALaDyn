@@ -1,5 +1,5 @@
 from .Simulation import Simulation
-from .__version__ import __version__
+from .__about__ import __version__
 
 __doc__ = """
 Light and fast Aladyn's data Manipulation in PYton (LAMPY)
