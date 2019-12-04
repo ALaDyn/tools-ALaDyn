@@ -718,7 +718,7 @@ class Particles(object):
         return ps_selected
 
     def histogram(self, phase_space, time=None, component1='x',
-                  component2=None, **kwargs):
+                  component2=None, comoving=False, **kwargs):
         """
         Method that generates either a 1D or a 2D histogram of a given set and
         for given components of the phase space.
@@ -740,6 +740,10 @@ class Particles(object):
             First component of the scatter plot. Default is taken as 'x'.
         component2 : str, optional
             Second component of the scatter plot. Default is taken as None
+        comoving : bool, optional
+            If True, the longitudinal axis is transformed as xi=x-v_w t.
+            Remember that, to obtain the comoving axis, the time is needed
+            even when the phase space dictionary is passed.
 
         Kwargs
         --------
@@ -777,7 +781,37 @@ class Particles(object):
             alpha = kwargs['alpha']
             del kwargs['alpha']
 
-        ps = self.select_particles(phase_space, time=time, **kwargs)
+        accepted_types = [str, dict]
+
+        if type(phase_space) not in accepted_types:
+            print("""
+        Input phase_space must be either a string with the phase_space name
+        or a dictionary
+                  """)
+            return
+
+        if type(phase_space) is str:
+            if time is None:
+                print("""
+        Time not known, impossible to plot datas.
+        Please specify a time variable.
+                      """)
+                return
+            time = self._Simulation._nearest_time(time)
+
+        if type(phase_space) is str:
+            self._return_phase_space(phase_space, time)
+            ps = self._stored_phase_space[(phase_space, time)].copy()
+        elif type(phase_space) is dict:
+            ps = phase_space.copy()
+
+        if comoving:
+            if time is None:
+                print("Time not known, impossible to shift datas.")
+                return
+            else:
+                v = self._params['w_speed']
+                ps['x'] = ps['x']-v*time
 
         if component2 is None:
             _ = plt.hist(ps[component1], weights=ps['weight'],
