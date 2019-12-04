@@ -88,9 +88,9 @@ def _compute_physical_parameters(dictionary):
     if 'n0_ref' in dictionary.keys():
         lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
         dictionary['omega_p'] = 2*pi/lambda_p
+        dictionary['n_reference'] = 1.e18
         if 'lam0' in dictionary.keys():
             dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
-            dictionary['n_reference'] = 1.e18
             dictionary['n0'] = dictionary['n0_ref']*dictionary['n_reference']
 
 
