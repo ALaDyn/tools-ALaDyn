@@ -272,7 +272,7 @@ class Particles(object):
         dx = self._params['dx']
         dy = self._params['dy']
         w0 = self._params['w0_y']
-        n0 = self._params['n0']*1.E-12
+        n0 = self._params['n_reference']*1.E-12
 
         pi = np.pi
 
@@ -432,7 +432,7 @@ class Particles(object):
         dx = self._params['dx']
         dy = self._params['dy']
         w0 = self._params['w0_y']
-        n0 = self._params['n0']*1.E-12
+        n0 = self._params['n_reference']*1.E-12
         if n_dimensions == 3:
             dz = self._params['dz']
         accepted_types = [str, dict]
