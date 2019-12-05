@@ -123,15 +123,16 @@ def _find_inputs(path):
     Utility that finds and classifies the input files found
     in the folder.
     """
-    tot_files = []
+    inputs = []
     for dirpath, dirnames, filenames in os.walk(path):
-        tot_files.extend(filenames)
+        for f in filenames:
+            if 'input_' in f and '.nml' in f:
+                inputs.append(os.path.join(dirpath,f))
         break
 
-    inputs = []
-    for f in tot_files:
-        if 'input_' in f and '.nml' in f:
-            inputs.append(f)
+    if len(inputs) == 0:
+        raise FileNotFoundError('No input namelist have been found in {}'
+                                .format(path))
 
     return inputs
 
