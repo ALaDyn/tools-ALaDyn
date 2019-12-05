@@ -30,7 +30,7 @@ except ImportError:
 
 class Simulation(object):
     """
-    Main class with all the simulation informations.
+    Main class with all the simulation information.
 
     From here, all the diagnostic can be accessed.
     To initialize the class, after having imported the package lampy,
@@ -38,14 +38,14 @@ class Simulation(object):
 
     >>> s=lampy.Simulation(path).
 
-    In all the package documentation, the previus sintax for the
+    In all the package documentation, the previous sintax for the
     simulation import will be assumed, so we will refer to the object
     'Simulation' as 's'.
 
     Parameters
     --------
     path : str, optional
-        Path where all the simulation datas are stored.
+        Path where all the simulation data are stored.
         If not given, by default '.' is passed
 
     Returns
@@ -60,21 +60,21 @@ class Simulation(object):
         List of all the available generated outputs
     s.Field : class
         Class containing all the methods to manipulate fields data.
-        Check the informations about the Field class
+        Check the information about the Field class
         by typing
 
         >>> help(s.Field)
 
     s.Particles : class
         Class containing all the methods to manipulate particle data.
-        Check the informations about the Particles class
+        Check the information about the Particles class
         by typing
 
         >>> help(s.Particles)
 
     s.Diagnostic : class
         Class containing all the methods to manipulate diagnostic files.
-        Check the informations about the Particles class
+        Check the information about the Particles class
         by typing
 
         >>> help(s.Diagnostics)
@@ -106,6 +106,11 @@ class Simulation(object):
 
         if len(path) == 0:
             path = os.getcwd()
+        path = os.path.abspath(path)
+
+        if not os.path.exists(path):
+            raise NotADirectoryError('Directory {} does not exist'
+                                     .format(path))
         self.params = self._open_folder(path)
         self.dx = self.params['dx']
         if 'dz' in self.params.keys():
