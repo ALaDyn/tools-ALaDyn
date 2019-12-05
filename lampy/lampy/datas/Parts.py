@@ -83,11 +83,11 @@ class Particles(object):
         sim = self._Simulation
         ndim = self._params['n_dimensions']
 
-        if phase_space_name not in sim.output:
+        if phase_space_name not in sim.outputs:
             print("""
         {} is not available.
         Available output are {}.
-        """.format(phase_space_name, sim.output))
+        """.format(phase_space_name, sim.outputs))
             return
 
         file_path = sim._derive_file_path(phase_space_name, timestep)
@@ -272,7 +272,7 @@ class Particles(object):
         dx = self._params['dx']
         dy = self._params['dy']
         w0 = self._params['w0_y']
-        n0 = self._params['n0']*1.E-12
+        n0 = self._params['n_reference']*1.E-12
 
         pi = np.pi
 
@@ -289,6 +289,8 @@ class Particles(object):
         a string with the phase_space name or a dictionary.
                   """)
             return
+
+        time = self._Simulation._nearest_time(time)
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
@@ -430,7 +432,7 @@ class Particles(object):
         dx = self._params['dx']
         dy = self._params['dy']
         w0 = self._params['w0_y']
-        n0 = self._params['n0']*1.E-12
+        n0 = self._params['n_reference']*1.E-12
         if n_dimensions == 3:
             dz = self._params['dz']
         accepted_types = [str, dict]
@@ -716,7 +718,7 @@ class Particles(object):
         return ps_selected
 
     def histogram(self, phase_space, time=None, component1='x',
-                  component2=None, **kwargs):
+                  component2=None, comoving=False, **kwargs):
         """
         Method that generates either a 1D or a 2D histogram of a given set and
         for given components of the phase space.
@@ -738,6 +740,10 @@ class Particles(object):
             First component of the scatter plot. Default is taken as 'x'.
         component2 : str, optional
             Second component of the scatter plot. Default is taken as None
+        comoving : bool, optional
+            If True, the longitudinal axis is transformed as xi=x-v_w t.
+            Remember that, to obtain the comoving axis, the time is needed
+            even when the phase space dictionary is passed.
 
         Kwargs
         --------
@@ -775,7 +781,37 @@ class Particles(object):
             alpha = kwargs['alpha']
             del kwargs['alpha']
 
-        ps = self.select_particles(phase_space, time=time, **kwargs)
+        accepted_types = [str, dict]
+
+        if type(phase_space) not in accepted_types:
+            print("""
+        Input phase_space must be either a string with the phase_space name
+        or a dictionary
+                  """)
+            return
+
+        if type(phase_space) is str:
+            if time is None:
+                print("""
+        Time not known, impossible to plot datas.
+        Please specify a time variable.
+                      """)
+                return
+            time = self._Simulation._nearest_time(time)
+
+        if type(phase_space) is str:
+            self._return_phase_space(phase_space, time)
+            ps = self._stored_phase_space[(phase_space, time)].copy()
+        elif type(phase_space) is dict:
+            ps = phase_space.copy()
+
+        if comoving:
+            if time is None:
+                print("Time not known, impossible to shift datas.")
+                return
+            else:
+                v = self._params['w_speed']
+                ps['x'] = ps['x']-v*time
 
         if component2 is None:
             _ = plt.hist(ps[component1], weights=ps['weight'],

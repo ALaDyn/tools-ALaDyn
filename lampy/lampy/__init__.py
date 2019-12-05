@@ -1,5 +1,5 @@
 from .Simulation import Simulation
-from .__version__ import __version__
+from .__about__ import __version__
 
 __doc__ = """
 Light and fast Aladyn's data Manipulation in PYton (LAMPY)
@@ -13,3 +13,6 @@ To import the simulation folder, type
 
 where 'path' is the relative or absolute path of interest.
 """
+
+print("LAMPy v"+__version__)
+print(__doc__)

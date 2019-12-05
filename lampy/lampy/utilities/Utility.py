@@ -30,8 +30,8 @@ for n in range(1, 6):
     _translated_filenames['rho_ion'+str(n)] = 'H'+str(n)+'dnout'
     _translated_filenames['energy_ion'+str(n)] = 'H'+str(n)+'enout'
 
-_translated_filenames['electron_energy'] = 'Elenout'
-_translated_filenames['proton_energy'] = 'Prenout'
+_translated_filenames['electrons_energy'] = 'Elenout'
+_translated_filenames['protons_energy'] = 'Prenout'
 _translated_filenames['phase_space_electrons'] = 'Elpout'
 _translated_filenames['phase_space_protons'] = 'Prpout'
 _translated_filenames['phase_space_ionization'] = 'Eionzout'
@@ -84,6 +84,14 @@ def _compute_physical_parameters(dictionary):
             dictionary['n0'] = dictionary['n_crit']*dictionary['n_over_nc']
             dictionary['n0'] = dictionary['n0']*1.E3*1.E18
             dictionary['n_crit'] = dictionary['n_crit']*1.E21
+            dictionary['n_reference'] = dictionary['n0']
+    if 'n0_ref' in dictionary.keys():
+        lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
+        dictionary['omega_p'] = 2*pi/lambda_p
+        dictionary['n_reference'] = 1.e18
+        if 'lam0' in dictionary.keys():
+            dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
+            dictionary['n0'] = dictionary['n0_ref']*dictionary['n_reference']
 
 
 def _compute_simulation_parameters(dictionary):
@@ -105,6 +113,27 @@ def _compute_simulation_parameters(dictionary):
         dictionary['dz'] = dictionary['zx_rat']*dictionary['dx']
     else:
         dictionary['dz'] = dictionary['dy']
+
+    if dictionary['str_flag'] > 0:
+        dictionary['stretched'] = True
+
+
+def _find_inputs(path):
+    """
+    Utility that finds and classifies the input files found
+    in the folder.
+    """
+    tot_files = []
+    for dirpath, dirnames, filenames in os.walk(path):
+        tot_files.extend(filenames)
+        break
+
+    inputs = []
+    for f in tot_files:
+        if 'input_' in f and '.nml' in f:
+            inputs.append(f)
+
+    return inputs
 
 
 def _grid_convert(box_limits, params, **kwargs):
@@ -141,7 +170,36 @@ def _grid_convert(box_limits, params, **kwargs):
     return grid_point
 
 
-def _read_simulation(path):
+def _read_simulation_nml(path):
+    """
+    Utility that reads the 'input_??.nml' file
+    in the given folder to assign the simulation
+    parameters.
+    It requires the package f90nml to be installed.
+    """
+    import f90nml
+
+    param_dic = dict()
+    inputs = _find_inputs(path)
+    if len(inputs) > 1:
+        print("LAMPy not yet prepared to read more outputs.")
+        for name in inputs[1:]:
+            inputs.remove(name)
+
+    n = dict()
+    for f in inputs:
+        name = f[-6:-4]
+        n[name] = f90nml.read(f)
+
+    for input_name in n.keys():
+        for namelist_name in n[input_name]:
+            for key, item in n[input_name][namelist_name].items():
+                param_dic[key] = item
+
+    return param_dic
+
+
+def _read_simulation_without_nml(path):
     """
     Utility that reads the 'input.nml' file
     in the given folder to assign the simulation

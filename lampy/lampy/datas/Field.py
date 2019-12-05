@@ -10,11 +10,14 @@ _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
 _Envelope = ['A', 'a']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 _Lorentz_force = ['Fy', 'Fz']
+_Energies = ['electrons_energy', 'protons_energy']
 # Lorentz force is assumed for a relativistic particle travelling along the x
 # direction
 
 for i in range(6):
     _Densities += ['rho_ion'+str(i)]
+
+_Field_list = _Electromagnetic_fields + _Envelope + _Densities + _Energies
 
 
 class Field(object):
@@ -27,7 +30,7 @@ class Field(object):
     quantity generated.
     """
 
-    def __init__(self, Simulation):
+    def __init__(self, Simulation, field_list):
 
         self._Simulation = Simulation
         self._params = Simulation.params
@@ -35,6 +38,7 @@ class Field(object):
         self._timesteps = Simulation._timesteps
         self._dimensions = Simulation._dimensions
         self._path = Simulation.path
+        self._Field_list = field_list
         self._stored_fields = dict()
         self._stored_axis = dict()
         self.normalized = False
@@ -45,27 +49,48 @@ class Field(object):
         self._omegap = self._params['omega_p']
         self._Directories = Simulation._Directories
         self._box_limits = self._read_all_box_limits()
+        self._field_dictionary = self._initialize_field_dic()
 
-    def _field_read(self, field_name, timestep):
+    def _field_read(self, field, timestep):
 
-        file_path = self._Simulation._derive_file_path(field_name, timestep)
-        try:
-            f, x, y, z = read_ALaDyn_bin(file_path, self._params)
-        except FileNotFoundError:
-            print("""
-        Field {} not available, impossible to read.
-            """.format(field_name))
-            raise
+        f = 0
+        field_list = self._field_dictionary[field]
+        for field_name in field_list:
+            file_path = self._Simulation._derive_file_path(field_name,
+                                                           timestep)
+            try:
+                f_temp, x, y, z = read_ALaDyn_bin(file_path, self._params)
+            except FileNotFoundError:
+                print("""
+            Field {} not available, impossible to read.
+                """.format(field_name))
+                raise
 
-        self._stored_fields[(field_name, timestep)] = f
-        self._stored_axis[('x', timestep)] = x
-        if self._params['n_dimensions'] >= 2:
-            self._stored_axis[('y', timestep)] = y
-        if self._params['n_dimensions'] == 3:
-            self._stored_axis[('z', timestep)] = z
+            self._stored_fields[(field_name, timestep)] = f_temp
+            self._stored_axis[('x', timestep)] = x
+            if self._params['n_dimensions'] >= 2:
+                self._stored_axis[('y', timestep)] = y
+            if self._params['n_dimensions'] == 3:
+                self._stored_axis[('z', timestep)] = z
+            if self._params['n_dimensions'] == 2:
+                self._stored_fields[(field_name, timestep)] =\
+                    self._stored_fields[(field_name, timestep)][:, :, 0]
+
+            if len(field_list) == 1:
+                return
+            f += f_temp
+
+        self._stored_fields[(field, timestep)] = f
         if self._params['n_dimensions'] == 2:
-            self._stored_fields[(field_name, timestep)] =\
-                self._stored_fields[(field_name, timestep)][:, :, 0]
+            self._stored_fields[(field, timestep)] =\
+                self._stored_fields[(field, timestep)][:, :, 0]
+
+    def _initialize_field_dic(self):
+
+        field_dic = dict()
+        for field in self._Field_list:
+            field_dic[field] = [field]
+        return field_dic
 
     def _read_all_box_limits(self):
 
@@ -104,9 +129,9 @@ class Field(object):
 
         if field_name in field_list:
             pass
-        elif not Lorentz_force:
+        elif field_name in self._Field_list:
             self._field_read(field_name, timestep)
-        else:
+        elif Lorentz_force:
             stor_fie = list()
             for field in fields:
                 if field in field_list:
@@ -114,12 +139,17 @@ class Field(object):
                 else:
                     self._field_read(field, timestep)
                 stor_fie += [self._stored_fields[(field, timestep)]]
+            temp = np.zeros_like(stor_fie[0])
             if component == 'y':
+                temp[:-1, ...] = \
+                    0.5*(stor_fie[0][1:, ...] + stor_fie[0][:-1, ...])
                 self._stored_fields[(field_name, timestep)] = \
-                    stor_fie[0] - stor_fie[1]
+                    temp - stor_fie[1]
             elif component == 'z':
+                temp[:, :-1, ...] = \
+                    0.5*(stor_fie[0][:, 1:, ...] + stor_fie[0][:, :-1, ...])
                 self._stored_fields[(field_name, timestep)] = \
-                    stor_fie[0] + stor_fie[1]
+                    temp + stor_fie[1]
 
     def _search_field_by_field(self, field_name):
 
@@ -140,7 +170,8 @@ class Field(object):
         return field_list
 
     def map_2d(self, field, timestep,
-               plane='xy', normalized=False, comoving=False, **kwargs):
+               plane='xy', normalized=False, comoving=False,
+               mask=None, mask_argument=None, **kwargs):
         """
         Method that generates a 2D map.
 
@@ -168,6 +199,24 @@ class Field(object):
         comoving : bool, optional
             Set comoving = True to plot the fields respect to the longitudinal
             variable xi=x-v_w t, where v_w is the moving window velocity.
+        mask : function, optional
+            If a mask function is given, only the non-masked values of the
+            output field will be plotted. Tipically, a mask function can be
+            passed as an anonymus lambda function, e.g.
+
+                mask = lambda x, y: (x-130)**2 + y**2 <= 200
+
+            that will be interpreted using the numpy method
+            numpy.ma.masked_where.
+        mask_argument : str, optional
+            Possible values are None (default), 'field' or 'axes'.
+            If None, an explicit mask is used for the field array via
+
+                f = mask.
+
+            If 'field' or 'axes', the variables of the anonymus function will
+            be interpreted as the plotted field itself or the axes
+            respectively.
 
         kwargs
         --------
@@ -272,6 +321,11 @@ class Field(object):
 
             f = f/norm
 
+        if mask is not None and mask_argument == 'field':
+            f = np.ma.masked_where(mask(f), f)
+        elif mask is not None and mask_argument is None:
+            f = mask
+
         if self._params['n_dimensions'] == 2:
             if plane != 'xy':
                 print("""WARNING: output data is in two dimensions:
@@ -280,6 +334,9 @@ class Field(object):
             if self.comoving or comoving:
                 x = x-x[0]
             y = self._stored_axis[('y', timestep)]
+            if mask is not None and mask_argument == 'axes':
+                X, Y = np.meshgrid(x, y)
+                f = np.ma.masked_where(mask(X.transpose(), Y.transpose()), f)
             plt.pcolormesh(x, y, f.transpose(), **kwargs)
 
         elif self._params['n_dimensions'] == 3:
@@ -290,6 +347,10 @@ class Field(object):
                     x = x-x[0]
                 y = self._stored_axis[('y', timestep)]
                 nz_map = map_plane['z']
+                if mask is not None and mask_argument == 'axes':
+                    X, Y = np.meshgrid(x, y)
+                    f = np.ma.masked_where(mask(X.transpose(),
+                                           Y.transpose()), f)
                 plt.pcolormesh(x, y, f[..., nz_map].transpose(), **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
@@ -298,12 +359,20 @@ class Field(object):
                     x = x-x[0]
                 z = self._stored_axis[('z', timestep)]
                 ny_map = map_plane['y']
+                if mask is not None and mask_argument == 'axes':
+                    X, Z = np.meshgrid(x, z)
+                    f = np.ma.masked_where(mask(X.transpose(),
+                                           Z.transpose()), f)
                 plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
                 z = self._stored_axis[('z', timestep)]
                 nx_map = map_plane['x']
+                if mask is not None and mask_argument == 'axes':
+                    Y, Z = np.meshgrid(y, z)
+                    f = np.ma.masked_where(mask(Y.transpose(),
+                                           Z.transpose()), f)
                 plt.pcolormesh(y, z, f[nx_map, ...].transpose(), **kwargs)
 
     def lineout(self, field, timestep, axis='x',
@@ -515,7 +584,7 @@ class Field(object):
         """
         self.normalized = False
 
-    def comoving(self):
+    def set_comoving(self):
         """
         Method used to change the reference frame
         from the lab fixed to the comoving longitudinal axis.
@@ -592,3 +661,22 @@ class Field(object):
         ax['time'] = time
 
         return ax
+
+    def sum(self, field_list, new_name):
+        """
+        Method that defines a new custom field as the sum of
+        other two available fields.
+        WARNING: sum is performed on the available grid, so only fields
+        sharing the same grid should be summed.
+
+        Parameters
+        --------
+        field_list: list
+            List of strings containing the fields that should be summed
+            (e.g. ['rho_electrons', 'rho_fluid'])
+        new_name: str
+            Name of the newly defined field
+        """
+        self._field_dictionary[new_name] = field_list
+        self._Simulation.outputs += [new_name]
+        self._Field_list += [new_name]
