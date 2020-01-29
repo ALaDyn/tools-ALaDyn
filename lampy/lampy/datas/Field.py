@@ -194,8 +194,9 @@ class Field(object):
             Plane where to execute the cut. Every plane is always defined
             at the center of the orthogonal axis.
         normalized : bool, optional
-            Set normalized = True to plot the field normalized to the 'unit_field'
-            quantity. By default, fields are displayed in code units.
+            Set normalized = True to plot the field normalized to the
+            'unit_field' quantity.
+            By default, fields are displayed in code units.
         comoving : bool, optional
             Set comoving = True to plot the fields respect to the longitudinal
             variable xi=x-v_w t, where v_w is the moving window velocity.
@@ -399,8 +400,9 @@ class Field(object):
             Axis along which the lineout is plotted. The plotting axis
             always intersects the orthogonal plane in its center.
         normalized : bool, optional
-            Set normalized = True to plot the field normalized to the 'unit_field'
-            quantity. By default, fields are displayed in code units.
+            Set normalized = True to plot the field normalized to the
+            'unit_field' quantity.
+            By default, fields are displayed in code units.
         comoving : bool, optional
             Set comoving = True to plot the fields respect to the longitudinal
             variable xi=x-v_w t, where v_w is the moving window velocity.
