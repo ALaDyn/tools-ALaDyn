@@ -127,7 +127,7 @@ def _find_inputs(path):
     for dirpath, dirnames, filenames in os.walk(path):
         for f in filenames:
             if 'input_' in f and '.nml' in f:
-                inputs.append(os.path.join(dirpath,f))
+                inputs.append(os.path.join(dirpath, f))
         break
 
     if len(inputs) == 0:
@@ -271,11 +271,11 @@ def _stretch_function(x, nx, ns, dx):
     """
     Stretch function.
 
-        / (5 dx ns)/(2 pi) tan(2 pi/5 (n-ns)/ns) + ns dx + C,   if 0 < n < ns
-
+        ( (5 dx ns)/(2 pi) tan(2 pi/5 (n-ns)/ns) + ns dx + C,   if 0 < n < ns
+       (
 f(x)= <  dx n + C,  if ns < n < nt-ns
-
-        \ dx (nt-ns) + (5 dx ns)/(2 pi) tan(2 pi/5 (n-(nt-ns))/ns) + C , else
+       (
+        ( dx (nt-ns) + (5 dx ns)/(2 pi) tan(2 pi/5 (n-(nt-ns))/ns) + C , else
 
     nt : total number of cells in the transverse direction.
     ns : total number of stretched cells

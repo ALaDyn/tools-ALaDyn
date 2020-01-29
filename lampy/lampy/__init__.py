@@ -2,7 +2,7 @@ from .Simulation import Simulation
 from .__about__ import __version__
 
 __doc__ = """
-Light and fast Aladyn's data Manipulation in PYton (LAMPY)
+Light and fast ALaDyn's data Manipulation in PYthon (LAMPy)
 
 This package is developed by the ALaDyn Collaboration
 
