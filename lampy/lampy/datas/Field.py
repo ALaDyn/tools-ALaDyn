@@ -194,7 +194,7 @@ class Field(object):
             Plane where to execute the cut. Every plane is always defined
             at the center of the orthogonal axis.
         normalized : bool, optional
-            Set normalized = True to plot the field normalized to the 'norm'
+            Set normalized = True to plot the field normalized to the 'unit_field'
             quantity. By default, fields are displayed in code units.
         comoving : bool, optional
             Set comoving = True to plot the fields respect to the longitudinal
@@ -220,10 +220,10 @@ class Field(object):
 
         kwargs
         --------
-        norm : float
-            Fields are normalized to the given norm.
+        unit_field : float
+            Fields are normalized to the given unit_field.
             To normalize electromagnetic fields to the cold wavebreaking limit,
-            call norm = s.params['omega_p']
+            call unit_field = s.params['omega_p']
         x : float
             Moves the cutting plane along the x axis to a given x value
         y : float
@@ -239,9 +239,9 @@ class Field(object):
         array """)
             return
 
-        if 'norm' in kwargs:
-            norm = kwargs['norm']
-            del kwargs['norm']
+        if 'unit_field' in kwargs:
+            norm = kwargs['unit_field']
+            del kwargs['unit_field']
         else:
             norm = None
 
@@ -399,7 +399,7 @@ class Field(object):
             Axis along which the lineout is plotted. The plotting axis
             always intersects the orthogonal plane in its center.
         normalized : bool, optional
-            Set normalized = True to plot the field normalized to the 'norm'
+            Set normalized = True to plot the field normalized to the 'unit_field'
             quantity. By default, fields are displayed in code units.
         comoving : bool, optional
             Set comoving = True to plot the fields respect to the longitudinal
@@ -407,10 +407,10 @@ class Field(object):
 
         kwargs
         --------
-        norm : float
-            Fields are normalized to the given norm.
+        unit_field : float
+            Fields are normalized to the given unit_field.
             To normalize electromagnetic fields to the cold wavebreaking limit,
-            call norm = s.params['omega_p']
+            call unit_field = s.params['omega_p']
         x : float
             Moves the lineout axis along the x axis to a given x value
         y : float
@@ -425,9 +425,9 @@ class Field(object):
             or a numpy array """)
             return
 
-        if 'norm' in kwargs:
-            norm = kwargs['norm']
-            del kwargs['norm']
+        if 'unit_field' in kwargs:
+            norm = kwargs['unit_field']
+            del kwargs['unit_field']
         else:
             norm = None
 
@@ -553,12 +553,12 @@ class Field(object):
             'Electromagnetic', 'Envelope', 'Density', 'All'
         kwargs
         --------
-        norm : float
+        unit_field : float
             Defines the normalizing value
         """
         norm = None
-        if 'norm' in kwargs:
-            norm = kwargs['norm']
+        if 'unit_field' in kwargs:
+            norm = kwargs['unit_field']
 
         if field_type == 'Electromagnetic' or field_type == 'All':
             if norm is not None:
