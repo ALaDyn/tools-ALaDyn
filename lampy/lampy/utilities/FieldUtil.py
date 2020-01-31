@@ -4,14 +4,9 @@ import numpy as np
 def convert_a_in_e(real_part, imaginary_part, x_axis, time,
                    parameters, **kwargs):
 
-    nx = parameters['nx']
-    ny = parameters['ny']
-    nz = parameters['nz']
     dx = parameters['dx']
 
     omega_0 = parameters['omega_0']
-
-    e_field = np.zeros((nx, ny, nz))
 
     phi = omega_0*(x_axis - time)
 
@@ -30,14 +25,9 @@ def convert_a_in_e_envelope(real_part, imaginary_part, x_axis, time,
 
     from scipy.signal import hilbert
 
-    nx = parameters['nx']
-    ny = parameters['ny']
-    nz = parameters['nz']
     dx = parameters['dx']
 
     omega_0 = parameters['omega_0']
-
-    e_field = np.zeros((nx, ny, nz))
 
     phi = omega_0*(x_axis - time)
 
