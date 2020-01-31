@@ -1,7 +1,4 @@
 from .fastread.parameter_read import _output_directories
-from .datas.Field import Field, _Field_list
-from .datas.Parts import Particles
-from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
 import os
 
@@ -98,6 +95,10 @@ class Simulation(object):
         s.outputs : list
             List of all the available generated outputs
         """
+        from .datas.Field import Field, _Field_list
+        from .datas.Parts import Particles
+        from .datas.Diag import Diagnostics
+
         plt.ion()
 
         if imported_seaborn:
@@ -157,6 +158,8 @@ class Simulation(object):
                 and 'A' not in output_list:
             output_list += ['A']
             self._a_from_imaginary = True
+        if 'ReA' in output_list and 'ImA' in output_list:
+            output_list += ['E_laser', 'E_envelope']
 
         return output_list
 
