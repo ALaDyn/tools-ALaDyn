@@ -121,6 +121,7 @@ class Simulation(object):
         self.ny = self.params['ny']
         self.nz = self.params['nz']
         self._dimensions = self.params['n_dimensions']
+        self._a_from_imaginary = False
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
         self.directories = self._Directories._show()
@@ -130,7 +131,6 @@ class Simulation(object):
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
         self.Diagnostics = Diagnostics(self)
-        self.__a_from_imaginary = False
 
     def _collect_outputs(self, *args):
 
@@ -154,9 +154,9 @@ class Simulation(object):
         if 'Ez' in output_list and 'By' in output_list:
             output_list += ['Fz']
         if 'ReA' in output_list and 'ImA' in output_list \
-            and 'A' not in output_list:
+                and 'A' not in output_list:
             output_list += ['A']
-            self.__a_from_imaginary = True
+            self._a_from_imaginary = True
 
         return output_list
 

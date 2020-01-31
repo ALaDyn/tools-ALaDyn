@@ -90,6 +90,12 @@ class Field(object):
         field_dic = dict()
         for field in self._Field_list:
             field_dic[field] = [field]
+
+        if 'ReA' in self._Simulation.outputs and \
+                'ImA' in self._Simulation.outputs:
+            del field_dic['A']
+            self._Field_list.remove('A')
+
         return field_dic
 
     def _read_all_box_limits(self):
@@ -128,7 +134,7 @@ class Field(object):
             elif component == 'z':
                 fields = ['Ez', 'By']
 
-        if self._Simulation.__a_from_imaginary and field_name == 'A':
+        if self._Simulation._a_from_imaginary and field_name == 'A':
             fields = ['ReA', 'ImA']
             Complex_envelope = True
 
