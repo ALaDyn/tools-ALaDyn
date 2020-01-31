@@ -7,7 +7,7 @@ import numpy as np
 
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
-_Envelope = ['A', 'a']
+_Envelope = ['A', 'a', 'ReA', 'ImA']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 _Lorentz_force = ['Fy', 'Fz']
 _Energies = ['electrons_energy', 'protons_energy']
@@ -117,6 +117,7 @@ class Field(object):
     def _return_field(self, field_name, timestep):
 
         Lorentz_force = False
+        Complex_envelope = False
         field_list = self._search_field_by_timestep(timestep)
 
         if field_name in _Lorentz_force:
@@ -126,6 +127,10 @@ class Field(object):
                 fields = ['Ey', 'Bz']
             elif component == 'z':
                 fields = ['Ez', 'By']
+
+        if self._Simulation.__a_from_imaginary and field_name == 'A':
+            fields = ['ReA', 'ImA']
+            Complex_envelope = True
 
         if field_name in field_list:
             pass
@@ -150,6 +155,16 @@ class Field(object):
                     0.5*(stor_fie[0][:, 1:, ...] + stor_fie[0][:, :-1, ...])
                 self._stored_fields[(field_name, timestep)] = \
                     temp + stor_fie[1]
+        elif Complex_envelope:
+            stor_fie = list()
+            for field in fields:
+                if field in field_list:
+                    pass
+                else:
+                    self._field_read(field, timestep)
+                stor_fie += [self._stored_fields[(field, timestep)]]
+            self._stored_fields[(field_name, timestep)] = \
+                np.sqrt(stor_fie[0]**2+stor_fie[1]**2)
 
     def _search_field_by_field(self, field_name):
 

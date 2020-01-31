@@ -130,6 +130,7 @@ class Simulation(object):
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
         self.Diagnostics = Diagnostics(self)
+        self.__a_from_imaginary = False
 
     def _collect_outputs(self, *args):
 
@@ -152,6 +153,10 @@ class Simulation(object):
             output_list += ['Fy']
         if 'Ez' in output_list and 'By' in output_list:
             output_list += ['Fz']
+        if 'ReA' in output_list and 'ImA' in output_list \
+            and 'A' not in output_list:
+            output_list += ['A']
+            self.__a_from_imaginary = True
 
         return output_list
 
