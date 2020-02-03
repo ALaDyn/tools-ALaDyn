@@ -7,10 +7,11 @@ import numpy as np
 
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
-_Envelope = ['A', 'a']
+_Envelope = ['A', 'a', 'ReA', 'ImA']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 _Lorentz_force = ['Fy', 'Fz']
 _Energies = ['electrons_energy', 'protons_energy']
+_Laser_from_envelope = ['E_laser', 'E_envelope']
 # Lorentz force is assumed for a relativistic particle travelling along the x
 # direction
 
@@ -90,6 +91,11 @@ class Field(object):
         field_dic = dict()
         for field in self._Field_list:
             field_dic[field] = [field]
+
+        if 'ReA' in self._Simulation.outputs and \
+                'ImA' in self._Simulation.outputs:
+            del field_dic['A']
+
         return field_dic
 
     def _read_all_box_limits(self):
@@ -117,6 +123,8 @@ class Field(object):
     def _return_field(self, field_name, timestep):
 
         Lorentz_force = False
+        Complex_envelope = False
+        Las_from_env = False
         field_list = self._search_field_by_timestep(timestep)
 
         if field_name in _Lorentz_force:
@@ -127,10 +135,20 @@ class Field(object):
             elif component == 'z':
                 fields = ['Ez', 'By']
 
+        if self._Simulation._a_from_imaginary and field_name == 'A':
+            fields = ['ReA', 'ImA']
+            Complex_envelope = True
+
+        if field_name in _Laser_from_envelope:
+            fields = ['ReA', 'ImA']
+            Las_from_env = True
+
         if field_name in field_list:
             pass
-        elif field_name in self._Field_list:
+
+        elif field_name in self._field_dictionary.keys():
             self._field_read(field_name, timestep)
+
         elif Lorentz_force:
             stor_fie = list()
             for field in fields:
@@ -150,6 +168,42 @@ class Field(object):
                     0.5*(stor_fie[0][:, 1:, ...] + stor_fie[0][:, :-1, ...])
                 self._stored_fields[(field_name, timestep)] = \
                     temp + stor_fie[1]
+
+        elif Complex_envelope:
+            stor_fie = list()
+            for field in fields:
+                if field in field_list:
+                    pass
+                else:
+                    self._field_read(field, timestep)
+                stor_fie += [self._stored_fields[(field, timestep)]]
+            self._stored_fields[(field_name, timestep)] = \
+                np.sqrt(stor_fie[0]**2+stor_fie[1]**2)
+
+        elif Las_from_env:
+
+            from ..utilities.FieldUtil import convert_a_in_e, \
+                convert_a_in_e_envelope
+
+            stor_fie = list()
+            for field in fields:
+                if field in field_list:
+                    pass
+                else:
+                    self._field_read(field, timestep)
+                stor_fie += [self._stored_fields[(field, timestep)]]
+
+            if field_name == 'E_laser':
+                x = self._stored_axis[('x', timestep)]
+                self._stored_fields[(field_name, timestep)] = \
+                    convert_a_in_e(stor_fie[0], stor_fie[1], x, timestep,
+                                   self._params)
+            elif field_name == 'E_envelope':
+                x = self._stored_axis[('x', timestep)]
+                self._stored_fields[(field_name, timestep)] = \
+                    convert_a_in_e_envelope(stor_fie[0], stor_fie[1],
+                                            x, timestep,
+                                            self._params)
 
     def _search_field_by_field(self, field_name):
 

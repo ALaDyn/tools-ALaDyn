@@ -1,7 +1,4 @@
 from .fastread.parameter_read import _output_directories
-from .datas.Field import Field, _Field_list
-from .datas.Parts import Particles
-from .datas.Diag import Diagnostics
 import matplotlib.pyplot as plt
 import os
 
@@ -98,6 +95,10 @@ class Simulation(object):
         s.outputs : list
             List of all the available generated outputs
         """
+        from .datas.Field import Field, _Field_list
+        from .datas.Parts import Particles
+        from .datas.Diag import Diagnostics
+
         plt.ion()
 
         if imported_seaborn:
@@ -121,6 +122,7 @@ class Simulation(object):
         self.ny = self.params['ny']
         self.nz = self.params['nz']
         self._dimensions = self.params['n_dimensions']
+        self._a_from_imaginary = False
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
         self.directories = self._Directories._show()
@@ -152,6 +154,12 @@ class Simulation(object):
             output_list += ['Fy']
         if 'Ez' in output_list and 'By' in output_list:
             output_list += ['Fz']
+        if 'ReA' in output_list and 'ImA' in output_list \
+                and 'A' not in output_list:
+            output_list += ['A']
+            self._a_from_imaginary = True
+        if 'ReA' in output_list and 'ImA' in output_list:
+            output_list += ['E_laser', 'E_envelope']
 
         return output_list
 
