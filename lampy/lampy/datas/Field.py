@@ -7,6 +7,7 @@ import numpy as np
 
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
+_Currents = ['Jx', 'Jy', 'Jz', 'Px_fluid', 'Py_fluid', 'Pz_fluid']
 _Envelope = ['A', 'a', 'ReA', 'ImA']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 _Lorentz_force = ['Fy', 'Fz']
@@ -18,7 +19,8 @@ _Laser_from_envelope = ['E_laser', 'E_envelope']
 for i in range(6):
     _Densities += ['rho_ion'+str(i)]
 
-_Field_list = _Electromagnetic_fields + _Envelope + _Densities + _Energies
+_Field_list = _Electromagnetic_fields + _Envelope + _Densities + _Energies +\
+    _Currents
 
 
 class Field(object):
