@@ -97,8 +97,11 @@ def _compute_physical_parameters(dictionary):
             dictionary['n_crit'] = dictionary['n_crit']*1.E21
             dictionary['n_reference'] = dictionary['n0']
     if 'n0_ref' in dictionary.keys():
-        lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
-        dictionary['omega_p'] = 2*pi/lambda_p
+        try:
+            lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
+            dictionary['omega_p'] = 2*pi/lambda_p
+        except ZeroDivisionError:
+            dictionary['omega_p'] = 0.
         dictionary['n_reference'] = 1.e18
         if 'lam0' in dictionary.keys():
             dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
