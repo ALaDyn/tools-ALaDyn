@@ -18,14 +18,17 @@ _translated_filenames['Ez'] = 'Ezfout'
 _translated_filenames['Bx'] = 'Bxfout'
 _translated_filenames['By'] = 'Byfout'
 _translated_filenames['Bz'] = 'Bzfout'
-_translated_filenames['Jx'] = 'Jxfout'
-_translated_filenames['Jy'] = 'Jyfout'
-_translated_filenames['Jz'] = 'Jzfout'
+_translated_filenames['Jx'] = 'denvxout'
+_translated_filenames['Jy'] = 'denvyout'
+_translated_filenames['Jz'] = 'denvzout'
 _translated_filenames['A'] = 'Aenvout'
 _translated_filenames['a'] = 'aenvout'
 _translated_filenames['ReA'] = 'Renvout'
 _translated_filenames['ImA'] = 'Ienvout'
 _translated_filenames['rho_fluid'] = 'Fdenout'
+_translated_filenames['Px_fluid'] = 'Flpxout'
+_translated_filenames['Py_fluid'] = 'Flpyout'
+_translated_filenames['Pz_fluid'] = 'Flpzout'
 _translated_filenames['rho_electrons'] = 'Edenout'
 _translated_filenames['rho_protons'] = 'Pdenout'
 for n in range(1, 6):
@@ -52,7 +55,13 @@ _total_filenamelist += ['Renvout']
 _total_filenamelist += ['Ienvout']
 _total_filenamelist += ['Aenvout']
 _total_filenamelist += ['aenvout']
+_total_filenamelist += ['denvxout']
+_total_filenamelist += ['denvyout']
+_total_filenamelist += ['denvzout']
 _total_filenamelist += ['Fdenout']
+_total_filenamelist += ['Flpxout']
+_total_filenamelist += ['Flpyout']
+_total_filenamelist += ['Flpzout']
 _total_filenamelist += ['Edenout']
 _total_filenamelist += ['Elenout']
 _total_filenamelist += ['Elpout']
@@ -88,8 +97,11 @@ def _compute_physical_parameters(dictionary):
             dictionary['n_crit'] = dictionary['n_crit']*1.E21
             dictionary['n_reference'] = dictionary['n0']
     if 'n0_ref' in dictionary.keys():
-        lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
-        dictionary['omega_p'] = 2*pi/lambda_p
+        try:
+            lambda_p = 33*np.sqrt(1/dictionary['n0_ref'])
+            dictionary['omega_p'] = 2*pi/lambda_p
+        except ZeroDivisionError:
+            dictionary['omega_p'] = 0.
         dictionary['n_reference'] = 1.e18
         if 'lam0' in dictionary.keys():
             dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
