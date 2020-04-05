@@ -6,6 +6,7 @@ dist/
 *.egg-info/
 read_field.c
 read_phase_space.c
+read_tracking.c
 
 #VS Code
 .vs/

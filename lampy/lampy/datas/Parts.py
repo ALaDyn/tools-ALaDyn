@@ -12,32 +12,32 @@ e = 1.6E-7
 
 class Particles(object):
 
+    """
+    Class that contains all the methods and datas related to the
+    particles phase space.
+
+    With the available methods it is possible to access, manipulate and
+    plot all the produced phase spaces.
+
+    Any phase space ps is a dictionary of 8 (3D) or 6 (2D) components.
+    ps['x'] particles coordinates on the x axis
+    ps['y'] particles coordinates on the y axis
+    ps['z'] particles coordinates on the z axis (only if 3D simulation)
+    ps['px'] particles momenta along the x direction
+    ps['py'] particles momenta along the y direction
+    ps['pz'] particles momenta along the z direction (only in 3D)
+    ps['weight'] particles computational weights
+    ps['gamma'] particles Lorentz factor.
+
+    Possible phase spaces are:
+    - phase_space_electrons: phase space of all the electrons
+    - phase_space_ionization: phase space of all the particles produced
+      via the ionization process
+    - phase_space_high_energy: phase space of all the particles with
+      gamma > gamma_min.
+    - phase_space_protons: phase space of all the protons
+    """
     def __init__(self, Simulation):
-        """
-        Class that contains all the methods and datas related to the
-        particles phase space.
-
-        With the available methods it is possible to access, manipulate and
-        plot all the produced phase spaces.
-
-        Any phase space ps is a dictionary of 8 (3D) or 6 (2D) components.
-        ps['x'] particles coordinates on the x axis
-        ps['y'] particles coordinates on the y axis
-        ps['z'] particles coordinates on the z axis (only if 3D simulation)
-        ps['px'] particles momenta along the x direction
-        ps['py'] particles momenta along the y direction
-        ps['pz'] particles momenta along the z direction (only in 3D)
-        ps['weight'] particles computational weights
-        ps['gamma'] particles Lorentz factor.
-
-        Possible phase spaces are:
-        - phase_space_electrons: phase space of all the electrons
-        - phase_space_ionization: phase space of all the particles produced
-          via the ionization process
-        - phase_space_high_energy: phase space of all the particles with
-          gamma > gamma_min.
-        - phase_space_protons: phase space of all the protons
-        """
         self._Simulation = Simulation
         self._params = Simulation.params
         self._directories = Simulation.directories
@@ -123,9 +123,9 @@ class Particles(object):
             [part_number, np.arange(part_number)]
         self._stored_phase_space[(phase_space_name, timestep)] = phase_space
 
-    def scatter(self, phase_space, time=None, component1='x',
+    def scatterplot(self, phase_space, time=None, component1='x',
                 component2='y', comoving=False,
-                selected_percentage=None, **kwargs):
+                selected_percentage=None, s=1, **kwargs):
         """
         Method that produces a scatter plot of the given phase space.
 
@@ -210,7 +210,7 @@ class Particles(object):
             self._selected_index[(phase_space, time)][1] = sel_index
 
         inds = self._selected_index[(phase_space, time)][1]
-        plt.scatter(ps[component1][inds], ps[component2][inds], s=1, **kwargs)
+        plt.scatter(ps[component1][inds], ps[component2][inds], s=s, **kwargs)
 
     def get_data(self, phase_space_name, timestep):
         """
@@ -428,6 +428,8 @@ class Particles(object):
         slice_length : float
             lenght of every slice
         """
+        from ..utilities.Utility import _sort_particles
+
         n_dimensions = self._params['n_dimensions']
         dx = self._params['dx']
         dy = self._params['dy']
@@ -477,10 +479,7 @@ class Particles(object):
         delta = float(x_max-x_min)/number_of_slices
         slice_length_fs = slice_length/speed_of_light
 
-        sorted_index = np.argsort(ps['x'])
-        ps_sorted = dict()
-        for key in ps.keys():
-            ps_sorted[key] = ps[key][sorted_index]
+        ps_sorted = _sort_particles(ps, 'x')
 
         for i in range(number_of_slices):
 

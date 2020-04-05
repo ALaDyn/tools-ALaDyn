@@ -1,7 +1,6 @@
 import os
 import struct
 
-
 def export_parameters(dir_path, file_name):
     path = os.path.join(os.path.join(dir_path, file_name))
     file_read = open(path+'.bin', 'rb')
@@ -88,7 +87,6 @@ def _output_directories(dir_path):
 
     listdir.sort(key=intval)
     return listdir
-
 
 def _read_box_limits(file_path):
 

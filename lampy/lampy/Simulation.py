@@ -1,4 +1,5 @@
 from .fastread.parameter_read import _output_directories
+from .utilities.Utility import _tracking_directory
 import matplotlib.pyplot as plt
 import os
 
@@ -98,6 +99,8 @@ class Simulation(object):
         from .datas.Field import Field, _Field_list
         from .datas.Parts import Particles
         from .datas.Diag import Diagnostics
+        from .datas.Tracking import Tracking
+        import os
 
         plt.ion()
 
@@ -126,12 +129,18 @@ class Simulation(object):
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
         self.directories = self._Directories._show()
+        self._tracking = self._Directories._tracking
+        self.tracking_dir = self._Directories._show()
         self._timesteps = self._collect_timesteps()
         self.outputs = self._collect_outputs()
         self.Field = Field(self, _Field_list)
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
         self.Diagnostics = Diagnostics(self)
+        self.Tracking = Tracking(self)
+        self._tracking_instantiated = not (self.Tracking is None)
+        if self._tracking_instantiated:
+            self._iter_dictionary = self.Tracking.iter_dictionary
 
     def _collect_outputs(self, *args):
 
@@ -180,6 +189,20 @@ class Simulation(object):
                 break
         return _timesteps
 
+    def _collect_tracking(self):
+
+        species = list()
+        if not self._tracking:
+            return
+        tdir = self.tracking_dir[0]
+
+        total_files = os.listdir(tdir)
+
+        for elem in total_files:
+            temp = elem.split('_')
+            if temp[1] not in species:
+                species += temp[1]
+
     def _derive_file_path(self, field_name, timestep):
 
         from .utilities.Utility import _translate_filename
@@ -193,6 +216,18 @@ class Simulation(object):
 
         return file_path
 
+    def _derive_tracking_file_path(self, timestep):
+
+        from .utilities.Utility import _tracking_directory,\
+            _tracking_basename
+
+        index = self._iter_dictionary[timestep]
+        file_name = _tracking_basename + str(index).zfill(4)
+        file_path = \
+            os.path.join(self.path, _tracking_directory, file_name)
+
+        return file_path
+
     def _nearest_time(self, timestep):
 
         times = list()
@@ -202,6 +237,21 @@ class Simulation(object):
             return timestep
         else:
             mintime = min(times, key=lambda x: abs(x-timestep))
+            print("""
+    WARNING: Requested time {} is not available.
+    Output is retrieved at time {}""".format(timestep,
+                                             mintime))
+            return mintime
+
+    def _nearest_tracking_time(self, timestep):
+
+        times = list()
+        times += [time for time in self._iter_dictionary.keys()]
+
+        if timestep in times:
+            return timestep
+        else:
+            mintime = min(times, key=lambda x: abs(x - timestep))
             print("""
     WARNING: Requested time {} is not available.
     Output is retrieved at time {}""".format(timestep,
@@ -308,6 +358,8 @@ class Directories(object):
 
         self._path = Simulation.path
         self._listdir = _output_directories(self._path)
+        self._tracking = False
+        self._find_tracklist()
 
     def _filelist(self, *args):
         if len(args) > 0:
@@ -323,6 +375,29 @@ class Directories(object):
             self._listfile += templist
 
         return self._listfile
+
+    def _find_tracklist(self):
+
+        from .utilities.Utility import _tracking_directory,\
+            _tracking_dictionary
+
+        self._tracklist = list()
+
+        if os.path.isdir(os.path.join(self._path, _tracking_directory)):
+            self._tracking = True
+        else:
+            self._tracking = False
+
+        if not self._tracking:
+            return None
+        file_list = \
+            os.listdir(os.path.join(self._path, _tracking_directory))
+
+        file_list.remove(_tracking_dictionary)
+        for item in self._tracklist:
+            name = item[:-4]
+            index = int(name.split('_')[2])
+            self._tracklist[index] = name
 
     def _show(self):
         return self._listdir

@@ -69,7 +69,12 @@ _total_filenamelist += ['Eionzout']
 _total_filenamelist += ['E_hg_out']
 _total_filenamelist += ['H'+str(n)+'dnout' for n in range(1, 6)]
 _total_filenamelist += ['H'+str(n)+'enout' for n in range(1, 6)]
+_total_filenamelist += ['Track_']
 
+_tracking_directory = 'tracking'
+_tracking_dictionary = 'tracking_dictionary.dat'
+# Warning, to be extended for more tracked species
+_tracking_basename = 'Track_1_'
 
 def _compute_physical_parameters(dictionary):
     """
@@ -130,6 +135,34 @@ def _compute_simulation_parameters(dictionary):
 
     if dictionary['str_flag'] > 0:
         dictionary['stretched'] = True
+
+
+def _convert_component_to_index(params, component):
+
+    ndim = params['n_dimensions']
+    if ndim == 3:
+        switch = {
+            'x': 0,
+            'y': 1,
+            'z': 2,
+            'px': 3,
+            'py': 4,
+            'pz': 5,
+            'weight': 6,
+            'gamma': 7,
+            'index': 8
+        }
+    elif ndim == 2:
+        switch = {
+            'x': 0,
+            'y': 1,
+            'px': 2,
+            'py': 3,
+            'weight': 4,
+            'gamma': 5,
+            'index': 6
+        }
+    return switch[component]
 
 
 def _find_inputs(path):
@@ -248,6 +281,20 @@ def _read_simulation_without_nml(path):
 
     return param_dic
 
+
+def _sort_particles(phase_space, component):
+
+    sorted_index = np.argsort(phase_space[component])
+    ps_sorted = dict()
+    for key in phase_space.keys():
+        ps_sorted[key] = phase_space[key][sorted_index]
+
+    return ps_sorted
+
+def _sort_tracked_particles(phase_space, index_in):
+
+    sorted_index = np.argsort(phase_space[index_in])
+    return phase_space[:,sorted_index]
 
 def _translate_filename(fname):
     """
