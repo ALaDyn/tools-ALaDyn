@@ -13,9 +13,7 @@ class Tracking(object):
     def __new__(cls, Simulation):
 
         if not Simulation._tracking:
-            print("""
-            Class Tracking not instantiated!
-                """)
+            print("Tracking not available")
             return None
         else:
             return super(Tracking, cls).__new__(cls)
@@ -35,10 +33,10 @@ class Tracking(object):
         self.iter_dictionary = dict()
         self._available_iterations = list()
         self._available_times = list()
-        self._track_dic_path = os.path.join(_tracking_directory, \
-            _tracking_dictionary)
+        self._available_species = list()
         self._tracking = self._Simulation._tracking
         self._read_iter_dic()
+        self._tracking_dictionary = _tracking_dictionary
         if self._params['n_dimensions'] == 2:
             self._array_dimensions = 7
         elif self._params['n_dimensions'] == 3:
@@ -55,27 +53,37 @@ class Tracking(object):
         if not self._tracking:
             return
 
-        with open(self._track_dic_path) as fp:
-            lines = fp.readlines()
+        for key, value in _tracking_dictionary.items():
+            track_dic_path = os.path.join(self._path, \
+                _tracking_directory, value)
 
-        # Removing header
-        lines.pop(0)
-        for line in lines:
-            self._available_iterations += [int(line.split()[0])]
-            self._available_times += [float(line.split()[1])]
-            self.iter_dictionary[float(line.split()[1])] =\
-                int(line.split()[0])
+            if os.path.isfile(track_dic_path):
+                self._available_species += [key]
+                self.iter_dictionary[key] = dict()
+            elif not os.path.isfile(track_dic_path):
+                continue
+
+            with open(track_dic_path) as fp:
+                lines = fp.readlines()
+
+            # Removing header
+            lines.pop(0)
+            for line in lines:
+                self._available_iterations += [int(line.split()[0])]
+                self._available_times += [float(line.split()[1])]
+                self.iter_dictionary[key][float(line.split()[1])] =\
+                    int(line.split()[0])
 
     
-    def _return_tracking_phase_space(self, timestep):
+    def _return_tracking_phase_space(self, timestep, species):
 
-        track_list = self._search_track_by_timestep(timestep)
+        track_list = self._search_track_by_timestep(timestep, species)
         if track_list is not None:
             pass
         else:
-            self._track_read(timestep)
+            self._track_read(timestep, species)
 
-    def select_index(self, time=None, **kwargs):
+    def select_index(self, time=None, species=1, **kwargs):
         """
         Function that takes in input a phase space dictionary, and the array of
         parameters and selects particles according to the given conditions.
@@ -134,10 +142,10 @@ class Tracking(object):
         index = list()
         kw_list = list(set(possible_kwargs).intersection(kwargs.keys()))
 
-        time = self._Simulation._nearest_tracking_time(time)
-        self._return_tracking_phase_space(time)
+        time = self._Simulation._nearest_tracking_time(time, species)
+        self._return_tracking_phase_space(time, species)
 
-        ps = self._stored_tracking[(time)].copy()
+        ps = self._stored_tracking[(time, species)].copy()
 
         if not kw_list:
             return ps
@@ -159,7 +167,7 @@ class Tracking(object):
 
         return np.array(ps[index_comp][tot_index])
         
-    def scatterplot(self, time=None, component1='x', component2='y',
+    def scatterplot(self, time=None, component1='x', component2='y', species=1,
                 comoving=False, s=1, **kwargs):
 
         if time is None:
@@ -168,34 +176,34 @@ class Tracking(object):
                 """)
             time = self._available_times[-1]
         else:
-            time = self._Simulation._nearest_tracking_time(time)
+            time = self._Simulation._nearest_tracking_time(time, species)
 
-        self._return_tracking_phase_space(time)
-        ps = self._stored_tracking[(time)].copy()
+        self._return_tracking_phase_space(time, species)
+        ps = self._stored_tracking[(time, species)].copy()
 
         component1 = _convert_component_to_index(self._params, component1)
         component2 = _convert_component_to_index(self._params, component2)
 
         plt.scatter(ps[component1], ps[component2], s=s, **kwargs)
 
-    def _search_track_by_timestep(self, timestep):
+    def _search_track_by_timestep(self, timestep, species):
 
         track_list = None
         for key in self._stored_tracking.keys():
-            if timestep == key:
+            if (timestep, species) == key:
                 track_list = key
 
         return track_list
 
 
-    def _track_read(self, timestep):
+    def _track_read(self, timestep, species):
 
         from ..utilities.Utility import _sort_tracked_particles
         sim = self._Simulation
         ndim = self._params['n_dimensions']
 
 
-        file_path = sim._derive_tracking_file_path(timestep)
+        file_path = sim._derive_tracking_file_path(timestep, species)
         try:
             ps, part_number = total_tracking_read(file_path, self._params)
         except FileNotFoundError:
@@ -208,14 +216,14 @@ class Tracking(object):
 
         ps_sorted = _sort_tracked_particles(ps, index_in)
 
-        self._stored_tracking[(timestep)] = ps_sorted
+        self._stored_tracking[(timestep, species)] = ps_sorted
 
     def trajectory_plot(self, time=None, component1='x', component2='y',
-            index='all', **kwargs):
+            species=1, index='all', **kwargs):
 
         from matplotlib.collections import LineCollection
 
-        time = self._Simulation._nearest_tracking_time(time)
+        time = self._Simulation._nearest_tracking_time(time, species)
         time_index = self._available_times.index(time)
         time_array = self._available_times[:time_index + 1]
         max_time = max(time_array)
@@ -232,9 +240,9 @@ class Tracking(object):
         # Performing the first iteration explicitly to generate the numpy
         # arrays to be plotted 
         instant = time_array.pop(0)
-        self._return_tracking_phase_space(instant)
-        self._return_tracking_phase_space(instant)
-        ps = self._stored_tracking[(instant)].copy()
+        self._return_tracking_phase_space(instant, species)
+        self._return_tracking_phase_space(instant, species)
+        ps = self._stored_tracking[(instant, species)].copy()
         mask = self._check_index_in_ps(ps, index)
         temp_comp1 = ps[component1][mask]
         temp_comp2 = ps[component2][mask]
@@ -245,8 +253,8 @@ class Tracking(object):
             plot_list_ordinate[temp_index[i]] = np.array(temp_comp2[i])
 
         for instant in time_array:
-            self._return_tracking_phase_space(instant)
-            ps = self._stored_tracking[(instant)].copy()
+            self._return_tracking_phase_space(instant, species)
+            ps = self._stored_tracking[(instant, species)].copy()
             mask = self._check_index_in_ps(ps, index)
             temp_comp1 = ps[component1][mask]
             temp_comp2 = ps[component2][mask]

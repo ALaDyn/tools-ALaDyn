@@ -216,13 +216,13 @@ class Simulation(object):
 
         return file_path
 
-    def _derive_tracking_file_path(self, timestep):
+    def _derive_tracking_file_path(self, timestep, species):
 
         from .utilities.Utility import _tracking_directory,\
             _tracking_basename
 
-        index = self._iter_dictionary[timestep]
-        file_name = _tracking_basename + str(index).zfill(4)
+        index = self._iter_dictionary[species][timestep]
+        file_name = _tracking_basename[species] + str(index).zfill(4)
         file_path = \
             os.path.join(self.path, _tracking_directory, file_name)
 
@@ -243,10 +243,10 @@ class Simulation(object):
                                              mintime))
             return mintime
 
-    def _nearest_tracking_time(self, timestep):
+    def _nearest_tracking_time(self, timestep, species):
 
         times = list()
-        times += [time for time in self._iter_dictionary.keys()]
+        times += [time for time in self._iter_dictionary[species].keys()]
 
         if timestep in times:
             return timestep
@@ -393,7 +393,9 @@ class Directories(object):
         file_list = \
             os.listdir(os.path.join(self._path, _tracking_directory))
 
-        file_list.remove(_tracking_dictionary)
+        for value in _tracking_dictionary.values():
+            if value in file_list:
+                file_list.remove(value)
         for item in self._tracklist:
             name = item[:-4]
             index = int(name.split('_')[2])

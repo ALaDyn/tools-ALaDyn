@@ -72,9 +72,14 @@ _total_filenamelist += ['H'+str(n)+'enout' for n in range(1, 6)]
 _total_filenamelist += ['Track_']
 
 _tracking_directory = 'tracking'
-_tracking_dictionary = 'tracking_dictionary.dat'
+_tracking_dictionary = dict()
+_tracking_basename = dict()
+for n in range(1, 6):
+    _tracking_dictionary[n] = 'tracking_dictionary_'+str(n)+'.dat'
+
 # Warning, to be extended for more tracked species
-_tracking_basename = 'Track_1_'
+for n in range(1, 6):
+    _tracking_basename[n] = 'Track_'+str(n)+'_'
 
 def _compute_physical_parameters(dictionary):
     """
