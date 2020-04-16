@@ -12,18 +12,18 @@ import struct
 import numpy as np
 cimport numpy as np
 
-def read_ALaDyn_bin(file_path,params):
+def read_ALaDyn_bin(file_path, params):
     
     # - #
     cdef int nx
     cdef int ny
     cdef int nz
     
-    path = file_path+'.bin'
+    path = file_path + '.bin'
     f = open(path, 'rb')
     uni_path = path.encode('UTF-8')
     cdef char* c_path = uni_path
-
+    dim = params['n_dimensions']
     # Here it reads the header via a standard struct unpack procedure
     f.seek(4)
     Nparam = struct.unpack('=i', f.read(4))[0]
@@ -34,9 +34,21 @@ def read_ALaDyn_bin(file_path,params):
     f.seek(4)
 
     ndimension = integerdata_temp[14]
+
     nx = params['nx']
     ny = params['ny']
     nz = params['nz']
+
+    if dim == 1:
+        nx = nx/params['jump']
+    elif dim == 2:
+        nx = nx/params['jump']
+        ny = ny/params['jump']
+    elif dim == 3:
+        nx = nx/params['jump']
+        ny = ny/params['jump']
+        nz = nz/params['jump']
+
     # End of the header read
 
     totlen = nx*ny*nz

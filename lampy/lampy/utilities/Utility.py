@@ -208,7 +208,7 @@ def _grid_convert(box_limits, params, **kwargs):
             grid_point['y'] = int((y-box_limits['y_min'])/(dy*params['jump']))
         else:
             comp = 'y'
-            grid_point['y'] = int(_transverse_stretch(y, params, comp))
+            grid_point['y'] = int(_transverse_stretch(y, params, comp)/params['jump'])
 
     if params['n_dimensions'] == 3:
         if 'z' in kwargs:
@@ -219,7 +219,7 @@ def _grid_convert(box_limits, params, **kwargs):
                                       (dz*params['jump']))
             else:
                 comp = 'z'
-                grid_point['z'] = int(_transverse_stretch(z, params, comp))
+                grid_point['z'] = int(_transverse_stretch(z, params, comp)/params['jump'])
     return grid_point
 
 
