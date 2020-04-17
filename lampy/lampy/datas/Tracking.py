@@ -171,7 +171,8 @@ class Tracking(object):
 
         nearest_part = False
         if 'nearest' in kwargs:
-            nearest_part = True
+            if kwargs['nearest']:
+                nearest_part = True
             if 'x' not in kwargs and 'y' not in kwargs and 'z' not in kwargs:
                 print("""
         Error, when you ask 'nearest' you should specify the component
@@ -180,11 +181,15 @@ class Tracking(object):
                 return
         comp_dict = dict()
         if 'x' in kwargs:
-            comp_dict['x'] = kwargs['x']
+            comp = _convert_component_to_index(self._params, 'x')
+            comp_dict[comp] = kwargs['x']
         if 'y' in kwargs:
-            comp_dict['y'] = kwargs['y']
+            comp = _convert_component_to_index(self._params, 'y')
+            comp_dict[comp] = kwargs['y']
         if 'z' in kwargs:
-            comp_dict['z'] = kwargs['z']
+            comp = _convert_component_to_index(self._params, 'z')
+            comp_dict[comp] = kwargs['z']
+        comp_dict['index'] = _convert_component_to_index(self._params, 'index')
 
         index = list()
         kw_list = list(set(possible_kwargs).intersection(kwargs.keys()))
@@ -196,7 +201,7 @@ class Tracking(object):
 
         if nearest_part:
             ind = _nearest_particle(ps, comp_dict)
-            return ps
+            return ind
 
         for kw in kw_list:
             if kw in var_dic_min.keys():
@@ -292,17 +297,14 @@ class Tracking(object):
         self._return_tracking_phase_space(instant, species)
         ps = self._stored_tracking[(instant, species)].copy()
         mask = self._check_index_in_ps(ps, index)
-        if component1 == 'time':
-            temp_comp1 = time_array
-        else:
+        if component1 != 'time':
             temp_comp1 = ps[component1][mask]
-
         temp_comp2 = ps[component2][mask]
         temp_index = ps[ind_comp][mask]
         particle_number = np.count_nonzero(mask)
         if component1 == 'time':
             for i in range(particle_number):
-                plot_list_abscissa[temp_index[i]] = np.array(temp_comp1)
+                plot_list_abscissa[temp_index[i]] = np.array([instant])
                 plot_list_ordinate[temp_index[i]] = np.array(temp_comp2[i])
         else:
             for i in range(particle_number):
@@ -321,7 +323,7 @@ class Tracking(object):
             for i in range(particle_number):
                 if component1 == 'time':
                     plot_list_abscissa[temp_index[i]] = \
-                        np.append(plot_list_abscissa[temp_index[i]], temp_comp1)
+                        np.append(plot_list_abscissa[temp_index[i]], [instant])
                 else:
                     plot_list_abscissa[temp_index[i]] = \
                         np.append(plot_list_abscissa[temp_index[i]], temp_comp1[i])

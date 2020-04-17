@@ -226,15 +226,16 @@ def _nearest_particle( phase_space, component_dict):
 
     import numpy as np
 
-    nparts = len(phase_space['x'])
+    nparts = len(phase_space[1])
     dist = np.zeros(nparts)    
+    index_comp = component_dict.pop('index')
     for comp, coord in component_dict.items():
         dist += (phase_space[comp] - coord)**2
     dist = np.sqrt(dist)
 
     minloc = np.argmin(dist)
 
-    return minloc
+    return phase_space[index_comp][minloc]
 
 def _read_simulation_nml(path):
     """
