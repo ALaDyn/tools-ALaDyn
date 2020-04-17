@@ -2,7 +2,7 @@ from ..compiled_cython.read_tracking import total_tracking_read
 import matplotlib.pylab as plt
 import numpy as np
 from ..utilities.Utility import speed_of_light, _tracking_directory, \
-    _tracking_dictionary, _convert_component_to_index
+    _tracking_dictionary, _convert_component_to_index, _nearest_particle
 import os
 
 m_e = 0.511
@@ -45,6 +45,8 @@ class Tracking(object):
     def _check_index_in_ps(self, phase_space, index):
 
         comp = _convert_component_to_index( self._params, 'index')
+        if index == 'all':
+            return True
         mask = np.isin(phase_space[comp], index, assume_unique=True)
         return mask
 
@@ -83,6 +85,33 @@ class Tracking(object):
         else:
             self._track_read(timestep, species)
 
+
+    def get_data(self, species, time):
+        """
+        Method that retrieves any field data and returns the 2D or 3D array.
+
+        Parameters
+        --------
+        field_name : str
+            Name of the array that is to be collected
+        time : float
+            Instant at which array is retrieved
+
+        Returns
+        --------
+        field : dict
+            Data are returned as a dictionary.
+            field['data'] is the array containing the data
+            field['time'] is the corresponding time
+        """
+        f = dict()
+        time = self._Simulation._nearest_tracking_time(time, species)
+        self._return_tracking_phase_space(time, species)
+        f['data'] = self._stored_tracking[(time, species)]
+        f['time'] = time
+
+        return f
+
     def select_index(self, time=None, species=1, **kwargs):
         """
         Function that takes in input a phase space dictionary, and the array of
@@ -104,7 +133,8 @@ class Tracking(object):
         List of possible kwargs:
 
                 'gamma_min', 'gamma_max', 'x_min', 'x_max', 'y_min', 'y_max',
-                'z_min', 'z_max', 'weight_min', 'weight_max'
+                'z_min', 'z_max', 'weight_min', 'weight_max', 'nearest',
+                'x', 'y', 'z'
 
                 It is possible to select parts of phase space to analyze via
                 the input kwargs.
@@ -139,6 +169,23 @@ class Tracking(object):
         if 'z_max' in kwargs and n_dimensions == 2:
             del kwargs['z_max']
 
+        nearest_part = False
+        if 'nearest' in kwargs:
+            nearest_part = True
+            if 'x' not in kwargs and 'y' not in kwargs and 'z' not in kwargs:
+                print("""
+        Error, when you ask 'nearest' you should specify the component
+        'x', 'y' or 'z'
+                    """)
+                return
+        comp_dict = dict()
+        if 'x' in kwargs:
+            comp_dict['x'] = kwargs['x']
+        if 'y' in kwargs:
+            comp_dict['y'] = kwargs['y']
+        if 'z' in kwargs:
+            comp_dict['z'] = kwargs['z']
+
         index = list()
         kw_list = list(set(possible_kwargs).intersection(kwargs.keys()))
 
@@ -147,7 +194,8 @@ class Tracking(object):
 
         ps = self._stored_tracking[(time, species)].copy()
 
-        if not kw_list:
+        if nearest_part:
+            ind = _nearest_particle(ps, comp_dict)
             return ps
 
         for kw in kw_list:
@@ -195,7 +243,6 @@ class Tracking(object):
 
         return track_list
 
-
     def _track_read(self, timestep, species):
 
         from ..utilities.Utility import _sort_tracked_particles
@@ -231,7 +278,8 @@ class Tracking(object):
         plot_list_abscissa = dict()
         plot_list_ordinate = dict()
 
-        component1 = _convert_component_to_index(self._params, component1)
+        if component1 != 'time':
+            component1 = _convert_component_to_index(self._params, component1)
         component2 = _convert_component_to_index(self._params, component2)
         ind_comp = _convert_component_to_index(self._params, 'index')
 
@@ -244,25 +292,39 @@ class Tracking(object):
         self._return_tracking_phase_space(instant, species)
         ps = self._stored_tracking[(instant, species)].copy()
         mask = self._check_index_in_ps(ps, index)
-        temp_comp1 = ps[component1][mask]
+        if component1 == 'time':
+            temp_comp1 = time_array
+        else:
+            temp_comp1 = ps[component1][mask]
+
         temp_comp2 = ps[component2][mask]
         temp_index = ps[ind_comp][mask]
         particle_number = np.count_nonzero(mask)
-        for i in range(particle_number):
-            plot_list_abscissa[temp_index[i]] = np.array(temp_comp1[i])
-            plot_list_ordinate[temp_index[i]] = np.array(temp_comp2[i])
+        if component1 == 'time':
+            for i in range(particle_number):
+                plot_list_abscissa[temp_index[i]] = np.array(temp_comp1)
+                plot_list_ordinate[temp_index[i]] = np.array(temp_comp2[i])
+        else:
+            for i in range(particle_number):
+                plot_list_abscissa[temp_index[i]] = np.array(temp_comp1[i])
+                plot_list_ordinate[temp_index[i]] = np.array(temp_comp2[i])
 
         for instant in time_array:
             self._return_tracking_phase_space(instant, species)
             ps = self._stored_tracking[(instant, species)].copy()
             mask = self._check_index_in_ps(ps, index)
-            temp_comp1 = ps[component1][mask]
+            if component1 != 'time':
+                temp_comp1 = ps[component1][mask]
             temp_comp2 = ps[component2][mask]
             temp_index = ps[ind_comp][mask]
             particle_number = np.count_nonzero(mask)
             for i in range(particle_number):
-                plot_list_abscissa[temp_index[i]] = \
-                    np.append(plot_list_abscissa[temp_index[i]], temp_comp1[i])
+                if component1 == 'time':
+                    plot_list_abscissa[temp_index[i]] = \
+                        np.append(plot_list_abscissa[temp_index[i]], temp_comp1)
+                else:
+                    plot_list_abscissa[temp_index[i]] = \
+                        np.append(plot_list_abscissa[temp_index[i]], temp_comp1[i])
                 plot_list_ordinate[temp_index[i]] = \
                     np.append(plot_list_ordinate[temp_index[i]], temp_comp2[i])
 

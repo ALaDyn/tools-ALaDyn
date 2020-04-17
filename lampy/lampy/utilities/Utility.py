@@ -222,6 +222,19 @@ def _grid_convert(box_limits, params, **kwargs):
                 grid_point['z'] = int(_transverse_stretch(z, params, comp)/params['jump'])
     return grid_point
 
+def _nearest_particle( phase_space, component_dict):
+
+    import numpy as np
+
+    nparts = len(phase_space['x'])
+    dist = np.zeros(nparts)    
+    for comp, coord in component_dict.items():
+        dist += (phase_space[comp] - coord)**2
+    dist = np.sqrt(dist)
+
+    minloc = np.argmin(dist)
+
+    return minloc
 
 def _read_simulation_nml(path):
     """
