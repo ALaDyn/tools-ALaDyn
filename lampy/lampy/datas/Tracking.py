@@ -114,8 +114,8 @@ class Tracking(object):
 
     def select_index(self, time=None, species=1, **kwargs):
         """
-        Function that takes in input a phase space dictionary, and the array of
-        parameters and selects particles according to the given conditions.
+        Function that takes in input a phase space and 
+        selects particles according to the given conditions.
 
         Parameters
         --------
@@ -141,8 +141,8 @@ class Tracking(object):
 
         Returns
         --------
-        ps_selected : dict
-            Phase space dictionary with the selected particles
+        ps_selected : np.array
+            Phase space with the selected particles
 
         """
         n_dimensions = self._params['n_dimensions']
@@ -221,8 +221,16 @@ class Tracking(object):
         return np.array(ps[index_comp][tot_index])
         
     def scatterplot(self, time=None, component1='x', component2='y', species=1,
-                comoving=False, s=1, **kwargs):
+                index='all', comoving=False, s=1, **kwargs):
+        """
+        Method that produces a scatter plot of the given tracked phase space.
 
+        It takes in input the tracked species and the time of interest.
+
+        Parameters
+        --------
+        
+        """
         if time is None:
             print("""
         Time not known, plotting last available dataset.
@@ -234,10 +242,11 @@ class Tracking(object):
         self._return_tracking_phase_space(time, species)
         ps = self._stored_tracking[(time, species)].copy()
 
+        mask = self._check_index_in_ps(ps, index)
         component1 = _convert_component_to_index(self._params, component1)
         component2 = _convert_component_to_index(self._params, component2)
 
-        plt.scatter(ps[component1], ps[component2], s=s, **kwargs)
+        plt.scatter(ps[component1][mask], ps[component2][mask], s=s, **kwargs)
 
     def _search_track_by_timestep(self, timestep, species):
 
