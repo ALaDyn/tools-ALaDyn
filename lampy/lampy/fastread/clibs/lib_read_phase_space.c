@@ -31,6 +31,7 @@ void read_phasespace(float *ps_component, int dimensionality, char *file_pointer
         
     }
 
+    fclose(binary);
 }
 
 int count_particles(int dimensionality, char *file_pointer){
@@ -59,6 +60,6 @@ int count_particles(int dimensionality, char *file_pointer){
 
     }
 
+    fclose(binary);
     return total_particles_number;
-
 }

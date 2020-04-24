@@ -30,6 +30,7 @@ void read_tracking_phasespace(float *ps_component, int dimensionality, char *fil
         
     }
 
+    fclose(binary);
 }
 
 int count_tracked_particles(int dimensionality, char *file_pointer){
@@ -57,6 +58,6 @@ int count_tracked_particles(int dimensionality, char *file_pointer){
 
     }
 
+    fclose(binary);
     return total_particles_number;
-
 }
