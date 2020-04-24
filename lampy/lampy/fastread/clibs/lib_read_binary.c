@@ -19,7 +19,7 @@ errno = 0;
 binary = fopen(file_pointer, "rb");
 
 if(binary == NULL){
-	printf("Can't read with error %d \n", errno);
+	printf("Can't read %s with error %d \n", file_pointer, errno);
 	exit(0);
 }
 

@@ -15,7 +15,7 @@ void read_tracking_phasespace(float *ps_component, int dimensionality, char *fil
     binary = fopen(file_pointer, "rb");
 
     if ( binary == NULL ){
-    	printf("Can't read with error %d \n", errno);
+    	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
     jump = 2*dimensionality + 3;
@@ -41,7 +41,7 @@ int count_tracked_particles(int dimensionality, char *file_pointer){
     binary = fopen(file_pointer, "rb");
 
     if( binary == NULL ){
-    	printf("Can't read with error %d \n", errno);
+    	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
     jump = 2*dimensionality + 3;
