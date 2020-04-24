@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "lib_read_phase_space.h"
 
 
@@ -10,11 +11,12 @@ void read_phasespace(float *ps_component, int dimensionality, char *file_pointer
     FILE *binary;
     int npart, a;
     int offset, jump;
+    errno = 0;
 
     binary=fopen(file_pointer,"rb");
 
     if(binary==NULL){
-    	printf("Can't read\n");
+    	printf("Can't read with error %d \n", errno);
     	exit(0);
     }
     jump=2*dimensionality+1;
@@ -36,11 +38,12 @@ int count_particles(int dimensionality, char *file_pointer){
     FILE *binary;
     int total_particles_number, npart, nelements;
     int jump;
+    errno = 0;
 
     binary=fopen(file_pointer,"rb");
 
     if(binary==NULL){
-    	printf("Can't read\n");
+    	printf("Can't read with error %d \n", errno);
     	exit(0);
     }
     jump=2*dimensionality+2;

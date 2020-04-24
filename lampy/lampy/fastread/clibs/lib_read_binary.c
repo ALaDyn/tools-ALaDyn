@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "lib_read_binary.h"
 
 
@@ -13,11 +14,12 @@ int npx, npy, npz, nproc_y, nproc_z, nproc_x, nparam;
 int offset, offsetx, offsety, offsetz;
 int *integer_params;
 float *real_params, ***field_temp;
+errno = 0;
 
 binary = fopen(file_pointer, "rb");
 
 if(binary == NULL){
-	printf("Can't read\n");
+	printf("Can't read with error %d \n", errno);
 	exit(0);
 }
 
