@@ -155,7 +155,8 @@ def _convert_component_to_index(params, component):
             'pz': 5,
             'weight': 6,
             'gamma': 7,
-            'index': 8
+            'index': 8,
+            'a': 9
         }
     elif ndim == 2:
         switch = {
@@ -165,7 +166,8 @@ def _convert_component_to_index(params, component):
             'py': 3,
             'weight': 4,
             'gamma': 5,
-            'index': 6
+            'index': 6,
+            'a': 7
         }
     return switch[component]
 

@@ -7,6 +7,8 @@ import os
 
 m_e = 0.511
 e = 1.6E-7
+_can_dict = dict()
+_can_dict['y'] = 'canonical momentum y'
 
 class Tracking(object):
 
@@ -242,11 +244,28 @@ class Tracking(object):
         self._return_tracking_phase_space(time, species)
         ps = self._stored_tracking[(time, species)].copy()
 
-        mask = self._check_index_in_ps(ps, index)
-        component1 = _convert_component_to_index(self._params, component1)
-        component2 = _convert_component_to_index(self._params, component2)
+        possible_components = ['x', 'y', 'z', 'px', 'py', 'pz', 'weight',
+                               'gamma', 'index', 'a']
 
-        plt.scatter(ps[component1][mask], ps[component2][mask], s=s, **kwargs)
+        mask = self._check_index_in_ps(ps, index)
+        if component1 in possible_components:
+            component1 = _convert_component_to_index(self._params, component1)
+            psx = ps[component1][mask]
+        if component2 in possible_components:
+            component2 = _convert_component_to_index(self._params, component2)
+            psy = ps[component2][mask]
+
+        if component1 == _can_dict['y'] or component2 == _can_dict['y']:
+            cmppy = _convert_component_to_index(self._params, 'py')
+            pspy = ps[cmppy][mask]
+            cmpa = _convert_component_to_index(self._params, 'a')
+            psa = ps[cmpa][mask]
+            if component1 == _can_dict['y']:
+                psx = pspy + psa
+            if component2 == _can_dict['y']:
+                psy = pspy + psa
+
+        plt.scatter(psx, psy, s=s, **kwargs)
 
     def _search_track_by_timestep(self, timestep, species):
 
@@ -266,7 +285,7 @@ class Tracking(object):
 
         file_path = sim._derive_tracking_file_path(timestep, species)
         try:
-            ps, part_number = total_tracking_read(file_path, self._params)
+            ps, part_number = total_tracking_read(file_path, self._params, species)
         except FileNotFoundError:
             print("""
         Tracking at time {} not available, impossible to read.
@@ -292,9 +311,10 @@ class Tracking(object):
         plot_list_abscissa = dict()
         plot_list_ordinate = dict()
 
-        if component1 != 'time':
+        if component1 != 'time' and component1 != _can_dict['y']:
             component1 = _convert_component_to_index(self._params, component1)
-        component2 = _convert_component_to_index(self._params, component2)
+        if component2 != 'time' and component2 != _can_dict['y']:
+            component2 = _convert_component_to_index(self._params, component2)
         ind_comp = _convert_component_to_index(self._params, 'index')
 
         cmap_name = 'copper'
@@ -303,12 +323,19 @@ class Tracking(object):
         # arrays to be plotted 
         instant = time_array.pop(0)
         self._return_tracking_phase_space(instant, species)
-        self._return_tracking_phase_space(instant, species)
         ps = self._stored_tracking[(instant, species)].copy()
         mask = self._check_index_in_ps(ps, index)
-        if component1 != 'time':
+        if component1 == _can_dict['y'] or component2 == _can_dict['y']:
+            pycomp = _convert_component_to_index(self._params, 'py')
+            acomp = _convert_component_to_index(self._params, 'a')
+        if component1 != 'time' and component1 != _can_dict['y']:
             temp_comp1 = ps[component1][mask]
-        temp_comp2 = ps[component2][mask]
+        if component2 != _can_dict['y']:
+            temp_comp2 = ps[component2][mask]
+        if component1 == _can_dict['y']:
+            temp_comp1 = ps[pycomp][mask] + ps[acomp][mask]
+        if component2 == _can_dict['y']:
+            temp_comp2 = ps[pycomp][mask] + ps[acomp][mask]
         temp_index = ps[ind_comp][mask]
         particle_number = np.count_nonzero(mask)
         if component1 == 'time':
@@ -324,9 +351,14 @@ class Tracking(object):
             self._return_tracking_phase_space(instant, species)
             ps = self._stored_tracking[(instant, species)].copy()
             mask = self._check_index_in_ps(ps, index)
-            if component1 != 'time':
+            if component1 != 'time' and component1 != _can_dict['y']:
                 temp_comp1 = ps[component1][mask]
-            temp_comp2 = ps[component2][mask]
+            if component2 != _can_dict['y']:
+                temp_comp2 = ps[component2][mask]
+            if component1 == _can_dict['y']:
+                temp_comp1 = ps[pycomp][mask] + ps[acomp][mask]
+            if component2 == _can_dict['y']:
+                temp_comp2 = ps[pycomp][mask] + ps[acomp][mask]
             temp_index = ps[ind_comp][mask]
             particle_number = np.count_nonzero(mask)
             for i in range(particle_number):

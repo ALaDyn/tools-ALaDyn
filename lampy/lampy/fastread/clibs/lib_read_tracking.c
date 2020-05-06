@@ -6,11 +6,11 @@
 #include "lib_read_tracking.h"
 
 
-void read_tracking_phasespace(float *ps_component, int dimensionality, char *file_pointer){ 
+void read_tracking_phasespace(float *ps_component, int jump, char *file_pointer){ 
 
     FILE *binary;
     int npart, a;
-    int offset, jump;
+    int offset;
     errno = 0;
     binary = fopen(file_pointer, "rb");
 
@@ -18,7 +18,6 @@ void read_tracking_phasespace(float *ps_component, int dimensionality, char *fil
     	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
-    jump = 2*dimensionality + 3;
     offset = 0;
     while( fread(&npart,sizeof(int), 1, binary) == 1 ){
 
@@ -33,11 +32,10 @@ void read_tracking_phasespace(float *ps_component, int dimensionality, char *fil
     fclose(binary);
 }
 
-int count_tracked_particles(int dimensionality, char *file_pointer){
+int count_tracked_particles(int jump, char *file_pointer){
 
     FILE *binary;
     int total_particles_number, npart, nelements;
-    int jump;
     errno = 0;
     binary = fopen(file_pointer, "rb");
 
@@ -45,16 +43,13 @@ int count_tracked_particles(int dimensionality, char *file_pointer){
     	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
-    jump = 2*dimensionality + 3;
     total_particles_number = 0;
     while( fread(&npart, sizeof(int), 1, binary) == 1){
         nelements = jump*npart;
 
         fseek(binary, sizeof(float)*nelements, SEEK_CUR);
 
-
         total_particles_number += npart;
-
 
     }
 
