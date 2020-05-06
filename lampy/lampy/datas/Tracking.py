@@ -261,9 +261,9 @@ class Tracking(object):
             cmpa = _convert_component_to_index(self._params, 'a')
             psa = ps[cmpa][mask]
             if component1 == _can_dict['y']:
-                psx = pspy + psa
+                psx = pspy - psa
             if component2 == _can_dict['y']:
-                psy = pspy + psa
+                psy = pspy - psa
 
         plt.scatter(psx, psy, s=s, **kwargs)
 
@@ -333,9 +333,9 @@ class Tracking(object):
         if component2 != _can_dict['y']:
             temp_comp2 = ps[component2][mask]
         if component1 == _can_dict['y']:
-            temp_comp1 = ps[pycomp][mask] + ps[acomp][mask]
+            temp_comp1 = ps[pycomp][mask] - ps[acomp][mask]
         if component2 == _can_dict['y']:
-            temp_comp2 = ps[pycomp][mask] + ps[acomp][mask]
+            temp_comp2 = ps[pycomp][mask] - ps[acomp][mask]
         temp_index = ps[ind_comp][mask]
         particle_number = np.count_nonzero(mask)
         if component1 == 'time':
@@ -356,9 +356,9 @@ class Tracking(object):
             if component2 != _can_dict['y']:
                 temp_comp2 = ps[component2][mask]
             if component1 == _can_dict['y']:
-                temp_comp1 = ps[pycomp][mask] + ps[acomp][mask]
+                temp_comp1 = ps[pycomp][mask] - ps[acomp][mask]
             if component2 == _can_dict['y']:
-                temp_comp2 = ps[pycomp][mask] + ps[acomp][mask]
+                temp_comp2 = ps[pycomp][mask] - ps[acomp][mask]
             temp_index = ps[ind_comp][mask]
             particle_number = np.count_nonzero(mask)
             for i in range(particle_number):
