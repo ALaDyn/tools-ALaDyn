@@ -381,4 +381,4 @@ class Tracking(object):
             #                   plot_list_ordinate[key]])
 
             # segments = np.concatenate([points[:-1], points[1:]], axis=1)
-            plt.plot( plot_list_abscissa[key], plot_list_ordinate[key])
+            plt.plot( plot_list_abscissa[key], plot_list_ordinate[key], **kwargs)
