@@ -116,6 +116,7 @@ def _compute_physical_parameters(dictionary):
         if 'lam0' in dictionary.keys():
             dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
             dictionary['n0'] = dictionary['n0_ref']*dictionary['n_reference']
+    dictionary['dt'] = (1./dictionary['k0'])*dictionary['cfl']
 
 
 def _compute_simulation_parameters(dictionary):
@@ -140,6 +141,9 @@ def _compute_simulation_parameters(dictionary):
 
     if dictionary['str_flag'] > 0:
         dictionary['stretched'] = True
+    if 'a_on_particles' not in dictionary.keys():
+        dictionary['a_on_particles'] = [False]*dictionary['nsp']
+
 
 
 def _convert_component_to_index(params, component):

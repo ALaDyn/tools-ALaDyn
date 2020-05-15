@@ -1,8 +1,8 @@
 from ..compiled_cython.read_tracking import total_tracking_read
 import matplotlib.pylab as plt
 import numpy as np
-from ..utilities.Utility import speed_of_light, _tracking_directory, \
-    _tracking_dictionary, _convert_component_to_index, _nearest_particle
+from ..utilities.Utility import speed_of_light, _convert_component_to_index,\
+    _tracking_directory, _tracking_dictionary, _nearest_particle
 import os
 
 m_e = 0.511
@@ -88,9 +88,13 @@ class Tracking(object):
             self._track_read(timestep, species)
 
 
-    def get_data(self, species, time):
+    def comp_to_index(self, index):
+        return _convert_component_to_index(self._params, index)
+
+    def get_data(self, species=1, time=0):
         """
-        Method that retrieves any field data and returns the 2D or 3D array.
+        Method that retrieves any tracked particle data and returns
+        phase space at a given time.
 
         Parameters
         --------
@@ -111,6 +115,59 @@ class Tracking(object):
         self._return_tracking_phase_space(time, species)
         f['data'] = self._stored_tracking[(time, species)]
         f['time'] = time
+
+        return f
+
+    def get_trajectory(self, species=1, index=1):
+        """
+        Method that retrieves any field data and returns the 2D or 3D array.
+
+        Parameters
+        --------
+        field_name : str
+            Name of the array that is to be collected
+        time : float
+            Instant at which array is retrieved
+
+        Returns
+        --------
+        field : dict
+            Data are returned as a dictionary.
+            field['data'] is the array containing the data
+            field['index'] is the corresponding index
+        """
+        try:
+            val = int(index)
+        except ValueError:
+            print("Index must be a number")
+            return
+        del(index)
+        f = dict()
+        timedict = self._Simulation._iter_dictionary[species]
+        lasttime = list(timedict.keys())[-1]
+        time_index = self._available_times.index(lasttime)
+        time_array = self._available_times[:time_index + 1]
+
+        # First iteration must be performed in order to initialize numpy arrays
+        instant = time_array.pop(0)
+        self._return_tracking_phase_space(instant, species)
+        ps = self._stored_tracking[(instant, species)].copy()
+        mask = self._check_index_in_ps(ps, val)
+        pscut = ps[:, mask]
+        pscut = np.append(pscut, instant)
+        pscut = pscut.reshape(-1, 1)
+
+        for instant in time_array:
+            self._return_tracking_phase_space(instant, species)
+            ps = self._stored_tracking[(instant, species)].copy()
+            mask = self._check_index_in_ps(ps, val)
+            pstemp = ps[:, mask]
+            pstemp = np.append(pstemp, instant)
+            pstemp = pstemp.reshape(-1, 1)
+            pscut = np.append(pscut, pstemp, axis=1)
+
+        f['data'] = pscut
+        f['index'] = val
 
         return f
 
