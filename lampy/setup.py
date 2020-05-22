@@ -45,9 +45,9 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages('.'),
     author='ALaDyn Collaboration',
-    author_email='davide.terzani@ino.it',
+    author_email='dterzani@lbl.gov',
     maintainer='Davide Terzani',
-    maintainer_email='davide.terzani@ino.it',
+    maintainer_email='dterzani@lbl.gov',
     license='GNU GPLv3',
     url='https://github.com/ALaDyn/ALaDyn',
     classifiers=[

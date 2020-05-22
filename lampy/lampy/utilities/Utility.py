@@ -429,3 +429,27 @@ def _inverse_stretch_function(x, nx, ns, dx):
                       lambda x: nx-f(2*symm_center-x)])
 
     return inv_str_func
+
+def moving_average(times, values, simulation):
+
+    dt = simulation.params['dt']
+    every = simulation.params['every_track'][0]
+    dt = every*dt
+    lam0 = simulation.params['lam0']
+    npoints_in_lam = int(lam0/dt + 0.5)
+    vals = values.copy()
+    N = npoints_in_lam
+    offset_left = N//2
+    offset_right = N-N//2
+    vals = np.insert(vals, 0, offset_left*[vals[0]])
+    vals = np.append(vals, offset_right*[vals[-1]])
+    averaged = np.zeros_like(vals)
+    cumsum = np.zeros_like(vals)
+    cumsum = np.append(cumsum, [0])
+    for i, x in enumerate(vals, 1):
+        cumsum[i] = cumsum[i-1] + x
+        if i >= N:
+            averaged[i-offset_right] = (cumsum[i] - cumsum[i-N])/N
+    averaged = averaged[offset_left:-offset_right]
+
+    return averaged

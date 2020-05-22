@@ -1,4 +1,5 @@
 from .Simulation import Simulation
+from .utilities import Utility
 from .__about__ import __version__
 
 __doc__ = """
