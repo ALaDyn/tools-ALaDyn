@@ -141,6 +141,7 @@ class Simulation(object):
         self._tracking_instantiated = not (self.Tracking is None)
         if self._tracking_instantiated:
             self._iter_dictionary = self.Tracking.iter_dictionary
+        self.isEnvelope = (self.params['model_id'] == 4)
 
     def _collect_outputs(self, *args):
 

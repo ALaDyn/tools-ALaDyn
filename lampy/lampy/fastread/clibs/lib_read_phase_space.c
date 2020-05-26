@@ -54,7 +54,6 @@ int count_particles(int dimensionality, char *file_pointer){
 
         fseek(binary,sizeof(float)*nelements,SEEK_CUR);
 
-
         total_particles_number+=npart;
 
 
