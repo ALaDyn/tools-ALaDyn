@@ -25,7 +25,7 @@ def total_tracking_read(file_path, params, species):
     cdef int jump
     cdef int part_number
 
-    if params['a_on_particles'][species - 1] and not (params['model_id'] == 4):
+    if params['a_on_particles'][species - 1]:
         non_phase_space_outputs = non_phase_space_outputs + 1
 
     jump = 2*n_dimensions + non_phase_space_outputs
