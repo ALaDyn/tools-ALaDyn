@@ -148,25 +148,21 @@ class Tracking(object):
         time_index = self._available_times.index(lasttime)
         time_array = self._available_times[:time_index + 1]
 
-        # First iteration must be performed in order to initialize numpy arrays
-        instant = time_array.pop(0)
-        self._return_tracking_phase_space(instant, species)
-        ps = self._stored_tracking[(instant, species)].copy()
-        mask = self._check_index_in_ps(ps, val)
-        pscut = ps[:, mask]
-        pscut = np.append(pscut, instant)
-        pscut = pscut.reshape(-1, 1)
+        pscut = list()
 
+        # Warning, only working for single particle for now
         for instant in time_array:
             self._return_tracking_phase_space(instant, species)
             ps = self._stored_tracking[(instant, species)].copy()
             mask = self._check_index_in_ps(ps, val)
+            if not mask.any():
+                continue
             pstemp = ps[:, mask]
             pstemp = np.append(pstemp, instant)
             pstemp = pstemp.reshape(-1, 1)
-            pscut = np.append(pscut, pstemp, axis=1)
+            pscut += [pstemp]
 
-        f['data'] = pscut
+        f['data'] = np.column_stack(pscut)
         f['index'] = val
 
         return f
