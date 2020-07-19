@@ -20,7 +20,7 @@ def total_tracking_read(file_path, params, species):
     uni_path = path.encode('UTF-8')
 
     cdef char* c_path = uni_path
-    cdef int n_dimensions = params['n_dimensions']
+    cdef int n_dimensions = params['particle_dimensions']
     cdef int non_phase_space_outputs = 3
     cdef int jump
     cdef int part_number

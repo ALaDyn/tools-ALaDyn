@@ -39,9 +39,9 @@ class Tracking(object):
         self._tracking = self._Simulation._tracking
         self._read_iter_dic()
         self._tracking_dictionary = _tracking_dictionary
-        if self._params['n_dimensions'] == 2:
+        if self._params['particle_dimensions'] == 2:
             self._array_dimensions = 7
-        elif self._params['n_dimensions'] == 3:
+        elif self._params['particle_dimensions'] == 3:
             self._array_dimensions = 9
     
     def _check_index_in_ps(self, phase_space, index):
@@ -200,7 +200,7 @@ class Tracking(object):
             Phase space with the selected particles
 
         """
-        n_dimensions = self._params['n_dimensions']
+        n_dimensions = self._params['particle_dimensions']
 
         possible_kwargs = ['gamma_min', 'gamma_max', 'x_min', 'x_max',
                            'y_min', 'y_max', 'z_min', 'z_max',
@@ -333,7 +333,7 @@ class Tracking(object):
 
         from ..utilities.Utility import _sort_tracked_particles
         sim = self._Simulation
-        ndim = self._params['n_dimensions']
+        ndim = self._params['particle_dimensions']
 
 
         file_path = sim._derive_tracking_file_path(timestep, species)

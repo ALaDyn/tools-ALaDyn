@@ -19,7 +19,7 @@ void read_phasespace(float *ps_component, int dimensionality, char *file_pointer
     	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
-    jump=2*dimensionality+1;
+    jump =2*dimensionality+1;
     offset=0;
     while(fread(&npart,sizeof(int),1,binary)==1){
 

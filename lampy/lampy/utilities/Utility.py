@@ -93,6 +93,9 @@ def _compute_physical_parameters(dictionary):
     else:
         dictionary['n_dimensions'] = 3
 
+    dictionary['particle_dimensions'] = dictionary['n_dimensions']
+    if dictionary['model_id'] == 2 or dictionary['model_id'] == 3:
+        dictionary['particle_dimensions'] = 3
     if 'lam0' in dictionary.keys():
         dictionary['omega_0'] = 2*pi/dictionary['lam0']
     if 'lam1' in dictionary.keys():

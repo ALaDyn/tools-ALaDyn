@@ -20,11 +20,11 @@ def total_phase_space_read(file_path, params):
     uni_path = path.encode('UTF-8')
 
     cdef char* c_path = uni_path
-    cdef int n_dimensions = params['n_dimensions']
+    cdef int n_dimensions = params['particle_dimensions']
     cdef int part_number
 
     part_number = count_particles(n_dimensions, c_path)
-    jump = 2*n_dimensions+1
+    jump = 2*n_dimensions + 1
     tot_dimension = jump*part_number
 
     ps = cvarray(shape=(tot_dimension,), itemsize=sizeof(float), format="f")    
