@@ -297,6 +297,11 @@ class Tracking(object):
         self._return_tracking_phase_space(time, species)
         ps = self._stored_tracking[(time, species)].copy()
 
+        if comoving:
+            v = self._params['w_speed']
+            t0 = self._params['wi_time']
+            xcomp = _convert_component_to_index(self._params, 'x')
+            ps[xcomp] = ps[xcomp]-v*(time - t0)
         possible_components = ['x', 'y', 'z', 'px', 'py', 'pz', 'weight',
                                'gamma', 'index', 'a']
 

@@ -195,7 +195,8 @@ class Particles(object):
                 return
             else:
                 v = self._params['w_speed']
-                ps['x'] = ps['x']-v*time
+                t0 = self._params['wi_time']
+                ps['x'] = ps['x']-v*(time - t0)
 
         if (selected_percentage != self._selected_percentage)\
                 and (selected_percentage is not None):
@@ -810,7 +811,8 @@ class Particles(object):
                 return
             else:
                 v = self._params['w_speed']
-                ps['x'] = ps['x']-v*time
+                t0 = self._params['wi_time']
+                ps['x'] = ps['x']-v*(time - t0)
 
         if component2 is None:
             _ = plt.hist(ps[component1], weights=ps['weight'],

@@ -151,7 +151,7 @@ def _compute_simulation_parameters(dictionary):
 
 def _convert_component_to_index(params, component):
 
-    ndim = params['n_dimensions']
+    ndim = params['particle_dimensions']
     if ndim == 3:
         switch = {
             'x': 0,
