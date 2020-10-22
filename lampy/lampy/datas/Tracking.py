@@ -15,7 +15,8 @@ class Tracking(object):
     def __new__(cls, Simulation):
 
         if not Simulation._tracking:
-            print("Tracking not available")
+            if Simulation._verbose_warning:
+                print("Tracking not available")
             return None
         else:
             return super(Tracking, cls).__new__(cls)
@@ -139,7 +140,8 @@ class Tracking(object):
         try:
             val = int(index)
         except ValueError:
-            print("Index must be a number")
+            if self._Simulation._verbose_error:
+                print("Index must be a number")
             return
         del(index)
         f = dict()
@@ -229,10 +231,11 @@ class Tracking(object):
             if kwargs['nearest']:
                 nearest_part = True
             if 'x' not in kwargs and 'y' not in kwargs and 'z' not in kwargs:
-                print("""
+                if self._Simulation._verbose_error:
+                    print("""
         Error, when you ask 'nearest' you should specify the component
         'x', 'y' or 'z'
-                    """)
+                        """)
                 return
         comp_dict = dict()
         if 'x' in kwargs:
@@ -286,7 +289,7 @@ class Tracking(object):
         --------
         
         """
-        if time is None:
+        if time is None and self._Simulation._verbose_warning:
             print("""
         Time not known, plotting last available dataset.
                 """)
@@ -345,9 +348,10 @@ class Tracking(object):
         try:
             ps, part_number = total_tracking_read(file_path, self._params, species)
         except FileNotFoundError:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Tracking at time {} not available, impossible to read.
-            """.format(timestep))
+                """.format(timestep))
             raise
 
         index_in = _convert_component_to_index(self._params, 'index')

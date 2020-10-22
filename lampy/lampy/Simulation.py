@@ -78,19 +78,27 @@ class Simulation(object):
         >>> help(s.Diagnostics)
     """
 
-    def __init__(self, path=os.getcwd()):
+    def __init__(self, path=os.getcwd(), verbose_level='all'):
         """
         Constructor for the Simulation class.
 
         It checks the datas, finds the data folders and then
         generates the simulation parameters
 
-        Returns
+        Parameters
+        --------
+        path : str
+            Path of the main simulation folder.
+            If left empty, the current folder is assumed.
+        verbose_level : str, optional
+            Verbosity of LAMPy.
+            If 'all', all the warnings and the errors are returned and explained.
+            If 'errors', only the errors are returned and explained.
+            If 'off', LAMPy does not return any indication.
+
         --------
         params : dict
             Dictionary containing all the parameters
-        path : str
-            Path of the main simulation folder
         directories : list
             List of all the output folders
         s.outputs : list
@@ -115,6 +123,20 @@ class Simulation(object):
         if not os.path.exists(path):
             raise NotADirectoryError('Directory {} does not exist'
                                      .format(path))
+
+        vlevel_accepted = ['all', 'errors', 'off']
+        if verbose_level not in vlevel_accepted:
+            print("verbose_level passed is wrong. 'all' will be assumed")
+            verbose_level = 'all'
+        if verbose_level == 'all':
+            self._verbose_warning = True
+        else:
+            self._verbose_warning = False
+        if verbose_level != 'off':
+            self._verbose_error = True
+        else:
+            self._verbose_error = False
+
         self.params = self._open_folder(path)
         self.dx = self.params['dx']
         if 'dz' in self.params.keys():
@@ -238,7 +260,8 @@ class Simulation(object):
             return timestep
         else:
             mintime = min(times, key=lambda x: abs(x-timestep))
-            print("""
+            if self._verbose_warning:
+                print("""
     WARNING: Requested time {} is not available.
     Output is retrieved at time {}""".format(timestep,
                                              mintime))
@@ -253,7 +276,8 @@ class Simulation(object):
             return timestep
         else:
             mintime = min(times, key=lambda x: abs(x - timestep))
-            print("""
+            if self._verbose_warning:
+                print("""
     WARNING: Requested time {} is not available.
     Output is retrieved at time {}""".format(timestep,
                                              mintime))
@@ -263,12 +287,15 @@ class Simulation(object):
 
         from .utilities.Utility import _read_simulation_nml,\
             _compute_physical_parameters, _compute_simulation_parameters,\
-            _read_simulation_without_nml
+            _read_simulation_without_nml, _read_simulation_json
 
-        if imported_f90nml:
-            params = _read_simulation_nml(path)
-        else:
-            params = _read_simulation_without_nml(path)
+        try:
+            params = _read_simulation_json(path)
+        except:
+            if imported_f90nml:
+                params = _read_simulation_nml(path)
+            else:
+                params = _read_simulation_without_nml(path)
 
         _compute_physical_parameters(params)
         _compute_simulation_parameters(params)
@@ -351,6 +378,31 @@ class Simulation(object):
         outputs.
         """
         print(self.outputs)
+
+    def verbose(self, verbose_level='all'):
+        """
+        Method that sets the level of verbosity of LAMPy.
+        Parameters
+        --------
+        verbose_level : str, optional
+            Verbosity of LAMPy.
+            If 'all', all the warnings and the errors are returned and explained.
+            If 'errors', only the errors are returned and explained.
+            If 'off', LAMPy does not return any indication.
+        """
+
+        vlevel_accepted = ['all', 'errors', 'off']
+        if verbose_level not in vlevel_accepted:
+            print("verbose_level passed is wrong. 'all' will be assumed")
+            verbose_level = 'all'
+        if verbose_level == 'all':
+            self._verbose_warning = True
+        else:
+            self._verbose_warning = False
+        if verbose_level != 'off':
+            self._verbose_error = True
+        else:
+            self._verbose_error = False
 
 
 class Directories(object):

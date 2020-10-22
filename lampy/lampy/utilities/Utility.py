@@ -98,7 +98,7 @@ def _compute_physical_parameters(dictionary):
         dictionary['particle_dimensions'] = 3
     if 'lam0' in dictionary.keys():
         dictionary['omega_0'] = 2*pi/dictionary['lam0']
-    if 'lam1' in dictionary.keys():
+    if 'lam1' in dictionary.keys() and dictionary['lam1'] > 0:
         dictionary['omega_1'] = 2*pi/dictionary['lam1']
     if 'n_over_nc' in dictionary.keys():
         dictionary['omega_p'] =\
@@ -179,7 +179,25 @@ def _convert_component_to_index(params, component):
     return switch[component]
 
 
-def _find_inputs(path):
+def _find_inputs_json(path):
+    """
+    Utility that finds and classifies the input files found
+    in the folder.
+    """
+    inputs = []
+    for dirpath, dirnames, filenames in os.walk(path):
+        for f in filenames:
+            if 'input_' in f and '.json' in f:
+                inputs.append(os.path.join(dirpath, f))
+        break
+
+    if len(inputs) == 0:
+        raise FileNotFoundError('No input JSON have been found in {}'
+                                .format(path))
+
+    return inputs
+
+def _find_inputs_nml(path):
     """
     Utility that finds and classifies the input files found
     in the folder.
@@ -246,6 +264,37 @@ def _nearest_particle( phase_space, component_dict):
 
     return phase_space[index_comp][minloc]
 
+def _read_simulation_json(path):
+    """
+    Utility that reads the 'input_??.json' file
+    in the given folder to assign the simulation
+    parameters.
+    It requires the package json to be installed.
+    """
+    import json
+
+    param_json = dict()
+    param_dic = dict()
+    inputs = _find_inputs_json(path)
+    if len(inputs) > 1:
+        print("LAMPy not yet prepared to read more outputs.")
+        for name in inputs[1:]:
+            inputs.remove(name)
+
+    for f in inputs:
+        name = f[-6:-4]
+        with open(f, 'r') as fp:
+            param_json[name] = json.load(fp)
+
+    names_view = param_json.keys()
+    names_iterator = iter(names_view)
+    first_name = next(names_iterator)
+    for key in param_json[first_name].keys():
+        for (key2, value2) in param_json[first_name][key].items():
+            param_dic[key2] = value2
+
+    return param_dic
+
 def _read_simulation_nml(path):
     """
     Utility that reads the 'input_??.nml' file
@@ -256,7 +305,7 @@ def _read_simulation_nml(path):
     import f90nml
 
     param_dic = dict()
-    inputs = _find_inputs(path)
+    inputs = _find_inputs_nml(path)
     if len(inputs) > 1:
         print("LAMPy not yet prepared to read more outputs.")
         for name in inputs[1:]:

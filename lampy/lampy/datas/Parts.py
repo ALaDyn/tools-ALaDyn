@@ -84,10 +84,11 @@ class Particles(object):
         ndim = self._params['n_dimensions']
 
         if phase_space_name not in sim.outputs:
-            print("""
-        {} is not available.
-        Available output are {}.
-        """.format(phase_space_name, sim.outputs))
+            if self._Simulation._verbose_error:
+                print("""
+            {} is not available.
+            Available output are {}.
+                    """.format(phase_space_name, sim.outputs))
             return
 
         file_path = sim._derive_file_path(phase_space_name, timestep)
@@ -95,9 +96,10 @@ class Particles(object):
             phase_space = dict()
             ps, part_number = total_phase_space_read(file_path, self._params)
         except FileNotFoundError:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Phase space {} not available, impossible to read.
-            """.format(phase_space_name))
+                """.format(phase_space_name))
             raise
 
         if ndim == 3:
@@ -168,18 +170,20 @@ class Particles(object):
         accepted_types = [str, dict]
 
         if type(phase_space) not in accepted_types:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Input phase_space must be either a string with the phase_space name
         or a dictionary
-                  """)
+                      """)
             return
 
         if type(phase_space) is str:
             if time is None:
-                print("""
+                if self._Simulation._verbose_error:
+                    print("""
         Time not known, impossible to plot datas.
         Please specify a time variable.
-                      """)
+                          """)
                 return
             time = self._Simulation._nearest_time(time)
 
@@ -191,7 +195,8 @@ class Particles(object):
 
         if comoving:
             if time is None:
-                print("Time not known, impossible to shift datas.")
+                if self._Simulation._verbose_error:
+                    print("Time not known, impossible to shift datas.")
                 return
             else:
                 v = self._params['w_speed']
@@ -285,7 +290,8 @@ class Particles(object):
         accepted_types = [str, dict]
 
         if type(phase_space) not in accepted_types:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Input phase_space must be either
         a string with the phase_space name or a dictionary.
                   """)
@@ -444,7 +450,8 @@ class Particles(object):
         f = open(path, 'w')
 
         if type(phase_space) not in accepted_types:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Input phase_space must be either a string with the phase_space name
         or a dictionary
                   """)
@@ -452,7 +459,8 @@ class Particles(object):
 
         if type(phase_space) is str:
             if time is None:
-                print("""
+                if self._Simulation._verbose_error:
+                    print("""
         Time not known, impossible to plot datas.
         Please specify a time variable.
                       """)
@@ -678,7 +686,8 @@ class Particles(object):
         accepted_types = [str, dict]
 
         if type(phase_space) not in accepted_types:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Input phase_space must be either a string with the phase_space name
         or a dictionary
                   """)
@@ -686,7 +695,8 @@ class Particles(object):
 
         if type(phase_space) is str:
             if time is None:
-                print("""
+                if self._Simulation._verbose_error:
+                    print("""
         Time not known, impossible to plot datas.
         Please specify a time variable.
                       """)
@@ -781,10 +791,16 @@ class Particles(object):
             alpha = kwargs['alpha']
             del kwargs['alpha']
 
+        shading_type = 'auto'
+        if 'shading' in kwargs:
+            shading_type = kwargs['shading']
+            del kwargs['shading']
+
         accepted_types = [str, dict]
 
         if type(phase_space) not in accepted_types:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         Input phase_space must be either a string with the phase_space name
         or a dictionary
                   """)
@@ -792,7 +808,8 @@ class Particles(object):
 
         if type(phase_space) is str:
             if time is None:
-                print("""
+                if self._Simulation._verbose_error:
+                    print("""
         Time not known, impossible to plot datas.
         Please specify a time variable.
                       """)
@@ -806,7 +823,7 @@ class Particles(object):
             ps = phase_space.copy()
 
         if comoving:
-            if time is None:
+            if time is None and self._Simulation._verbose_error:
                 print("Time not known, impossible to shift datas.")
                 return
             else:
@@ -825,4 +842,4 @@ class Particles(object):
             H = H.T
             X, Y = np.meshgrid(xedge, yedge)
             H = np.ma.masked_where(H == 0, H)
-            plt.pcolormesh(X, Y, H, cmap=cmap, alpha=alpha)
+            plt.pcolormesh(X, Y, H, shading=shading_type, cmap=cmap, alpha=alpha)

@@ -383,6 +383,11 @@ class Field(object):
         elif mask is not None and mask_argument is None:
             f = mask
 
+        shading_type = 'auto'
+        if 'shading' in kwargs:
+            shading_type = kwargs['shading']
+            del kwargs['shading']
+
         if self._params['n_dimensions'] == 2:
             if plane != 'xy':
                 print("""WARNING: output data is in two dimensions:
@@ -394,7 +399,7 @@ class Field(object):
             if mask is not None and mask_argument == 'axes':
                 X, Y = np.meshgrid(x, y)
                 f = np.ma.masked_where(mask(X.transpose(), Y.transpose()), f)
-            plt.pcolormesh(x, y, f.transpose(), **kwargs)
+            plt.pcolormesh(x, y, f.transpose(), shading=shading_type, **kwargs)
 
         elif self._params['n_dimensions'] == 3:
 
@@ -408,7 +413,7 @@ class Field(object):
                     X, Y = np.meshgrid(x, y)
                     f = np.ma.masked_where(mask(X.transpose(),
                                            Y.transpose()), f)
-                plt.pcolormesh(x, y, f[..., nz_map].transpose(), **kwargs)
+                plt.pcolormesh(x, y, f[..., nz_map].transpose(), shading=shading_type, **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
                 x = self._stored_axis[('x', timestep)]
@@ -420,7 +425,7 @@ class Field(object):
                     X, Z = np.meshgrid(x, z)
                     f = np.ma.masked_where(mask(X.transpose(),
                                            Z.transpose()), f)
-                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), **kwargs)
+                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), shading=shading_type, **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
@@ -430,7 +435,7 @@ class Field(object):
                     Y, Z = np.meshgrid(y, z)
                     f = np.ma.masked_where(mask(Y.transpose(),
                                            Z.transpose()), f)
-                plt.pcolormesh(y, z, f[nx_map, ...].transpose(), **kwargs)
+                plt.pcolormesh(y, z, f[nx_map, ...].transpose(), shading=shading_type, **kwargs)
 
     def lineout(self, field, timestep, axis='x',
                 normalized=False, comoving=False, **kwargs):
@@ -479,8 +484,9 @@ class Field(object):
 
         accepted_types = [str, np.ndarray]
         if type(field) not in accepted_types:
-            print("""Input field must be either a string with the field name
-            or a numpy array """)
+            if self._Simulation._verbose_error:
+                print("""Input field must be either a string with the field name
+                or a numpy array """)
             return
 
         if 'unit_field' in kwargs:
@@ -490,10 +496,11 @@ class Field(object):
             norm = None
 
         if field not in self._Simulation.outputs:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         {} is not available.
         Available output are {}.
-        """.format(field, self._Simulation.outputs))
+            """.format(field, self._Simulation.outputs))
             return
 
         timestep = self._Simulation._nearest_time(timestep)
@@ -537,7 +544,8 @@ class Field(object):
             error += """value chosen for the lineout
                 is not in the computational box\n"""
         if error != '':
-            print(error)
+            if self._Simulation._verbose_error:
+                print(error)
 
         if type(field) is str:
             self._return_field(field, timestep)
@@ -563,7 +571,8 @@ class Field(object):
         line = _grid_convert(box_limits, self._params, x=x_line, y=y_line,
                              z=z_line)
         if axis == 'z' and self._params['n_dimensions'] == 2:
-            print("""WARNING: No lineout along the z axis is possible
+            if self._Simulation._verbose_warning:
+                print("""No lineout along the z axis is possible
                      in 2 dimensions.
                      Lineout will be performed along the x axis""")
             axis = 'x'
@@ -709,7 +718,7 @@ class Field(object):
         time = self._Simulation._nearest_time(time)
         field_list = self._search_field_by_timestep(time)
         ax = dict()
-        if not field_list:
+        if not field_list and self._Simulation._verbose_error:
             print("""No axis have been read yet at timestep {}.
             Call first
             >>> f = s.Field.get_data(any_available_field_name,{})
