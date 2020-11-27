@@ -81,6 +81,7 @@ for n in range(1, 6):
 for n in range(1, 6):
     _tracking_basename[n] = 'Track_'+str(n)+'_'
 
+
 def _compute_physical_parameters(dictionary):
     """
     Utility that computes the relevant physical parameters
@@ -148,7 +149,6 @@ def _compute_simulation_parameters(dictionary):
         dictionary['a_on_particles'] = [False]*dictionary['nsp']
 
 
-
 def _convert_component_to_index(params, component):
 
     ndim = params['particle_dimensions']
@@ -197,6 +197,7 @@ def _find_inputs_json(path):
 
     return inputs
 
+
 def _find_inputs_nml(path):
     """
     Utility that finds and classifies the input files found
@@ -235,7 +236,8 @@ def _grid_convert(box_limits, params, **kwargs):
             grid_point['y'] = int((y-box_limits['y_min'])/(dy*params['jump']))
         else:
             comp = 'y'
-            grid_point['y'] = int(_transverse_stretch(y, params, comp)/params['jump'])
+            grid_point['y'] = \
+                int(_transverse_stretch(y, params, comp)/params['jump'])
 
     if params['n_dimensions'] == 3:
         if 'z' in kwargs:
@@ -246,15 +248,17 @@ def _grid_convert(box_limits, params, **kwargs):
                                       (dz*params['jump']))
             else:
                 comp = 'z'
-                grid_point['z'] = int(_transverse_stretch(z, params, comp)/params['jump'])
+                grid_point['z'] = \
+                    int(_transverse_stretch(z, params, comp)/params['jump'])
     return grid_point
 
-def _nearest_particle( phase_space, component_dict):
+
+def _nearest_particle(phase_space, component_dict):
 
     import numpy as np
 
     nparts = len(phase_space[1])
-    dist = np.zeros(nparts)    
+    dist = np.zeros(nparts)
     index_comp = component_dict.pop('index')
     for comp, coord in component_dict.items():
         dist += (phase_space[comp] - coord)**2
@@ -263,6 +267,7 @@ def _nearest_particle( phase_space, component_dict):
     minloc = np.argmin(dist)
 
     return phase_space[index_comp][minloc]
+
 
 def _read_simulation_json(path):
     """
@@ -294,6 +299,7 @@ def _read_simulation_json(path):
             param_dic[key2] = value2
 
     return param_dic
+
 
 def _read_simulation_nml(path):
     """
@@ -368,10 +374,12 @@ def _sort_particles(phase_space, component):
 
     return ps_sorted
 
+
 def _sort_tracked_particles(phase_space, index_in):
 
     sorted_index = np.argsort(phase_space[index_in])
-    return phase_space[:,sorted_index]
+    return phase_space[:, sorted_index]
+
 
 def _translate_filename(fname):
     """
@@ -481,6 +489,7 @@ def _inverse_stretch_function(x, nx, ns, dx):
                       lambda x: nx-f(2*symm_center-x)])
 
     return inv_str_func
+
 
 def moving_average(times, values, simulation):
 

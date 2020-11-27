@@ -52,6 +52,15 @@ class Particles(object):
         self._selected_index = dict()
         self._selected_percentage = 1
 
+    def _get_stored_phase_space(self, phase_space_name, timestep):
+
+        if self._Simulation._save_data:
+            ps = self._stored_phase_space[(phase_space_name, timestep)]
+        else:
+            ps = self._stored_phase_space.pop((phase_space_name, timestep))
+
+        return ps
+
     def _search_ps_by_timestep(self, timestep):
 
         phase_space_list = list()
@@ -126,8 +135,8 @@ class Particles(object):
         self._stored_phase_space[(phase_space_name, timestep)] = phase_space
 
     def scatterplot(self, phase_space, time=None, component1='x',
-                component2='y', comoving=False,
-                selected_percentage=None, s=1, **kwargs):
+                    component2='y', comoving=False,
+                    selected_percentage=None, s=1, **kwargs):
         """
         Method that produces a scatter plot of the given phase space.
 
@@ -189,7 +198,7 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._stored_phase_space[(phase_space, time)].copy()
+            ps = self._get_stored_phase_space(phase_space, time).copy()
         elif type(phase_space) is dict:
             ps = phase_space.copy()
 
@@ -243,7 +252,7 @@ class Particles(object):
         ps = dict()
         timestep = self._Simulation._nearest_time(timestep)
         self._return_phase_space(phase_space_name, timestep)
-        ps['data'] = self._stored_phase_space[(phase_space_name, timestep)]
+        ps['data'] = self._get_stored_phase_space(phase_space_name, timestep)
         ps['time'] = timestep
 
         return ps
@@ -301,7 +310,7 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._stored_phase_space[(phase_space, time)]
+            ps = self._get_stored_phase_space(phase_space, time)
         elif type(phase_space) is dict:
             ps = phase_space
 
@@ -468,7 +477,7 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._stored_phase_space[(phase_space, time)]
+            ps = self._get_stored_phase_space(phase_space, time)
         elif type(phase_space) is dict:
             ps = phase_space
 
@@ -705,7 +714,7 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._stored_phase_space[(phase_space, time)].copy()
+            ps = self._get_stored_phase_space(phase_space, time).copy()
         elif type(phase_space) is dict:
             ps = phase_space.copy()
 
@@ -818,7 +827,7 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._stored_phase_space[(phase_space, time)].copy()
+            ps = self._get_stored_phase_space(phase_space, time).copy()
         elif type(phase_space) is dict:
             ps = phase_space.copy()
 
@@ -842,4 +851,5 @@ class Particles(object):
             H = H.T
             X, Y = np.meshgrid(xedge, yedge)
             H = np.ma.masked_where(H == 0, H)
-            plt.pcolormesh(X, Y, H, shading=shading_type, cmap=cmap, alpha=alpha)
+            plt.pcolormesh(X, Y, H, shading=shading_type,
+                           cmap=cmap, alpha=alpha)

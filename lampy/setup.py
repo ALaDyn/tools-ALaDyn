@@ -32,9 +32,9 @@ lib_read_phase_space = ('lib_read_phase_space',
                          [os.path.join('lampy', 'fastread', 'clibs',
                                        'lib_read_phase_space.c')]})
 lib_read_tracking = ('lib_read_tracking',
-                        {'sources':
-                         [os.path.join('lampy', 'fastread', 'clibs',
-                                       'lib_read_tracking.c')]})
+                     {'sources':
+                      [os.path.join('lampy', 'fastread', 'clibs',
+                                    'lib_read_tracking.c')]})
 
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(

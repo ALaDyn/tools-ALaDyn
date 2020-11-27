@@ -70,14 +70,14 @@ class Field(object):
                 raise
 
             self._stored_fields[(field_name, timestep)] = f_temp
+            if self._params['n_dimensions'] == 2:
+                self._stored_fields[(field_name, timestep)] =\
+                    self._stored_fields[(field_name, timestep)][:, :, 0]
             self._stored_axis[('x', timestep)] = x
             if self._params['n_dimensions'] >= 2:
                 self._stored_axis[('y', timestep)] = y
             if self._params['n_dimensions'] == 3:
                 self._stored_axis[('z', timestep)] = z
-            if self._params['n_dimensions'] == 2:
-                self._stored_fields[(field_name, timestep)] =\
-                    self._stored_fields[(field_name, timestep)][:, :, 0]
 
             if len(field_list) == 1:
                 return
@@ -87,6 +87,15 @@ class Field(object):
         if self._params['n_dimensions'] == 2:
             self._stored_fields[(field, timestep)] =\
                 self._stored_fields[(field, timestep)][:, :, 0]
+
+    def _get_stored_field(self, field_name, timestep):
+
+        if self._Simulation._save_data:
+            f = self._stored_fields[(field_name, timestep)]
+        else:
+            f = self._stored_fields.pop((field_name, timestep))
+
+        return f
 
     def _initialize_field_dic(self):
 
@@ -359,7 +368,7 @@ class Field(object):
 
         if type(field) is str:
             self._return_field(field, timestep)
-            f = self._stored_fields[(field, timestep)]
+            f = self._get_stored_field(field, timestep)
         elif type(field) is np.ndarray:
             f = field
 
@@ -413,7 +422,8 @@ class Field(object):
                     X, Y = np.meshgrid(x, y)
                     f = np.ma.masked_where(mask(X.transpose(),
                                            Y.transpose()), f)
-                plt.pcolormesh(x, y, f[..., nz_map].transpose(), shading=shading_type, **kwargs)
+                plt.pcolormesh(x, y, f[..., nz_map].transpose(),
+                               shading=shading_type, **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
                 x = self._stored_axis[('x', timestep)]
@@ -425,7 +435,8 @@ class Field(object):
                     X, Z = np.meshgrid(x, z)
                     f = np.ma.masked_where(mask(X.transpose(),
                                            Z.transpose()), f)
-                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), shading=shading_type, **kwargs)
+                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(),
+                               shading=shading_type, **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
@@ -435,7 +446,8 @@ class Field(object):
                     Y, Z = np.meshgrid(y, z)
                     f = np.ma.masked_where(mask(Y.transpose(),
                                            Z.transpose()), f)
-                plt.pcolormesh(y, z, f[nx_map, ...].transpose(), shading=shading_type, **kwargs)
+                plt.pcolormesh(y, z, f[nx_map, ...].transpose(),
+                               shading=shading_type, **kwargs)
 
     def lineout(self, field, timestep, axis='x',
                 normalized=False, comoving=False, **kwargs):
@@ -549,7 +561,7 @@ class Field(object):
 
         if type(field) is str:
             self._return_field(field, timestep)
-            f = self._stored_fields[(field, timestep)]
+            f = self._get_stored_field(field, timestep)
         elif type(field) is np.ndarray:
             f = field
 
@@ -692,7 +704,7 @@ class Field(object):
         f = dict()
         time = self._Simulation._nearest_time(time)
         self._return_field(field_name, time)
-        f['data'] = self._stored_fields[(field_name, time)]
+        f['data'] = self._get_stored_field(field_name, time)
         f['time'] = time
 
         return f

@@ -1,5 +1,4 @@
 from .fastread.parameter_read import _output_directories
-from .utilities.Utility import _tracking_directory
 import matplotlib.pyplot as plt
 import os
 
@@ -18,6 +17,7 @@ finally:
 try:
     import f90nml
     imported_f90nml = True
+    f90nmlversion = f90nml.__version__
 except ImportError:
     print("""
     Cannot find f90nml module.
@@ -78,7 +78,7 @@ class Simulation(object):
         >>> help(s.Diagnostics)
     """
 
-    def __init__(self, path=os.getcwd(), verbose_level='all'):
+    def __init__(self, path=os.getcwd(), verbose_level='all', save_data=True):
         """
         Constructor for the Simulation class.
 
@@ -92,9 +92,17 @@ class Simulation(object):
             If left empty, the current folder is assumed.
         verbose_level : str, optional
             Verbosity of LAMPy.
-            If 'all', all the warnings and the errors are returned and explained.
+            If 'all', all the warnings and the errors are returned
+            and explained.
+            This is the default value.
             If 'errors', only the errors are returned and explained.
             If 'off', LAMPy does not return any indication.
+        save_data : bool, optional
+            If True, read data is saved in memory to avoid file re-read.
+            This is the default value.
+            If False, no data is stored in memory and files are
+            accessed every
+            time.
 
         --------
         params : dict
@@ -164,6 +172,7 @@ class Simulation(object):
         if self._tracking_instantiated:
             self._iter_dictionary = self.Tracking.iter_dictionary
         self.isEnvelope = (self.params['model_id'] == 4)
+        self._save_data = save_data
 
     def _collect_outputs(self, *args):
 
@@ -386,7 +395,8 @@ class Simulation(object):
         --------
         verbose_level : str, optional
             Verbosity of LAMPy.
-            If 'all', all the warnings and the errors are returned and explained.
+            If 'all', all the warnings and the errors are returned
+            and explained.
             If 'errors', only the errors are returned and explained.
             If 'off', LAMPy does not return any indication.
         """

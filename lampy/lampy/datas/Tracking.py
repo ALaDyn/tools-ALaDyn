@@ -1,7 +1,7 @@
 from ..compiled_cython.read_tracking import total_tracking_read
 import matplotlib.pylab as plt
 import numpy as np
-from ..utilities.Utility import speed_of_light, _convert_component_to_index,\
+from ..utilities.Utility import _convert_component_to_index,\
     _tracking_directory, _tracking_dictionary, _nearest_particle
 import os
 
@@ -9,6 +9,7 @@ m_e = 0.511
 e = 1.6E-7
 _can_dict = dict()
 _can_dict['y'] = 'canonical momentum y'
+
 
 class Tracking(object):
 
@@ -44,14 +45,23 @@ class Tracking(object):
             self._array_dimensions = 7
         elif self._params['particle_dimensions'] == 3:
             self._array_dimensions = 9
-    
+
     def _check_index_in_ps(self, phase_space, index):
 
-        comp = _convert_component_to_index( self._params, 'index')
+        comp = _convert_component_to_index(self._params, 'index')
         if index == 'all':
             return True
         mask = np.isin(phase_space[comp], index, assume_unique=True)
         return mask
+
+    def _get_stored_tracking(self, timestep, species):
+
+        if self._Simulation._save_data:
+            ps = self._stored_tracking[(timestep, species)]
+        else:
+            ps = self._stored_tracking.pop(timestep, species)
+
+        return ps
 
     def _read_iter_dic(self):
 
@@ -59,8 +69,8 @@ class Tracking(object):
             return
 
         for key, value in _tracking_dictionary.items():
-            track_dic_path = os.path.join(self._path, \
-                _tracking_directory, value)
+            track_dic_path =\
+                os.path.join(self._path, _tracking_directory, value)
 
             if os.path.isfile(track_dic_path):
                 self._available_species += [key]
@@ -79,7 +89,6 @@ class Tracking(object):
                 self.iter_dictionary[key][float(line.split()[1])] =\
                     int(line.split()[0])
 
-    
     def _return_tracking_phase_space(self, timestep, species):
 
         track_list = self._search_track_by_timestep(timestep, species)
@@ -88,6 +97,36 @@ class Tracking(object):
         else:
             self._track_read(timestep, species)
 
+    def _search_track_by_timestep(self, timestep, species):
+
+        track_list = None
+        for key in self._stored_tracking.keys():
+            if (timestep, species) == key:
+                track_list = key
+
+        return track_list
+
+    def _track_read(self, timestep, species):
+
+        from ..utilities.Utility import _sort_tracked_particles
+        sim = self._Simulation
+
+        file_path = sim._derive_tracking_file_path(timestep, species)
+        try:
+            ps, part_number = total_tracking_read(file_path, self._params,
+                                                  species)
+        except FileNotFoundError:
+            if self._Simulation._verbose_error:
+                print("""
+        Tracking at time {} not available, impossible to read.
+                """.format(timestep))
+            raise
+
+        index_in = _convert_component_to_index(self._params, 'index')
+
+        ps_sorted = _sort_tracked_particles(ps, index_in)
+
+        self._stored_tracking[(timestep, species)] = ps_sorted
 
     def comp_to_index(self, index):
         return _convert_component_to_index(self._params, index)
@@ -114,7 +153,7 @@ class Tracking(object):
         f = dict()
         time = self._Simulation._nearest_tracking_time(time, species)
         self._return_tracking_phase_space(time, species)
-        f['data'] = self._stored_tracking[(time, species)]
+        f['data'] = self._get_stored_tracking(time, species)
         f['time'] = time
 
         return f
@@ -155,7 +194,7 @@ class Tracking(object):
         # Warning, only working for single particle for now
         for instant in time_array:
             self._return_tracking_phase_space(instant, species)
-            ps = self._stored_tracking[(instant, species)].copy()
+            ps = self._get_stored_tracking(instant, species).copy()
             mask = self._check_index_in_ps(ps, val)
             if not mask.any():
                 continue
@@ -171,7 +210,7 @@ class Tracking(object):
 
     def select_index(self, time=None, species=1, **kwargs):
         """
-        Function that takes in input a phase space and 
+        Function that takes in input a phase space and
         selects particles according to the given conditions.
 
         Parameters
@@ -220,7 +259,7 @@ class Tracking(object):
         var_dic_max['z_max'] = 'z'
         var_dic_min['weight_min'] = 'weight'
         var_dic_max['weight_max'] = 'weight'
-        
+
         if 'z_min' in kwargs and n_dimensions == 2:
             del kwargs['z_min']
         if 'z_max' in kwargs and n_dimensions == 2:
@@ -255,7 +294,7 @@ class Tracking(object):
         time = self._Simulation._nearest_tracking_time(time, species)
         self._return_tracking_phase_space(time, species)
 
-        ps = self._stored_tracking[(time, species)].copy()
+        ps = self._get_stored_tracking(time, species).copy()
 
         if nearest_part:
             ind = _nearest_particle(ps, comp_dict)
@@ -263,10 +302,12 @@ class Tracking(object):
 
         for kw in kw_list:
             if kw in var_dic_min.keys():
-                comp = _convert_component_to_index(self._params, var_dic_min[kw])
+                comp = _convert_component_to_index(self._params,
+                                                   var_dic_min[kw])
                 index.append(np.where(ps[comp] > kwargs[kw])[0])
             elif kw in var_dic_max.keys():
-                comp = _convert_component_to_index(self._params, var_dic_max[kw])
+                comp = _convert_component_to_index(self._params,
+                                                   var_dic_max[kw])
                 index.append(np.where(ps[comp] < kwargs[kw])[0])
 
         tot_index = index[0]
@@ -277,17 +318,35 @@ class Tracking(object):
         index_comp = _convert_component_to_index(self._params, 'index')
 
         return np.array(ps[index_comp][tot_index])
-        
+
     def scatterplot(self, time=None, component1='x', component2='y', species=1,
-                index='all', comoving=False, s=1, **kwargs):
+                    index='all', comoving=False, s=1, **kwargs):
         """
         Method that produces a scatter plot of the given tracked phase space.
 
-        It takes in input the tracked species and the time of interest.
-
         Parameters
         --------
-        
+        time : float, optional
+            Time of the given plot, default is None
+        component1: str, optional
+            Phase space component that goes on the x axis.
+            Default value is 'x'.
+        component2: str, optional
+            Phase space component that goes on the y axis.
+            Default value is 'y'.
+        species: int, optional
+            Tracked species number, default is 1
+        index: str, optional
+            Particle index to be plotted, default is 'all'.
+        comoving: bool, optional
+            Flag that shifts the longitudinal axis in the comoving
+            reference frame. Default is False.
+        s: int, optional
+            Scatterplot element size. Default is 1.
+
+        Kwargs
+        ---------
+        Accepts all the kwargs for matplotlib.scatterplot
         """
         if time is None and self._Simulation._verbose_warning:
             print("""
@@ -298,7 +357,7 @@ class Tracking(object):
             time = self._Simulation._nearest_tracking_time(time, species)
 
         self._return_tracking_phase_space(time, species)
-        ps = self._stored_tracking[(time, species)].copy()
+        ps = self._get_stored_tracking(time, species).copy()
 
         if comoving:
             v = self._params['w_speed']
@@ -328,48 +387,41 @@ class Tracking(object):
 
         plt.scatter(psx, psy, s=s, **kwargs)
 
-    def _search_track_by_timestep(self, timestep, species):
-
-        track_list = None
-        for key in self._stored_tracking.keys():
-            if (timestep, species) == key:
-                track_list = key
-
-        return track_list
-
-    def _track_read(self, timestep, species):
-
-        from ..utilities.Utility import _sort_tracked_particles
-        sim = self._Simulation
-        ndim = self._params['particle_dimensions']
-
-
-        file_path = sim._derive_tracking_file_path(timestep, species)
-        try:
-            ps, part_number = total_tracking_read(file_path, self._params, species)
-        except FileNotFoundError:
-            if self._Simulation._verbose_error:
-                print("""
-        Tracking at time {} not available, impossible to read.
-                """.format(timestep))
-            raise
-
-        index_in = _convert_component_to_index(self._params, 'index')
-
-        ps_sorted = _sort_tracked_particles(ps, index_in)
-
-        self._stored_tracking[(timestep, species)] = ps_sorted
-
     def trajectory_plot(self, time=None, component1='x', component2='y',
-            species=1, index='all', **kwargs):
+                        species=1, index='all', **kwargs):
+        """
+        Method that plots the trajectory of a given particle over time.
 
-        from matplotlib.collections import LineCollection
+        Parameters
+        ---------
+        time : float, optional
+            Final time of the given plot, default is None
+        component1: str, optional
+            Phase space component that goes on the x axis.
+            component1 can also be 'time', which generates a
+            component2 plot vs time.
+            Default value is 'x'.
+        component2: str, optional
+            Phase space component that goes on the y axis.
+            Default value is 'y'.
+        species: int, optional
+            Tracked species number, default is 1
+        index: str, optional
+            Particle index to be plotted, default is 'all'.
+        comoving: bool, optional
+            Flag that shifts the longitudinal axis in the comoving
+            reference frame. Default is False.
+        s: int, optional
+            Scatterplot element size. Default is 1.
+
+        Kwargs
+        ---------
+        Accepts all the kwargs for matplotlib.plot
+        """
 
         time = self._Simulation._nearest_tracking_time(time, species)
         time_index = self._available_times.index(time)
         time_array = self._available_times[:time_index + 1]
-        max_time = max(time_array)
-        min_time = max(time_array)
         plot_list_abscissa = dict()
         plot_list_ordinate = dict()
 
@@ -379,13 +431,13 @@ class Tracking(object):
             component2 = _convert_component_to_index(self._params, component2)
         ind_comp = _convert_component_to_index(self._params, 'index')
 
-        cmap_name = 'copper'
-        norm = plt.Normalize(min_time, max_time)
+        # cmap_name = 'copper'
+        # norm = plt.Normalize(min_time, max_time)
         # Performing the first iteration explicitly to generate the numpy
-        # arrays to be plotted 
+        # arrays to be plotted
         instant = time_array.pop(0)
         self._return_tracking_phase_space(instant, species)
-        ps = self._stored_tracking[(instant, species)].copy()
+        ps = self._get_stored_tracking(instant, species).copy()
         mask = self._check_index_in_ps(ps, index)
         if component1 == _can_dict['y'] or component2 == _can_dict['y']:
             pycomp = _convert_component_to_index(self._params, 'py')
@@ -411,7 +463,7 @@ class Tracking(object):
 
         for instant in time_array:
             self._return_tracking_phase_space(instant, species)
-            ps = self._stored_tracking[(instant, species)].copy()
+            ps = self._get_stored_tracking(instant, species).copy()
             mask = self._check_index_in_ps(ps, index)
             if component1 != 'time' and component1 != _can_dict['y']:
                 temp_comp1 = ps[component1][mask]
@@ -429,18 +481,11 @@ class Tracking(object):
                         np.append(plot_list_abscissa[temp_index[i]], [instant])
                 else:
                     plot_list_abscissa[temp_index[i]] = \
-                        np.append(plot_list_abscissa[temp_index[i]], temp_comp1[i])
+                        np.append(plot_list_abscissa[temp_index[i]],
+                                  temp_comp1[i])
                 plot_list_ordinate[temp_index[i]] = \
                     np.append(plot_list_ordinate[temp_index[i]], temp_comp2[i])
 
         for key in plot_list_abscissa.keys():
-            max_xplot = max(plot_list_abscissa[key])
-            max_yplot = max(plot_list_ordinate[key])
-            min_xplot = min(plot_list_abscissa[key])
-            min_yplot = min(plot_list_ordinate[key])
-
-            # points = np.array([plot_list_abscissa[key],
-            #                   plot_list_ordinate[key]])
-
-            # segments = np.concatenate([points[:-1], points[1:]], axis=1)
-            plt.plot( plot_list_abscissa[key], plot_list_ordinate[key], **kwargs)
+            plt.plot(plot_list_abscissa[key],
+                     plot_list_ordinate[key], **kwargs)
