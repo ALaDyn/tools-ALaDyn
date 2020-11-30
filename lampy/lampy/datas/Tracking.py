@@ -194,7 +194,8 @@ class Tracking(object):
         # Warning, only working for single particle for now
         for instant in time_array:
             self._return_tracking_phase_space(instant, species)
-            ps = self._get_stored_tracking(instant, species).copy()
+            ps0 = self._get_stored_tracking(instant, species)
+            ps = ps0.copy()
             mask = self._check_index_in_ps(ps, val)
             if not mask.any():
                 continue
@@ -294,7 +295,8 @@ class Tracking(object):
         time = self._Simulation._nearest_tracking_time(time, species)
         self._return_tracking_phase_space(time, species)
 
-        ps = self._get_stored_tracking(time, species).copy()
+        ps0 = self._get_stored_tracking(time, species)
+        ps = ps0.copy()
 
         if nearest_part:
             ind = _nearest_particle(ps, comp_dict)
@@ -357,7 +359,8 @@ class Tracking(object):
             time = self._Simulation._nearest_tracking_time(time, species)
 
         self._return_tracking_phase_space(time, species)
-        ps = self._get_stored_tracking(time, species).copy()
+        ps0 = self._get_stored_tracking(time, species)
+        ps = ps0.copy()
 
         if comoving:
             v = self._params['w_speed']
@@ -437,7 +440,8 @@ class Tracking(object):
         # arrays to be plotted
         instant = time_array.pop(0)
         self._return_tracking_phase_space(instant, species)
-        ps = self._get_stored_tracking(instant, species).copy()
+        ps0 = self._get_stored_tracking(instant, species)
+        ps = ps0.copy()
         mask = self._check_index_in_ps(ps, index)
         if component1 == _can_dict['y'] or component2 == _can_dict['y']:
             pycomp = _convert_component_to_index(self._params, 'py')
@@ -463,7 +467,8 @@ class Tracking(object):
 
         for instant in time_array:
             self._return_tracking_phase_space(instant, species)
-            ps = self._get_stored_tracking(instant, species).copy()
+            ps0 = self._get_stored_tracking(instant, species)
+            ps = ps0.copy()
             mask = self._check_index_in_ps(ps, index)
             if component1 != 'time' and component1 != _can_dict['y']:
                 temp_comp1 = ps[component1][mask]

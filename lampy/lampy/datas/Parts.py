@@ -198,7 +198,8 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._get_stored_phase_space(phase_space, time).copy()
+            ps0 = self._get_stored_phase_space(phase_space, time)
+            ps = ps0.copy()
         elif type(phase_space) is dict:
             ps = phase_space.copy()
 
@@ -714,7 +715,8 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._get_stored_phase_space(phase_space, time).copy()
+            ps0 = self._get_stored_phase_space(phase_space, time)
+            ps = ps0.copy()
         elif type(phase_space) is dict:
             ps = phase_space.copy()
 
@@ -827,7 +829,8 @@ class Particles(object):
 
         if type(phase_space) is str:
             self._return_phase_space(phase_space, time)
-            ps = self._get_stored_phase_space(phase_space, time).copy()
+            ps0 = self._get_stored_phase_space(phase_space, time)
+            ps = ps0.copy()
         elif type(phase_space) is dict:
             ps = phase_space.copy()
 
