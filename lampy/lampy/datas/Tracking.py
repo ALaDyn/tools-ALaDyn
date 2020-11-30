@@ -59,7 +59,7 @@ class Tracking(object):
         if self._Simulation._save_data:
             ps = self._stored_tracking[(timestep, species)]
         else:
-            ps = self._stored_tracking.pop(timestep, species)
+            ps = self._stored_tracking.pop((timestep, species))
 
         return ps
 
