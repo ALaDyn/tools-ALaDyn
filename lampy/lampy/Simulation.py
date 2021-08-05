@@ -195,12 +195,18 @@ class Simulation(object):
             output_list += ['Fy']
         if 'Ez' in output_list and 'By' in output_list:
             output_list += ['Fz']
-        if 'ReA' in output_list and 'ImA' in output_list \
-                and 'A' not in output_list:
-            output_list += ['A']
+        if 'Re1A' in output_list and 'Im1A' in output_list \
+                and 'A1' not in output_list:
+            output_list += ['A1']
             self._a_from_imaginary = True
-        if 'ReA' in output_list and 'ImA' in output_list:
-            output_list += ['E_laser', 'E_envelope']
+        if 'Re1A' in output_list and 'Im1A' in output_list:
+            output_list += ['E1_laser', 'E1_envelope']
+        if 'Re2A' in output_list and 'Im2A' in output_list \
+                and 'A2' not in output_list:
+            output_list += ['A2']
+            self._a_from_imaginary = True
+        if 'Re2A' in output_list and 'Im2A' in output_list:
+            output_list += ['E2_laser', 'E2_envelope']
 
         return output_list
 
