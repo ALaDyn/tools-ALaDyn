@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <errno.h>
 #include "lib_read_phase_space.h"
 
 
@@ -10,14 +11,15 @@ void read_phasespace(float *ps_component, int dimensionality, char *file_pointer
     FILE *binary;
     int npart, a;
     int offset, jump;
+    errno = 0;
 
     binary=fopen(file_pointer,"rb");
 
     if(binary==NULL){
-    	printf("Can't read\n");
+    	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
-    jump=2*dimensionality+1;
+    jump =2*dimensionality+1;
     offset=0;
     while(fread(&npart,sizeof(int),1,binary)==1){
 
@@ -29,6 +31,7 @@ void read_phasespace(float *ps_component, int dimensionality, char *file_pointer
         
     }
 
+    fclose(binary);
 }
 
 int count_particles(int dimensionality, char *file_pointer){
@@ -36,11 +39,12 @@ int count_particles(int dimensionality, char *file_pointer){
     FILE *binary;
     int total_particles_number, npart, nelements;
     int jump;
+    errno = 0;
 
     binary=fopen(file_pointer,"rb");
 
     if(binary==NULL){
-    	printf("Can't read\n");
+    	printf("Can't read %s with error %d \n", file_pointer, errno);
     	exit(0);
     }
     jump=2*dimensionality+2;
@@ -50,12 +54,11 @@ int count_particles(int dimensionality, char *file_pointer){
 
         fseek(binary,sizeof(float)*nelements,SEEK_CUR);
 
-
         total_particles_number+=npart;
 
 
     }
 
+    fclose(binary);
     return total_particles_number;
-
 }

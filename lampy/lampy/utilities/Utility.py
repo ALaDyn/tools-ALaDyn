@@ -21,10 +21,12 @@ _translated_filenames['Bz'] = 'Bzfout'
 _translated_filenames['Jx'] = 'denvxout'
 _translated_filenames['Jy'] = 'denvyout'
 _translated_filenames['Jz'] = 'denvzout'
-_translated_filenames['A'] = 'Aenvout'
-_translated_filenames['a'] = 'aenvout'
-_translated_filenames['ReA'] = 'Renvout'
-_translated_filenames['ImA'] = 'Ienvout'
+_translated_filenames['A1'] = 'A1envout'
+_translated_filenames['A2'] = 'A2envout'
+_translated_filenames['Re1A'] = 'R1envout'
+_translated_filenames['Im1A'] = 'I1envout'
+_translated_filenames['Re2A'] = 'R2envout'
+_translated_filenames['Im2A'] = 'I2envout'
 _translated_filenames['rho_fluid'] = 'Fdenout'
 _translated_filenames['Px_fluid'] = 'Flpxout'
 _translated_filenames['Py_fluid'] = 'Flpyout'
@@ -51,10 +53,12 @@ _total_filenamelist += ['Bzfout']
 _total_filenamelist += ['Jxfout']
 _total_filenamelist += ['Jyfout']
 _total_filenamelist += ['Jzfout']
-_total_filenamelist += ['Renvout']
-_total_filenamelist += ['Ienvout']
-_total_filenamelist += ['Aenvout']
-_total_filenamelist += ['aenvout']
+_total_filenamelist += ['R1envout']
+_total_filenamelist += ['I1envout']
+_total_filenamelist += ['R2envout']
+_total_filenamelist += ['I2envout']
+_total_filenamelist += ['A1envout']
+_total_filenamelist += ['A2envout']
 _total_filenamelist += ['denvxout']
 _total_filenamelist += ['denvyout']
 _total_filenamelist += ['denvzout']
@@ -69,6 +73,17 @@ _total_filenamelist += ['Eionzout']
 _total_filenamelist += ['E_hg_out']
 _total_filenamelist += ['H'+str(n)+'dnout' for n in range(1, 6)]
 _total_filenamelist += ['H'+str(n)+'enout' for n in range(1, 6)]
+_total_filenamelist += ['Track_']
+
+_tracking_directory = 'tracking'
+_tracking_dictionary = dict()
+_tracking_basename = dict()
+for n in range(1, 6):
+    _tracking_dictionary[n] = 'tracking_dictionary_'+str(n)+'.dat'
+
+# Warning, to be extended for more tracked species
+for n in range(1, 6):
+    _tracking_basename[n] = 'Track_'+str(n)+'_'
 
 
 def _compute_physical_parameters(dictionary):
@@ -83,9 +98,12 @@ def _compute_physical_parameters(dictionary):
     else:
         dictionary['n_dimensions'] = 3
 
+    dictionary['particle_dimensions'] = dictionary['n_dimensions']
+    if dictionary['model_id'] == 2 or dictionary['model_id'] == 3:
+        dictionary['particle_dimensions'] = 3
     if 'lam0' in dictionary.keys():
         dictionary['omega_0'] = 2*pi/dictionary['lam0']
-    if 'lam1' in dictionary.keys():
+    if 'lam1' in dictionary.keys() and dictionary['lam1'] > 0:
         dictionary['omega_1'] = 2*pi/dictionary['lam1']
     if 'n_over_nc' in dictionary.keys():
         dictionary['omega_p'] =\
@@ -106,6 +124,7 @@ def _compute_physical_parameters(dictionary):
         if 'lam0' in dictionary.keys():
             dictionary['n_crit'] = pi/(r_e*dictionary['lam0']**2)
             dictionary['n0'] = dictionary['n0_ref']*dictionary['n_reference']
+    dictionary['dt'] = (1./dictionary['k0'])*dictionary['cfl']
 
 
 def _compute_simulation_parameters(dictionary):
@@ -130,9 +149,60 @@ def _compute_simulation_parameters(dictionary):
 
     if dictionary['str_flag'] > 0:
         dictionary['stretched'] = True
+    if 'a_on_particles' not in dictionary.keys():
+        dictionary['a_on_particles'] = [False]*dictionary['nsp']
 
 
-def _find_inputs(path):
+def _convert_component_to_index(params, component):
+
+    ndim = params['particle_dimensions']
+    if ndim == 3:
+        switch = {
+            'x': 0,
+            'y': 1,
+            'z': 2,
+            'px': 3,
+            'py': 4,
+            'pz': 5,
+            'weight': 6,
+            'gamma': 7,
+            'index': 8,
+            'a': 9
+        }
+    elif ndim == 2:
+        switch = {
+            'x': 0,
+            'y': 1,
+            'px': 2,
+            'py': 3,
+            'weight': 4,
+            'gamma': 5,
+            'index': 6,
+            'a': 7
+        }
+    return switch[component]
+
+
+def _find_inputs_json(path):
+    """
+    Utility that finds and classifies the input files found
+    in the folder.
+    """
+    inputs = []
+    for dirpath, dirnames, filenames in os.walk(path):
+        for f in filenames:
+            if 'input_' in f and '.json' in f:
+                inputs.append(os.path.join(dirpath, f))
+        break
+
+    if len(inputs) == 0:
+        raise FileNotFoundError('No input JSON have been found in {}'
+                                .format(path))
+
+    return inputs
+
+
+def _find_inputs_nml(path):
     """
     Utility that finds and classifies the input files found
     in the folder.
@@ -170,7 +240,8 @@ def _grid_convert(box_limits, params, **kwargs):
             grid_point['y'] = int((y-box_limits['y_min'])/(dy*params['jump']))
         else:
             comp = 'y'
-            grid_point['y'] = int(_transverse_stretch(y, params, comp))
+            grid_point['y'] = \
+                int(_transverse_stretch(y, params, comp)/params['jump'])
 
     if params['n_dimensions'] == 3:
         if 'z' in kwargs:
@@ -181,8 +252,57 @@ def _grid_convert(box_limits, params, **kwargs):
                                       (dz*params['jump']))
             else:
                 comp = 'z'
-                grid_point['z'] = int(_transverse_stretch(z, params, comp))
+                grid_point['z'] = \
+                    int(_transverse_stretch(z, params, comp)/params['jump'])
     return grid_point
+
+
+def _nearest_particle(phase_space, component_dict):
+
+    import numpy as np
+
+    nparts = len(phase_space[1])
+    dist = np.zeros(nparts)
+    index_comp = component_dict.pop('index')
+    for comp, coord in component_dict.items():
+        dist += (phase_space[comp] - coord)**2
+    dist = np.sqrt(dist)
+
+    minloc = np.argmin(dist)
+
+    return phase_space[index_comp][minloc]
+
+
+def _read_simulation_json(path):
+    """
+    Utility that reads the 'input_??.json' file
+    in the given folder to assign the simulation
+    parameters.
+    It requires the package json to be installed.
+    """
+    import json
+
+    param_json = dict()
+    param_dic = dict()
+    inputs = _find_inputs_json(path)
+    if len(inputs) > 1:
+        print("LAMPy not yet prepared to read more outputs.")
+        for name in inputs[1:]:
+            inputs.remove(name)
+
+    for f in inputs:
+        name = f[-6:-4]
+        with open(f, 'r') as fp:
+            param_json[name] = json.load(fp)
+
+    names_view = param_json.keys()
+    names_iterator = iter(names_view)
+    first_name = next(names_iterator)
+    for key in param_json[first_name].keys():
+        for (key2, value2) in param_json[first_name][key].items():
+            param_dic[key2] = value2
+
+    return param_dic
 
 
 def _read_simulation_nml(path):
@@ -195,7 +315,7 @@ def _read_simulation_nml(path):
     import f90nml
 
     param_dic = dict()
-    inputs = _find_inputs(path)
+    inputs = _find_inputs_nml(path)
     if len(inputs) > 1:
         print("LAMPy not yet prepared to read more outputs.")
         for name in inputs[1:]:
@@ -247,6 +367,22 @@ def _read_simulation_without_nml(path):
             param_dic[key] = False
 
     return param_dic
+
+
+def _sort_particles(phase_space, component):
+
+    sorted_index = np.argsort(phase_space[component])
+    ps_sorted = dict()
+    for key in phase_space.keys():
+        ps_sorted[key] = phase_space[key][sorted_index]
+
+    return ps_sorted
+
+
+def _sort_tracked_particles(phase_space, index_in):
+
+    sorted_index = np.argsort(phase_space[index_in])
+    return phase_space[:, sorted_index]
 
 
 def _translate_filename(fname):
@@ -357,3 +493,28 @@ def _inverse_stretch_function(x, nx, ns, dx):
                       lambda x: nx-f(2*symm_center-x)])
 
     return inv_str_func
+
+
+def moving_average(times, values, simulation):
+
+    dt = simulation.params['dt']
+    every = simulation.params['every_track'][0]
+    dt = every*dt
+    lam0 = simulation.params['lam0']
+    npoints_in_lam = int(lam0/dt + 0.5)
+    vals = values.copy()
+    N = npoints_in_lam
+    offset_left = N//2
+    offset_right = N-N//2
+    vals = np.insert(vals, 0, offset_left*[vals[0]])
+    vals = np.append(vals, offset_right*[vals[-1]])
+    averaged = np.zeros_like(vals)
+    cumsum = np.zeros_like(vals)
+    cumsum = np.append(cumsum, [0])
+    for i, x in enumerate(vals, 1):
+        cumsum[i] = cumsum[i-1] + x
+        if i >= N:
+            averaged[i-offset_right] = (cumsum[i] - cumsum[i-N])/N
+    averaged = averaged[offset_left:-offset_right]
+
+    return averaged

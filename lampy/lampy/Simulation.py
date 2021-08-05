@@ -17,6 +17,7 @@ finally:
 try:
     import f90nml
     imported_f90nml = True
+    f90nmlversion = f90nml.__version__
 except ImportError:
     print("""
     Cannot find f90nml module.
@@ -77,19 +78,35 @@ class Simulation(object):
         >>> help(s.Diagnostics)
     """
 
-    def __init__(self, path=os.getcwd()):
+    def __init__(self, path=os.getcwd(), verbose_level='all', save_data=True):
         """
         Constructor for the Simulation class.
 
         It checks the datas, finds the data folders and then
         generates the simulation parameters
 
-        Returns
+        Parameters
+        --------
+        path : str
+            Path of the main simulation folder.
+            If left empty, the current folder is assumed.
+        verbose_level : str, optional
+            Verbosity of LAMPy.
+            If 'all', all the warnings and the errors are returned
+            and explained.
+            This is the default value.
+            If 'errors', only the errors are returned and explained.
+            If 'off', LAMPy does not return any indication.
+        save_data : bool, optional
+            If True, read data is saved in memory to avoid file re-read.
+            This is the default value.
+            If False, no data is stored in memory and files are
+            accessed every
+            time.
+
         --------
         params : dict
             Dictionary containing all the parameters
-        path : str
-            Path of the main simulation folder
         directories : list
             List of all the output folders
         s.outputs : list
@@ -98,6 +115,8 @@ class Simulation(object):
         from .datas.Field import Field, _Field_list
         from .datas.Parts import Particles
         from .datas.Diag import Diagnostics
+        from .datas.Tracking import Tracking
+        import os
 
         plt.ion()
 
@@ -112,6 +131,20 @@ class Simulation(object):
         if not os.path.exists(path):
             raise NotADirectoryError('Directory {} does not exist'
                                      .format(path))
+
+        vlevel_accepted = ['all', 'errors', 'off']
+        if verbose_level not in vlevel_accepted:
+            print("verbose_level passed is wrong. 'all' will be assumed")
+            verbose_level = 'all'
+        if verbose_level == 'all':
+            self._verbose_warning = True
+        else:
+            self._verbose_warning = False
+        if verbose_level != 'off':
+            self._verbose_error = True
+        else:
+            self._verbose_error = False
+
         self.params = self._open_folder(path)
         self.dx = self.params['dx']
         if 'dz' in self.params.keys():
@@ -126,12 +159,20 @@ class Simulation(object):
         self.path = os.path.abspath(path)
         self._Directories = Directories(self)
         self.directories = self._Directories._show()
+        self._tracking = self._Directories._tracking
+        self.tracking_dir = self._Directories._show()
         self._timesteps = self._collect_timesteps()
         self.outputs = self._collect_outputs()
         self.Field = Field(self, _Field_list)
         self.Particles = Particles(self)
         self._box_limits = self.Field._box_limits
         self.Diagnostics = Diagnostics(self)
+        self.Tracking = Tracking(self)
+        self._tracking_instantiated = not (self.Tracking is None)
+        if self._tracking_instantiated:
+            self._iter_dictionary = self.Tracking.iter_dictionary
+        self.isEnvelope = (self.params['model_id'] == 4)
+        self._save_data = save_data
 
     def _collect_outputs(self, *args):
 
@@ -154,12 +195,18 @@ class Simulation(object):
             output_list += ['Fy']
         if 'Ez' in output_list and 'By' in output_list:
             output_list += ['Fz']
-        if 'ReA' in output_list and 'ImA' in output_list \
-                and 'A' not in output_list:
-            output_list += ['A']
+        if 'Re1A' in output_list and 'Im1A' in output_list \
+                and 'A1' not in output_list:
+            output_list += ['A1']
             self._a_from_imaginary = True
-        if 'ReA' in output_list and 'ImA' in output_list:
-            output_list += ['E_laser', 'E_envelope']
+        if 'Re1A' in output_list and 'Im1A' in output_list:
+            output_list += ['E1_laser', 'E1_envelope']
+        if 'Re2A' in output_list and 'Im2A' in output_list \
+                and 'A2' not in output_list:
+            output_list += ['A2']
+            self._a_from_imaginary = True
+        if 'Re2A' in output_list and 'Im2A' in output_list:
+            output_list += ['E2_laser', 'E2_envelope']
 
         return output_list
 
@@ -180,6 +227,20 @@ class Simulation(object):
                 break
         return _timesteps
 
+    def _collect_tracking(self):
+
+        species = list()
+        if not self._tracking:
+            return
+        tdir = self.tracking_dir[0]
+
+        total_files = os.listdir(tdir)
+
+        for elem in total_files:
+            temp = elem.split('_')
+            if temp[1] not in species:
+                species += temp[1]
+
     def _derive_file_path(self, field_name, timestep):
 
         from .utilities.Utility import _translate_filename
@@ -193,6 +254,18 @@ class Simulation(object):
 
         return file_path
 
+    def _derive_tracking_file_path(self, timestep, species):
+
+        from .utilities.Utility import _tracking_directory,\
+            _tracking_basename
+
+        index = self._iter_dictionary[species][timestep]
+        file_name = _tracking_basename[species] + str(index).zfill(4)
+        file_path = \
+            os.path.join(self.path, _tracking_directory, file_name)
+
+        return file_path
+
     def _nearest_time(self, timestep):
 
         times = list()
@@ -202,7 +275,24 @@ class Simulation(object):
             return timestep
         else:
             mintime = min(times, key=lambda x: abs(x-timestep))
-            print("""
+            if self._verbose_warning:
+                print("""
+    WARNING: Requested time {} is not available.
+    Output is retrieved at time {}""".format(timestep,
+                                             mintime))
+            return mintime
+
+    def _nearest_tracking_time(self, timestep, species):
+
+        times = list()
+        times += [time for time in self._iter_dictionary[species].keys()]
+
+        if timestep in times:
+            return timestep
+        else:
+            mintime = min(times, key=lambda x: abs(x - timestep))
+            if self._verbose_warning:
+                print("""
     WARNING: Requested time {} is not available.
     Output is retrieved at time {}""".format(timestep,
                                              mintime))
@@ -212,12 +302,15 @@ class Simulation(object):
 
         from .utilities.Utility import _read_simulation_nml,\
             _compute_physical_parameters, _compute_simulation_parameters,\
-            _read_simulation_without_nml
+            _read_simulation_without_nml, _read_simulation_json
 
-        if imported_f90nml:
-            params = _read_simulation_nml(path)
-        else:
-            params = _read_simulation_without_nml(path)
+        try:
+            params = _read_simulation_json(path)
+        except:
+            if imported_f90nml:
+                params = _read_simulation_nml(path)
+            else:
+                params = _read_simulation_without_nml(path)
 
         _compute_physical_parameters(params)
         _compute_simulation_parameters(params)
@@ -301,6 +394,32 @@ class Simulation(object):
         """
         print(self.outputs)
 
+    def verbose(self, verbose_level='all'):
+        """
+        Method that sets the level of verbosity of LAMPy.
+        Parameters
+        --------
+        verbose_level : str, optional
+            Verbosity of LAMPy.
+            If 'all', all the warnings and the errors are returned
+            and explained.
+            If 'errors', only the errors are returned and explained.
+            If 'off', LAMPy does not return any indication.
+        """
+
+        vlevel_accepted = ['all', 'errors', 'off']
+        if verbose_level not in vlevel_accepted:
+            print("verbose_level passed is wrong. 'all' will be assumed")
+            verbose_level = 'all'
+        if verbose_level == 'all':
+            self._verbose_warning = True
+        else:
+            self._verbose_warning = False
+        if verbose_level != 'off':
+            self._verbose_error = True
+        else:
+            self._verbose_error = False
+
 
 class Directories(object):
 
@@ -308,6 +427,8 @@ class Directories(object):
 
         self._path = Simulation.path
         self._listdir = _output_directories(self._path)
+        self._tracking = False
+        self._find_tracklist()
 
     def _filelist(self, *args):
         if len(args) > 0:
@@ -323,6 +444,31 @@ class Directories(object):
             self._listfile += templist
 
         return self._listfile
+
+    def _find_tracklist(self):
+
+        from .utilities.Utility import _tracking_directory,\
+            _tracking_dictionary
+
+        self._tracklist = list()
+
+        if os.path.isdir(os.path.join(self._path, _tracking_directory)):
+            self._tracking = True
+        else:
+            self._tracking = False
+
+        if not self._tracking:
+            return None
+        file_list = \
+            os.listdir(os.path.join(self._path, _tracking_directory))
+
+        for value in _tracking_dictionary.values():
+            if value in file_list:
+                file_list.remove(value)
+        for item in self._tracklist:
+            name = item[:-4]
+            index = int(name.split('_')[2])
+            self._tracklist[index] = name
 
     def _show(self):
         return self._listdir

@@ -18,7 +18,10 @@ extensions = [Extension(
           sources=[os.path.join('lampy', 'fastread', 'read_field.pyx')]),
           Extension(
           name='read_phase_space',
-          sources=[os.path.join('lampy', 'fastread', 'read_phase_space.pyx')])
+          sources=[os.path.join('lampy', 'fastread', 'read_phase_space.pyx')]),
+          Extension(
+          name='read_tracking',
+          sources=[os.path.join('lampy', 'fastread', 'read_tracking.pyx')])
 ]
 
 lib_read_binary = ('lib_read_binary',
@@ -28,6 +31,10 @@ lib_read_phase_space = ('lib_read_phase_space',
                         {'sources':
                          [os.path.join('lampy', 'fastread', 'clibs',
                                        'lib_read_phase_space.c')]})
+lib_read_tracking = ('lib_read_tracking',
+                     {'sources':
+                      [os.path.join('lampy', 'fastread', 'clibs',
+                                    'lib_read_tracking.c')]})
 
 requirements = ['numpy', 'matplotlib', 'Cython', 'scipy']
 setup(
@@ -38,9 +45,9 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages('.'),
     author='ALaDyn Collaboration',
-    author_email='davide.terzani@ino.it',
+    author_email='dterzani@lbl.gov',
     maintainer='Davide Terzani',
-    maintainer_email='davide.terzani@ino.it',
+    maintainer_email='dterzani@lbl.gov',
     license='GNU GPLv3',
     url='https://github.com/ALaDyn/ALaDyn',
     classifiers=[
@@ -54,6 +61,6 @@ setup(
     ext_modules=cythonize(extensions),
     install_requires=[requirements],
     ext_package=os.path.join('lampy', 'compiled_cython'),
-    libraries=[lib_read_binary, lib_read_phase_space],
+    libraries=[lib_read_binary, lib_read_phase_space, lib_read_tracking],
     include_dirs=[numpy.get_include()]
 )

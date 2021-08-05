@@ -1,4 +1,5 @@
 from .Simulation import Simulation
+from .utilities import Utility
 from .__about__ import __version__
 
 __doc__ = """
@@ -12,6 +13,10 @@ To import the simulation folder, type
 >>> sim=lampy.Simulation(path)
 
 where 'path' is the relative or absolute path of interest.
+To read more, please use the command
+
+>>> help(lampy.Simulation)
+
 """
 
 print("LAMPy v"+__version__)

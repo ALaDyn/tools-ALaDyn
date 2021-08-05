@@ -8,11 +8,12 @@ import numpy as np
 _axis_names = ['x', 'y', 'z']
 _Electromagnetic_fields = ['Ex', 'Ey', 'Ez', 'Bx', 'By', 'Bz']
 _Currents = ['Jx', 'Jy', 'Jz', 'Px_fluid', 'Py_fluid', 'Pz_fluid']
-_Envelope = ['A', 'a', 'ReA', 'ImA']
+_Envelope = ['A1', 'A2', 'Re1A', 'Im1A', 'Re2A', 'Im2A']
 _Densities = ['rho_electrons', 'rho_fluid', 'rho_protons']
 _Lorentz_force = ['Fy', 'Fz']
 _Energies = ['electrons_energy', 'protons_energy']
-_Laser_from_envelope = ['E_laser', 'E_envelope']
+_Laser1_from_envelope = ['E1_laser', 'E1_envelope']
+_Laser2_from_envelope = ['E2_laser', 'E2_envelope']
 # Lorentz force is assumed for a relativistic particle travelling along the x
 # direction
 
@@ -70,14 +71,14 @@ class Field(object):
                 raise
 
             self._stored_fields[(field_name, timestep)] = f_temp
+            if self._params['n_dimensions'] == 2:
+                self._stored_fields[(field_name, timestep)] =\
+                    self._stored_fields[(field_name, timestep)][:, :, 0]
             self._stored_axis[('x', timestep)] = x
             if self._params['n_dimensions'] >= 2:
                 self._stored_axis[('y', timestep)] = y
             if self._params['n_dimensions'] == 3:
                 self._stored_axis[('z', timestep)] = z
-            if self._params['n_dimensions'] == 2:
-                self._stored_fields[(field_name, timestep)] =\
-                    self._stored_fields[(field_name, timestep)][:, :, 0]
 
             if len(field_list) == 1:
                 return
@@ -88,15 +89,27 @@ class Field(object):
             self._stored_fields[(field, timestep)] =\
                 self._stored_fields[(field, timestep)][:, :, 0]
 
+    def _get_stored_field(self, field_name, timestep):
+
+        if self._Simulation._save_data:
+            f = self._stored_fields[(field_name, timestep)]
+        else:
+            f = self._stored_fields.pop((field_name, timestep))
+
+        return f
+
     def _initialize_field_dic(self):
 
         field_dic = dict()
         for field in self._Field_list:
             field_dic[field] = [field]
 
-        if 'ReA' in self._Simulation.outputs and \
-                'ImA' in self._Simulation.outputs:
-            del field_dic['A']
+        if 'Re1A' in self._Simulation.outputs and \
+                'Im1A' in self._Simulation.outputs:
+            del field_dic['A1']
+        if 'Re2A' in self._Simulation.outputs and \
+                'Im2A' in self._Simulation.outputs:
+            del field_dic['A2']
 
         return field_dic
 
@@ -137,12 +150,20 @@ class Field(object):
             elif component == 'z':
                 fields = ['Ez', 'By']
 
-        if self._Simulation._a_from_imaginary and field_name == 'A':
-            fields = ['ReA', 'ImA']
+        if self._Simulation._a_from_imaginary and field_name == 'A1':
+            fields = ['Re1A', 'Im1A']
             Complex_envelope = True
 
-        if field_name in _Laser_from_envelope:
-            fields = ['ReA', 'ImA']
+        if self._Simulation._a_from_imaginary and field_name == 'A2':
+            fields = ['Re2A', 'Im2A']
+            Complex_envelope = True
+
+        if field_name in _Laser1_from_envelope:
+            fields = ['Re1A', 'Im1A']
+            Las_from_env = True
+
+        if field_name in _Laser2_from_envelope:
+            fields = ['Re2A', 'Im2A']
             Las_from_env = True
 
         if field_name in field_list:
@@ -195,17 +216,29 @@ class Field(object):
                     self._field_read(field, timestep)
                 stor_fie += [self._stored_fields[(field, timestep)]]
 
-            if field_name == 'E_laser':
+            if field_name == 'E1_laser':
                 x = self._stored_axis[('x', timestep)]
                 self._stored_fields[(field_name, timestep)] = \
                     convert_a_in_e(stor_fie[0], stor_fie[1], x, timestep,
-                                   self._params)
-            elif field_name == 'E_envelope':
+                                   self._params, 1)
+            elif field_name == 'E1_envelope':
                 x = self._stored_axis[('x', timestep)]
                 self._stored_fields[(field_name, timestep)] = \
                     convert_a_in_e_envelope(stor_fie[0], stor_fie[1],
                                             x, timestep,
-                                            self._params)
+                                            self._params, 1)
+
+            if field_name == 'E2_laser':
+                x = self._stored_axis[('x', timestep)]
+                self._stored_fields[(field_name, timestep)] = \
+                    convert_a_in_e(stor_fie[0], stor_fie[1], x, timestep,
+                                   self._params, 2)
+            elif field_name == 'E2_envelope':
+                x = self._stored_axis[('x', timestep)]
+                self._stored_fields[(field_name, timestep)] = \
+                    convert_a_in_e_envelope(stor_fie[0], stor_fie[1],
+                                            x, timestep,
+                                            self._params, 2)
 
     def _search_field_by_field(self, field_name):
 
@@ -359,7 +392,7 @@ class Field(object):
 
         if type(field) is str:
             self._return_field(field, timestep)
-            f = self._stored_fields[(field, timestep)]
+            f = self._get_stored_field(field, timestep)
         elif type(field) is np.ndarray:
             f = field
 
@@ -383,6 +416,11 @@ class Field(object):
         elif mask is not None and mask_argument is None:
             f = mask
 
+        shading_type = 'auto'
+        if 'shading' in kwargs:
+            shading_type = kwargs['shading']
+            del kwargs['shading']
+
         if self._params['n_dimensions'] == 2:
             if plane != 'xy':
                 print("""WARNING: output data is in two dimensions:
@@ -394,7 +432,7 @@ class Field(object):
             if mask is not None and mask_argument == 'axes':
                 X, Y = np.meshgrid(x, y)
                 f = np.ma.masked_where(mask(X.transpose(), Y.transpose()), f)
-            plt.pcolormesh(x, y, f.transpose(), **kwargs)
+            plt.pcolormesh(x, y, f.transpose(), shading=shading_type, **kwargs)
 
         elif self._params['n_dimensions'] == 3:
 
@@ -408,7 +446,8 @@ class Field(object):
                     X, Y = np.meshgrid(x, y)
                     f = np.ma.masked_where(mask(X.transpose(),
                                            Y.transpose()), f)
-                plt.pcolormesh(x, y, f[..., nz_map].transpose(), **kwargs)
+                plt.pcolormesh(x, y, f[..., nz_map].transpose(),
+                               shading=shading_type, **kwargs)
 
             elif plane == 'xz' or plane == 'zx':
                 x = self._stored_axis[('x', timestep)]
@@ -420,7 +459,8 @@ class Field(object):
                     X, Z = np.meshgrid(x, z)
                     f = np.ma.masked_where(mask(X.transpose(),
                                            Z.transpose()), f)
-                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(), **kwargs)
+                plt.pcolormesh(x, z, f[:, ny_map, :].transpose(),
+                               shading=shading_type, **kwargs)
 
             elif plane == 'zy' or plane == 'yz':
                 y = self._stored_axis[('y', timestep)]
@@ -430,7 +470,8 @@ class Field(object):
                     Y, Z = np.meshgrid(y, z)
                     f = np.ma.masked_where(mask(Y.transpose(),
                                            Z.transpose()), f)
-                plt.pcolormesh(y, z, f[nx_map, ...].transpose(), **kwargs)
+                plt.pcolormesh(y, z, f[nx_map, ...].transpose(),
+                               shading=shading_type, **kwargs)
 
     def lineout(self, field, timestep, axis='x',
                 normalized=False, comoving=False, **kwargs):
@@ -479,8 +520,9 @@ class Field(object):
 
         accepted_types = [str, np.ndarray]
         if type(field) not in accepted_types:
-            print("""Input field must be either a string with the field name
-            or a numpy array """)
+            if self._Simulation._verbose_error:
+                print("""Input field must be either a string with the field name
+                or a numpy array """)
             return
 
         if 'unit_field' in kwargs:
@@ -490,10 +532,11 @@ class Field(object):
             norm = None
 
         if field not in self._Simulation.outputs:
-            print("""
+            if self._Simulation._verbose_error:
+                print("""
         {} is not available.
         Available output are {}.
-        """.format(field, self._Simulation.outputs))
+            """.format(field, self._Simulation.outputs))
             return
 
         timestep = self._Simulation._nearest_time(timestep)
@@ -537,11 +580,12 @@ class Field(object):
             error += """value chosen for the lineout
                 is not in the computational box\n"""
         if error != '':
-            print(error)
+            if self._Simulation._verbose_error:
+                print(error)
 
         if type(field) is str:
             self._return_field(field, timestep)
-            f = self._stored_fields[(field, timestep)]
+            f = self._get_stored_field(field, timestep)
         elif type(field) is np.ndarray:
             f = field
 
@@ -563,7 +607,8 @@ class Field(object):
         line = _grid_convert(box_limits, self._params, x=x_line, y=y_line,
                              z=z_line)
         if axis == 'z' and self._params['n_dimensions'] == 2:
-            print("""WARNING: No lineout along the z axis is possible
+            if self._Simulation._verbose_warning:
+                print("""No lineout along the z axis is possible
                      in 2 dimensions.
                      Lineout will be performed along the x axis""")
             axis = 'x'
@@ -683,7 +728,7 @@ class Field(object):
         f = dict()
         time = self._Simulation._nearest_time(time)
         self._return_field(field_name, time)
-        f['data'] = self._stored_fields[(field_name, time)]
+        f['data'] = self._get_stored_field(field_name, time)
         f['time'] = time
 
         return f
@@ -709,7 +754,10 @@ class Field(object):
         time = self._Simulation._nearest_time(time)
         field_list = self._search_field_by_timestep(time)
         ax = dict()
-        if not field_list:
+        axis_is_not_empty = bool(self._stored_axis)
+        if axis_is_not_empty or \
+            (axis, time) not in self._stored_axis.keys() \
+                and self._Simulation._verbose_error:
             print("""No axis have been read yet at timestep {}.
             Call first
             >>> f = s.Field.get_data(any_available_field_name,{})

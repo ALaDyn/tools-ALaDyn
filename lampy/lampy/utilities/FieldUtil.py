@@ -2,13 +2,16 @@ import numpy as np
 
 
 def convert_a_in_e(real_part, imaginary_part, x_axis, time,
-                   parameters, **kwargs):
+                   parameters, laser_number, **kwargs):
 
     dx = parameters['dx']
 
-    omega_0 = parameters['omega_0']
+    if laser_number == 1:
+        omega = parameters['omega_0']
+    elif laser_number == 2:
+        omega = parameters['omega_1']
 
-    phi = omega_0*(x_axis - time)
+    phi = omega*(x_axis - time)
 
     e_field = (real_part.transpose()*np.sin(phi) +
                imaginary_part.transpose()*np.cos(phi)).transpose()
@@ -21,15 +24,18 @@ def convert_a_in_e(real_part, imaginary_part, x_axis, time,
 
 
 def convert_a_in_e_envelope(real_part, imaginary_part, x_axis, time,
-                            parameters, **kwargs):
+                            parameters, laser_number, **kwargs):
 
     from scipy.signal import hilbert
 
     dx = parameters['dx']
 
-    omega_0 = parameters['omega_0']
+    if laser_number == 1:
+        omega = parameters['omega_0']
+    elif laser_number == 2:
+        omega = parameters['omega_1']
 
-    phi = omega_0*(x_axis - time)
+    phi = omega*(x_axis - time)
 
     e_field = (real_part.transpose()*np.cos(phi) -
                imaginary_part.transpose()*np.sin(phi)).transpose()
