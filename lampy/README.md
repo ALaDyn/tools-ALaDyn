@@ -26,7 +26,14 @@ To install LAMPy, you can build it from the source code, or you can download the
 To build LAMPy from source, you must run the following commands
 
 - `python setup.py build_clib` that compiles the C libraries needed to read the data files using a system C compiler,
-- `python setup.py develop` that builds the cython and python sources and installs the package in the `$PYTHONENV`.
+- `python setup.py build_ext` that compiles the cython extensions required
+- `python setup.py install` installs the package in the `$PYTHONENV`.
+
+Another option (preferred) is to use the PEP517 compliant system:
+
+- `pip install build` that installs the python automatic build facility
+- `python -m build` provides a `.whl` file in the new `dist` directory
+- Install the wheel via pip
 
 ## How to use
 
