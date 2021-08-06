@@ -1,4 +1,4 @@
-from ..compiled_cython.read_field import read_ALaDyn_bin
+from compiled_cython.read_field import read_ALaDyn_bin
 from ..utilities.Utility import _grid_convert, _translate_timestep
 from ..fastread.parameter_read import _read_box_limits
 import matplotlib.pyplot as plt

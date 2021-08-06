@@ -1,4 +1,4 @@
-from ..compiled_cython.read_tracking import total_tracking_read
+from compiled_cython.read_tracking import total_tracking_read
 import matplotlib.pylab as plt
 import numpy as np
 from ..utilities.Utility import _convert_component_to_index,\

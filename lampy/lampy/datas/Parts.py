@@ -1,4 +1,4 @@
-from ..compiled_cython.read_phase_space import total_phase_space_read
+from compiled_cython.read_phase_space import total_phase_space_read
 import matplotlib.pylab as plt
 import numpy as np
 from ..utilities.Utility import speed_of_light

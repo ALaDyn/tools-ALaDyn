@@ -84,7 +84,7 @@ def _output_directories(dir_path):
                if os.path.isdir(os.path.join(dir_path, o)) and len(o) == 4]
 
     def intval(val):
-        return int(val)
+        return int(float(val))
 
     listdir.sort(key=intval)
     return listdir
